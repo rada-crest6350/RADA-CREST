@@ -2,188 +2,183 @@
 <html lang="en">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<meta charset="utf-8">
+  <title>Cart — RADA CREST</title>
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
->
+  <link rel="stylesheet" href="style.css">
 
-<title>Cart — RADA CREST</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
 
-<link rel="stylesheet" href="style.css">
+  <style>
+    .checkout-box{
+      margin-top:30px;
+      padding:24px;
+      border:1px solid #ddd;
+      border-radius:18px;
+      background:#fff;
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="supabase-client.js"></script>
+    .checkout-box h2{
+      margin-top:0;
+    }
 
-<style>
+    .checkout-box input,
+    .checkout-box textarea{
+      width:100%;
+      padding:14px;
+      margin:8px 0 14px;
+      border:1px solid #ddd;
+      border-radius:10px;
+      font:inherit;
+      box-sizing:border-box;
+    }
 
-.checkout-box{
-  max-width:650px;
-  margin:30px auto;
-  padding:25px;
-  border:1px solid #ddd;
-  border-radius:18px;
-}
+    .checkout-box textarea{
+      min-height:110px;
+      resize:vertical;
+    }
 
-.checkout-box input,
-.checkout-box textarea{
-  width:100%;
-  padding:13px;
-  margin:7px 0 15px;
-  border:1px solid #ccc;
-  border-radius:10px;
-  box-sizing:border-box;
-}
+    .cart-item{
+      display:grid;
+      grid-template-columns:90px 1fr auto;
+      gap:15px;
+      align-items:center;
+      padding:18px 0;
+      border-bottom:1px solid #eee;
+    }
 
-.checkout-box textarea{
-  min-height:100px;
-  resize:vertical;
-}
+    .cart-item img{
+      width:80px;
+      height:80px;
+      object-fit:cover;
+      border-radius:12px;
+    }
 
-.cart-item{
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:15px 0;
-  border-bottom:1px solid #ddd;
-}
+    .cart-item-info{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
 
-.cart-item img{
-  width:80px;
-  height:80px;
-  object-fit:contain;
-  border-radius:10px;
-}
+    .qty-box{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:8px;
+    }
 
-.cart-item-info{
-  flex:1;
-}
+    .qty-box button{
+      width:32px;
+      height:32px;
+      padding:0;
+      border:1px solid #ddd;
+      background:#fff;
+      border-radius:8px;
+      cursor:pointer;
+    }
 
-.qty-box{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
+    .remove-btn{
+      margin-top:7px;
+      border:0;
+      background:none;
+      color:#c33;
+      cursor:pointer;
+    }
 
-.qty-box button{
-  width:32px;
-  height:32px;
-  border:1px solid #ccc;
-  border-radius:7px;
-  background:#fff;
-  cursor:pointer;
-}
+    .total-box{
+      display:flex;
+      justify-content:space-between;
+      padding:22px 0;
+      font-size:20px;
+    }
 
-.remove-btn{
-  border:0;
-  background:none;
-  cursor:pointer;
-  color:#d33;
-}
+    .msg{
+      margin-top:14px;
+    }
 
-.total-box{
-  display:flex;
-  justify-content:space-between;
-  font-size:20px;
-  margin:25px 0;
-}
+    @media(max-width:600px){
+      .cart-item{
+        grid-template-columns:70px 1fr;
+      }
 
-</style>
+      .cart-item > div:last-child{
+        grid-column:2;
+      }
+    }
+  </style>
 
 </head>
-
 
 <body>
 
 <main class="section">
 
-<a href="index.html">
-← Continue Shopping
-</a>
+  <a href="index.html">← Continue Shopping</a>
 
-<h1>
-Your Cart
-</h1>
+  <h1>Your Cart</h1>
 
-
-<div id="cart">
-
-<p>
-Loading cart...
-</p>
-
-</div>
+  <div id="cart">
+    <p>Loading cart...</p>
+  </div>
 
 
-<div
-  id="checkout"
-  class="checkout-box"
-  style="display:none"
->
+  <div id="checkout" class="checkout-box" style="display:none">
 
-<h2>
-Delivery Details
-</h2>
+    <h2>Delivery Details</h2>
 
-<p>
-Enter your details to place the order.
-</p>
+    <p>
+      Enter your details to place your order.
+    </p>
 
+    <label>Full Name</label>
 
-<label>
-Full Name
-</label>
-
-<input
-  id="customerName"
-  type="text"
-  autocomplete="name"
-  placeholder="Your full name"
->
+    <input
+      id="customerName"
+      type="text"
+      autocomplete="name"
+      placeholder="Your full name"
+    >
 
 
-<label>
-Mobile Number
-</label>
+    <label>Mobile Number</label>
 
-<input
-  id="customerPhone"
-  type="tel"
-  inputmode="numeric"
-  maxlength="10"
-  placeholder="10-digit mobile number"
->
+    <input
+      id="customerPhone"
+      type="tel"
+      inputmode="numeric"
+      maxlength="10"
+      placeholder="10-digit mobile number"
+    >
 
 
-<label>
-Delivery Address
-</label>
+    <label>Delivery Address</label>
 
-<textarea
-  id="customerAddress"
-  placeholder="House / Village / City / State / PIN code"
-></textarea>
-
-
-<button
-  id="orderBtn"
-  class="btn full"
-  type="button"
-  onclick="placeOrder()"
->
-Place Order on WhatsApp
-</button>
+    <textarea
+      id="customerAddress"
+      autocomplete="street-address"
+      placeholder="House / Shop No, Street, Village / City, District, State, PIN"
+    ></textarea>
 
 
-<p
-  id="checkoutMsg"
-  class="msg"
-></p>
+    <button
+      id="orderBtn"
+      class="btn full"
+      type="button"
+      onclick="placeOrder()"
+    >
+      Place Order on WhatsApp
+    </button>
 
-</div>
+    <p
+      id="checkoutMsg"
+      class="msg"
+    ></p>
+
+  </div>
 
 </main>
 
@@ -191,8 +186,8 @@ Place Order on WhatsApp
 <script>
 
 let cartProducts = [];
-
 let cartTotal = 0;
+let placingOrder = false;
 
 
 function escapeHtml(value){
@@ -248,8 +243,7 @@ function getImages(url){
 
 async function render(){
 
-  const cart =
-    getCart();
+  const cart = getCart();
 
   const cartBox =
     document.getElementById("cart");
@@ -273,8 +267,7 @@ async function render(){
       </div>
     `;
 
-    checkout.style.display =
-      "none";
+    checkout.style.display = "none";
 
     return;
 
@@ -292,9 +285,7 @@ async function render(){
 
 
   const ids =
-    cart.map(
-      item => item.id
-    );
+    cart.map(item => item.id);
 
 
   const {
@@ -318,8 +309,7 @@ async function render(){
   }
 
 
-  cartProducts =
-    data || [];
+  cartProducts = data || [];
 
 
   if(!cartProducts.length){
@@ -327,8 +317,7 @@ async function render(){
     cartBox.innerHTML =
       "<p>Your cart is empty.</p>";
 
-    checkout.style.display =
-      "none";
+    checkout.style.display = "none";
 
     return;
 
@@ -336,7 +325,6 @@ async function render(){
 
 
   cartTotal = 0;
-
 
   let html = "";
 
@@ -365,10 +353,7 @@ async function render(){
     if(stock > 0){
 
       quantity =
-        Math.min(
-          quantity,
-          stock
-        );
+        Math.min(quantity,stock);
 
     }
 
@@ -382,9 +367,7 @@ async function render(){
 
 
     const images =
-      getImages(
-        product.image_url
-      );
+      getImages(product.image_url);
 
 
     const image =
@@ -407,6 +390,7 @@ async function render(){
             `<img
               src="${escapeHtml(image)}"
               alt="${escapeHtml(product.name)}"
+              onerror="this.style.display='none'"
             >`
 
             :
@@ -437,6 +421,7 @@ async function render(){
             ₹${Number(product.price || 0)
               .toLocaleString("en-IN")}
           </small>
+
 
           <div class="qty-box">
 
@@ -492,9 +477,7 @@ async function render(){
 
     <div class="total-box">
 
-      <b>
-        Total
-      </b>
+      <b>Total</b>
 
       <b>
         ₹${cartTotal.toLocaleString("en-IN")}
@@ -505,12 +488,9 @@ async function render(){
   `;
 
 
-  cartBox.innerHTML =
-    html;
+  cartBox.innerHTML = html;
 
-
-  checkout.style.display =
-    "block";
+  checkout.style.display = "block";
 
 
   const {
@@ -549,8 +529,7 @@ async function render(){
 
 function changeQty(id,difference){
 
-  const cart =
-    getCart();
+  const cart = getCart();
 
 
   const item =
@@ -574,10 +553,7 @@ function changeQty(id,difference){
     const index =
       cart.indexOf(item);
 
-    cart.splice(
-      index,
-      1
-    );
+    cart.splice(index,1);
 
   }
 
@@ -609,15 +585,13 @@ function removeItem(id){
 
 async function placeOrder(){
 
+  if(placingOrder) return;
+
   const msg =
-    document.getElementById(
-      "checkoutMsg"
-    );
+    document.getElementById("checkoutMsg");
 
   const button =
-    document.getElementById(
-      "orderBtn"
-    );
+    document.getElementById("orderBtn");
 
 
   if(!cartProducts.length){
@@ -699,8 +673,11 @@ async function placeOrder(){
   }
 
 
-  button.disabled =
-    true;
+  placingOrder = true;
+
+  button.disabled = true;
+
+  msg.style.color = "#555";
 
   msg.textContent =
     "Creating your order...";
@@ -717,37 +694,37 @@ async function placeOrder(){
       data: order,
       error: orderError
     } =
-      await supabaseClient
-        .from("orders")
-        .insert({
+    await supabaseClient
+      .from("orders")
+      .insert({
 
-          customer_id:
-            user.id,
+        customer_id:
+          user.id,
 
-          customer_name:
-            name,
+        customer_name:
+          name,
 
-          customer_phone:
-            phone,
+        customer_phone:
+          phone,
 
-          customer_email:
-            user.email || null,
+        customer_email:
+          user.email || null,
 
-          total_amount:
-            cartTotal,
+        total_amount:
+          cartTotal,
 
-          status:
-            "pending",
+        status:
+          "pending",
 
-          payment_status:
-            "pending",
+        payment_status:
+          "pending",
 
-          shipping_address:
-            address
+        shipping_address:
+          address
 
-        })
-        .select()
-        .single();
+      })
+      .select()
+      .single();
 
 
     if(orderError){
@@ -761,58 +738,48 @@ async function placeOrder(){
       2. CREATE ORDER ITEMS
     */
 
-
-    const cart =
-      getCart();
+    const cart = getCart();
 
 
     const orderItems =
-      cartProducts.map(
-        product => {
+      cartProducts.map(product => {
 
-          const item =
-            cart.find(
-              x =>
-                Number(x.id) ===
-                Number(product.id)
-            );
+        const item =
+          cart.find(
+            x =>
+              Number(x.id) ===
+              Number(product.id)
+          );
 
 
-          return {
+        return {
 
-            order_id:
-              order.id,
+          order_id:
+            order.id,
 
-            product_id:
-              product.id,
+          product_id:
+            product.id,
 
-            product_name:
-              product.name,
+          product_name:
+            product.name,
 
-            quantity:
-              Number(
-                item?.qty || 1
-              ),
+          quantity:
+            Number(item?.qty || 1),
 
-            price:
-              Number(
-                product.price || 0
-              )
+          price:
+            Number(product.price || 0)
 
-          };
+        };
 
-        }
-      );
+      });
 
 
     const {
       error: itemError
     } =
-      await supabaseClient
-        .from("order_items")
-        .insert(
-          orderItems
-        );
+    await supabaseClient
+      .from("order_items")
+      .insert(orderItems);
 
 
     if(itemError){
@@ -823,51 +790,44 @@ async function placeOrder(){
 
 
     /*
-      3. CREATE WHATSAPP MESSAGE
+      3. WHATSAPP MESSAGE
     */
 
-
-    let productText =
-      "";
+    let productText = "";
 
 
-    cartProducts.forEach(
-      product => {
+    cartProducts.forEach(product => {
 
-        const item =
-          cart.find(
-            x =>
-              Number(x.id) ===
-              Number(product.id)
-          );
-
-
-        const qty =
-          Number(
-            item?.qty || 1
-          );
+      const item =
+        cart.find(
+          x =>
+            Number(x.id) ===
+            Number(product.id)
+        );
 
 
-        productText +=
+      const qty =
+        Number(item?.qty || 1);
 
-          `${product.name} × ${qty} = ₹${(
-            Number(product.price || 0) *
-            qty
-          ).toLocaleString("en-IN")}\n`;
 
-      }
-    );
+      const subtotal =
+        Number(product.price || 0) *
+        qty;
+
+
+      productText +=
+        `• ${product.name} × ${qty} = ₹${subtotal.toLocaleString("en-IN")}\n`;
+
+    });
 
 
     const message =
-
 `RADA CREST — NEW ORDER
 
 Order ID: #${order.id}
 
 PRODUCTS
 ${productText}
-
 TOTAL
 ₹${cartTotal.toLocaleString("en-IN")}
 
@@ -894,47 +854,41 @@ Pending Confirmation`;
       4. CLEAR CART
     */
 
-    localStorage.removeItem(
-      "rc_cart"
-    );
+    localStorage.removeItem("rc_cart");
 
 
     /*
-      5. OPEN WHATSAPP
+      5. OPEN YOUR WHATSAPP
     */
 
     const whatsappUrl =
       "https://wa.me/919079714767?text=" +
-      encodeURIComponent(
-        message
-      );
+      encodeURIComponent(message);
 
 
-    msg.style.color =
-      "#1b8a3a";
+    msg.style.color = "#1b8a3a";
 
     msg.textContent =
       "Order created. Opening WhatsApp...";
 
 
-    setTimeout(
-      function(){
+    setTimeout(() => {
 
-        window.location.href =
-          whatsappUrl;
+      window.location.href =
+        whatsappUrl;
 
-      },
-      500
-    );
+    },500);
 
 
   }catch(error){
 
     console.error(error);
 
+    placingOrder = false;
 
-    msg.style.color =
-      "#d33";
+    button.disabled = false;
+
+    msg.style.color = "#d33";
 
     msg.textContent =
       "Order failed: " +
@@ -942,10 +896,6 @@ Pending Confirmation`;
         error.message ||
         "Please try again."
       );
-
-
-    button.disabled =
-      false;
 
   }
 
