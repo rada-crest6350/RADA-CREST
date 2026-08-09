@@ -1,8 +1,11 @@
 <!doctype html>
 <html lang="en">
+
 <head>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+
   <title>Orders — RADA CREST</title>
 
   <link rel="stylesheet" href="style.css">
@@ -10,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
+
 </head>
 
 <body>
@@ -19,17 +23,26 @@
   <a href="admin-dashboard.html">← Dashboard</a>
 
   <div class="section-head">
+
     <div>
-      <p class="eyebrow">RADA CREST ADMIN</p>
+
+      <p class="eyebrow">
+        RADA CREST ADMIN
+      </p>
+
       <h1>Orders</h1>
+
     </div>
+
   </div>
+
 
   <div id="message"></div>
 
   <div id="list"></div>
 
 </main>
+
 
 <script>
 
@@ -41,173 +54,296 @@ async function loadOrders(){
   const list =
     document.getElementById("list");
 
+
   const {
     data: { user }
   } = await supabaseClient.auth.getUser();
 
+
   if(!user){
+
     location.href = "admin.html";
+
     return;
+
   }
 
-  message.textContent = "Loading orders...";
+
+  message.textContent =
+    "Loading orders...";
+
 
   const { data, error } =
     await supabaseClient
       .from("orders")
       .select("*")
-      .order("created_at", { ascending:false });
+      .order("created_at", {
+        ascending: false
+      });
+
 
   if(error){
+
+    console.error(error);
 
     message.textContent =
       error.message;
 
     return;
+
   }
+
 
   message.textContent = "";
 
+
   if(!data || !data.length){
 
-    list.innerHTML =
-      "<p>No orders yet.</p>";
+    list.innerHTML = `
+      <div class="empty">
+        No orders yet.
+      </div>
+    `;
 
     return;
+
   }
 
-  list.innerHTML =
-    data.map(order => {
 
-      const date =
-        order.created_at
-          ? new Date(order.created_at)
-              .toLocaleString("en-IN")
-          : "";
+  list.innerHTML = data.map(order => {
 
-      const status =
-        order.status || "pending";
+    const date =
+      order.created_at
+        ? new Date(
+            order.created_at
+          ).toLocaleString("en-IN")
+        : "";
 
-      const payment =
-        order.payment_status || "pending";
 
-      return `
+    const status =
+      order.status || "pending";
 
-        <article class="cart-row"
-          style="
-            display:block;
-            margin-bottom:16px;
-            padding:20px;
-          ">
 
-          <div>
+    const payment =
+      order.payment_status || "pending";
 
+
+    return `
+
+      <article
+        class="cart-row"
+        style="
+          display:block;
+          margin-bottom:16px;
+          padding:20px;
+        "
+      >
+
+        <div>
+
+          <b>
+            Order #${
+              escapeHtml(
+                order.order_number ||
+                String(order.id)
+              )
+            }
+          </b>
+
+
+          <small>
+            👤 ${
+              escapeHtml(
+                order.customer_name || ""
+              )
+            }
+          </small>
+
+
+          <small>
+            📱 ${
+              escapeHtml(
+                order.customer_phone || ""
+              )
+            }
+          </small>
+
+
+          ${
+            order.customer_email
+            ?
+            `
+            <small>
+              ✉ ${
+                escapeHtml(
+                  order.customer_email
+                )
+              }
+            </small>
+            `
+            :
+            ""
+          }
+
+
+          <small>
+            📍 ${
+              escapeHtml(
+                order.shipping_address || ""
+              )
+            }
+          </small>
+
+
+          <small>
+            📅 ${date}
+          </small>
+
+        </div>
+
+
+        <div style="margin-top:14px">
+
+          <strong>
+            ₹${
+              Number(
+                order.total_amount || 0
+              ).toLocaleString("en-IN")
+            }
+          </strong>
+
+        </div>
+
+
+        <div style="margin-top:14px">
+
+          <label>
+            Order Status
+          </label>
+
+
+          <select
+            onchange="
+              updateStatus(
+                ${order.id},
+                this.value
+              )
+            "
+          >
+
+            <option
+              value="pending"
+              ${
+                status === "pending"
+                ? "selected"
+                : ""
+              }
+            >
+              Pending
+            </option>
+
+
+            <option
+              value="confirmed"
+              ${
+                status === "confirmed"
+                ? "selected"
+                : ""
+              }
+            >
+              Confirmed
+            </option>
+
+
+            <option
+              value="processing"
+              ${
+                status === "processing"
+                ? "selected"
+                : ""
+              }
+            >
+              Processing
+            </option>
+
+
+            <option
+              value="shipped"
+              ${
+                status === "shipped"
+                ? "selected"
+                : ""
+              }
+            >
+              Shipped
+            </option>
+
+
+            <option
+              value="delivered"
+              ${
+                status === "delivered"
+                ? "selected"
+                : ""
+              }
+            >
+              Delivered
+            </option>
+
+
+            <option
+              value="cancelled"
+              ${
+                status === "cancelled"
+                ? "selected"
+                : ""
+              }
+            >
+              Cancelled
+            </option>
+
+
+            <option
+              value="returned"
+              ${
+                status === "returned"
+                ? "selected"
+                : ""
+              }
+            >
+              Returned
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div style="margin-top:10px">
+
+          <small>
+
+            Payment:
             <b>
-              Order #${order.order_number || order.id}
+              ${
+                escapeHtml(
+                  payment
+                )
+              }
             </b>
 
-            <small>
-              ${escapeHtml(order.customer_name || "")}
-            </small>
+          </small>
 
-            <small>
-              📱 ${escapeHtml(order.customer_phone || "")}
-            </small>
+        </div>
 
-            ${
-              order.customer_email
-              ? `<small>
-                   ✉ ${escapeHtml(order.customer_email)}
-                 </small>`
-              : ""
-            }
+      </article>
 
-            <small>
-              📅 ${date}
-            </small>
+    `;
 
-            <small>
-              📍 ${escapeHtml(order.shipping_address || "")}
-            </small>
-
-          </div>
-
-          <div style="margin-top:14px">
-
-            <strong>
-              ₹${Number(order.total_amount || 0)
-                .toLocaleString("en-IN")}
-            </strong>
-
-          </div>
-
-          <div style="margin-top:14px">
-
-            <label>
-              Order Status
-            </label>
-
-            <select
-              onchange="updateStatus(${order.id}, this.value)"
-            >
-
-              <option value="pending"
-                ${status==="pending" ? "selected" : ""}>
-                Pending
-              </option>
-
-              <option value="confirmed"
-                ${status==="confirmed" ? "selected" : ""}>
-                Confirmed
-              </option>
-
-              <option value="processing"
-                ${status==="processing" ? "selected" : ""}>
-                Processing
-              </option>
-
-              <option value="shipped"
-                ${status==="shipped" ? "selected" : ""}>
-                Shipped
-              </option>
-
-              <option value="delivered"
-                ${status==="delivered" ? "selected" : ""}>
-                Delivered
-              </option>
-
-              <option value="cancelled"
-                ${status==="cancelled" ? "selected" : ""}>
-                Cancelled
-              </option>
-
-              <option value="returned"
-                ${status==="returned" ? "selected" : ""}>
-                Returned
-              </option>
-
-            </select>
-
-          </div>
-
-          <div style="margin-top:10px">
-
-            <small>
-              Payment:
-              <b>
-                ${escapeHtml(payment)}
-              </b>
-            </small>
-
-          </div>
-
-        </article>
-
-      `;
-
-    }).join("");
+  }).join("");
 
 }
+
 
 
 async function updateStatus(id, status){
@@ -216,36 +352,61 @@ async function updateStatus(id, status){
     await supabaseClient
       .from("orders")
       .update({
-        status: status,
-        updated_at: new Date().toISOString()
+        status: status
       })
       .eq("id", id);
 
+
   if(error){
 
+    console.error(error);
+
     alert(
-      "Status update failed: " +
+      "Status update failed:\n" +
       error.message
     );
 
+    await loadOrders();
+
     return;
+
   }
 
-  alert("Order status updated.");
 
   await loadOrders();
 
 }
 
 
+
 function escapeHtml(value){
 
   return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
@@ -255,4 +416,5 @@ loadOrders();
 </script>
 
 </body>
+
 </html>
