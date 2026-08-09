@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
@@ -13,7 +12,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
-
 </head>
 
 <body class="center-page">
@@ -25,19 +23,40 @@
     <span>RADA <b>CREST</b></span>
   </a>
 
+  <div id="accountArea">
 
-  <h1 id="title">
-    Welcome to RADA CREST
-  </h1>
+    <h1>My Account</h1>
 
-  <p id="sub">
-    Login to continue shopping.
-  </p>
+    <p id="welcome">
+      Loading account...
+    </p>
+
+    <div id="ordersBox"></div>
+
+    <button
+      class="btn full"
+      type="button"
+      onclick="location.href='index.html'"
+    >
+      Continue Shopping
+    </button>
+
+    <button
+      class="text-btn"
+      type="button"
+      onclick="logout()"
+    >
+      Logout
+    </button>
+
+  </div>
 
 
-  <!-- LOGIN -->
+  <div id="loginArea" class="hidden">
 
-  <section id="login">
+    <h1>Welcome to RADA CREST</h1>
+
+    <p>Login to continue shopping.</p>
 
     <label>Email</label>
 
@@ -48,7 +67,6 @@
       placeholder="you@example.com"
     >
 
-
     <label>Password</label>
 
     <input
@@ -58,7 +76,6 @@
       placeholder="Password"
     >
 
-
     <button
       class="btn full"
       type="button"
@@ -66,7 +83,6 @@
     >
       Login
     </button>
-
 
     <button
       class="text-btn"
@@ -76,7 +92,6 @@
       Create Account
     </button>
 
-
     <button
       class="text-btn"
       type="button"
@@ -84,7 +99,6 @@
     >
       Forgot Password?
     </button>
-
 
     <button
       class="text-btn"
@@ -94,15 +108,14 @@
       Skip for now
     </button>
 
-  </section>
+  </div>
 
 
-  <!-- SIGNUP -->
+  <div id="signupArea" class="hidden">
 
-  <section
-    id="signup"
-    class="hidden"
-  >
+    <h1>Create Account</h1>
+
+    <p>Create your RADA CREST account.</p>
 
     <label>Name</label>
 
@@ -111,7 +124,6 @@
       autocomplete="name"
       placeholder="Your full name"
     >
-
 
     <label>Email</label>
 
@@ -122,17 +134,15 @@
       placeholder="you@example.com"
     >
 
-
     <label>Password</label>
 
     <input
       id="signupPass"
       type="password"
-      autocomplete="new-password"
       minlength="8"
+      autocomplete="new-password"
       placeholder="At least 8 characters"
     >
-
 
     <button
       class="btn full"
@@ -142,7 +152,6 @@
       Create Account
     </button>
 
-
     <button
       class="text-btn"
       type="button"
@@ -151,67 +160,33 @@
       Already have an account? Login
     </button>
 
-  </section>
+  </div>
 
 
-  <p
-    id="msg"
-    class="msg"
-  ></p>
+  <p id="msg" class="msg"></p>
 
 </main>
 
 
 <script>
 
-const loginBox =
-  document.getElementById("login");
+const accountArea =
+  document.getElementById("accountArea");
 
-const signupBox =
-  document.getElementById("signup");
+const loginArea =
+  document.getElementById("loginArea");
 
-const title =
-  document.getElementById("title");
+const signupArea =
+  document.getElementById("signupArea");
 
-const sub =
-  document.getElementById("sub");
+const welcome =
+  document.getElementById("welcome");
+
+const ordersBox =
+  document.getElementById("ordersBox");
 
 const msg =
   document.getElementById("msg");
-
-
-function showSignup(){
-
-  loginBox.classList.add("hidden");
-
-  signupBox.classList.remove("hidden");
-
-  title.textContent =
-    "Create your account";
-
-  sub.textContent =
-    "Create an account to track your orders.";
-
-  msg.textContent = "";
-
-}
-
-
-function showLogin(){
-
-  signupBox.classList.add("hidden");
-
-  loginBox.classList.remove("hidden");
-
-  title.textContent =
-    "Welcome to RADA CREST";
-
-  sub.textContent =
-    "Login to continue shopping.";
-
-  msg.textContent = "";
-
-}
 
 
 function getRedirect(){
@@ -229,6 +204,28 @@ function getRedirect(){
 }
 
 
+function showLogin(){
+
+  accountArea.classList.add("hidden");
+  signupArea.classList.add("hidden");
+  loginArea.classList.remove("hidden");
+
+  msg.textContent = "";
+
+}
+
+
+function showSignup(){
+
+  accountArea.classList.add("hidden");
+  loginArea.classList.add("hidden");
+  signupArea.classList.remove("hidden");
+
+  msg.textContent = "";
+
+}
+
+
 function continueAsGuest(){
 
   sessionStorage.setItem(
@@ -238,127 +235,6 @@ function continueAsGuest(){
 
   location.href =
     getRedirect();
-
-}
-
-
-async function signup(){
-
-  if(!sbReady()){
-
-    msg.textContent =
-      "Supabase is not configured.";
-
-    return;
-
-  }
-
-
-  const name =
-    document
-      .getElementById("signupName")
-      .value
-      .trim();
-
-
-  const email =
-    document
-      .getElementById("signupEmail")
-      .value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById("signupPass")
-      .value;
-
-
-  if(!name){
-
-    msg.textContent =
-      "Please enter your name.";
-
-    return;
-
-  }
-
-
-  if(!email){
-
-    msg.textContent =
-      "Please enter your email.";
-
-    return;
-
-  }
-
-
-  if(password.length < 8){
-
-    msg.textContent =
-      "Password must be at least 8 characters.";
-
-    return;
-
-  }
-
-
-  msg.textContent =
-    "Creating your account...";
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.auth.signUp({
-
-      email: email,
-
-      password: password,
-
-      options: {
-
-        data: {
-          full_name: name
-        },
-
-        emailRedirectTo:
-          window.location.origin +
-          "/account.html"
-
-      }
-
-    });
-
-
-  if(error){
-
-    msg.textContent =
-      error.message;
-
-    return;
-
-  }
-
-
-  if(data.session){
-
-    sessionStorage.removeItem(
-      "rc_guest"
-    );
-
-    location.href =
-      getRedirect();
-
-    return;
-
-  }
-
-
-  msg.textContent =
-    "Account created. Check your email for confirmation, then login.";
 
 }
 
@@ -374,47 +250,38 @@ async function login(){
 
   }
 
-
   const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
-
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
 
   const password =
-    document
-      .getElementById("loginPass")
-      .value;
-
+    document.getElementById(
+      "loginPass"
+    ).value;
 
   if(!email || !password){
 
     msg.textContent =
-      "Enter your email and password.";
+      "Enter email and password.";
 
     return;
 
   }
 
-
   msg.textContent =
     "Logging in...";
 
-
   const {
-    data,
     error
   } =
     await supabaseClient.auth
       .signInWithPassword({
 
-        email: email,
-
-        password: password
+        email,
+        password
 
       });
-
 
   if(error){
 
@@ -425,19 +292,31 @@ async function login(){
 
   }
 
-
   sessionStorage.removeItem(
     "rc_guest"
   );
 
-
-  location.href =
+  const redirect =
     getRedirect();
+
+  if(
+    redirect &&
+    redirect !== "index.html"
+  ){
+
+    location.href =
+      redirect;
+
+    return;
+
+  }
+
+  await loadAccount();
 
 }
 
 
-async function resetPassword(){
+async function signup(){
 
   if(!sbReady()){
 
@@ -448,13 +327,101 @@ async function resetPassword(){
 
   }
 
+  const name =
+    document.getElementById(
+      "signupName"
+    ).value.trim();
 
   const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
+    document.getElementById(
+      "signupEmail"
+    ).value.trim();
 
+  const password =
+    document.getElementById(
+      "signupPass"
+    ).value;
+
+  if(!name){
+
+    msg.textContent =
+      "Enter your name.";
+
+    return;
+
+  }
+
+  if(!email){
+
+    msg.textContent =
+      "Enter your email.";
+
+    return;
+
+  }
+
+  if(password.length < 8){
+
+    msg.textContent =
+      "Password must be at least 8 characters.";
+
+    return;
+
+  }
+
+  msg.textContent =
+    "Creating account...";
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.signUp({
+
+      email,
+      password,
+
+      options: {
+        data: {
+          full_name: name
+        }
+      }
+
+    });
+
+  if(error){
+
+    msg.textContent =
+      error.message;
+
+    return;
+
+  }
+
+  if(data.session){
+
+    sessionStorage.removeItem(
+      "rc_guest"
+    );
+
+    await loadAccount();
+
+    return;
+
+  }
+
+  msg.textContent =
+    "Account created. Check your email if confirmation is enabled, then login.";
+
+}
+
+
+async function resetPassword(){
+
+  const email =
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
 
   if(!email){
 
@@ -465,11 +432,6 @@ async function resetPassword(){
 
   }
 
-
-  msg.textContent =
-    "Sending reset email...";
-
-
   const {
     error
   } =
@@ -479,52 +441,212 @@ async function resetPassword(){
         email,
 
         {
-
           redirectTo:
             window.location.origin +
             "/reset-password.html"
-
         }
 
       );
 
-
   msg.textContent =
     error
       ? error.message
-      : "Password reset email sent. Check your inbox.";
+      : "Password reset email sent.";
 
 }
 
 
-async function checkExistingSession(){
+async function loadAccount(){
 
-  if(!sbReady()) return;
+  if(!sbReady()){
 
+    accountArea.classList.add("hidden");
+    loginArea.classList.remove("hidden");
 
-  const {
-    data: {
-      session
-    }
-  } =
-    await supabaseClient.auth
-      .getSession();
-
-
-  if(session){
-
-    location.href =
-      getRedirect();
+    return;
 
   }
 
+  const {
+    data: {
+      user
+    }
+  } =
+    await supabaseClient.auth
+      .getUser();
+
+
+  if(!user){
+
+    accountArea.classList.add("hidden");
+    loginArea.classList.remove("hidden");
+
+    return;
+
+  }
+
+
+  loginArea.classList.add("hidden");
+  signupArea.classList.add("hidden");
+  accountArea.classList.remove("hidden");
+
+
+  const name =
+    user.user_metadata?.full_name ||
+    user.email ||
+    "Customer";
+
+
+  welcome.innerHTML =
+    `Welcome, <strong>${escapeHtml(name)}</strong>`;
+
+
+  await loadOrders(user.id);
+
 }
 
 
-checkExistingSession();
+async function loadOrders(userId){
+
+  ordersBox.innerHTML = `
+    <h2>My Orders</h2>
+    <p>Loading orders...</p>
+  `;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .eq("customer_id",userId)
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    ordersBox.innerHTML = `
+      <h2>My Orders</h2>
+      <p>${escapeHtml(error.message)}</p>
+    `;
+
+    return;
+
+  }
+
+
+  if(!data || !data.length){
+
+    ordersBox.innerHTML = `
+      <h2>My Orders</h2>
+      <p>No orders yet.</p>
+    `;
+
+    return;
+
+  }
+
+
+  ordersBox.innerHTML = `
+
+    <h2>My Orders</h2>
+
+    ${data.map(order => `
+
+      <div
+        class="cart-row"
+        style="
+          display:block;
+          margin:15px 0;
+          padding:15px;
+        "
+      >
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+          "
+        >
+
+          <strong>
+            Order #${order.id}
+          </strong>
+
+          <strong>
+            ₹${Number(
+              order.total_amount || 0
+            ).toLocaleString("en-IN")}
+          </strong>
+
+        </div>
+
+        <small>
+          ${new Date(
+            order.created_at
+          ).toLocaleString("en-IN")}
+        </small>
+
+        <p>
+          Order Status:
+          <strong>
+            ${escapeHtml(
+              order.status || "pending"
+            )}
+          </strong>
+        </p>
+
+        <p>
+          Payment:
+          <strong>
+            ${escapeHtml(
+              order.payment_status || "pending"
+            )}
+          </strong>
+        </p>
+
+      </div>
+
+    `).join("")}
+
+  `;
+
+}
+
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  location.href =
+    "account.html";
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+loadAccount();
 
 </script>
 
 </body>
-
 </html>
