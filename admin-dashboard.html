@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard — RADA CREST</title><link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script>
+</head><body><header class="header"><a class="brand" href="index.html"><span class="brand-mark">RC</span><span>RADA <b>CREST</b></span></a><nav><a href="index.html">Store</a><a href="#" onclick="logout()">Logout</a></nav></header>
+<main class="section"><p class="eyebrow">ADMIN DASHBOARD</p><h1>Store Overview</h1><div class="stats"><div><b id="orders">—</b><small>Orders</small></div><div><b id="customers">—</b><small>Customers</small></div><div><b id="products">—</b><small>Products</small></div><div><b>SECURE</b><small>Supabase Auth + RLS</small></div></div>
+<div class="admin-grid"><div><h2>Products</h2><p>Add, edit, activate/deactivate and manage stock.</p><button class="btn" onclick="location.href='admin-products.html'">Manage Products</button></div>
+<div><h2>Orders</h2><p>View orders and update delivery status.</p><button class="btn" onclick="location.href='admin-orders.html'">Manage Orders</button></div>
+<div><h2>Customers</h2><p>View customer profiles allowed by RLS.</p><button class="btn" onclick="location.href='admin-customers.html'">View Customers</button></div></div></main>
+<script>
+async function guard(){if(!sbReady())return;const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return location.href='admin.html';const {data:p}=await supabaseClient.from('profiles').select('role').eq('id',user.id).single();if(p?.role!=='admin'){await supabaseClient.auth.signOut();location.href='admin.html';return}
+const [{count:o},{count:c},{count:pr}]=await Promise.all([
+ supabaseClient.from('orders').select('*',{count:'exact',head:true}),
+ supabaseClient.from('profiles').select('*',{count:'exact',head:true}),
+ supabaseClient.from('products').select('*',{count:'exact',head:true})
+]);orders.textContent=o??0;customers.textContent=c??0;products.textContent=pr??0}
+async function logout(){await supabaseClient.auth.signOut();location.href='admin.html'} guard();
+</script></body></html>

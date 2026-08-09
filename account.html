@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Account — RADA CREST</title><link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script><script src="supabase-client.js"></script>
+</head><body class="center-page"><main class="auth">
+<a class="brand" href="index.html"><span class="brand-mark">RC</span><span>RADA <b>CREST</b></span></a>
+<h1 id="title">Welcome to RADA CREST</h1><p id="sub">Login to continue shopping.</p>
+<section id="login">
+<label>Email</label><input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com">
+<label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="Password">
+<button class="btn full" onclick="login()">Login</button>
+<button class="text-btn" onclick="showSignup()">Create Account</button>
+<button class="text-btn" onclick="resetPassword()">Forgot Password?</button>
+</section>
+<section id="signup" class="hidden">
+<label>Name</label><input id="signupName" autocomplete="name" placeholder="Your name">
+<label>Email</label><input id="signupEmail" type="email" autocomplete="email" placeholder="you@example.com">
+<label>Password</label><input id="signupPass" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+<button class="btn full" onclick="signup()">Create Account</button>
+<button class="text-btn" onclick="showLogin()">Already have an account? Login</button>
+</section>
+<p id="msg" class="msg"></p></main>
+<script>
+function showSignup(){login.classList.add('hidden');signup.classList.remove('hidden');title.textContent='Create your account';sub.textContent='Create an account to track orders.'}
+function showLogin(){signup.classList.add('hidden');login.classList.remove('hidden');title.textContent='Welcome to RADA CREST';sub.textContent='Login to continue shopping.'}
+async function signup(){
+ if(!sbReady()) return msg.textContent='First configure Supabase in config.js.';
+ const email=signupEmail.value.trim(), password=signupPass.value, name=signupName.value.trim();
+ if(!email||!name||password.length<8) return msg.textContent='Enter name, valid email and password (8+ characters).';
+ const {error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:name}}});
+ msg.textContent=error?error.message:'Account created. Check your email if confirmation is enabled, then login.';
+}
+async function login(){
+ if(!sbReady()) return msg.textContent='First configure Supabase in config.js.';
+ const {data,error}=await supabaseClient.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPass.value});
+ if(error) return msg.textContent=error.message;
+ location.href='index.html';
+}
+async function resetPassword(){
+ if(!sbReady()) return msg.textContent='First configure Supabase in config.js.';
+ const email=loginEmail.value.trim(); if(!email)return msg.textContent='Enter your email first.';
+ const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/reset-password.html'});
+ msg.textContent=error?error.message:'Password reset email sent.';
+}
+</script></body></html>
