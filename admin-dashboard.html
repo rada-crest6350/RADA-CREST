@@ -3,104 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>RADA CREST — Admin Dashboard</title>
 
 <style>
-*{
-  box-sizing:border-box;
+*{box-sizing:border-box}
+
+:root{
+  --bg:#090909;
+  --panel:#121212;
+  --panel2:#171717;
+  --border:#292929;
+  --text:#fff;
+  --muted:#929292;
+  --green:#7dff9b;
+  --red:#ff7777;
+  --yellow:#ffd66b;
 }
 
 body{
   margin:0;
+  background:var(--bg);
+  color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
-  background:#090909;
-  color:#fff;
 }
 
-button,input,select,textarea{
+button,input,textarea,select{
   font:inherit;
 }
 
+button{
+  cursor:pointer;
+}
+
+.app{
+  display:flex;
+  min-height:100vh;
+}
+
+/* SIDEBAR */
+
 .sidebar{
+  width:245px;
+  background:#0d0d0d;
+  border-right:1px solid var(--border);
+  padding:25px 16px;
   position:fixed;
   left:0;
   top:0;
-  width:240px;
-  height:100vh;
-  background:#111;
-  border-right:1px solid #242424;
-  padding:24px 15px;
-  z-index:10;
+  bottom:0;
 }
 
 .brand{
   padding:10px 12px 28px;
-  font-size:18px;
-  font-weight:900;
-  letter-spacing:2px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:20px;
 }
 
-.brand span{
-  display:block;
-  margin-top:6px;
-  color:#777;
-  font-size:10px;
+.logo{
+  width:45px;
+  height:45px;
+  border:2px solid #fff;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  margin-bottom:14px;
+}
+
+.brand small{
+  color:#aaa;
   letter-spacing:3px;
+  font-size:10px;
+  font-weight:bold;
+}
+
+.brand h2{
+  margin:7px 0 0;
+  font-size:19px;
 }
 
 .menu button{
   width:100%;
-  border:0;
   background:transparent;
   color:#999;
+  border:0;
+  padding:13px 14px;
   text-align:left;
-  padding:14px 12px;
   border-radius:10px;
   margin-bottom:5px;
-  cursor:pointer;
   font-weight:700;
 }
 
 .menu button:hover,
 .menu button.active{
-  background:#222;
-  color:#fff;
+  background:#fff;
+  color:#111;
 }
 
 .logout{
   position:absolute;
-  bottom:24px;
-  left:15px;
-  width:210px;
+  left:16px;
+  right:16px;
+  bottom:20px;
+  width:calc(100% - 32px);
   padding:12px;
-  border:1px solid #292929;
-  border-radius:10px;
-  background:#191919;
+  background:#171717;
+  border:1px solid #303030;
   color:#fff;
-  cursor:pointer;
+  border-radius:10px;
 }
 
+/* MAIN */
+
 .main{
-  margin-left:240px;
-  padding:30px;
+  margin-left:245px;
+  width:calc(100% - 245px);
+  min-height:100vh;
 }
 
 .topbar{
+  height:72px;
+  border-bottom:1px solid var(--border);
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  margin-bottom:30px;
+  justify-content:space-between;
+  padding:0 30px;
+  background:#0c0c0c;
+  position:sticky;
+  top:0;
+  z-index:20;
 }
 
 .topbar h1{
   margin:0;
-  font-size:28px;
+  font-size:22px;
 }
 
-.admin-name{
-  color:#888;
+.topbar span{
+  color:#777;
   font-size:13px;
+}
+
+.content{
+  padding:30px;
 }
 
 .page{
@@ -111,15 +156,18 @@ button,input,select,textarea{
   display:block;
 }
 
+/* DASHBOARD */
+
 .cards{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:18px;
+  gap:16px;
+  margin-bottom:20px;
 }
 
 .card{
-  background:#151515;
-  border:1px solid #282828;
+  background:var(--panel);
+  border:1px solid var(--border);
   border-radius:16px;
   padding:22px;
 }
@@ -134,11 +182,11 @@ button,input,select,textarea{
 }
 
 .panel{
-  margin-top:25px;
-  background:#151515;
-  border:1px solid #282828;
+  background:var(--panel);
+  border:1px solid var(--border);
   border-radius:16px;
   padding:22px;
+  margin-bottom:20px;
 }
 
 .panel-header{
@@ -146,46 +194,50 @@ button,input,select,textarea{
   justify-content:space-between;
   align-items:center;
   gap:15px;
-  margin-bottom:20px;
+}
+
+.panel h2{
+  margin:0 0 18px;
 }
 
 .panel-header h2{
   margin:0;
 }
 
-.primary{
-  border:0;
+.primary,
+.save{
   background:#fff;
   color:#111;
+  border:0;
+  border-radius:9px;
   padding:11px 17px;
-  border-radius:9px;
   font-weight:800;
-  cursor:pointer;
 }
 
-.primary:hover{
-  opacity:.9;
+.primary:hover,
+.save:hover{
+  opacity:.88;
 }
 
-.search{
-  width:100%;
-  max-width:350px;
-  background:#0d0d0d;
-  color:#fff;
-  border:1px solid #333;
-  padding:12px;
-  border-radius:9px;
-  outline:none;
+.empty{
+  border:1px dashed #303030;
+  border-radius:12px;
+  padding:30px;
+  text-align:center;
+  color:#777;
 }
+
+/* TABLE */
 
 .table-wrap{
+  width:100%;
   overflow-x:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:700px;
+  min-width:750px;
 }
 
 th{
@@ -193,58 +245,88 @@ th{
   color:#777;
   font-size:12px;
   padding:13px 10px;
-  border-bottom:1px solid #292929;
+  border-bottom:1px solid var(--border);
 }
 
 td{
-  padding:14px 10px;
-  border-bottom:1px solid #222;
+  padding:13px 10px;
+  border-bottom:1px solid #202020;
   font-size:13px;
 }
 
 .product-img{
-  width:45px;
-  height:45px;
+  width:48px;
+  height:48px;
+  border-radius:9px;
+  background:#1d1d1d;
   object-fit:cover;
-  border-radius:8px;
-  background:#222;
+  border:1px solid #303030;
+}
+
+.search{
+  width:100%;
+  margin-top:20px;
+  padding:13px;
+  border:1px solid #303030;
+  background:#0d0d0d;
+  color:#fff;
+  border-radius:10px;
+  outline:none;
 }
 
 .badge{
   display:inline-block;
-  padding:5px 8px;
-  border-radius:6px;
-  font-size:11px;
-  background:#222;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#282828;
   color:#aaa;
+  font-size:11px;
+  font-weight:bold;
 }
 
 .badge.active{
-  color:#9cffb0;
+  background:#15351d;
+  color:var(--green);
+}
+
+.badge.warning{
+  background:#382e15;
+  color:var(--yellow);
+}
+
+.edit-btn,
+.status-btn,
+.delete-btn{
+  border:0;
+  border-radius:7px;
+  padding:7px 9px;
+  margin:2px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.edit-btn{
+  background:#fff;
+  color:#111;
+}
+
+.status-btn{
+  background:#252525;
+  color:#fff;
 }
 
 .delete-btn{
-  background:#241313;
+  background:#321818;
   color:#ff7777;
-  border:1px solid #492020;
-  border-radius:7px;
-  padding:7px 10px;
-  cursor:pointer;
-}
-
-.empty{
-  padding:35px;
-  text-align:center;
-  color:#777;
 }
 
 /* MODAL */
 
 .modal{
-  display:none;
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.78);
+  display:none;
   align-items:center;
   justify-content:center;
   padding:20px;
@@ -256,13 +338,14 @@ td{
 }
 
 .modal-box{
-  width:min(600px,100%);
-  max-height:90vh;
+  width:min(720px,100%);
+  max-height:92vh;
   overflow:auto;
   background:#151515;
-  border:1px solid #333;
+  border:1px solid #303030;
   border-radius:18px;
   padding:25px;
+  box-shadow:0 25px 100px #000;
 }
 
 .modal-box h2{
@@ -275,148 +358,190 @@ td{
   gap:15px;
 }
 
-.field{
-  margin-bottom:15px;
+.field label{
+  display:block;
+  color:#aaa;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  padding:12px;
+  background:#0d0d0d;
+  color:#fff;
+  border:1px solid #303030;
+  border-radius:9px;
+  outline:none;
+}
+
+.field textarea{
+  min-height:110px;
+  resize:vertical;
 }
 
 .field.full{
   grid-column:1/-1;
 }
 
-.field label{
-  display:block;
-  color:#aaa;
-  font-size:12px;
-  margin-bottom:7px;
+.form-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:20px;
 }
 
-.field input,
-.field select,
-.field textarea{
+.cancel{
+  padding:11px 17px;
+  border-radius:9px;
+  background:#252525;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.message{
+  margin-top:13px;
+  font-size:13px;
+}
+
+/* CATEGORY */
+
+.category-list{
+  display:grid;
+  gap:10px;
+}
+
+.category-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:13px;
+  border:1px solid #292929;
+  border-radius:10px;
+  background:#101010;
+}
+
+.category-actions button{
+  margin-left:5px;
+}
+
+/* STORE */
+
+.setting-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.setting-field{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.setting-field.full{
+  grid-column:1/-1;
+}
+
+.setting-field label{
+  color:#aaa;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.setting-field input,
+.setting-field textarea{
   width:100%;
   background:#0d0d0d;
   color:#fff;
-  border:1px solid #333;
+  border:1px solid #303030;
   border-radius:9px;
   padding:12px;
   outline:none;
 }
 
-.field textarea{
-  min-height:100px;
-  resize:vertical;
+.setting-field textarea{
+  min-height:120px;
 }
 
-.form-actions{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
+/* RESPONSIVE */
 
-.cancel{
-  flex:1;
-  padding:12px;
-  border:1px solid #333;
-  background:#202020;
-  color:#fff;
-  border-radius:9px;
-  cursor:pointer;
-}
-
-.save{
-  flex:1;
-  padding:12px;
-  border:0;
-  background:#fff;
-  color:#111;
-  border-radius:9px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.message{
-  margin-top:12px;
-  font-size:13px;
-  color:#ff7777;
-}
-
-@media(max-width:900px){
-
-  .sidebar{
-    width:70px;
-    padding:15px 8px;
-  }
-
-  .brand{
-    font-size:0;
-    text-align:center;
-  }
-
-  .brand:after{
-    content:"RC";
-    font-size:16px;
-  }
-
-  .brand span{
-    display:none;
-  }
-
-  .menu button{
-    text-align:center;
-    font-size:0;
-  }
-
-  .menu button::first-letter{
-    font-size:18px;
-  }
-
-  .logout{
-    width:54px;
-    left:8px;
-    font-size:0;
-  }
-
-  .logout:after{
-    content:"↪";
-    font-size:18px;
-  }
-
-  .main{
-    margin-left:70px;
-    padding:20px;
-  }
-
+@media(max-width:1000px){
   .cards{
     grid-template-columns:repeat(2,1fr);
   }
 }
 
-@media(max-width:600px){
+@media(max-width:700px){
 
-  .cards{
-    grid-template-columns:1fr;
+  .sidebar{
+    width:100%;
+    height:auto;
+    position:relative;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+  }
+
+  .app{
+    display:block;
+  }
+
+  .main{
+    margin-left:0;
+    width:100%;
+  }
+
+  .logout{
+    position:static;
+    width:100%;
+    margin-top:15px;
+  }
+
+  .menu{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+  }
+
+  .menu button{
+    margin:0;
   }
 
   .topbar{
-    flex-direction:column;
-    align-items:flex-start;
+    padding:0 18px;
   }
 
-  .panel-header{
-    flex-direction:column;
-    align-items:flex-start;
+  .content{
+    padding:18px;
   }
 
-  .search{
-    max-width:none;
+  .cards{
+    grid-template-columns:1fr 1fr;
   }
 
-  .form-grid{
+  .form-grid,
+  .setting-grid{
     grid-template-columns:1fr;
   }
 
-  .field.full{
+  .field.full,
+  .setting-field.full{
     grid-column:auto;
+  }
+
+  .panel-header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+@media(max-width:430px){
+  .cards{
+    grid-template-columns:1fr;
   }
 }
 </style>
@@ -424,11 +549,16 @@ td{
 
 <body>
 
+<div class="app">
+
+<!-- SIDEBAR -->
+
 <aside class="sidebar">
 
   <div class="brand">
-    RADA CREST
-    <span>ADMIN PANEL</span>
+    <div class="logo">RC</div>
+    <small>RADA CREST</small>
+    <h2>Admin Panel</h2>
   </div>
 
   <div class="menu">
@@ -439,6 +569,10 @@ td{
 
     <button onclick="showPage('products',this)">
       ▣ Products
+    </button>
+
+    <button onclick="showPage('categories',this)">
+      ◫ Categories
     </button>
 
     <button onclick="showPage('orders',this)">
@@ -462,165 +596,262 @@ td{
 </aside>
 
 
+<!-- MAIN -->
+
 <main class="main">
 
-  <div class="topbar">
+  <header class="topbar">
     <h1 id="pageTitle">Dashboard</h1>
-    <div class="admin-name">RADA CREST ADMIN</div>
+    <span id="connectionStatus">Connecting...</span>
+  </header>
+
+  <div class="content">
+
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="page active">
+
+  <div class="cards">
+
+    <div class="card">
+      <small>Total Products</small>
+      <h2 id="dashboardProducts">0</h2>
+    </div>
+
+    <div class="card">
+      <small>Active Products</small>
+      <h2 id="dashboardActive">0</h2>
+    </div>
+
+    <div class="card">
+      <small>Low Stock</small>
+      <h2 id="dashboardLowStock">0</h2>
+    </div>
+
+    <div class="card">
+      <small>Out of Stock</small>
+      <h2 id="dashboardOutStock">0</h2>
+    </div>
+
   </div>
 
+  <div class="panel">
 
-  <!-- DASHBOARD -->
+    <h2>Recent Products</h2>
 
-  <section id="dashboard" class="page active">
+    <div id="recentProducts" class="empty">
+      Loading...
+    </div>
 
-    <div class="cards">
+  </div>
 
-      <div class="card">
-        <small>Total Sales</small>
-        <h2>₹0</h2>
+  <div class="panel">
+
+    <h2>Orders</h2>
+
+    <div class="empty">
+      Orders will appear here after the customer ordering system is connected.
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- PRODUCTS -->
+
+<section id="products" class="page">
+
+  <div class="panel">
+
+    <div class="panel-header">
+
+      <h2>Products</h2>
+
+      <button class="primary" onclick="openProductModal()">
+        + Add Product
+      </button>
+
+    </div>
+
+    <input
+      id="searchProduct"
+      class="search"
+      type="search"
+      placeholder="Search products..."
+      oninput="renderProducts()"
+    >
+
+    <div class="table-wrap" style="margin-top:20px;">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Featured</th>
+            <th>Action</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="productsTable"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- CATEGORIES -->
+
+<section id="categories" class="page">
+
+  <div class="panel">
+
+    <div class="panel-header">
+
+      <h2>Categories</h2>
+
+      <button class="primary" onclick="openCategoryModal()">
+        + Add Category
+      </button>
+
+    </div>
+
+    <div id="categoriesList" class="category-list">
+      Loading...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ORDERS -->
+
+<section id="orders" class="page">
+
+  <div class="panel">
+
+    <h2>Orders</h2>
+
+    <div class="empty">
+      No orders available yet.
+      <br><br>
+      Orders will automatically appear here after the customer ordering system is connected.
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- CUSTOMERS -->
+
+<section id="customers" class="page">
+
+  <div class="panel">
+
+    <h2>Customers</h2>
+
+    <div class="empty">
+      No customers available yet.
+      <br><br>
+      Customer accounts will appear here after the customer system is connected.
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- STORE CONTROL -->
+
+<section id="store" class="page">
+
+  <div class="panel">
+
+    <h2>Store Control</h2>
+
+    <div class="setting-grid">
+
+      <div class="setting-field">
+        <label>Site Name</label>
+        <input id="siteName">
       </div>
 
-      <div class="card">
-        <small>Total Orders</small>
-        <h2 id="dashboardOrders">0</h2>
+      <div class="setting-field">
+        <label>Logo URL</label>
+        <input id="siteLogo" placeholder="https://...">
       </div>
 
-      <div class="card">
-        <small>Total Products</small>
-        <h2 id="dashboardProducts">0</h2>
+      <div class="setting-field full">
+        <label>Homepage Banner URL</label>
+        <input id="siteBanner" placeholder="https://...">
       </div>
 
-      <div class="card">
-        <small>Customers</small>
-        <h2 id="dashboardCustomers">0</h2>
+      <div class="setting-field full">
+        <label>Offer Text</label>
+        <input id="offerText" placeholder="Example: Special Offer">
+      </div>
+
+      <div class="setting-field">
+        <label>Contact Phone</label>
+        <input id="contactPhone">
+      </div>
+
+      <div class="setting-field">
+        <label>Contact Email</label>
+        <input id="contactEmail" type="email">
+      </div>
+
+      <div class="setting-field full">
+        <label>Store Description</label>
+        <textarea id="storeDescription"></textarea>
       </div>
 
     </div>
 
-    <div class="panel">
-      <h2>Recent Orders</h2>
-      <div class="empty">
-        Orders system will be connected next.
-      </div>
-    </div>
+    <div class="form-actions">
 
-    <div class="panel">
-      <h2>Sales Overview</h2>
-      <div class="empty">
-        Sales data will appear here.
-      </div>
-    </div>
-
-  </section>
-
-
-  <!-- PRODUCTS -->
-
-  <section id="products" class="page">
-
-    <div class="panel">
-
-      <div class="panel-header">
-
-        <h2>Products</h2>
-
-        <button class="primary" onclick="openProductModal()">
-          + Add Product
-        </button>
-
-      </div>
-
-      <input
-        id="searchProduct"
-        class="search"
-        type="search"
-        placeholder="Search products..."
-        oninput="renderProducts()"
-      >
-
-      <div class="table-wrap" style="margin-top:20px;">
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody id="productsTable">
-          </tbody>
-
-        </table>
-
-      </div>
+      <button class="save" onclick="saveStoreSettings()">
+        Save Store Settings
+      </button>
 
     </div>
 
-  </section>
+    <div id="storeMessage" class="message"></div>
+
+  </div>
+
+</section>
 
 
-  <!-- ORDERS -->
-
-  <section id="orders" class="page">
-
-    <div class="panel">
-      <h2>Orders</h2>
-
-      <div class="empty">
-        Orders management will be added next.
-      </div>
-    </div>
-
-  </section>
-
-
-  <!-- CUSTOMERS -->
-
-  <section id="customers" class="page">
-
-    <div class="panel">
-      <h2>Customers</h2>
-
-      <div class="empty">
-        Customer management will be added next.
-      </div>
-    </div>
-
-  </section>
-
-
-  <!-- STORE CONTROL -->
-
-  <section id="store" class="page">
-
-    <div class="panel">
-      <h2>Store Control</h2>
-
-      <div class="empty">
-        Logo, banners, offers and categories will be added next.
-      </div>
-    </div>
-
-  </section>
+  </div>
 
 </main>
 
+</div>
 
-<!-- ADD PRODUCT MODAL -->
+
+<!-- PRODUCT MODAL -->
 
 <div id="productModal" class="modal">
 
   <div class="modal-box">
 
-    <h2>Add Product</h2>
+    <h2 id="productModalTitle">Add Product</h2>
 
     <form id="productForm">
 
@@ -632,38 +863,86 @@ td{
         </div>
 
         <div class="field">
+          <label>SKU</label>
+          <input id="productSku" placeholder="Example: RC-LED-09">
+        </div>
+
+        <div class="field">
           <label>Category</label>
-          <input id="productCategory">
+          <select id="productCategory">
+            <option value="">Select category</option>
+          </select>
         </div>
 
         <div class="field">
           <label>Price *</label>
-          <input id="productPrice" type="number" min="0" step="0.01" required>
+          <input
+            id="productPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            required
+          >
         </div>
 
         <div class="field">
           <label>Old Price</label>
-          <input id="productOldPrice" type="number" min="0" step="0.01">
+          <input
+            id="productOldPrice"
+            type="number"
+            min="0"
+            step="0.01"
+          >
+        </div>
+
+        <div class="field">
+          <label>Discount %</label>
+          <input
+            id="productDiscount"
+            type="number"
+            min="0"
+            max="100"
+            value="0"
+          >
         </div>
 
         <div class="field">
           <label>Stock</label>
-          <input id="productStock" type="number" min="0" value="0">
+          <input
+            id="productStock"
+            type="number"
+            min="0"
+            value="0"
+          >
         </div>
 
         <div class="field">
           <label>Warranty</label>
-          <input id="productWarranty" placeholder="Example: 1 Year">
+          <input
+            id="productWarranty"
+            placeholder="Example: 1 Year"
+          >
         </div>
 
         <div class="field full">
           <label>Product Image URL</label>
-          <input id="productImage" placeholder="https://...">
+          <input
+            id="productImage"
+            placeholder="https://..."
+          >
         </div>
 
         <div class="field full">
           <label>Description</label>
           <textarea id="productDescription"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Featured Product</label>
+          <select id="productFeatured">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
         </div>
 
       </div>
@@ -696,6 +975,54 @@ td{
 </div>
 
 
+<!-- CATEGORY MODAL -->
+
+<div id="categoryModal" class="modal">
+
+  <div class="modal-box">
+
+    <h2 id="categoryModalTitle">Add Category</h2>
+
+    <form id="categoryForm">
+
+      <div class="field">
+        <label>Category Name *</label>
+        <input id="categoryName" required>
+      </div>
+
+      <div class="field" style="margin-top:15px;">
+        <label>Category Image URL</label>
+        <input id="categoryImage" placeholder="https://...">
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="cancel"
+          onclick="closeCategoryModal()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="save"
+        >
+          Save Category
+        </button>
+
+      </div>
+
+      <div id="categoryMessage" class="message"></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
 <script type="module">
 
 import { createClient }
@@ -709,10 +1036,8 @@ from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 const SUPABASE_URL =
 "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 
-
 const SUPABASE_KEY =
 "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
-
 
 const supabase =
 createClient(
@@ -728,11 +1053,9 @@ createClient(
 const { data: sessionData } =
 await supabase.auth.getSession();
 
-
 if(!sessionData.session){
 
-  window.location.href =
-  "admin.html";
+  window.location.href = "admin.html";
 
 }
 
@@ -745,43 +1068,42 @@ window.showPage =
 function(page,button){
 
   document
-  .querySelectorAll(".page")
-  .forEach(p=>{
-    p.classList.remove("active");
-  });
+    .querySelectorAll(".page")
+    .forEach(p=>{
+      p.classList.remove("active");
+    });
+
+  const selectedPage =
+    document.getElementById(page);
+
+  if(selectedPage){
+    selectedPage.classList.add("active");
+  }
 
   document
-  .getElementById(page)
-  .classList.add("active");
+    .querySelectorAll(".menu button")
+    .forEach(b=>{
+      b.classList.remove("active");
+    });
 
-
-  document
-  .querySelectorAll(".menu button")
-  .forEach(b=>{
-    b.classList.remove("active");
-  });
-
-
-  button.classList.add("active");
-
+  if(button){
+    button.classList.add("active");
+  }
 
   const titles = {
 
     dashboard:"Dashboard",
-
     products:"Products",
-
+    categories:"Categories",
     orders:"Orders",
-
     customers:"Customers",
-
     store:"Store Control"
 
   };
 
-
   document.getElementById("pageTitle")
-  .textContent = titles[page];
+    .textContent =
+    titles[page] || "Admin";
 
 };
 
@@ -796,85 +1118,200 @@ async function(){
   await supabase.auth.signOut();
 
   window.location.href =
-  "admin.html";
+    "admin.html";
 
 };
 
 
 /* ================================
-   PRODUCTS
+   DATA
 ================================ */
 
 let products = [];
+let categories = [];
+let editingProductId = null;
+let editingCategoryId = null;
 
+
+/* ================================
+   PRODUCTS LOAD
+================================ */
 
 async function loadProducts(){
 
   const { data,error } =
-  await supabase
-  .from("products")
-  .select("*")
-  .order("created_at",{ascending:false});
-
+    await supabase
+      .from("products")
+      .select("*")
+      .order("created_at",{ascending:false});
 
   if(error){
 
     console.error(error);
 
+    document.getElementById("connectionStatus")
+      .textContent = "Database Error";
+
     return;
 
   }
 
-
   products = data || [];
 
   renderProducts();
+  updateDashboard();
 
-  document.getElementById(
-    "dashboardProducts"
-  ).textContent =
-  products.length;
+  renderRecentProducts();
 
 }
 
 
+/* ================================
+   DASHBOARD
+================================ */
+
+function updateDashboard(){
+
+  const total =
+    products.length;
+
+  const active =
+    products.filter(p=>p.active === true).length;
+
+  const lowStock =
+    products.filter(p=>
+      Number(p.stock || 0) > 0 &&
+      Number(p.stock || 0) <= 5
+    ).length;
+
+  const outStock =
+    products.filter(p=>
+      Number(p.stock || 0) <= 0
+    ).length;
+
+  document.getElementById(
+    "dashboardProducts"
+  ).textContent = total;
+
+  document.getElementById(
+    "dashboardActive"
+  ).textContent = active;
+
+  document.getElementById(
+    "dashboardLowStock"
+  ).textContent = lowStock;
+
+  document.getElementById(
+    "dashboardOutStock"
+  ).textContent = outStock;
+
+}
+
+
+/* ================================
+   RECENT PRODUCTS
+================================ */
+
+function renderRecentProducts(){
+
+  const box =
+    document.getElementById("recentProducts");
+
+  const recent =
+    products.slice(0,5);
+
+  if(!recent.length){
+
+    box.innerHTML =
+      "No products added yet.";
+
+    return;
+
+  }
+
+  box.innerHTML =
+    recent.map(p=>`
+
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        padding:12px 0;
+        border-bottom:1px solid #242424;
+      ">
+
+        <div>
+          <strong>
+            ${escapeHtml(p.name || "Unnamed")}
+          </strong>
+
+          <div style="
+            color:#777;
+            font-size:11px;
+            margin-top:4px;
+          ">
+            ${escapeHtml(p.category || "No category")}
+          </div>
+        </div>
+
+        <div>
+          ₹${Number(p.price || 0).toLocaleString("en-IN")}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* ================================
+   PRODUCTS RENDER
+================================ */
+
 function renderProducts(){
 
   const tbody =
-  document.getElementById(
-    "productsTable"
-  );
-
+    document.getElementById("productsTable");
 
   const search =
-  document.getElementById(
-    "searchProduct"
-  ).value
-  .toLowerCase()
-  .trim();
-
+    document.getElementById("searchProduct")
+      .value
+      .toLowerCase()
+      .trim();
 
   const filtered =
-  products.filter(product => {
+    products.filter(product=>{
 
-    return (
-      (product.name || "")
-      .toLowerCase()
-      .includes(search)
-      ||
-      (product.category || "")
-      .toLowerCase()
-      .includes(search)
-    );
+      return (
 
-  });
+        (product.name || "")
+          .toLowerCase()
+          .includes(search)
+
+        ||
+
+        (product.category || "")
+          .toLowerCase()
+          .includes(search)
+
+        ||
+
+        (product.sku || "")
+          .toLowerCase()
+          .includes(search)
+
+      );
+
+    });
 
 
   if(!filtered.length){
 
     tbody.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="empty">
             No products found.
           </div>
@@ -888,88 +1325,173 @@ function renderProducts(){
 
 
   tbody.innerHTML =
-  filtered.map(product => {
+    filtered.map(product=>{
 
-    const image =
-    product.image_url
-    ?
-    `<img class="product-img"
-      src="${escapeHtml(product.image_url)}"
-      alt="">`
-    :
-    `<div class="product-img"></div>`;
+      const image =
+        product.image_url
+        ?
+        `<img
+          class="product-img"
+          src="${escapeHtml(product.image_url)}"
+          alt=""
+        >`
+        :
+        `<div class="product-img"></div>`;
 
 
-    return `
-      <tr>
+      const stock =
+        Number(product.stock || 0);
 
-        <td>${image}</td>
 
-        <td>
-          <strong>
-            ${escapeHtml(product.name || "")}
-          </strong>
-        </td>
+      let stockBadge = "";
 
-        <td>
-          ${escapeHtml(product.category || "-")}
-        </td>
+      if(stock <= 0){
 
-        <td>
-          ₹${Number(product.price || 0).toLocaleString("en-IN")}
-        </td>
+        stockBadge =
+          `<span class="badge">Out of stock</span>`;
 
-        <td>
-          ${product.stock ?? 0}
-        </td>
+      }
+      else if(stock <= 5){
 
-        <td>
-          <span class="badge ${product.active ? "active" : ""}">
-            ${product.active ? "Active" : "Inactive"}
-          </span>
-        </td>
+        stockBadge =
+          `<span class="badge warning">${stock} Low</span>`;
 
-        <td>
-          <button
-           class="edit-btn"
-           onclick="editProduct(${product.id})"
-         >
-           Edit
-         </button>
+      }
+      else{
 
-          <button
-           class="status-btn"
-           onclick="toggleProductStatus(${product.id})"
-         > 
-          ${product.active ? "Disable" : "Enable"}
-         </button>
+        stockBadge =
+          `<span class="badge active">${stock}</span>`;
 
-           <button
-           class="delete-btn"
-          onclick="deleteProduct(${product.id})"
-       >
-          Delete
-       </button>
-      </td>
+      }
 
-      </tr>
-    `;
 
-  }).join("");
+      return `
+
+        <tr>
+
+          <td>${image}</td>
+
+          <td>
+
+            <strong>
+              ${escapeHtml(product.name || "")}
+            </strong>
+
+            <div style="
+              color:#666;
+              font-size:10px;
+              margin-top:4px;
+            ">
+              ${escapeHtml(product.sku || "")}
+            </div>
+
+          </td>
+
+          <td>
+            ${escapeHtml(product.category || "-")}
+          </td>
+
+          <td>
+            ₹${Number(product.price || 0)
+              .toLocaleString("en-IN")}
+          </td>
+
+          <td>
+            ${stockBadge}
+          </td>
+
+          <td>
+
+            <span class="badge ${
+              product.active ? "active" : ""
+            }">
+
+              ${product.active
+                ? "Active"
+                : "Inactive"}
+
+            </span>
+
+          </td>
+
+          <td>
+
+            <span class="badge ${
+              product.featured ? "active" : ""
+            }">
+
+              ${product.featured
+                ? "Yes"
+                : "No"}
+
+            </span>
+
+          </td>
+
+          <td>
+
+            <button
+              class="edit-btn"
+              onclick="editProduct(${product.id})"
+            >
+              Edit
+            </button>
+
+            <button
+              class="status-btn"
+              onclick="toggleProductStatus(${product.id})"
+            >
+              ${product.active
+                ? "Disable"
+                : "Enable"}
+            </button>
+
+            <button
+              class="delete-btn"
+              onclick="deleteProduct(${product.id})"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
 
 }
 
 
 /* ================================
-   ADD PRODUCT
+   PRODUCT MODAL
 ================================ */
 
 window.openProductModal =
 function(){
 
-  document
-  .getElementById("productModal")
-  .classList.add("show");
+  editingProductId = null;
+
+  document.getElementById(
+    "productModalTitle"
+  ).textContent =
+    "Add Product";
+
+  document.querySelector(
+    "#productForm .save"
+  ).textContent =
+    "Save Product";
+
+  document.getElementById(
+    "productForm"
+  ).reset();
+
+  populateCategorySelect();
+
+  document.getElementById(
+    "productModal"
+  ).classList.add("show");
 
 };
 
@@ -977,132 +1499,382 @@ function(){
 window.closeProductModal =
 function(){
 
-  document
-  .getElementById("productModal")
-  .classList.remove("show");
+  editingProductId = null;
 
-  document
-  .getElementById("productForm")
-  .reset();
+  document.getElementById(
+    "productModal"
+  ).classList.remove("show");
 
-  document
-  .getElementById("productMessage")
-  .textContent = "";
+  document.getElementById(
+    "productForm"
+  ).reset();
+
+  document.getElementById(
+    "productMessage"
+  ).textContent = "";
 
 };
 
 
+/* ================================
+   CATEGORY SELECT
+================================ */
+
+function populateCategorySelect(){
+
+  const select =
+    document.getElementById(
+      "productCategory"
+    );
+
+  select.innerHTML =
+    `<option value="">Select category</option>`;
+
+  categories
+    .filter(c=>c.active !== false)
+    .forEach(category=>{
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        category.name;
+
+      option.textContent =
+        category.name;
+
+      select.appendChild(option);
+
+    });
+
+}
+
+
+/* ================================
+   ADD / UPDATE PRODUCT
+================================ */
+
 document
-.getElementById("productForm")
-.addEventListener("submit", async function(e){
-.const product = {
-  
-  e.preventDefault();
+  .getElementById("productForm")
+  .addEventListener(
+    "submit",
+    async function(e){
+
+      e.preventDefault();
+
+      const message =
+        document.getElementById(
+          "productMessage"
+        );
+
+      message.style.color =
+        "#999";
+
+      message.textContent =
+        editingProductId
+        ?
+        "Updating product..."
+        :
+        "Saving product...";
 
 
-  const message =
-  document.getElementById(
-    "productMessage"
+      const categoryName =
+        document.getElementById(
+          "productCategory"
+        ).value.trim();
+
+
+      const selectedCategory =
+        categories.find(
+          c=>c.name === categoryName
+        );
+
+
+      const productData = {
+
+        name:
+          document.getElementById(
+            "productName"
+          ).value.trim(),
+
+        sku:
+          document.getElementById(
+            "productSku"
+          ).value.trim() || null,
+
+        category:
+          categoryName || null,
+
+        category_id:
+          selectedCategory
+          ?
+          selectedCategory.id
+          :
+          null,
+
+        price:
+          Number(
+            document.getElementById(
+              "productPrice"
+            ).value
+          ),
+
+        old_price:
+          Number(
+            document.getElementById(
+              "productOldPrice"
+            ).value
+          ) || null,
+
+        discount_percent:
+          Number(
+            document.getElementById(
+              "productDiscount"
+            ).value
+          ) || 0,
+
+        stock:
+          Number(
+            document.getElementById(
+              "productStock"
+            ).value
+          ) || 0,
+
+        warranty:
+          document.getElementById(
+            "productWarranty"
+          ).value.trim(),
+
+        image_url:
+          document.getElementById(
+            "productImage"
+          ).value.trim(),
+
+        description:
+          document.getElementById(
+            "productDescription"
+          ).value.trim(),
+
+        featured:
+          document.getElementById(
+            "productFeatured"
+          ).value === "true"
+
+      };
+
+
+      let result;
+
+
+      if(editingProductId !== null){
+
+        result =
+          await supabase
+            .from("products")
+            .update(productData)
+            .eq("id",editingProductId);
+
+      }
+      else{
+
+        productData.active = true;
+
+        result =
+          await supabase
+            .from("products")
+            .insert(productData);
+
+      }
+
+
+      if(result.error){
+
+        console.error(result.error);
+
+        message.style.color =
+          "#ff7777";
+
+        message.textContent =
+          result.error.message;
+
+        return;
+
+      }
+
+
+      message.style.color =
+        "#7dff9b";
+
+      message.textContent =
+        editingProductId
+        ?
+        "Product updated successfully."
+        :
+        "Product added successfully.";
+
+
+      await loadProducts();
+
+
+      setTimeout(()=>{
+
+        closeProductModal();
+
+      },700);
+
+    }
   );
 
 
-  message.style.color = "#999";
+/* ================================
+   EDIT PRODUCT
+================================ */
 
-  message.textContent =
-  "Saving product...";
+window.editProduct =
+function(id){
+
+  const product =
+    products.find(
+      p=>p.id === id
+    );
+
+  if(!product){
+    return;
+  }
+
+  editingProductId = id;
+
+  populateCategorySelect();
+
+  document.getElementById(
+    "productModalTitle"
+  ).textContent =
+    "Edit Product";
+
+  document.querySelector(
+    "#productForm .save"
+  ).textContent =
+    "Update Product";
 
 
-  const product = {
+  document.getElementById(
+    "productName"
+  ).value =
+    product.name || "";
 
-    name:
-    document.getElementById(
-      "productName"
-    ).value.trim(),
 
-    category:
-    document.getElementById(
-      "productCategory"
-    ).value.trim(),
+  document.getElementById(
+    "productSku"
+  ).value =
+    product.sku || "";
 
-    price:
-    Number(
-      document.getElementById(
-        "productPrice"
-      ).value
-    ),
 
-    old_price:
-    Number(
-      document.getElementById(
-        "productOldPrice"
-      ).value
-    ) || null,
+  document.getElementById(
+    "productCategory"
+  ).value =
+    product.category || "";
 
-    stock:
-    Number(
-      document.getElementById(
-        "productStock"
-      ).value
-    ) || 0,
 
-    warranty:
-    document.getElementById(
-      "productWarranty"
-    ).value.trim(),
+  document.getElementById(
+    "productPrice"
+  ).value =
+    product.price ?? "";
 
-    image_url:
-    document.getElementById(
-      "productImage"
-    ).value.trim(),
 
-    description:
-    document.getElementById(
-      "productDescription"
-    ).value.trim(),
+  document.getElementById(
+    "productOldPrice"
+  ).value =
+    product.old_price ?? "";
 
-    active:true
 
-  };
+  document.getElementById(
+    "productDiscount"
+  ).value =
+    product.discount_percent ?? 0;
+
+
+  document.getElementById(
+    "productStock"
+  ).value =
+    product.stock ?? 0;
+
+
+  document.getElementById(
+    "productWarranty"
+  ).value =
+    product.warranty || "";
+
+
+  document.getElementById(
+    "productImage"
+  ).value =
+    product.image_url || "";
+
+
+  document.getElementById(
+    "productDescription"
+  ).value =
+    product.description || "";
+
+
+  document.getElementById(
+    "productFeatured"
+  ).value =
+    product.featured
+    ?
+    "true"
+    :
+    "false";
+
+
+  document.getElementById(
+    "productModal"
+  ).classList.add("show");
+
+};
+
+
+/* ================================
+   PRODUCT STATUS
+================================ */
+
+window.toggleProductStatus =
+async function(id){
+
+  const product =
+    products.find(
+      p=>p.id === id
+    );
+
+  if(!product){
+    return;
+  }
+
+
+  const newStatus =
+    !product.active;
 
 
   const { error } =
-  await supabase
-  .from("products")
-  .insert(product);
+    await supabase
+      .from("products")
+      .update({
+        active:newStatus
+      })
+      .eq("id",id);
 
 
   if(error){
 
-    console.error(error);
-
-    message.style.color =
-    "#ff7777";
-
-    message.textContent =
-    error.message;
-
+    alert(error.message);
     return;
 
   }
 
 
-  message.style.color =
-  "#7dff9b";
-
-  message.textContent =
-  "Product added successfully.";
-
-
   await loadProducts();
 
-
-  setTimeout(()=>{
-
-    closeProductModal();
-
-  },700);
-
-});
+};
 
 
 /* ================================
@@ -1112,28 +1884,39 @@ document
 window.deleteProduct =
 async function(id){
 
-  const confirmDelete =
-  confirm(
-    "Delete this product?"
-  );
+  const product =
+    products.find(
+      p=>p.id === id
+    );
 
 
-  if(!confirmDelete){
+  const name =
+    product
+    ?
+    product.name
+    :
+    "this product";
+
+
+  if(!confirm(
+    `Delete "${name}" permanently?`
+  )){
+
     return;
+
   }
 
 
   const { error } =
-  await supabase
-  .from("products")
-  .delete()
-  .eq("id",id);
+    await supabase
+      .from("products")
+      .delete()
+      .eq("id",id);
 
 
   if(error){
 
     alert(error.message);
-
     return;
 
   }
@@ -1143,169 +1926,389 @@ async function(id){
 
 };
 
-/* ================================
-   EDIT PRODUCT
-================================ */
-
-let editingProductId = null;
-
-window.editProduct =
-function(id){
-
-  const product =
-  products.find(p => p.id === id);
-
-  if(!product){
-    return;
-  }
-
-  editingProductId = id;
-
-  document.getElementById("productName").value =
-    product.name || "";
-
-  document.getElementById("productCategory").value =
-    product.category || "";
-
-  document.getElementById("productPrice").value =
-    product.price ?? "";
-
-  document.getElementById("productOldPrice").value =
-    product.old_price ?? "";
-
-  document.getElementById("productStock").value =
-    product.stock ?? 0;
-
-  document.getElementById("productWarranty").value =
-    product.warranty || "";
-
-  document.getElementById("productImage").value =
-    product.image_url || "";
-
-  document.getElementById("productDescription").value =
-    product.description || "";
-
-  document.querySelector("#productModal h2").textContent =
-    "Edit Product";
-
-  document.querySelector("#productForm .save").textContent =
-    "Update Product";
-
-  document
-    .getElementById("productModal")
-    .classList.add("show");
-};
-
 
 /* ================================
-   UPDATE PRODUCT
+   CATEGORIES LOAD
 ================================ */
 
-async function updateProduct(){
+async function loadCategories(){
 
-  const message =
-    document.getElementById("productMessage");
-
-  const updatedProduct = {
-
-    name:
-      document.getElementById("productName")
-      .value.trim(),
-
-    category:
-      document.getElementById("productCategory")
-      .value.trim(),
-
-    price:
-      Number(
-        document.getElementById("productPrice").value
-      ),
-
-    old_price:
-      Number(
-        document.getElementById("productOldPrice").value
-      ) || null,
-
-    stock:
-      Number(
-        document.getElementById("productStock").value
-      ) || 0,
-
-    warranty:
-      document.getElementById("productWarranty")
-      .value.trim(),
-
-    image_url:
-      document.getElementById("productImage")
-      .value.trim(),
-
-    description:
-      document.getElementById("productDescription")
-      .value.trim()
-
-  };
-
-
-  const { error } =
+  const { data,error } =
     await supabase
-      .from("products")
-      .update(updatedProduct)
-      .eq("id", editingProductId);
+      .from("categories")
+      .select("*")
+      .order("name",{ascending:true});
 
 
   if(error){
 
     console.error(error);
-
-    message.style.color = "#ff7777";
-    message.textContent = error.message;
-
     return;
 
   }
 
 
-  message.style.color = "#7dff9b";
-  message.textContent =
-    "Product updated successfully.";
+  categories =
+    data || [];
 
-  await loadProducts();
 
-  setTimeout(() => {
-
-    editingProductId = null;
-
-    closeProductModal();
-
-  },700);
+  renderCategories();
+  populateCategorySelect();
 
 }
 
 
 /* ================================
-   ACTIVE / INACTIVE
+   CATEGORIES RENDER
 ================================ */
 
-window.toggleProductStatus =
-async function(id){
+function renderCategories(){
 
-  const product =
-    products.find(p => p.id === id);
+  const box =
+    document.getElementById(
+      "categoriesList"
+    );
 
-  if(!product){
+
+  if(!categories.length){
+
+    box.innerHTML =
+      `<div class="empty">
+        No categories found.
+      </div>`;
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    categories.map(category=>`
+
+      <div class="category-row">
+
+        <div>
+
+          <strong>
+            ${escapeHtml(category.name)}
+          </strong>
+
+          <div style="
+            color:#666;
+            font-size:11px;
+            margin-top:4px;
+          ">
+
+            ${escapeHtml(
+              category.slug || ""
+            )}
+
+          </div>
+
+        </div>
+
+        <div class="category-actions">
+
+          <span class="badge ${
+            category.active
+            ?
+            "active"
+            :
+            ""
+          }">
+
+            ${
+              category.active
+              ?
+              "Active"
+              :
+              "Inactive"
+            }
+
+          </span>
+
+          <button
+            class="edit-btn"
+            onclick="editCategory(${category.id})"
+          >
+            Edit
+          </button>
+
+          <button
+            class="status-btn"
+            onclick="toggleCategory(${category.id})"
+          >
+            ${
+              category.active
+              ?
+              "Disable"
+              :
+              "Enable"
+            }
+          </button>
+
+          <button
+            class="delete-btn"
+            onclick="deleteCategory(${category.id})"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+/* ================================
+   CATEGORY MODAL
+================================ */
+
+window.openCategoryModal =
+function(){
+
+  editingCategoryId = null;
+
+  document.getElementById(
+    "categoryModalTitle"
+  ).textContent =
+    "Add Category";
+
+  document.querySelector(
+    "#categoryForm .save"
+  ).textContent =
+    "Save Category";
+
+  document.getElementById(
+    "categoryForm"
+  ).reset();
+
+  document.getElementById(
+    "categoryModal"
+  ).classList.add("show");
+
+};
+
+
+window.closeCategoryModal =
+function(){
+
+  editingCategoryId = null;
+
+  document.getElementById(
+    "categoryModal"
+  ).classList.remove("show");
+
+  document.getElementById(
+    "categoryForm"
+  ).reset();
+
+  document.getElementById(
+    "categoryMessage"
+  ).textContent = "";
+
+};
+
+
+/* ================================
+   CATEGORY ADD / UPDATE
+================================ */
+
+document
+  .getElementById("categoryForm")
+  .addEventListener(
+    "submit",
+    async function(e){
+
+      e.preventDefault();
+
+
+      const message =
+        document.getElementById(
+          "categoryMessage"
+        );
+
+
+      const name =
+        document.getElementById(
+          "categoryName"
+        ).value.trim();
+
+
+      const image =
+        document.getElementById(
+          "categoryImage"
+        ).value.trim();
+
+
+      if(!name){
+
+        message.style.color =
+          "#ff7777";
+
+        message.textContent =
+          "Category name is required.";
+
+        return;
+
+      }
+
+
+      const slug =
+        name
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g,"-")
+          .replace(/^-+|-+$/g,"");
+
+
+      let result;
+
+
+      if(editingCategoryId !== null){
+
+        result =
+          await supabase
+            .from("categories")
+            .update({
+              name:name,
+              slug:slug,
+              image_url:image || null
+            })
+            .eq("id",editingCategoryId);
+
+      }
+      else{
+
+        result =
+          await supabase
+            .from("categories")
+            .insert({
+              name:name,
+              slug:slug,
+              image_url:image || null,
+              active:true
+            });
+
+      }
+
+
+      if(result.error){
+
+        message.style.color =
+          "#ff7777";
+
+        message.textContent =
+          result.error.message;
+
+        return;
+
+      }
+
+
+      message.style.color =
+        "#7dff9b";
+
+      message.textContent =
+        editingCategoryId !== null
+        ?
+        "Category updated successfully."
+        :
+        "Category added successfully.";
+
+
+      await loadCategories();
+
+
+      setTimeout(()=>{
+
+        closeCategoryModal();
+
+      },700);
+
+    }
+  );
+
+
+/* ================================
+   EDIT CATEGORY
+================================ */
+
+window.editCategory =
+function(id){
+
+  const category =
+    categories.find(
+      c=>c.id === id
+    );
+
+  if(!category){
     return;
   }
 
-  const newStatus =
-    !product.active;
+
+  editingCategoryId = id;
+
+
+  document.getElementById(
+    "categoryModalTitle"
+  ).textContent =
+    "Edit Category";
+
+
+  document.querySelector(
+    "#categoryForm .save"
+  ).textContent =
+    "Update Category";
+
+
+  document.getElementById(
+    "categoryName"
+  ).value =
+    category.name || "";
+
+
+  document.getElementById(
+    "categoryImage"
+  ).value =
+    category.image_url || "";
+
+
+  document.getElementById(
+    "categoryModal"
+  ).classList.add("show");
+
+};
+
+
+/* ================================
+   CATEGORY STATUS
+================================ */
+
+window.toggleCategory =
+async function(id){
+
+  const category =
+    categories.find(
+      c=>c.id === id
+    );
+
+
+  if(!category){
+    return;
+  }
+
 
   const { error } =
     await supabase
-      .from("products")
+      .from("categories")
       .update({
-        active: newStatus
+        active:!category.active
       })
-      .eq("id", id);
+      .eq("id",id);
 
 
   if(error){
@@ -1315,11 +2318,243 @@ async function(id){
 
   }
 
+
+  await loadCategories();
+
+};
+
+
+/* ================================
+   DELETE CATEGORY
+================================ */
+
+window.deleteCategory =
+async function(id){
+
+  const category =
+    categories.find(
+      c=>c.id === id
+    );
+
+
+  if(!confirm(
+    `Delete "${category?.name || "category"}"?`
+  )){
+
+    return;
+
+  }
+
+
+  const { error } =
+    await supabase
+      .from("categories")
+      .delete()
+      .eq("id",id);
+
+
+  if(error){
+
+    alert(error.message);
+    return;
+
+  }
+
+
+  await loadCategories();
   await loadProducts();
 
 };
 
-  
+
+/* ================================
+   STORE SETTINGS
+================================ */
+
+let siteSettingsId = null;
+
+
+async function loadStoreSettings(){
+
+  const { data,error } =
+    await supabase
+      .from("site_settings")
+      .select("*")
+      .limit(1);
+
+
+  if(error){
+
+    console.error(error);
+    return;
+
+  }
+
+
+  if(!data || !data.length){
+
+    return;
+
+  }
+
+
+  const settings =
+    data[0];
+
+
+  siteSettingsId =
+    settings.id;
+
+
+  document.getElementById(
+    "siteName"
+  ).value =
+    settings.site_name || "";
+
+
+  document.getElementById(
+    "siteLogo"
+  ).value =
+    settings.logo_url || "";
+
+
+  document.getElementById(
+    "siteBanner"
+  ).value =
+    settings.banner_url || "";
+
+
+  document.getElementById(
+    "offerText"
+  ).value =
+    settings.offer_text || "";
+
+
+  document.getElementById(
+    "contactPhone"
+  ).value =
+    settings.contact_phone || "";
+
+
+  document.getElementById(
+    "contactEmail"
+  ).value =
+    settings.contact_email || "";
+
+
+  document.getElementById(
+    "storeDescription"
+  ).value =
+    settings.store_description || "";
+
+}
+
+
+/* ================================
+   SAVE STORE SETTINGS
+================================ */
+
+window.saveStoreSettings =
+async function(){
+
+  const message =
+    document.getElementById(
+      "storeMessage"
+    );
+
+
+  const values = {
+
+    site_name:
+      document.getElementById(
+        "siteName"
+      ).value.trim(),
+
+    logo_url:
+      document.getElementById(
+        "siteLogo"
+      ).value.trim(),
+
+    banner_url:
+      document.getElementById(
+        "siteBanner"
+      ).value.trim(),
+
+    offer_text:
+      document.getElementById(
+        "offerText"
+      ).value.trim(),
+
+    contact_phone:
+      document.getElementById(
+        "contactPhone"
+      ).value.trim(),
+
+    contact_email:
+      document.getElementById(
+        "contactEmail"
+      ).value.trim(),
+
+    store_description:
+      document.getElementById(
+        "storeDescription"
+      ).value.trim(),
+
+    updated_at:
+      new Date().toISOString()
+
+  };
+
+
+  let result;
+
+
+  if(siteSettingsId !== null){
+
+    result =
+      await supabase
+        .from("site_settings")
+        .update(values)
+        .eq("id",siteSettingsId);
+
+  }
+  else{
+
+    result =
+      await supabase
+        .from("site_settings")
+        .insert(values);
+
+  }
+
+
+  if(result.error){
+
+    console.error(result.error);
+
+    message.style.color =
+      "#ff7777";
+
+    message.textContent =
+      result.error.message;
+
+    return;
+
+  }
+
+
+  message.style.color =
+    "#7dff9b";
+
+  message.textContent =
+    "Store settings saved successfully.";
+
+
+  await loadStoreSettings();
+
+};
+
+
 /* ================================
    SAFE TEXT
 ================================ */
@@ -1327,20 +2562,32 @@ async function(id){
 function escapeHtml(value){
 
   return String(value)
-  .replaceAll("&","&amp;")
-  .replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
+
+
+/* ================================
+   CONNECTION
+================================ */
+
+document.getElementById(
+  "connectionStatus"
+).textContent =
+  "Connected";
 
 
 /* ================================
    START
 ================================ */
 
+await loadCategories();
 await loadProducts();
+await loadStoreSettings();
 
 </script>
 
