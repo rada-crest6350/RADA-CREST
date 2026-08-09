@@ -1,0 +1,930 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Product — RADA CREST</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
+</head>
+
+<body>
+
+<main class="section">
+
+  <a href="index.html">
+    ← Continue Shopping
+  </a>
+
+  <div id="productPage">
+    <p>Loading product...</p>
+  </div>
+
+</main>
+
+
+<script>
+
+const productPage =
+  document.getElementById("productPage");
+
+
+let product = null;
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function getCart(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem("rc_cart") || "[]"
+    );
+
+  }catch{
+
+    return [];
+
+  }
+
+}
+
+
+function saveCart(cart){
+
+  localStorage.setItem(
+    "rc_cart",
+    JSON.stringify(cart)
+  );
+
+}
+
+
+function getProductId(){
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return params.get("id");
+
+}
+
+
+function getImages(url){
+
+  if(!url) return [];
+
+  return String(url)
+    .split(/[\n,]+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+
+}
+
+
+async function loadProduct(){
+
+  if(!sbReady()){
+
+    productPage.innerHTML =
+      "<p>Supabase is not configured.</p>";
+
+    return;
+
+  }
+
+
+  const id =
+    getProductId();
+
+
+  if(!id){
+
+    productPage.innerHTML =
+      "<p>Product not found.</p>";
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("products")
+      .select("*")
+      .eq("id",id)
+      .eq("active",true)
+      .single();
+
+
+  if(error || !data){
+
+    productPage.innerHTML = `
+      <h2>Product not found</h2>
+      <a class="btn" href="index.html">
+        Back to Shop
+      </a>
+    `;
+
+    return;
+
+  }
+
+
+  product = data;
+
+
+  renderProduct();
+
+}
+
+
+function renderProduct(){
+
+  const price =
+    Number(product.price || 0);
+
+  const oldPrice =
+    Number(product.old_price || 0);
+
+  const stock =
+    Number(product.stock || 0);
+
+  const discount =
+    Number(product.discount_percent || 0);
+
+
+  const images =
+    getImages(product.image_url);
+
+
+  const imageList =
+    images.length
+      ? images
+      : [""];
+
+
+  productPage.innerHTML = `
+
+    <div
+      style="
+        display:grid;
+        grid-template-columns:
+          repeat(auto-fit,minmax(280px,1fr));
+        gap:35px;
+        margin-top:25px;
+      "
+    >
+
+      <div>
+
+        <div
+          id="mainImage"
+          style="
+            width:100%;
+            min-height:320px;
+            border-radius:18px;
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+          "
+        >
+
+          ${
+            imageList[0]
+
+            ?
+
+            `<img
+              src="${escapeHtml(imageList[0])}"
+              alt="${escapeHtml(product.name)}"
+              style="
+                width:100%;
+                height:100%;
+                max-height:520px;
+                object-fit:contain;
+              "
+            >`
+
+            :
+
+            `<span style="font-size:80px">
+              💡
+            </span>`
+          }
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            overflow-x:auto;
+            margin-top:12px;
+          "
+        >
+
+          ${imageList.map((img,index) => `
+
+            <button
+              type="button"
+              onclick="changeImage(${index})"
+              style="
+                min-width:75px;
+                height:75px;
+                padding:4px;
+                border-radius:10px;
+                overflow:hidden;
+              "
+            >
+
+              ${
+                img
+
+                ?
+
+                `<img
+                  src="${escapeHtml(img)}"
+                  alt=""
+                  style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                  "
+                >`
+
+                :
+
+                "💡"
+              }
+
+            </button>
+
+          `).join("")}
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <small>
+          ${escapeHtml(
+            product.category || "Electrical"
+          )}
+        </small>
+
+
+        <h1>
+          ${escapeHtml(product.name)}
+        </h1>
+
+
+        <div style="margin:15px 0">
+
+          <strong
+            style="font-size:28px"
+          >
+            ₹${price.toLocaleString("en-IN")}
+          </strong>
+
+
+          ${
+            oldPrice > price
+
+            ?
+
+            `<del style="margin-left:10px">
+              ₹${oldPrice.toLocaleString("en-IN")}
+            </del>`
+
+            :
+
+            ""
+          }
+
+
+          ${
+            discount > 0
+
+            ?
+
+            `<span
+              class="badge"
+              style="margin-left:10px"
+            >
+              ${discount}% OFF
+            </span>`
+
+            :
+
+            ""
+          }
+
+        </div>
+
+
+        ${
+          product.warranty
+
+          ?
+
+          `<p>
+            🛡️
+            <strong>Warranty:</strong>
+            ${escapeHtml(product.warranty)}
+          </p>`
+
+          :
+
+          ""
+        }
+
+
+        <p>
+          📦
+          ${
+            stock > 0
+              ? `${stock} available`
+              : "Out of Stock"
+          }
+        </p>
+
+
+        <div
+          style="
+            margin:20px 0;
+            line-height:1.7;
+          "
+        >
+
+          ${
+            product.description
+              ? escapeHtml(product.description)
+              : "Premium RADA CREST product designed for everyday use."
+          }
+
+        </div>
+
+
+        ${
+          stock > 0
+
+          ?
+
+          `
+
+          <label>
+            Quantity
+          </label>
+
+          <input
+            id="quantity"
+            type="number"
+            min="1"
+            max="${stock}"
+            value="1"
+            style="
+              width:90px;
+              margin:8px 0 15px;
+            "
+          >
+
+
+          <div
+            style="
+              display:flex;
+              gap:10px;
+              flex-wrap:wrap;
+            "
+          >
+
+            <button
+              class="btn"
+              type="button"
+              onclick="addToCart()"
+            >
+              Add to Cart
+            </button>
+
+
+            <button
+              class="buy"
+              type="button"
+              onclick="buyNow()"
+            >
+              Buy Now
+            </button>
+
+          </div>
+
+          `
+
+          :
+
+          `<button
+            class="btn"
+            disabled
+          >
+            Out of Stock
+          </button>`
+        }
+
+      </div>
+
+    </div>
+
+
+    <section
+      style="
+        margin-top:45px;
+      "
+    >
+
+      <h2>
+        Customer Reviews
+      </h2>
+
+      <div id="reviews">
+        Loading reviews...
+      </div>
+
+    </section>
+
+  `;
+
+
+  loadReviews();
+
+}
+
+
+function changeImage(index){
+
+  const images =
+    getImages(product.image_url);
+
+
+  if(!images[index]) return;
+
+
+  const box =
+    document.getElementById(
+      "mainImage"
+    );
+
+
+  box.innerHTML = `
+
+    <img
+      src="${escapeHtml(images[index])}"
+      alt="${escapeHtml(product.name)}"
+      style="
+        width:100%;
+        height:100%;
+        max-height:520px;
+        object-fit:contain;
+      "
+    >
+
+  `;
+
+}
+
+
+function addToCart(){
+
+  const quantity =
+    Number(
+      document.getElementById(
+        "quantity"
+      ).value
+    );
+
+
+  if(
+    !quantity ||
+    quantity < 1 ||
+    quantity > Number(product.stock)
+  ){
+
+    alert("Please select a valid quantity.");
+
+    return;
+
+  }
+
+
+  const cart =
+    getCart();
+
+
+  const existing =
+    cart.find(
+      x =>
+        Number(x.id) ===
+        Number(product.id)
+    );
+
+
+  if(existing){
+
+    existing.qty =
+      Math.min(
+        Number(product.stock),
+        existing.qty + quantity
+      );
+
+  }else{
+
+    cart.push({
+
+      id: product.id,
+
+      qty: quantity
+
+    });
+
+  }
+
+
+  saveCart(cart);
+
+
+  alert("Added to cart.");
+
+}
+
+
+async function buyNow(){
+
+  const quantity =
+    Number(
+      document.getElementById(
+        "quantity"
+      ).value
+    );
+
+
+  if(
+    !quantity ||
+    quantity < 1 ||
+    quantity > Number(product.stock)
+  ){
+
+    alert("Please select a valid quantity.");
+
+    return;
+
+  }
+
+
+  const {
+    data: {
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if(!user){
+
+    location.href =
+      "account.html?redirect=" +
+      encodeURIComponent(
+        "product.html?id=" +
+        product.id
+      );
+
+    return;
+
+  }
+
+
+  const name =
+    prompt(
+      "Enter your full name:"
+    );
+
+
+  if(!name || !name.trim()){
+
+    alert("Name is required.");
+
+    return;
+
+  }
+
+
+  const phoneInput =
+    prompt(
+      "Enter your 10-digit mobile number:"
+    );
+
+
+  const phone =
+    String(phoneInput || "")
+      .replace(/\D/g,"");
+
+
+  if(!/^[0-9]{10}$/.test(phone)){
+
+    alert(
+      "Please enter a valid 10-digit mobile number."
+    );
+
+    return;
+
+  }
+
+
+  const address =
+    prompt(
+      "Enter your complete delivery address:"
+    );
+
+
+  if(
+    !address ||
+    address.trim().length < 10
+  ){
+
+    alert(
+      "Complete address is required."
+    );
+
+    return;
+
+  }
+
+
+  const price =
+    Number(product.price || 0);
+
+
+  const total =
+    price * quantity;
+
+
+  const {
+    data: order,
+    error: orderError
+  } =
+    await supabaseClient
+      .from("orders")
+      .insert({
+
+        customer_id:
+          user.id,
+
+        customer_name:
+          name.trim(),
+
+        customer_phone:
+          phone,
+
+        customer_email:
+          user.email || null,
+
+        total_amount:
+          total,
+
+        status:
+          "pending",
+
+        payment_status:
+          "pending",
+
+        shipping_address:
+          address.trim()
+
+      })
+      .select()
+      .single();
+
+
+  if(orderError){
+
+    alert(
+      "Order failed:\n" +
+      orderError.message
+    );
+
+    return;
+
+  }
+
+
+  const {
+    error: itemError
+  } =
+    await supabaseClient
+      .from("order_items")
+      .insert({
+
+        order_id:
+          order.id,
+
+        product_id:
+          product.id,
+
+        product_name:
+          product.name,
+
+        quantity:
+          quantity,
+
+        price:
+          price
+
+      });
+
+
+  if(itemError){
+
+    alert(
+      "Order item could not be saved:\n" +
+      itemError.message
+    );
+
+    return;
+
+  }
+
+
+  const whatsappMessage =
+
+`RADA CREST — NEW ORDER
+
+Order ID: #${order.id}
+
+Product:
+${product.name}
+
+Quantity:
+${quantity}
+
+Price:
+₹${price.toLocaleString("en-IN")}
+
+Total:
+₹${total.toLocaleString("en-IN")}
+
+Customer:
+${name.trim()}
+
+Mobile:
+${phone}
+
+Email:
+${user.email || "Not provided"}
+
+Delivery Address:
+${address.trim()}
+
+Payment:
+Cash on Delivery
+
+Status:
+Pending Confirmation`;
+
+
+  const whatsappUrl =
+    "https://wa.me/919079714767?text=" +
+    encodeURIComponent(
+      whatsappMessage
+    );
+
+
+  window.location.href =
+    whatsappUrl;
+
+}
+
+
+async function loadReviews(){
+
+  const box =
+    document.getElementById(
+      "reviews"
+    );
+
+
+  if(!box) return;
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("product_reviews")
+      .select("*")
+      .eq(
+        "product_id",
+        product.id
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(error){
+
+    box.innerHTML =
+      "<p>Reviews will appear here.</p>";
+
+    return;
+
+  }
+
+
+  if(!data || !data.length){
+
+    box.innerHTML =
+      "<p>No reviews yet.</p>";
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    data.map(review => `
+
+      <div
+        style="
+          padding:15px;
+          margin:10px 0;
+          border-radius:12px;
+        "
+      >
+
+        <strong>
+          ${"⭐".repeat(
+            Math.min(
+              5,
+              Math.max(
+                1,
+                Number(review.rating)
+              )
+            )
+          )}
+        </strong>
+
+        <p>
+          ${escapeHtml(
+            review.review
+          )}
+        </p>
+
+        <small>
+          ${escapeHtml(
+            review.customer_name ||
+            "Customer"
+          )}
+        </small>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+loadProduct();
+
+</script>
+
+</body>
+</html>
