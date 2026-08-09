@@ -931,12 +931,26 @@ function renderProducts(){
 
         <td>
           <button
-            class="delete-btn"
-            onclick="deleteProduct(${product.id})"
-          >
-            Delete
-          </button>
-        </td>
+           class="edit-btn"
+           onclick="editProduct(${product.id})"
+         >
+           Edit
+         </button>
+
+          <button
+           class="status-btn"
+           onclick="toggleProductStatus(${product.id})"
+         > 
+          ${product.active ? "Disable" : "Enable"}
+         </button>
+
+           <button
+           class="delete-btn"
+          onclick="deleteProduct(${product.id})"
+       >
+          Delete
+       </button>
+      </td>
 
       </tr>
     `;
@@ -981,7 +995,8 @@ function(){
 document
 .getElementById("productForm")
 .addEventListener("submit", async function(e){
-
+.const product = {
+  
   e.preventDefault();
 
 
@@ -1128,7 +1143,183 @@ async function(id){
 
 };
 
+/* ================================
+   EDIT PRODUCT
+================================ */
 
+let editingProductId = null;
+
+window.editProduct =
+function(id){
+
+  const product =
+  products.find(p => p.id === id);
+
+  if(!product){
+    return;
+  }
+
+  editingProductId = id;
+
+  document.getElementById("productName").value =
+    product.name || "";
+
+  document.getElementById("productCategory").value =
+    product.category || "";
+
+  document.getElementById("productPrice").value =
+    product.price ?? "";
+
+  document.getElementById("productOldPrice").value =
+    product.old_price ?? "";
+
+  document.getElementById("productStock").value =
+    product.stock ?? 0;
+
+  document.getElementById("productWarranty").value =
+    product.warranty || "";
+
+  document.getElementById("productImage").value =
+    product.image_url || "";
+
+  document.getElementById("productDescription").value =
+    product.description || "";
+
+  document.querySelector("#productModal h2").textContent =
+    "Edit Product";
+
+  document.querySelector("#productForm .save").textContent =
+    "Update Product";
+
+  document
+    .getElementById("productModal")
+    .classList.add("show");
+};
+
+
+/* ================================
+   UPDATE PRODUCT
+================================ */
+
+async function updateProduct(){
+
+  const message =
+    document.getElementById("productMessage");
+
+  const updatedProduct = {
+
+    name:
+      document.getElementById("productName")
+      .value.trim(),
+
+    category:
+      document.getElementById("productCategory")
+      .value.trim(),
+
+    price:
+      Number(
+        document.getElementById("productPrice").value
+      ),
+
+    old_price:
+      Number(
+        document.getElementById("productOldPrice").value
+      ) || null,
+
+    stock:
+      Number(
+        document.getElementById("productStock").value
+      ) || 0,
+
+    warranty:
+      document.getElementById("productWarranty")
+      .value.trim(),
+
+    image_url:
+      document.getElementById("productImage")
+      .value.trim(),
+
+    description:
+      document.getElementById("productDescription")
+      .value.trim()
+
+  };
+
+
+  const { error } =
+    await supabase
+      .from("products")
+      .update(updatedProduct)
+      .eq("id", editingProductId);
+
+
+  if(error){
+
+    console.error(error);
+
+    message.style.color = "#ff7777";
+    message.textContent = error.message;
+
+    return;
+
+  }
+
+
+  message.style.color = "#7dff9b";
+  message.textContent =
+    "Product updated successfully.";
+
+  await loadProducts();
+
+  setTimeout(() => {
+
+    editingProductId = null;
+
+    closeProductModal();
+
+  },700);
+
+}
+
+
+/* ================================
+   ACTIVE / INACTIVE
+================================ */
+
+window.toggleProductStatus =
+async function(id){
+
+  const product =
+    products.find(p => p.id === id);
+
+  if(!product){
+    return;
+  }
+
+  const newStatus =
+    !product.active;
+
+  const { error } =
+    await supabase
+      .from("products")
+      .update({
+        active: newStatus
+      })
+      .eq("id", id);
+
+
+  if(error){
+
+    alert(error.message);
+    return;
+
+  }
+
+  await loadProducts();
+
+};
+
+  
 /* ================================
    SAFE TEXT
 ================================ */
