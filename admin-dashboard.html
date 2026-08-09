@@ -1,18 +1,1157 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Dashboard — RADA CREST</title><link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script>
-</head><body><header class="header"><a class="brand" href="index.html"><span class="brand-mark">RC</span><span>RADA <b>CREST</b></span></a><nav><a href="index.html">Store</a><a href="#" onclick="logout()">Logout</a></nav></header>
-<main class="section"><p class="eyebrow">ADMIN DASHBOARD</p><h1>Store Overview</h1><div class="stats"><div><b id="orders">—</b><small>Orders</small></div><div><b id="customers">—</b><small>Customers</small></div><div><b id="products">—</b><small>Products</small></div><div><b>SECURE</b><small>Supabase Auth + RLS</small></div></div>
-<div class="admin-grid"><div><h2>Products</h2><p>Add, edit, activate/deactivate and manage stock.</p><button class="btn" onclick="location.href='admin-products.html'">Manage Products</button></div>
-<div><h2>Orders</h2><p>View orders and update delivery status.</p><button class="btn" onclick="location.href='admin-orders.html'">Manage Orders</button></div>
-<div><h2>Customers</h2><p>View customer profiles allowed by RLS.</p><button class="btn" onclick="location.href='admin-customers.html'">View Customers</button></div></div></main>
-<script>
-async function guard(){if(!sbReady())return;const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return location.href='admin.html';const {data:p}=await supabaseClient.from('profiles').select('role').eq('id',user.id).single();if(p?.role!=='admin'){await supabaseClient.auth.signOut();location.href='admin.html';return}
-const [{count:o},{count:c},{count:pr}]=await Promise.all([
- supabaseClient.from('orders').select('*',{count:'exact',head:true}),
- supabaseClient.from('profiles').select('*',{count:'exact',head:true}),
- supabaseClient.from('products').select('*',{count:'exact',head:true})
-]);orders.textContent=o??0;customers.textContent=c??0;products.textContent=pr??0}
-async function logout(){await supabaseClient.auth.signOut();location.href='admin.html'} guard();
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RADA CREST — Admin Dashboard</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#090909;
+  color:#fff;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:240px;
+  height:100vh;
+  background:#111;
+  border-right:1px solid #242424;
+  padding:24px 15px;
+  z-index:10;
+}
+
+.brand{
+  padding:10px 12px 28px;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.brand span{
+  display:block;
+  margin-top:6px;
+  color:#777;
+  font-size:10px;
+  letter-spacing:3px;
+}
+
+.menu button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#999;
+  text-align:left;
+  padding:14px 12px;
+  border-radius:10px;
+  margin-bottom:5px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.menu button:hover,
+.menu button.active{
+  background:#222;
+  color:#fff;
+}
+
+.logout{
+  position:absolute;
+  bottom:24px;
+  left:15px;
+  width:210px;
+  padding:12px;
+  border:1px solid #292929;
+  border-radius:10px;
+  background:#191919;
+  color:#fff;
+  cursor:pointer;
+}
+
+.main{
+  margin-left:240px;
+  padding:30px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+}
+
+.topbar h1{
+  margin:0;
+  font-size:28px;
+}
+
+.admin-name{
+  color:#888;
+  font-size:13px;
+}
+
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;
+}
+
+.card{
+  background:#151515;
+  border:1px solid #282828;
+  border-radius:16px;
+  padding:22px;
+}
+
+.card small{
+  color:#888;
+}
+
+.card h2{
+  margin:10px 0 0;
+  font-size:28px;
+}
+
+.panel{
+  margin-top:25px;
+  background:#151515;
+  border:1px solid #282828;
+  border-radius:16px;
+  padding:22px;
+}
+
+.panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.panel-header h2{
+  margin:0;
+}
+
+.primary{
+  border:0;
+  background:#fff;
+  color:#111;
+  padding:11px 17px;
+  border-radius:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.primary:hover{
+  opacity:.9;
+}
+
+.search{
+  width:100%;
+  max-width:350px;
+  background:#0d0d0d;
+  color:#fff;
+  border:1px solid #333;
+  padding:12px;
+  border-radius:9px;
+  outline:none;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
+}
+
+th{
+  text-align:left;
+  color:#777;
+  font-size:12px;
+  padding:13px 10px;
+  border-bottom:1px solid #292929;
+}
+
+td{
+  padding:14px 10px;
+  border-bottom:1px solid #222;
+  font-size:13px;
+}
+
+.product-img{
+  width:45px;
+  height:45px;
+  object-fit:cover;
+  border-radius:8px;
+  background:#222;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:6px;
+  font-size:11px;
+  background:#222;
+  color:#aaa;
+}
+
+.badge.active{
+  color:#9cffb0;
+}
+
+.delete-btn{
+  background:#241313;
+  color:#ff7777;
+  border:1px solid #492020;
+  border-radius:7px;
+  padding:7px 10px;
+  cursor:pointer;
+}
+
+.empty{
+  padding:35px;
+  text-align:center;
+  color:#777;
+}
+
+/* MODAL */
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:100;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-box{
+  width:min(600px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#151515;
+  border:1px solid #333;
+  border-radius:18px;
+  padding:25px;
+}
+
+.modal-box h2{
+  margin-top:0;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.field{
+  margin-bottom:15px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+.field label{
+  display:block;
+  color:#aaa;
+  font-size:12px;
+  margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  background:#0d0d0d;
+  color:#fff;
+  border:1px solid #333;
+  border-radius:9px;
+  padding:12px;
+  outline:none;
+}
+
+.field textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.form-actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.cancel{
+  flex:1;
+  padding:12px;
+  border:1px solid #333;
+  background:#202020;
+  color:#fff;
+  border-radius:9px;
+  cursor:pointer;
+}
+
+.save{
+  flex:1;
+  padding:12px;
+  border:0;
+  background:#fff;
+  color:#111;
+  border-radius:9px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.message{
+  margin-top:12px;
+  font-size:13px;
+  color:#ff7777;
+}
+
+@media(max-width:900px){
+
+  .sidebar{
+    width:70px;
+    padding:15px 8px;
+  }
+
+  .brand{
+    font-size:0;
+    text-align:center;
+  }
+
+  .brand:after{
+    content:"RC";
+    font-size:16px;
+  }
+
+  .brand span{
+    display:none;
+  }
+
+  .menu button{
+    text-align:center;
+    font-size:0;
+  }
+
+  .menu button::first-letter{
+    font-size:18px;
+  }
+
+  .logout{
+    width:54px;
+    left:8px;
+    font-size:0;
+  }
+
+  .logout:after{
+    content:"↪";
+    font-size:18px;
+  }
+
+  .main{
+    margin-left:70px;
+    padding:20px;
+  }
+
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:600px){
+
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .panel-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .search{
+    max-width:none;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .field.full{
+    grid-column:auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+  <div class="brand">
+    RADA CREST
+    <span>ADMIN PANEL</span>
+  </div>
+
+  <div class="menu">
+
+    <button class="active" onclick="showPage('dashboard',this)">
+      ◉ Dashboard
+    </button>
+
+    <button onclick="showPage('products',this)">
+      ▣ Products
+    </button>
+
+    <button onclick="showPage('orders',this)">
+      ▤ Orders
+    </button>
+
+    <button onclick="showPage('customers',this)">
+      ♙ Customers
+    </button>
+
+    <button onclick="showPage('store',this)">
+      ⚙ Store Control
+    </button>
+
+  </div>
+
+  <button class="logout" onclick="logout()">
+    Logout
+  </button>
+
+</aside>
+
+
+<main class="main">
+
+  <div class="topbar">
+    <h1 id="pageTitle">Dashboard</h1>
+    <div class="admin-name">RADA CREST ADMIN</div>
+  </div>
+
+
+  <!-- DASHBOARD -->
+
+  <section id="dashboard" class="page active">
+
+    <div class="cards">
+
+      <div class="card">
+        <small>Total Sales</small>
+        <h2>₹0</h2>
+      </div>
+
+      <div class="card">
+        <small>Total Orders</small>
+        <h2 id="dashboardOrders">0</h2>
+      </div>
+
+      <div class="card">
+        <small>Total Products</small>
+        <h2 id="dashboardProducts">0</h2>
+      </div>
+
+      <div class="card">
+        <small>Customers</small>
+        <h2 id="dashboardCustomers">0</h2>
+      </div>
+
+    </div>
+
+    <div class="panel">
+      <h2>Recent Orders</h2>
+      <div class="empty">
+        Orders system will be connected next.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Sales Overview</h2>
+      <div class="empty">
+        Sales data will appear here.
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- PRODUCTS -->
+
+  <section id="products" class="page">
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <h2>Products</h2>
+
+        <button class="primary" onclick="openProductModal()">
+          + Add Product
+        </button>
+
+      </div>
+
+      <input
+        id="searchProduct"
+        class="search"
+        type="search"
+        placeholder="Search products..."
+        oninput="renderProducts()"
+      >
+
+      <div class="table-wrap" style="margin-top:20px;">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="productsTable">
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ORDERS -->
+
+  <section id="orders" class="page">
+
+    <div class="panel">
+      <h2>Orders</h2>
+
+      <div class="empty">
+        Orders management will be added next.
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- CUSTOMERS -->
+
+  <section id="customers" class="page">
+
+    <div class="panel">
+      <h2>Customers</h2>
+
+      <div class="empty">
+        Customer management will be added next.
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- STORE CONTROL -->
+
+  <section id="store" class="page">
+
+    <div class="panel">
+      <h2>Store Control</h2>
+
+      <div class="empty">
+        Logo, banners, offers and categories will be added next.
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- ADD PRODUCT MODAL -->
+
+<div id="productModal" class="modal">
+
+  <div class="modal-box">
+
+    <h2>Add Product</h2>
+
+    <form id="productForm">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label>Product Name *</label>
+          <input id="productName" required>
+        </div>
+
+        <div class="field">
+          <label>Category</label>
+          <input id="productCategory">
+        </div>
+
+        <div class="field">
+          <label>Price *</label>
+          <input id="productPrice" type="number" min="0" step="0.01" required>
+        </div>
+
+        <div class="field">
+          <label>Old Price</label>
+          <input id="productOldPrice" type="number" min="0" step="0.01">
+        </div>
+
+        <div class="field">
+          <label>Stock</label>
+          <input id="productStock" type="number" min="0" value="0">
+        </div>
+
+        <div class="field">
+          <label>Warranty</label>
+          <input id="productWarranty" placeholder="Example: 1 Year">
+        </div>
+
+        <div class="field full">
+          <label>Product Image URL</label>
+          <input id="productImage" placeholder="https://...">
+        </div>
+
+        <div class="field full">
+          <label>Description</label>
+          <textarea id="productDescription"></textarea>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          type="button"
+          class="cancel"
+          onclick="closeProductModal()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="save"
+        >
+          Save Product
+        </button>
+
+      </div>
+
+      <div id="productMessage" class="message"></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<script type="module">
+
+import { createClient }
+from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+
+/* ================================
+   SUPABASE
+================================ */
+
+const SUPABASE_URL =
+"https://ynpsnkvrjhaxdynmurzj.supabase.co";
+
+
+const SUPABASE_KEY =
+"sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+
+
+const supabase =
+createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* ================================
+   SESSION SECURITY
+================================ */
+
+const { data: sessionData } =
+await supabase.auth.getSession();
+
+
+if(!sessionData.session){
+
+  window.location.href =
+  "admin.html";
+
+}
+
+
+/* ================================
+   NAVIGATION
+================================ */
+
+window.showPage =
+function(page,button){
+
+  document
+  .querySelectorAll(".page")
+  .forEach(p=>{
+    p.classList.remove("active");
+  });
+
+  document
+  .getElementById(page)
+  .classList.add("active");
+
+
+  document
+  .querySelectorAll(".menu button")
+  .forEach(b=>{
+    b.classList.remove("active");
+  });
+
+
+  button.classList.add("active");
+
+
+  const titles = {
+
+    dashboard:"Dashboard",
+
+    products:"Products",
+
+    orders:"Orders",
+
+    customers:"Customers",
+
+    store:"Store Control"
+
+  };
+
+
+  document.getElementById("pageTitle")
+  .textContent = titles[page];
+
+};
+
+
+/* ================================
+   LOGOUT
+================================ */
+
+window.logout =
+async function(){
+
+  await supabase.auth.signOut();
+
+  window.location.href =
+  "admin.html";
+
+};
+
+
+/* ================================
+   PRODUCTS
+================================ */
+
+let products = [];
+
+
+async function loadProducts(){
+
+  const { data,error } =
+  await supabase
+  .from("products")
+  .select("*")
+  .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    console.error(error);
+
+    return;
+
+  }
+
+
+  products = data || [];
+
+  renderProducts();
+
+  document.getElementById(
+    "dashboardProducts"
+  ).textContent =
+  products.length;
+
+}
+
+
+function renderProducts(){
+
+  const tbody =
+  document.getElementById(
+    "productsTable"
+  );
+
+
+  const search =
+  document.getElementById(
+    "searchProduct"
+  ).value
+  .toLowerCase()
+  .trim();
+
+
+  const filtered =
+  products.filter(product => {
+
+    return (
+      (product.name || "")
+      .toLowerCase()
+      .includes(search)
+      ||
+      (product.category || "")
+      .toLowerCase()
+      .includes(search)
+    );
+
+  });
+
+
+  if(!filtered.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">
+          <div class="empty">
+            No products found.
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+  filtered.map(product => {
+
+    const image =
+    product.image_url
+    ?
+    `<img class="product-img"
+      src="${escapeHtml(product.image_url)}"
+      alt="">`
+    :
+    `<div class="product-img"></div>`;
+
+
+    return `
+      <tr>
+
+        <td>${image}</td>
+
+        <td>
+          <strong>
+            ${escapeHtml(product.name || "")}
+          </strong>
+        </td>
+
+        <td>
+          ${escapeHtml(product.category || "-")}
+        </td>
+
+        <td>
+          ₹${Number(product.price || 0).toLocaleString("en-IN")}
+        </td>
+
+        <td>
+          ${product.stock ?? 0}
+        </td>
+
+        <td>
+          <span class="badge ${product.active ? "active" : ""}">
+            ${product.active ? "Active" : "Inactive"}
+          </span>
+        </td>
+
+        <td>
+          <button
+            class="delete-btn"
+            onclick="deleteProduct(${product.id})"
+          >
+            Delete
+          </button>
+        </td>
+
+      </tr>
+    `;
+
+  }).join("");
+
+}
+
+
+/* ================================
+   ADD PRODUCT
+================================ */
+
+window.openProductModal =
+function(){
+
+  document
+  .getElementById("productModal")
+  .classList.add("show");
+
+};
+
+
+window.closeProductModal =
+function(){
+
+  document
+  .getElementById("productModal")
+  .classList.remove("show");
+
+  document
+  .getElementById("productForm")
+  .reset();
+
+  document
+  .getElementById("productMessage")
+  .textContent = "";
+
+};
+
+
+document
+.getElementById("productForm")
+.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+
+  const message =
+  document.getElementById(
+    "productMessage"
+  );
+
+
+  message.style.color = "#999";
+
+  message.textContent =
+  "Saving product...";
+
+
+  const product = {
+
+    name:
+    document.getElementById(
+      "productName"
+    ).value.trim(),
+
+    category:
+    document.getElementById(
+      "productCategory"
+    ).value.trim(),
+
+    price:
+    Number(
+      document.getElementById(
+        "productPrice"
+      ).value
+    ),
+
+    old_price:
+    Number(
+      document.getElementById(
+        "productOldPrice"
+      ).value
+    ) || null,
+
+    stock:
+    Number(
+      document.getElementById(
+        "productStock"
+      ).value
+    ) || 0,
+
+    warranty:
+    document.getElementById(
+      "productWarranty"
+    ).value.trim(),
+
+    image_url:
+    document.getElementById(
+      "productImage"
+    ).value.trim(),
+
+    description:
+    document.getElementById(
+      "productDescription"
+    ).value.trim(),
+
+    active:true
+
+  };
+
+
+  const { error } =
+  await supabase
+  .from("products")
+  .insert(product);
+
+
+  if(error){
+
+    console.error(error);
+
+    message.style.color =
+    "#ff7777";
+
+    message.textContent =
+    error.message;
+
+    return;
+
+  }
+
+
+  message.style.color =
+  "#7dff9b";
+
+  message.textContent =
+  "Product added successfully.";
+
+
+  await loadProducts();
+
+
+  setTimeout(()=>{
+
+    closeProductModal();
+
+  },700);
+
+});
+
+
+/* ================================
+   DELETE PRODUCT
+================================ */
+
+window.deleteProduct =
+async function(id){
+
+  const confirmDelete =
+  confirm(
+    "Delete this product?"
+  );
+
+
+  if(!confirmDelete){
+    return;
+  }
+
+
+  const { error } =
+  await supabase
+  .from("products")
+  .delete()
+  .eq("id",id);
+
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+
+  }
+
+
+  await loadProducts();
+
+};
+
+
+/* ================================
+   SAFE TEXT
+================================ */
+
+function escapeHtml(value){
+
+  return String(value)
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+
+}
+
+
+/* ================================
+   START
+================================ */
+
+await loadProducts();
+
+</script>
+
+</body>
+</html>
