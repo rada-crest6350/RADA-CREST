@@ -1,46 +1,530 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Account — RADA CREST</title><link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script><script src="supabase-client.js"></script>
-</head><body class="center-page"><main class="auth">
-<a class="brand" href="index.html"><span class="brand-mark">RC</span><span>RADA <b>CREST</b></span></a>
-<h1 id="title">Welcome to RADA CREST</h1><p id="sub">Login to continue shopping.</p>
-<section id="login">
-<label>Email</label><input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com">
-<label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="Password">
-<button class="btn full" onclick="login()">Login</button>
-<button class="text-btn" onclick="showSignup()">Create Account</button>
-<button class="text-btn" onclick="resetPassword()">Forgot Password?</button>
-</section>
-<section id="signup" class="hidden">
-<label>Name</label><input id="signupName" autocomplete="name" placeholder="Your name">
-<label>Email</label><input id="signupEmail" type="email" autocomplete="email" placeholder="you@example.com">
-<label>Password</label><input id="signupPass" type="password" autocomplete="new-password" placeholder="At least 8 characters">
-<button class="btn full" onclick="signup()">Create Account</button>
-<button class="text-btn" onclick="showLogin()">Already have an account? Login</button>
-</section>
-<p id="msg" class="msg"></p></main>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Account — RADA CREST</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
+</head>
+
+<body class="center-page">
+
+<main class="auth">
+
+  <a class="brand" href="index.html">
+    <span class="brand-mark">RC</span>
+    <span>RADA <b>CREST</b></span>
+  </a>
+
+
+  <h1 id="title">
+    Welcome to RADA CREST
+  </h1>
+
+  <p id="sub">
+    Login to continue shopping.
+  </p>
+
+
+  <!-- LOGIN -->
+
+  <section id="login">
+
+    <label>Email</label>
+
+    <input
+      id="loginEmail"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+    >
+
+
+    <label>Password</label>
+
+    <input
+      id="loginPass"
+      type="password"
+      autocomplete="current-password"
+      placeholder="Password"
+    >
+
+
+    <button
+      class="btn full"
+      type="button"
+      onclick="login()"
+    >
+      Login
+    </button>
+
+
+    <button
+      class="text-btn"
+      type="button"
+      onclick="showSignup()"
+    >
+      Create Account
+    </button>
+
+
+    <button
+      class="text-btn"
+      type="button"
+      onclick="resetPassword()"
+    >
+      Forgot Password?
+    </button>
+
+
+    <button
+      class="text-btn"
+      type="button"
+      onclick="continueAsGuest()"
+    >
+      Skip for now
+    </button>
+
+  </section>
+
+
+  <!-- SIGNUP -->
+
+  <section
+    id="signup"
+    class="hidden"
+  >
+
+    <label>Name</label>
+
+    <input
+      id="signupName"
+      autocomplete="name"
+      placeholder="Your full name"
+    >
+
+
+    <label>Email</label>
+
+    <input
+      id="signupEmail"
+      type="email"
+      autocomplete="email"
+      placeholder="you@example.com"
+    >
+
+
+    <label>Password</label>
+
+    <input
+      id="signupPass"
+      type="password"
+      autocomplete="new-password"
+      minlength="8"
+      placeholder="At least 8 characters"
+    >
+
+
+    <button
+      class="btn full"
+      type="button"
+      onclick="signup()"
+    >
+      Create Account
+    </button>
+
+
+    <button
+      class="text-btn"
+      type="button"
+      onclick="showLogin()"
+    >
+      Already have an account? Login
+    </button>
+
+  </section>
+
+
+  <p
+    id="msg"
+    class="msg"
+  ></p>
+
+</main>
+
+
 <script>
-function showSignup(){login.classList.add('hidden');signup.classList.remove('hidden');title.textContent='Create your account';sub.textContent='Create an account to track orders.'}
-function showLogin(){signup.classList.add('hidden');login.classList.remove('hidden');title.textContent='Welcome to RADA CREST';sub.textContent='Login to continue shopping.'}
+
+const loginBox =
+  document.getElementById("login");
+
+const signupBox =
+  document.getElementById("signup");
+
+const title =
+  document.getElementById("title");
+
+const sub =
+  document.getElementById("sub");
+
+const msg =
+  document.getElementById("msg");
+
+
+function showSignup(){
+
+  loginBox.classList.add("hidden");
+
+  signupBox.classList.remove("hidden");
+
+  title.textContent =
+    "Create your account";
+
+  sub.textContent =
+    "Create an account to track your orders.";
+
+  msg.textContent = "";
+
+}
+
+
+function showLogin(){
+
+  signupBox.classList.add("hidden");
+
+  loginBox.classList.remove("hidden");
+
+  title.textContent =
+    "Welcome to RADA CREST";
+
+  sub.textContent =
+    "Login to continue shopping.";
+
+  msg.textContent = "";
+
+}
+
+
+function getRedirect(){
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  return (
+    params.get("redirect") ||
+    "index.html"
+  );
+
+}
+
+
+function continueAsGuest(){
+
+  sessionStorage.setItem(
+    "rc_guest",
+    "true"
+  );
+
+  location.href =
+    getRedirect();
+
+}
+
+
 async function signup(){
- if(!sbReady()) return msg.textContent='First configure Supabase in config.js.';
- const email=signupEmail.value.trim(), password=signupPass.value, name=signupName.value.trim();
- if(!email||!name||password.length<8) return msg.textContent='Enter name, valid email and password (8+ characters).';
- const {error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:name}}});
- msg.textContent=error?error.message:'Account created. Check your email if confirmation is enabled, then login.';
+
+  if(!sbReady()){
+
+    msg.textContent =
+      "Supabase is not configured.";
+
+    return;
+
+  }
+
+
+  const name =
+    document
+      .getElementById("signupName")
+      .value
+      .trim();
+
+
+  const email =
+    document
+      .getElementById("signupEmail")
+      .value
+      .trim();
+
+
+  const password =
+    document
+      .getElementById("signupPass")
+      .value;
+
+
+  if(!name){
+
+    msg.textContent =
+      "Please enter your name.";
+
+    return;
+
+  }
+
+
+  if(!email){
+
+    msg.textContent =
+      "Please enter your email.";
+
+    return;
+
+  }
+
+
+  if(password.length < 8){
+
+    msg.textContent =
+      "Password must be at least 8 characters.";
+
+    return;
+
+  }
+
+
+  msg.textContent =
+    "Creating your account...";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth.signUp({
+
+      email: email,
+
+      password: password,
+
+      options: {
+
+        data: {
+          full_name: name
+        },
+
+        emailRedirectTo:
+          window.location.origin +
+          "/account.html"
+
+      }
+
+    });
+
+
+  if(error){
+
+    msg.textContent =
+      error.message;
+
+    return;
+
+  }
+
+
+  if(data.session){
+
+    sessionStorage.removeItem(
+      "rc_guest"
+    );
+
+    location.href =
+      getRedirect();
+
+    return;
+
+  }
+
+
+  msg.textContent =
+    "Account created. Check your email for confirmation, then login.";
+
 }
+
+
 async function login(){
- if(!sbReady()) return msg.textContent='First configure Supabase in config.js.';
- const {data,error}=await supabaseClient.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPass.value});
- if(error) return msg.textContent=error.message;
- location.href='index.html';
+
+  if(!sbReady()){
+
+    msg.textContent =
+      "Supabase is not configured.";
+
+    return;
+
+  }
+
+
+  const email =
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
+
+  const password =
+    document
+      .getElementById("loginPass")
+      .value;
+
+
+  if(!email || !password){
+
+    msg.textContent =
+      "Enter your email and password.";
+
+    return;
+
+  }
+
+
+  msg.textContent =
+    "Logging in...";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth
+      .signInWithPassword({
+
+        email: email,
+
+        password: password
+
+      });
+
+
+  if(error){
+
+    msg.textContent =
+      error.message;
+
+    return;
+
+  }
+
+
+  sessionStorage.removeItem(
+    "rc_guest"
+  );
+
+
+  location.href =
+    getRedirect();
+
 }
+
+
 async function resetPassword(){
- if(!sbReady()) return msg.textContent='First configure Supabase in config.js.';
- const email=loginEmail.value.trim(); if(!email)return msg.textContent='Enter your email first.';
- const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/reset-password.html'});
- msg.textContent=error?error.message:'Password reset email sent.';
+
+  if(!sbReady()){
+
+    msg.textContent =
+      "Supabase is not configured.";
+
+    return;
+
+  }
+
+
+  const email =
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
+
+  if(!email){
+
+    msg.textContent =
+      "Enter your email first.";
+
+    return;
+
+  }
+
+
+  msg.textContent =
+    "Sending reset email...";
+
+
+  const {
+    error
+  } =
+    await supabaseClient.auth
+      .resetPasswordForEmail(
+
+        email,
+
+        {
+
+          redirectTo:
+            window.location.origin +
+            "/reset-password.html"
+
+        }
+
+      );
+
+
+  msg.textContent =
+    error
+      ? error.message
+      : "Password reset email sent. Check your inbox.";
+
 }
-</script></body></html>
+
+
+async function checkExistingSession(){
+
+  if(!sbReady()) return;
+
+
+  const {
+    data: {
+      session
+    }
+  } =
+    await supabaseClient.auth
+      .getSession();
+
+
+  if(session){
+
+    location.href =
+      getRedirect();
+
+  }
+
+}
+
+
+checkExistingSession();
+
+</script>
+
+</body>
+
+</html>
