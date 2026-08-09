@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="en">
 
 <head>
@@ -10,7 +11,9 @@
   <link rel="stylesheet" href="style.css">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="config.js"></script>
+
   <script src="supabase-client.js"></script>
 
   <style>
@@ -108,6 +111,11 @@
       .cart-item > div:last-child{
         grid-column:2;
       }
+
+      .cart-item img{
+        width:65px;
+        height:65px;
+      }
     }
   </style>
 
@@ -117,7 +125,7 @@
 
 <main class="section">
 
-  <a href="index.html">← Continue Shopping</a>
+<a href="index.html">← Continue Shopping</a>
 
   <h1>Your Cart</h1>
 
@@ -125,63 +133,65 @@
     <p>Loading cart...</p>
   </div>
 
+  <div
+    id="checkout"
+    class="checkout-box"
+    style="display:none"
+  >
 
-  <div id="checkout" class="checkout-box" style="display:none">
+```
+<h2>Delivery Details</h2>
 
-    <h2>Delivery Details</h2>
+<label>Full Name</label>
 
-    <p>
-      Enter your details to place your order.
-    </p>
-
-    <label>Full Name</label>
-
-    <input
-      id="customerName"
-      type="text"
-      autocomplete="name"
-      placeholder="Your full name"
-    >
-
-
-    <label>Mobile Number</label>
-
-    <input
-      id="customerPhone"
-      type="tel"
-      inputmode="numeric"
-      maxlength="10"
-      placeholder="10-digit mobile number"
-    >
+<input
+  id="customerName"
+  type="text"
+  autocomplete="name"
+  placeholder="Your full name"
+>
 
 
-    <label>Delivery Address</label>
+<label>Mobile Number</label>
 
-    <textarea
-      id="customerAddress"
-      autocomplete="street-address"
-      placeholder="House / Shop No, Street, Village / City, District, State, PIN"
-    ></textarea>
+<input
+  id="customerPhone"
+  type="tel"
+  inputmode="numeric"
+  maxlength="10"
+  autocomplete="tel"
+  placeholder="10-digit mobile number"
+>
 
 
-    <button
-      id="orderBtn"
-      class="btn full"
-      type="button"
-      onclick="placeOrder()"
-    >
-      Place Order on WhatsApp
-    </button>
+<label>Delivery Address</label>
 
-    <p
-      id="checkoutMsg"
-      class="msg"
-    ></p>
+<textarea
+  id="customerAddress"
+  autocomplete="street-address"
+  placeholder="House / Street / Village / City / PIN code"
+></textarea>
+
+
+<button
+  id="orderBtn"
+  class="btn full"
+  type="button"
+  onclick="placeOrder()"
+>
+  Place Order on WhatsApp
+</button>
+
+
+<p
+  id="checkoutMsg"
+  class="msg"
+></p>
+```
 
   </div>
 
 </main>
-
 
 <script>
 
@@ -210,7 +220,7 @@ function getCart(){
       localStorage.getItem("rc_cart") || "[]"
     );
 
-  }catch{
+  }catch(error){
 
     return [];
 
@@ -256,6 +266,7 @@ async function render(){
 
     cartBox.innerHTML = `
       <div style="padding:30px 0">
+
         <h2>Your cart is empty.</h2>
 
         <a
@@ -264,6 +275,7 @@ async function render(){
         >
           Shop Products
         </a>
+
       </div>
     `;
 
@@ -353,8 +365,16 @@ async function render(){
     if(stock > 0){
 
       quantity =
-        Math.min(quantity,stock);
+        Math.min(
+          quantity,
+          stock
+        );
 
+    }
+
+
+    if(quantity < 1){
+      quantity = 1;
     }
 
 
@@ -390,7 +410,6 @@ async function render(){
             `<img
               src="${escapeHtml(image)}"
               alt="${escapeHtml(product.name)}"
-              onerror="this.style.display='none'"
             >`
 
             :
@@ -402,6 +421,8 @@ async function render(){
                 display:grid;
                 place-items:center;
                 font-size:40px;
+                background:#f5f5f5;
+                border-radius:12px;
               "
             >
               💡
@@ -432,9 +453,11 @@ async function render(){
               −
             </button>
 
+
             <strong>
               ${quantity}
             </strong>
+
 
             <button
               type="button"
@@ -544,7 +567,7 @@ function changeQty(id,difference){
 
 
   item.qty =
-    Number(item.qty) +
+    Number(item.qty || 1) +
     difference;
 
 
@@ -553,7 +576,10 @@ function changeQty(id,difference){
     const index =
       cart.indexOf(item);
 
-    cart.splice(index,1);
+    cart.splice(
+      index,
+      1
+    );
 
   }
 
@@ -568,12 +594,11 @@ function changeQty(id,difference){
 function removeItem(id){
 
   const cart =
-    getCart()
-      .filter(
-        x =>
-          Number(x.id) !==
-          Number(id)
-      );
+    getCart().filter(
+      x =>
+        Number(x.id) !==
+        Number(id)
+    );
 
 
   saveCart(cart);
@@ -587,11 +612,17 @@ async function placeOrder(){
 
   if(placingOrder) return;
 
+
   const msg =
-    document.getElementById("checkoutMsg");
+    document.getElementById(
+      "checkoutMsg"
+    );
+
 
   const button =
-    document.getElementById("orderBtn");
+    document.getElementById(
+      "orderBtn"
+    );
 
 
   if(!cartProducts.length){
@@ -685,7 +716,6 @@ async function placeOrder(){
 
   try{
 
-
     /*
       1. CREATE ORDER
     */
@@ -694,37 +724,37 @@ async function placeOrder(){
       data: order,
       error: orderError
     } =
-    await supabaseClient
-      .from("orders")
-      .insert({
+      await supabaseClient
+        .from("orders")
+        .insert({
 
-        customer_id:
-          user.id,
+          customer_id:
+            user.id,
 
-        customer_name:
-          name,
+          customer_name:
+            name,
 
-        customer_phone:
-          phone,
+          customer_phone:
+            phone,
 
-        customer_email:
-          user.email || null,
+          customer_email:
+            user.email || null,
 
-        total_amount:
-          cartTotal,
+          total_amount:
+            cartTotal,
 
-        status:
-          "pending",
+          status:
+            "pending",
 
-        payment_status:
-          "pending",
+          payment_status:
+            "pending",
 
-        shipping_address:
-          address
+          shipping_address:
+            address
 
-      })
-      .select()
-      .single();
+        })
+        .select()
+        .single();
 
 
     if(orderError){
@@ -777,9 +807,9 @@ async function placeOrder(){
     const {
       error: itemError
     } =
-    await supabaseClient
-      .from("order_items")
-      .insert(orderItems);
+      await supabaseClient
+        .from("order_items")
+        .insert(orderItems);
 
 
     if(itemError){
@@ -790,7 +820,7 @@ async function placeOrder(){
 
 
     /*
-      3. WHATSAPP MESSAGE
+      3. CREATE WHATSAPP MESSAGE
     */
 
     let productText = "";
@@ -851,19 +881,19 @@ Pending Confirmation`;
 
 
     /*
-      4. CLEAR CART
-    */
-
-    localStorage.removeItem("rc_cart");
-
-
-    /*
-      5. OPEN YOUR WHATSAPP
+      4. SAVE WHATSAPP URL
     */
 
     const whatsappUrl =
       "https://wa.me/919079714767?text=" +
       encodeURIComponent(message);
+
+
+    /*
+      5. CLEAR CART
+    */
+
+    localStorage.removeItem("rc_cart");
 
 
     msg.style.color = "#1b8a3a";
@@ -872,12 +902,12 @@ Pending Confirmation`;
       "Order created. Opening WhatsApp...";
 
 
-    setTimeout(() => {
+    /*
+      6. OPEN WHATSAPP DIRECTLY
+    */
 
-      window.location.href =
-        whatsappUrl;
-
-    },500);
+    window.location.href =
+      whatsappUrl;
 
 
   }catch(error){
