@@ -1,12 +1,947 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RADA CREST — Premium Electrical</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script></head>
-<body><header class="header"><a class="brand" href="index.html"><span class="brand-mark">RC</span><span>RADA <b>CREST</b></span></a><div class="search"><input id="search" placeholder="Search products..." oninput="loadProducts()"><button>⌕</button></div><nav><a href="#products">Shop</a><a href="#why">Why Us</a><a href="account.html">Account</a><a href="cart.html">🛒 <span id="cartCount">0</span></a></nav></header>
-<section class="hero"><div><p class="eyebrow">RADA CREST • SMART ELECTRICAL</p><h1>Light up your home.<br><em>Upgrade your everyday.</em></h1><p>Premium LED lighting and electrical essentials designed for modern homes.</p><a class="btn" href="#products">Shop Now →</a></div><div class="hero-card"><span>NEW</span><strong>LED<br>COLLECTION</strong><small>Efficient • Reliable • Premium</small></div></section>
-<section id="products" class="section"><div class="section-head"><h2>Featured Products</h2></div><div id="grid" class="grid"></div></section>
-<section id="why" class="why"><div><p class="eyebrow">WHY RADA CREST</p><h2>Built for everyday trust.</h2></div><div class="benefits"><div>✓<b>Quality Products</b><small>Made for daily use</small></div><div>✓<b>Warranty Support</b><small>Clear product warranty</small></div><div>✓<b>Secure Packaging</b><small>Carefully packed</small></div><div>✓<b>Customer Support</b><small>Help when you need it</small></div></div></section>
-<footer><div class="brand"><span class="brand-mark">RC</span><span>RADA <b>CREST</b></span></div><div><a href="admin.html">Admin</a> · <a href="account.html">Account</a> · <a href="cart.html">Cart</a></div></footer>
+<!doctype html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>RADA CREST — Premium Electrical</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+  <a
+    class="brand"
+    href="index.html"
+  >
+
+    <span class="brand-mark">
+      RC
+    </span>
+
+    <span>
+      RADA <b>CREST</b>
+    </span>
+
+  </a>
+
+
+  <div class="search">
+
+    <input
+      id="search"
+      type="search"
+      placeholder="Search products..."
+      autocomplete="off"
+      oninput="loadProducts()"
+    >
+
+    <button
+      type="button"
+      onclick="loadProducts()"
+    >
+      ⌕
+    </button>
+
+  </div>
+
+
+  <nav>
+
+    <a href="#products">
+      Shop
+    </a>
+
+    <a href="#why">
+      Why Us
+    </a>
+
+    <a href="account.html">
+      Account
+    </a>
+
+    <a href="cart.html">
+      🛒
+      <span id="cartCount">0</span>
+    </a>
+
+  </nav>
+
+</header>
+
+
+
+<section class="hero">
+
+  <div>
+
+    <p class="eyebrow">
+      RADA CREST • SMART ELECTRICAL
+    </p>
+
+    <h1>
+      Light up your home.
+      <br>
+      <em>Upgrade your everyday.</em>
+    </h1>
+
+    <p>
+      Premium LED lighting and electrical
+      essentials designed for modern homes.
+    </p>
+
+    <a
+      class="btn"
+      href="#products"
+    >
+      Shop Now →
+    </a>
+
+  </div>
+
+
+  <div class="hero-card">
+
+    <span>
+      NEW
+    </span>
+
+    <strong>
+      LED
+      <br>
+      COLLECTION
+    </strong>
+
+    <small>
+      Efficient • Reliable • Premium
+    </small>
+
+  </div>
+
+</section>
+
+
+
+<section
+  id="products"
+  class="section"
+>
+
+  <div class="section-head">
+
+    <div>
+
+      <p class="eyebrow">
+        RADA CREST COLLECTION
+      </p>
+
+      <h2>
+        Featured Products
+      </h2>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="grid"
+    class="grid"
+  >
+
+    <p>
+      Loading products...
+    </p>
+
+  </div>
+
+</section>
+
+
+
+<section
+  id="why"
+  class="why"
+>
+
+  <div>
+
+    <p class="eyebrow">
+      WHY RADA CREST
+    </p>
+
+    <h2>
+      Built for everyday trust.
+    </h2>
+
+  </div>
+
+
+  <div class="benefits">
+
+    <div>
+      ✓
+      <b>Quality Products</b>
+      <small>
+        Made for daily use
+      </small>
+    </div>
+
+
+    <div>
+      ✓
+      <b>Warranty Support</b>
+      <small>
+        Clear product warranty
+      </small>
+    </div>
+
+
+    <div>
+      ✓
+      <b>Secure Packaging</b>
+      <small>
+        Carefully packed
+      </small>
+    </div>
+
+
+    <div>
+      ✓
+      <b>Customer Support</b>
+      <small>
+        Help when you need it
+      </small>
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<footer>
+
+  <div class="brand">
+
+    <span class="brand-mark">
+      RC
+    </span>
+
+    <span>
+      RADA <b>CREST</b>
+    </span>
+
+  </div>
+
+
+  <div>
+
+    <a href="admin.html">
+      Admin
+    </a>
+
+    ·
+
+    <a href="account.html">
+      Account
+    </a>
+
+    ·
+
+    <a href="cart.html">
+      Cart
+    </a>
+
+  </div>
+
+</footer>
+
+
+
 <script>
-let products=[];
-async function loadProducts(){if(!sbReady()){grid.innerHTML='<p>Configure Supabase in config.js to load products.</p>';return}
- let q=search.value.trim();let query=supabaseClient.from('products').select('*').eq('active',true).order('created_at',{ascending:false});if(q)query=query.ilike('name','%'+q+'%');let {data,error}=await query;products=data||[];if(error)return grid.innerHTML='<p>'+error.message+'</p>';grid.innerHTML=products.map(p=>`<article class="product"><div class="pimg"><strong>💡</strong></div><div class="pbody"><small>${p.category}</small><h3>${p.name}</h3><div><b>₹${Number(p.price).toLocaleString('en-IN')}</b> ${p.old_price?`<del>₹${Number(p.old_price).toLocaleString('en-IN')}</del>`:''}</div><button class="btn small" onclick="add(${p.id})">Add to Cart</button><button class="buy" onclick="buy(${p.id})">Buy Now</button></div></article>`).join('')}
-function getCart(){return JSON.parse(localStorage.getItem('rc_cart')||'[]')}function saveCart(c){localStorage.setItem('rc_cart',JSON.stringify(c));document.getElementById('cartCount').textContent=c.reduce((s,x)=>s+x.qty,0)}function add(id){let c=getCart(),x=c.find(a=>a.id===id);x?x.qty++:c.push({id,qty:1});saveCart(c);alert('Added to cart')}function buy(id){add(id);location.href='cart.html'}saveCart(getCart());loadProducts();
-</script></body></html>
+
+
+let products = [];
+
+
+
+function getCart(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem("rc_cart") || "[]"
+    );
+
+  }catch{
+
+    return [];
+
+  }
+
+}
+
+
+
+function saveCart(cart){
+
+  localStorage.setItem(
+    "rc_cart",
+    JSON.stringify(cart)
+  );
+
+
+  updateCartCount();
+
+}
+
+
+
+function updateCartCount(){
+
+  const cart =
+    getCart();
+
+
+  const count =
+    cart.reduce(
+      (total,item) =>
+        total + (Number(item.qty) || 0),
+      0
+    );
+
+
+  const element =
+    document.getElementById(
+      "cartCount"
+    );
+
+
+  if(element){
+
+    element.textContent =
+      count;
+
+  }
+
+}
+
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+
+}
+
+
+
+async function loadProducts(){
+
+  const grid =
+    document.getElementById(
+      "grid"
+    );
+
+
+  if(!sbReady()){
+
+    grid.innerHTML = `
+
+      <div class="empty">
+
+        Supabase is not configured.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  const searchInput =
+    document.getElementById(
+      "search"
+    );
+
+
+  const searchText =
+    searchInput
+      ? searchInput.value.trim()
+      : "";
+
+
+  let query =
+    supabaseClient
+      .from("products")
+      .select("*")
+      .eq("active",true)
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+  if(searchText){
+
+    query =
+      query.or(
+        "name.ilike.%" +
+        searchText +
+        "%,category.ilike.%" +
+        searchText +
+        "%"
+      );
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await query;
+
+
+  if(error){
+
+    console.error(error);
+
+
+    grid.innerHTML = `
+
+      <div class="empty">
+
+        Unable to load products.
+
+        <br><br>
+
+        ${escapeHtml(
+          error.message
+        )}
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  products =
+    data || [];
+
+
+  if(!products.length){
+
+    grid.innerHTML = `
+
+      <div class="empty">
+
+        No products found.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  grid.innerHTML =
+    products.map(
+      product =>
+        createProductCard(
+          product
+        )
+    ).join("");
+
+}
+
+
+
+function createProductCard(product){
+
+  const price =
+    Number(
+      product.price || 0
+    );
+
+
+  const oldPrice =
+    Number(
+      product.old_price || 0
+    );
+
+
+  const stock =
+    Number(
+      product.stock || 0
+    );
+
+
+  const discount =
+    Number(
+      product.discount_percent || 0
+    );
+
+
+  const outOfStock =
+    stock <= 0;
+
+
+  let discountBadge = "";
+
+
+  if(discount > 0){
+
+    discountBadge = `
+
+      <span
+        class="badge"
+        style="margin-left:6px"
+      >
+        ${discount}% OFF
+      </span>
+
+    `;
+
+  }
+
+
+  let image = `
+
+    <div
+      class="pimg"
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      "
+    >
+
+      <strong>
+        💡
+      </strong>
+
+    </div>
+
+  `;
+
+
+  if(product.image_url){
+
+    image = `
+
+      <div
+        class="pimg"
+        style="
+          overflow:hidden;
+          position:relative;
+        "
+      >
+
+        <img
+          src="${escapeHtml(
+            product.image_url
+          )}"
+          alt="${escapeHtml(
+            product.name
+          )}"
+          loading="lazy"
+          style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+          "
+        >
+
+      </div>
+
+    `;
+
+  }
+
+
+  const stockText =
+    outOfStock
+      ? "Out of Stock"
+      : `${stock} in stock`;
+
+
+  const buttons =
+    outOfStock
+
+      ?
+
+      `
+
+      <button
+        class="btn small"
+        type="button"
+        disabled
+      >
+        Out of Stock
+      </button>
+
+      `
+
+      :
+
+      `
+
+      <button
+        class="btn small"
+        type="button"
+        onclick="addToCart(${product.id})"
+      >
+        Add to Cart
+      </button>
+
+
+      <button
+        class="buy"
+        type="button"
+        onclick="buyNow(${product.id})"
+      >
+        Buy Now
+      </button>
+
+      `;
+
+
+  return `
+
+    <article class="product">
+
+      ${image}
+
+
+      <div class="pbody">
+
+        <small>
+          ${escapeHtml(
+            product.category ||
+            "Electrical"
+          )}
+        </small>
+
+
+        <h3>
+          ${escapeHtml(
+            product.name
+          )}
+        </h3>
+
+
+        <div>
+
+          <b>
+            ₹${price.toLocaleString(
+              "en-IN"
+            )}
+          </b>
+
+
+          ${
+            oldPrice > price
+
+            ?
+
+            `
+
+            <del>
+              ₹${oldPrice.toLocaleString(
+                "en-IN"
+              )}
+            </del>
+
+            `
+
+            :
+
+            ""
+          }
+
+
+          ${discountBadge}
+
+        </div>
+
+
+        ${
+          product.warranty
+
+          ?
+
+          `
+
+          <small>
+            Warranty:
+            ${escapeHtml(
+              product.warranty
+            )}
+          </small>
+
+          `
+
+          :
+
+          ""
+        }
+
+
+        <small>
+
+          ${stockText}
+
+        </small>
+
+
+        <div
+          style="
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+            margin-top:10px;
+          "
+        >
+
+          ${buttons}
+
+        </div>
+
+      </div>
+
+    </article>
+
+  `;
+
+}
+
+
+
+function addToCart(id){
+
+  const product =
+    products.find(
+      p =>
+        Number(p.id) ===
+        Number(id)
+    );
+
+
+  if(!product){
+
+    alert(
+      "Product not found."
+    );
+
+    return;
+
+  }
+
+
+  const stock =
+    Number(
+      product.stock || 0
+    );
+
+
+  if(stock <= 0){
+
+    alert(
+      "This product is currently out of stock."
+    );
+
+    return;
+
+  }
+
+
+  const cart =
+    getCart();
+
+
+  const existing =
+    cart.find(
+      item =>
+        Number(item.id) ===
+        Number(id)
+    );
+
+
+  if(existing){
+
+    if(
+      Number(existing.qty) >=
+      stock
+    ){
+
+      alert(
+        "Maximum available stock reached."
+      );
+
+      return;
+
+    }
+
+
+    existing.qty++;
+
+  }else{
+
+    cart.push({
+
+      id:
+        product.id,
+
+      qty:
+        1
+
+    });
+
+  }
+
+
+  saveCart(cart);
+
+
+  alert(
+    "Product added to cart."
+  );
+
+}
+
+
+
+function buyNow(id){
+
+  const product =
+    products.find(
+      p =>
+        Number(p.id) ===
+        Number(id)
+    );
+
+
+  if(!product){
+
+    alert(
+      "Product not found."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    Number(product.stock || 0) <= 0
+  ){
+
+    alert(
+      "This product is currently out of stock."
+    );
+
+    return;
+
+  }
+
+
+  const cart =
+    getCart();
+
+
+  const existing =
+    cart.find(
+      item =>
+        Number(item.id) ===
+        Number(id)
+    );
+
+
+  if(existing){
+
+    existing.qty = 1;
+
+  }else{
+
+    cart.push({
+
+      id:
+        product.id,
+
+      qty:
+        1
+
+    });
+
+  }
+
+
+  saveCart(cart);
+
+
+  location.href =
+    "cart.html";
+
+}
+
+
+
+updateCartCount();
+
+loadProducts();
+
+
+</script>
+
+
+</body>
+
+</html>
