@@ -1,140 +1,572 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Product — RADA CREST</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="supabase-client.js"></script>
-<style>
-.rc-wrap{max-width:1180px;margin:auto;padding-bottom:60px}.rc-back{display:inline-block;margin-bottom:22px;font-weight:700}
-.rc-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:48px}.rc-media{position:sticky;top:18px}
-.rc-main{height:500px;border:1px solid #e7e7e7;border-radius:26px;background:#fafaf8;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.rc-main img,.rc-main video{width:100%;height:100%;object-fit:contain;padding:24px;box-sizing:border-box}.rc-main iframe{width:100%;height:100%;border:0}
-.rc-empty{color:#777;text-align:center}.rc-nav{display:flex;gap:10px;overflow:auto;padding:12px 2px}
-.rc-thumb{width:78px;height:78px;min-width:78px;border:1px solid #ddd;border-radius:13px;background:#fff;padding:3px;overflow:hidden;cursor:pointer}
-.rc-thumb.active{border:2px solid #111}.rc-thumb img{width:100%;height:100%;object-fit:contain}.rc-video{width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff;font-size:28px}
-.rc-info small{color:#777;font-weight:700;text-transform:uppercase}.rc-info h1{font-size:clamp(32px,5vw,54px);line-height:1.05;margin:10px 0 18px;letter-spacing:-.04em}
-.rc-price-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rc-price{font-size:34px;font-weight:900}.rc-mrp{text-decoration:line-through;color:#888}.rc-off{background:#111;color:#fff;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900}
-.rc-trust{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}.rc-trust div{border:1px solid #e7e7e7;border-radius:15px;padding:13px}.rc-trust b{display:block;font-size:13px}.rc-trust span{font-size:12px;color:#777}
-.rc-desc{white-space:pre-line;line-height:1.75;color:#444;margin:20px 0}.rc-qty{display:flex;align-items:center;gap:9px;margin:20px 0}.rc-qty button{width:42px;height:42px;border:1px solid #ddd;background:#fff;border-radius:11px;font-size:22px}.rc-qty input{width:62px;height:42px;text-align:center;border:1px solid #ddd;border-radius:11px;font-weight:800}
-.rc-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.rc-actions button{min-height:52px;border-radius:14px;font-weight:900;cursor:pointer}.rc-cart{background:#111;color:#fff;border:0}.rc-buy{background:#fff;color:#111;border:1px solid #111}
-.rc-msg{min-height:24px;margin-top:10px;font-weight:700}.rc-section{margin-top:60px}.rc-review{border:1px solid #e7e7e7;border-radius:17px;padding:17px;margin:12px 0}.rc-stars{letter-spacing:2px}
-@media(max-width:850px){.rc-grid{grid-template-columns:1fr}.rc-media{position:static}.rc-main{height:420px}}
-@media(max-width:560px){.rc-main{height:340px}.rc-actions{grid-template-columns:1fr}.rc-info h1{font-size:34px}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Product — RADA CREST</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
+  <style>
+    .rc-wrap{max-width:1180px;margin:auto;padding:24px 16px 70px}
+    .rc-back{display:inline-block;margin-bottom:24px;font-weight:800;text-decoration:none}
+    .rc-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:48px}
+    .rc-media{position:sticky;top:18px;align-self:start}
+    .rc-main{height:520px;border:1px solid #e7e7e7;border-radius:26px;background:#fafaf8;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .rc-main img,.rc-main video{width:100%;height:100%;object-fit:contain;padding:20px;box-sizing:border-box}
+    .rc-main iframe{width:100%;height:100%;border:0}
+    .rc-empty{color:#777;text-align:center;font-weight:700;line-height:1.7;padding:20px}
+    .rc-nav{display:flex;gap:10px;overflow-x:auto;padding:13px 2px 5px;scrollbar-width:thin}
+    .rc-thumb{width:78px;height:78px;min-width:78px;border:1px solid #ddd;border-radius:13px;background:#fff;padding:3px;overflow:hidden;cursor:pointer}
+    .rc-thumb.active{border:2px solid #111}
+    .rc-thumb img{width:100%;height:100%;object-fit:contain}
+    .rc-video-thumb{width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff;font-size:25px}
+    .rc-info small{color:#777;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .rc-info h1{font-size:clamp(32px,5vw,54px);line-height:1.05;margin:10px 0 18px;letter-spacing:-.04em}
+    .rc-price-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .rc-price{font-size:34px;font-weight:900}
+    .rc-mrp{text-decoration:line-through;color:#888}
+    .rc-off{background:#111;color:#fff;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900}
+    .rc-trust{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
+    .rc-trust div{border:1px solid #e7e7e7;border-radius:15px;padding:13px}
+    .rc-trust b{display:block;font-size:13px}
+    .rc-trust span{font-size:12px;color:#777}
+    .rc-desc{white-space:pre-line;line-height:1.75;color:#444;margin:20px 0}
+    .rc-qty{display:flex;align-items:center;gap:9px;margin:20px 0}
+    .rc-qty button{width:42px;height:42px;border:1px solid #ddd;background:#fff;border-radius:11px;font-size:22px;cursor:pointer}
+    .rc-qty input{width:62px;height:42px;text-align:center;border:1px solid #ddd;border-radius:11px;font-weight:800}
+    .rc-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .rc-actions button{min-height:52px;border-radius:14px;font-weight:900;cursor:pointer}
+    .rc-cart{background:#111;color:#fff;border:0}
+    .rc-buy{background:#fff;color:#111;border:1px solid #111}
+    .rc-msg{min-height:24px;margin-top:10px;font-weight:700}
+    .rc-section{margin-top:60px}
+    .rc-review{border:1px solid #e7e7e7;border-radius:17px;padding:17px;margin:12px 0}
+    .rc-stars{letter-spacing:2px}
+    @media(max-width:850px){
+      .rc-grid{grid-template-columns:1fr}
+      .rc-media{position:static}
+      .rc-main{height:420px}
+    }
+    @media(max-width:560px){
+      .rc-main{height:340px}
+      .rc-actions{grid-template-columns:1fr}
+      .rc-info h1{font-size:34px}
+    }
+  </style>
 </head>
+
 <body>
 <main class="section rc-wrap">
-<a class="rc-back" href="index.html">← Continue Shopping</a>
-<div id="productPage"><p>Loading product...</p></div>
+  <a class="rc-back" href="index.html">← Continue Shopping</a>
+  <div id="productPage"><p>Loading product...</p></div>
 </main>
 
 <script>
-const productPage=document.getElementById("productPage");
-let product=null,media=[],activeMedia=0;
+"use strict";
 
-function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
-function images(v){return String(v||"").split(/[\n,]+/).map(x=>x.trim()).filter(Boolean)}
+const productPage = document.getElementById("productPage");
+
+let product = null;
+let media = [];
+let activeMedia = 0;
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function getUrls(value){
+  return String(value || "")
+    .split(/[\n,]+/)
+    .map(x => x.trim())
+    .filter(Boolean);
+}
+
+function getProductId(){
+  return new URLSearchParams(window.location.search).get("id");
+}
+
 function youtubeId(url){
   try{
-    const u=new URL(url);
-    if(u.hostname.includes("youtu.be"))return u.pathname.split("/")[1]||null;
-    if(u.hostname.includes("youtube.com")){
-      if(u.pathname==="/watch")return u.searchParams.get("v");
-      if(u.pathname.startsWith("/shorts/"))return u.pathname.split("/")[2]||null;
-      if(u.pathname.startsWith("/embed/"))return u.pathname.split("/")[2]||null;
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+
+    if(host === "youtu.be" || host.endsWith(".youtu.be")){
+      return u.pathname.split("/").filter(Boolean)[0] || null;
     }
-  }catch(e){}
+
+    if(host.includes("youtube.com")){
+      if(u.pathname === "/watch"){
+        return u.searchParams.get("v");
+      }
+
+      if(u.pathname.startsWith("/shorts/")){
+        return u.pathname.split("/").filter(Boolean)[1] || null;
+      }
+
+      if(u.pathname.startsWith("/embed/")){
+        return u.pathname.split("/").filter(Boolean)[1] || null;
+      }
+    }
+  }catch(e){
+    return null;
+  }
+
   return null;
 }
+
 function buildMedia(){
-  media=images(product.image_url).map(url=>({type:"image",url}));
-  if(product.video_url)media.push({type:"video",url:String(product.video_url).trim()});
-  if(!media.length)media=[{type:"empty",url:""}];
-}
-function renderMedia(){
-  const box=document.getElementById("rcMain"); if(!box)return;
-  const m=media[activeMedia];
-  if(m.type==="empty"){box.innerHTML='<div class="rc-empty">💡<br>Product image unavailable</div>';return}
-  if(m.type==="image"){
-    box.innerHTML=`<img src="${esc(m.url)}" alt="${esc(product.name)}" onerror="this.parentElement.innerHTML='<div class="rc-empty">🖼️<br>Image unavailable</div>'>`;
-  }else{
-    const id=youtubeId(m.url);
-    box.innerHTML=id?`<iframe src="https://www.youtube.com/embed/${encodeURIComponent(id)}" title="Product video" allowfullscreen></iframe>`:`<video src="${esc(m.url)}" controls playsinline preload="metadata" onerror="this.parentElement.innerHTML='<div class="rc-empty">🎬<br>Video unavailable</div>'"></video>`;
+  media = [];
+
+  getUrls(product.image_url).forEach(url => {
+    media.push({type:"image", url});
+  });
+
+  if(product.video_url){
+    const videoUrl = String(product.video_url).trim();
+    if(videoUrl){
+      media.push({type:"video", url:videoUrl});
+    }
   }
-  document.querySelectorAll(".rc-thumb").forEach((x,i)=>x.classList.toggle("active",i===activeMedia));
+
+  if(!media.length){
+    media.push({type:"empty", url:""});
+  }
+
+  activeMedia = 0;
 }
-function selectMedia(i){activeMedia=i;renderMedia()}
+
+function renderMedia(){
+  const box = document.getElementById("rcMain");
+  if(!box) return;
+
+  const item = media[activeMedia];
+
+  if(!item || item.type === "empty"){
+    box.innerHTML = '<div class="rc-empty">💡<br>Product image unavailable</div>';
+    return;
+  }
+
+  if(item.type === "image"){
+    box.innerHTML = `
+      <img
+        src="${esc(item.url)}"
+        alt="${esc(product.name)}"
+        onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;rc-empty&quot;>🖼️<br>Image unavailable</div>'"
+      >
+    `;
+  }else{
+    const id = youtubeId(item.url);
+
+    if(id){
+      box.innerHTML = `
+        <iframe
+          src="https://www.youtube.com/embed/${encodeURIComponent(id)}"
+          title="RADA CREST Product Video"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      `;
+    }else{
+      box.innerHTML = `
+        <video
+          src="${esc(item.url)}"
+          controls
+          playsinline
+          preload="metadata"
+          onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;rc-empty&quot;>🎬<br>Video unavailable</div>'">
+        </video>
+      `;
+    }
+  }
+
+  document.querySelectorAll(".rc-thumb").forEach((thumb,index)=>{
+    thumb.classList.toggle("active", index === activeMedia);
+  });
+}
+
+function selectMedia(index){
+  if(index < 0 || index >= media.length) return;
+  activeMedia = index;
+  renderMedia();
+}
+
 function renderThumbs(){
-  const nav=document.getElementById("rcNav");
-  nav.innerHTML=media.map((m,i)=>m.type==="image"
-    ?`<button class="rc-thumb ${i===0?"active":""}" onclick="selectMedia(${i})"><img src="${esc(m.url)}" alt=""></button>`
-    :m.type==="video"?`<button class="rc-thumb" onclick="selectMedia(${i})"><span class="rc-video">▶</span></button>`:"").join("");
+  const nav = document.getElementById("rcNav");
+  if(!nav) return;
+
+  nav.innerHTML = media.map((item,index)=>{
+    if(item.type === "image"){
+      return `
+        <button
+          type="button"
+          class="rc-thumb ${index === 0 ? "active" : ""}"
+          onclick="selectMedia(${index})"
+          aria-label="Product image ${index + 1}">
+          <img src="${esc(item.url)}" alt="">
+        </button>
+      `;
+    }
+
+    if(item.type === "video"){
+      return `
+        <button
+          type="button"
+          class="rc-thumb"
+          onclick="selectMedia(${index})"
+          aria-label="Product video">
+          <span class="rc-video-thumb">▶</span>
+        </button>
+      `;
+    }
+
+    return "";
+  }).join("");
 }
-function discount(){
-  const mrp=Number(product.old_price||0),price=Number(product.price||0);
-  return mrp>price&&mrp>0?Math.round((mrp-price)/mrp*100):0;
+
+function getDiscount(){
+  const mrp = Number(product.old_price || 0);
+  const price = Number(product.price || 0);
+
+  if(mrp > 0 && price >= 0 && price < mrp){
+    return Math.round(((mrp - price) / mrp) * 100);
+  }
+
+  return 0;
 }
+
 function renderProduct(){
-  const price=Number(product.price||0),mrp=Number(product.old_price||0),stock=Number(product.stock||0),off=discount();
+  const price = Number(product.price || 0);
+  const mrp = Number(product.old_price || 0);
+  const stock = Number(product.stock || 0);
+  const off = getDiscount();
+
   buildMedia();
-  productPage.innerHTML=`
-  <div class="rc-grid">
-    <div class="rc-media"><div id="rcMain" class="rc-main"></div><div id="rcNav" class="rc-nav"></div></div>
-    <div class="rc-info">
-      <small>${esc(product.category||"RADA CREST")}</small>
-      <h1>${esc(product.name)}</h1>
-      <div class="rc-price-row"><span class="rc-price">₹${price.toLocaleString("en-IN")}</span>${mrp>price?`<span class="rc-mrp">₹${mrp.toLocaleString("en-IN")}</span>`:""}${off?`<span class="rc-off">${off}% OFF</span>`:""}</div>
-      <div class="rc-trust"><div><b>🛡 Warranty</b><span>${esc(product.warranty||"As specified")}</span></div><div><b>📦 Stock</b><span>${stock>0?stock+" available":"Out of stock"}</span></div></div>
-      <div class="rc-desc">${product.description?esc(product.description):"Premium RADA CREST product designed for everyday use."}</div>
-      ${stock>0?`<div class="rc-qty"><b>Quantity</b><button onclick="changeQty(-1)">−</button><input id="qty" type="number" min="1" max="${stock}" value="1"><button onclick="changeQty(1)">+</button></div><div class="rc-actions"><button class="rc-cart" onclick="addToCart()">Add to Cart</button><button class="rc-buy" onclick="buyNow()">Buy Now</button></div><div id="msg" class="rc-msg"></div>`:`<button class="btn" disabled>Out of Stock</button>`}
+
+  productPage.innerHTML = `
+    <div class="rc-grid">
+
+      <div class="rc-media">
+        <div id="rcMain" class="rc-main"></div>
+        <div id="rcNav" class="rc-nav"></div>
+      </div>
+
+      <div class="rc-info">
+        <small>${esc(product.category || "RADA CREST")}</small>
+
+        <h1>${esc(product.name || "RADA CREST Product")}</h1>
+
+        <div class="rc-price-row">
+          <span class="rc-price">
+            ₹${price.toLocaleString("en-IN")}
+          </span>
+
+          ${mrp > price ? `
+            <span class="rc-mrp">
+              ₹${mrp.toLocaleString("en-IN")}
+            </span>
+          ` : ""}
+
+          ${off ? `
+            <span class="rc-off">${off}% OFF</span>
+          ` : ""}
+        </div>
+
+        <div class="rc-trust">
+          <div>
+            <b>🛡 Warranty</b>
+            <span>${esc(product.warranty || "As specified")}</span>
+          </div>
+
+          <div>
+            <b>📦 Stock</b>
+            <span>${stock > 0 ? stock + " available" : "Out of stock"}</span>
+          </div>
+        </div>
+
+        <div class="rc-desc">
+          ${product.description
+            ? esc(product.description)
+            : "Premium RADA CREST product designed for everyday use."}
+        </div>
+
+        ${
+          stock > 0
+          ? `
+            <div class="rc-qty">
+              <b>Quantity</b>
+              <button type="button" onclick="changeQty(-1)">−</button>
+              <input id="qty" type="number" min="1" max="${stock}" value="1">
+              <button type="button" onclick="changeQty(1)">+</button>
+            </div>
+
+            <div class="rc-actions">
+              <button type="button" class="rc-cart" onclick="addToCart()">
+                Add to Cart
+              </button>
+
+              <button type="button" class="rc-buy" onclick="buyNow()">
+                Buy Now
+              </button>
+            </div>
+
+            <div id="msg" class="rc-msg"></div>
+          `
+          : `
+            <button class="btn" type="button" disabled>
+              Out of Stock
+            </button>
+          `
+        }
+      </div>
     </div>
-  </div>
-  <section class="rc-section"><h2>Customer Reviews</h2><div id="reviews">Loading reviews...</div></section>`;
-  renderMedia();renderThumbs();loadReviews();
+
+    <section class="rc-section">
+      <h2>Customer Reviews</h2>
+      <div id="reviews">Loading reviews...</div>
+    </section>
+  `;
+
+  renderMedia();
+  renderThumbs();
+  loadReviews();
 }
-function changeQty(d){
-  const q=document.getElementById("qty");if(!q)return;
-  q.value=Math.max(1,Math.min(Number(product.stock),Number(q.value||1)+d));
+
+function changeQty(delta){
+  const input = document.getElementById("qty");
+  if(!input) return;
+
+  const stock = Number(product.stock || 0);
+  const current = Number(input.value || 1);
+
+  input.value = Math.max(
+    1,
+    Math.min(stock, current + delta)
+  );
 }
-function qty(){
-  const q=Number(document.getElementById("qty")?.value||0);
-  if(!Number.isInteger(q)||q<1||q>Number(product.stock)){document.getElementById("msg").textContent="Please select a valid quantity.";return null}
-  return q;
+
+function getQty(){
+  const input = document.getElementById("qty");
+  const message = document.getElementById("msg");
+
+  const quantity = Number(input?.value || 0);
+  const stock = Number(product.stock || 0);
+
+  if(
+    !Number.isInteger(quantity) ||
+    quantity < 1 ||
+    quantity > stock
+  ){
+    if(message){
+      message.textContent = "Please select a valid quantity.";
+    }
+    return null;
+  }
+
+  return quantity;
 }
-function cart(){try{return JSON.parse(localStorage.getItem("rc_cart")||"[]")}catch{return[]}}
-function saveCart(c){localStorage.setItem("rc_cart",JSON.stringify(c))}
+
+function getCart(){
+  try{
+    return JSON.parse(
+      localStorage.getItem("rc_cart") || "[]"
+    );
+  }catch(e){
+    return [];
+  }
+}
+
+function saveCart(cart){
+  localStorage.setItem(
+    "rc_cart",
+    JSON.stringify(cart)
+  );
+}
+
 function addToCart(){
-  const q=qty();if(q===null)return;
-  const c=cart(),x=c.find(i=>Number(i.id)===Number(product.id));
-  if(x)x.qty=Math.min(Number(product.stock),Number(x.qty||0)+q);else c.push({id:product.id,qty:q});
-  saveCart(c);document.getElementById("msg").textContent="Added to cart.";
+  const quantity = getQty();
+  if(quantity === null) return;
+
+  const cart = getCart();
+
+  const existing = cart.find(
+    item => Number(item.id) === Number(product.id)
+  );
+
+  if(existing){
+    existing.qty = Math.min(
+      Number(product.stock),
+      Number(existing.qty || 0) + quantity
+    );
+  }else{
+    cart.push({
+      id: product.id,
+      qty: quantity
+    });
+  }
+
+  saveCart(cart);
+
+  const message = document.getElementById("msg");
+  if(message){
+    message.textContent = "Added to cart.";
+  }
 }
+
 async function buyNow(){
-  const q=qty();if(q===null)return;
-  const {data:{user}}=await supabaseClient.auth.getUser();
-  if(!user){location.href="account.html?redirect="+encodeURIComponent("product.html?id="+product.id);return}
-  localStorage.setItem("rc_buy_now",JSON.stringify({id:product.id,qty:q}));
-  location.href="checkout.html?buy_now=1";
+  const quantity = getQty();
+  if(quantity === null) return;
+
+  try{
+    const {
+      data: { user },
+      error
+    } = await supabaseClient.auth.getUser();
+
+    if(error){
+      console.error(error);
+    }
+
+    if(!user){
+      window.location.href =
+        "account.html?redirect=" +
+        encodeURIComponent(
+          "product.html?id=" + product.id
+        );
+      return;
+    }
+
+    localStorage.setItem(
+      "rc_buy_now",
+      JSON.stringify({
+        id: product.id,
+        qty: quantity
+      })
+    );
+
+    window.location.href = "checkout.html?buy_now=1";
+
+  }catch(error){
+    console.error(error);
+    const message = document.getElementById("msg");
+    if(message){
+      message.textContent =
+        "Unable to continue. Please try again.";
+    }
+  }
 }
+
 async function loadReviews(){
-  const box=document.getElementById("reviews");
-  const {data,error}=await supabaseClient.from("product_reviews").select("*").eq("product_id",product.id).order("created_at",{ascending:false});
-  if(error){box.innerHTML="<p>Reviews will appear here.</p>";return}
-  if(!data?.length){box.innerHTML="<p>No reviews yet.</p>";return}
-  box.innerHTML=data.map(r=>{const n=Math.min(5,Math.max(1,Number(r.rating)||1));return`<div class="rc-review"><div class="rc-stars">${"★".repeat(n)}${"☆".repeat(5-n)}</div><p>${esc(r.review||"")}</p><small>${esc(r.customer_name||"Customer")}</small></div>`}).join("");
+  const box = document.getElementById("reviews");
+  if(!box) return;
+
+  try{
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("product_reviews")
+      .select("*")
+      .eq("product_id", product.id)
+      .order("created_at", {ascending:false});
+
+    if(error){
+      console.error(error);
+      box.innerHTML = "<p>Reviews will appear here.</p>";
+      return;
+    }
+
+    if(!data || !data.length){
+      box.innerHTML = "<p>No reviews yet.</p>";
+      return;
+    }
+
+    box.innerHTML = data.map(review=>{
+      const rating = Math.min(
+        5,
+        Math.max(1, Number(review.rating) || 1)
+      );
+
+      return `
+        <div class="rc-review">
+          <div class="rc-stars">
+            ${"★".repeat(rating)}${"☆".repeat(5 - rating)}
+          </div>
+
+          <p>${esc(review.review || "")}</p>
+
+          <small>
+            ${esc(review.customer_name || "Customer")}
+          </small>
+        </div>
+      `;
+    }).join("");
+
+  }catch(error){
+    console.error(error);
+    box.innerHTML = "<p>Reviews will appear here.</p>";
+  }
 }
+
 async function loadProduct(){
-  if(!sbReady()){productPage.innerHTML="<p>Supabase is not configured.</p>";return}
-  const id=new URLSearchParams(location.search).get("id");
-  if(!id){productPage.innerHTML='<h2>Product not found</h2>';return}
-  const {data,error}=await supabaseClient.from("products").select("*").eq("id",id).eq("active",true).single();
-  if(error||!data){productPage.innerHTML='<h2>Product not found</h2><a class="btn" href="index.html">Back to Shop</a>';return}
-  product=data;renderProduct();
+  if(typeof sbReady !== "function" || !sbReady()){
+    productPage.innerHTML =
+      "<p>Supabase is not configured.</p>";
+    return;
+  }
+
+  const id = getProductId();
+
+  if(!id){
+    productPage.innerHTML = `
+      <h2>Product not found</h2>
+      <a class="btn" href="index.html">Back to Shop</a>
+    `;
+    return;
+  }
+
+  try{
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .eq("active", true)
+      .single();
+
+    if(error || !data){
+      console.error(error);
+      productPage.innerHTML = `
+        <h2>Product not found</h2>
+        <a class="btn" href="index.html">Back to Shop</a>
+      `;
+      return;
+    }
+
+    product = data;
+    renderProduct();
+
+  }catch(error){
+    console.error(error);
+    productPage.innerHTML = `
+      <h2>Unable to load product</h2>
+      <p>Please try again.</p>
+      <a class="btn" href="index.html">Back to Shop</a>
+    `;
+  }
 }
+
 loadProduct();
 </script>
 </body>
