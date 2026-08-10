@@ -4,244 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RADA CREST — Admin Login</title>
-
 <style>
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  min-height:100vh;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#0b0b0b;
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.box{
-  width:min(420px,92%);
-  background:#151515;
-  border:1px solid #292929;
-  border-radius:22px;
-  padding:35px;
-  box-shadow:0 25px 80px #000;
-}
-
-.logo{
-  width:52px;
-  height:52px;
-  border:2px solid #fff;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  font-weight:900;
-  margin-bottom:22px;
-}
-
-.small{
-  color:#999;
-  font-size:11px;
-  letter-spacing:3px;
-  font-weight:bold;
-}
-
-h1{
-  font-size:32px;
-  margin:10px 0;
-}
-
-p{
-  color:#999;
-  line-height:1.6;
-}
-
-label{
-  display:block;
-  margin:18px 0 7px;
-  font-size:13px;
-  font-weight:bold;
-}
-
-input{
-  width:100%;
-  padding:14px;
-  border-radius:10px;
-  border:1px solid #333;
-  background:#0d0d0d;
-  color:#fff;
-  outline:none;
-}
-
-button{
-  width:100%;
-  margin-top:22px;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  background:#fff;
-  color:#111;
-  font-weight:800;
-  cursor:pointer;
-}
-
-button:hover{
-  opacity:.9;
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-.msg{
-  margin-top:16px;
-  font-size:13px;
-  color:#ff7777;
-}
-
-.back{
-  display:block;
-  margin-top:20px;
-  text-align:center;
-  color:#888;
-  text-decoration:none;
-  font-size:13px;
-}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:#0b0b0b;color:#fff;display:flex;align-items:center;justify-content:center}.box{width:min(420px,92%);background:#151515;border:1px solid #292929;border-radius:22px;padding:35px;box-shadow:0 25px 80px #000}.logo{width:52px;height:52px;border:2px solid #fff;border-radius:14px;display:grid;place-items:center;font-weight:900;margin-bottom:22px}.small{color:#999;font-size:11px;letter-spacing:3px;font-weight:bold}h1{font-size:32px;margin:10px 0}p{color:#999;line-height:1.6}label{display:block;margin:18px 0 7px;font-size:13px;font-weight:bold}input{width:100%;padding:14px;border-radius:10px;border:1px solid #333;background:#0d0d0d;color:#fff;outline:none}button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:10px;background:#fff;color:#111;font-weight:800;cursor:pointer}button:hover{opacity:.9}button:disabled{opacity:.5;cursor:not-allowed}.msg{margin-top:16px;font-size:13px;color:#ff7777}.back{display:block;margin-top:20px;text-align:center;color:#888;text-decoration:none;font-size:13px}
 </style>
 </head>
-
 <body>
-
 <div class="box">
-
-  <div class="logo">RC</div>
-
-  <div class="small">RADA CREST</div>
-
-  <h1>Admin Login</h1>
-
-  <p>
-    Secure access to your RADA CREST store administration panel.
-  </p>
-
-  <label>Email</label>
-  <input id="email" type="email" placeholder="Admin email">
-
-  <label>Password</label>
-  <input id="password" type="password" placeholder="Password">
-
-  <button id="loginBtn" onclick="login()">LOGIN TO ADMIN</button>
-
-  <div id="msg" class="msg"></div>
-
-  <a class="back" href="index.html">← Back to Store</a>
-
+<div class="logo">RC</div>
+<div class="small">RADA CREST</div>
+<h1>Admin Login</h1>
+<p>Secure access to your RADA CREST store administration panel.</p>
+<label>Email</label>
+<input id="email" type="email" placeholder="Admin email" autocomplete="username">
+<label>Password</label>
+<input id="password" type="password" placeholder="Password" autocomplete="current-password">
+<button id="loginBtn" onclick="login()">LOGIN TO ADMIN</button>
+<div id="msg" class="msg"></div>
+<a class="back" href="index.html">← Back to Store</a>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY="sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-<script type="module">
-
-import { createClient }
-from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-/* ===============================
-   SUPABASE CONFIGURATION
-================================ */
-
-const SUPABASE_URL =
-"https://ynpsnkvrjhaxdynmurzj.supabase.co";
-
-/*
-   यहाँ अपनी Supabase Publishable Key डालो.
-   Secret/service_role key बिल्कुल मत डालना.
-*/
-const SUPABASE_KEY =
-"sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
-
-const supabase =
-createClient(SUPABASE_URL, SUPABASE_KEY);
-
-
-/* ===============================
-   LOGIN
-================================ */
-
-window.login = async function(){
-
-  const email =
-  document.getElementById("email").value.trim();
-
-  const password =
-  document.getElementById("password").value;
-
-  const msg =
-  document.getElementById("msg");
-
-  const button =
-  document.getElementById("loginBtn");
-
-
-  if(!email || !password){
-
-    msg.textContent =
-    "Please enter email and password.";
-
-    return;
-  }
-
-
-  button.disabled = true;
-
-  msg.style.color = "#999";
-
-  msg.textContent =
-  "Signing in...";
-
-
-  const { data, error } =
-  await supabase.auth.signInWithPassword({
-
-    email: email,
-
-    password: password
-
-  });
-
-
-  if(error){
-
-    msg.style.color = "#ff7777";
-
-    msg.textContent =
-    error.message;
-
-    button.disabled = false;
-
-    return;
-  }
-
-
-  if(data.session){
-
-    msg.style.color = "#7dff9b";
-
-    msg.textContent =
-    "Login successful...";
-
-
-    /*
-      बाद में यहाँ हमारा
-      professional Admin Dashboard खुलेगा.
-    */
-
-    window.location.href =
-    "admin-dashboard.html";
-
-  }
-
+window.login=async function(){
+ const email=document.getElementById("email").value.trim();
+ const password=document.getElementById("password").value;
+ const msg=document.getElementById("msg");
+ const button=document.getElementById("loginBtn");
+ if(!email||!password){msg.style.color="#ff7777";msg.textContent="Please enter email and password.";return}
+ button.disabled=true;msg.style.color="#999";msg.textContent="Signing in...";
+ const {data,error}=await supabase.auth.signInWithPassword({email,password});
+ if(error){msg.style.color="#ff7777";msg.textContent=error.message;button.disabled=false;return}
+ if(data.session){msg.style.color="#7dff9b";msg.textContent="Login successful...";window.location.href="admin-dashboard.html"}
 };
-
 </script>
-
 </body>
 </html>
