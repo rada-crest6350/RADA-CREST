@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>Checkout — RADA CREST</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
+  <style>
+    .checkout-wrap{
+      max-width:1100px;
+      margin:auto;
+      padding-bottom:70px;
+    }
+
+    .checkout-head{
+      margin-bottom:30px;
+    }
+
+    .checkout-head a{
+      font-weight:700;
+      text-decoration:none;
+    }
+
+    .checkout-grid{
+      display:grid;
+      grid-template-columns:1fr 380px;
+      gap:28px;
+      align-items:start;
+    }
+
+    .checkout-card{
+      background:#fff;
+      border:1px solid #e7e7e7;
+      border-radius:24px;
+      padding:26px;
+      box-shadow:0 10px 35px rgba(0,0,0,.05);
+    }
+
+    .checkout-card h2{
+      margin-top:0;
+      margin-bottom:22px;
+    }
+
+    .field{
+      margin-bottom:18px;
+    }
+
+    .field label{
+      display:block;
+      font-size:14px;
+      font-weight:800;
+      margin-bottom:7px;
+    }
+
+    .field input,
+    .field textarea{
+      width:100%;
+      box-sizing:border-box;
+      border:1px solid #dcdcdc;
+      border-radius:13px;
+      padding:14px;
+      font-size:15px;
+      outline:none;
+      background:#fff;
+    }
+
+    .field textarea{
+      min-height:120px;
+      resize:vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus{
+      border-color:#111;
+    }
+
+    .order-item{
+      display:flex;
+      gap:14px;
+      padding:15px 0;
+      border-bottom:1px solid #eee;
+    }
+
+    .order-image{
+      width:72px;
+      height:72px;
+      min-width:72px;
+      border-radius:13px;
+      background:#f6f6f4;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+    }
+
+    .order-image img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    .order-info{
+      flex:1;
+    }
+
+    .order-info h3{
+      margin:0 0 5px;
+      font-size:15px;
+    }
+
+    .order-info small{
+      color:#777;
+    }
+
+    .order-price{
+      font-weight:900;
+      white-space:nowrap;
+    }
+
+    .summary-row{
+      display:flex;
+      justify-content:space-between;
+      gap:15px;
+      margin:14px 0;
+    }
+
+    .summary-total{
+      display:flex;
+      justify-content:space-between;
+      border-top:1px solid #ddd;
+      margin-top:18px;
+      padding-top:18px;
+      font-size:21px;
+      font-weight:900;
+    }
+
+    .cod-box{
+      margin-top:20px;
+      padding:15px;
+      border:1px solid #ddd;
+      border-radius:14px;
+      background:#fafaf8;
+    }
+
+    .place-btn{
+      width:100%;
+      min-height:56px;
+      margin-top:22px;
+      border:0;
+      border-radius:15px;
+      background:#111;
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .place-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .msg{
+      margin-top:15px;
+      min-height:22px;
+      font-weight:700;
+      line-height:1.5;
+    }
+
+    .empty{
+      text-align:center;
+      padding:40px 10px;
+      color:#777;
+    }
+
+    .secure{
+      margin-top:15px;
+      text-align:center;
+      font-size:12px;
+      color:#777;
+    }
+
+    .login-box{
+      padding:20px;
+      border-radius:16px;
+      background:#fafafa;
+      border:1px solid #eee;
+    }
+
+    @media(max-width:800px){
+      .checkout-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:500px){
+      .checkout-card{
+        padding:19px;
+        border-radius:18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<main class="section checkout-wrap">
+
+  <div class="checkout-head">
+    <a href="index.html">← Continue Shopping</a>
+
+    <h1>Checkout</h1>
+
+    <p>
+      Complete your delivery details and place your RADA CREST order.
+    </p>
+  </div>
+
+
+  <div id="loginBox" class="login-box" style="display:none">
+    <strong>Please login to continue.</strong>
+    <br><br>
+
+    <a class="btn" href="account.html?redirect=checkout.html">
+      Login / Create Account
+    </a>
+  </div>
+
+
+  <div id="checkoutArea" class="checkout-grid" style="display:none">
+
+
+    <!-- CUSTOMER DETAILS -->
+
+    <section class="checkout-card">
+
+      <h2>Delivery Details</h2>
+
+      <div class="field">
+        <label for="shippingName">
+          Full Name
+        </label>
+
+        <input
+          id="shippingName"
+          type="text"
+          placeholder="Enter your full name"
+          autocomplete="name"
+        >
+      </div>
+
+
+      <div class="field">
+        <label for="shippingPhone">
+          Mobile Number
+        </label>
+
+        <input
+          id="shippingPhone"
+          type="tel"
+          inputmode="numeric"
+          maxlength="10"
+          placeholder="10-digit mobile number"
+          autocomplete="tel"
+        >
+      </div>
+
+
+      <div class="field">
+        <label for="shippingAddress">
+          Complete Delivery Address
+        </label>
+
+        <textarea
+          id="shippingAddress"
+          placeholder="House / Shop, Street, Village / City, District, State, PIN"
+          autocomplete="street-address"
+        ></textarea>
+      </div>
+
+
+      <div class="cod-box">
+
+        <strong>💵 Cash on Delivery</strong>
+
+        <br>
+
+        <small>
+          Payment will be collected when your order is delivered.
+        </small>
+
+      </div>
+
+
+      <button
+        id="placeOrderBtn"
+        class="place-btn"
+        type="button"
+        onclick="placeOrder()"
+      >
+        Place Order
+      </button>
+
+
+      <div
+        id="msg"
+        class="msg"
+      ></div>
+
+
+      <div class="secure">
+        🔒 Secure order processing by RADA CREST
+      </div>
+
+    </section>
+
+
+    <!-- ORDER SUMMARY -->
+
+    <aside class="checkout-card">
+
+      <h2>Order Summary</h2>
+
+      <div id="orderItems">
+        Loading...
+      </div>
+
+
+      <div class="summary-row">
+        <span>Subtotal</span>
+
+        <strong id="subtotal">
+          ₹0
+        </strong>
+      </div>
+
+
+      <div class="summary-row">
+        <span>Delivery</span>
+
+        <strong>
+          FREE
+        </strong>
+      </div>
+
+
+      <div class="summary-total">
+        <span>Total</span>
+
+        <span id="total">
+          ₹0
+        </span>
+      </div>
+
+    </aside>
+
+  </div>
+
+
+  <div
+    id="loading"
+    class="checkout-card"
+  >
+    Loading checkout...
+  </div>
+
+</main>
+
+
+<script>
+
+let checkoutItems = [];
+let checkoutTotal = 0;
+let currentUser = null;
+
+
+/* -------------------------
+   BASIC HELPERS
+------------------------- */
+
+function esc(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function money(value){
+
+  return Number(value || 0)
+    .toLocaleString("en-IN");
+
+}
+
+
+/* -------------------------
+   CART
+------------------------- */
+
+function getCart(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem("rc_cart") || "[]"
+    );
+
+  }catch{
+
+    return [];
+
+  }
+
+}
+
+
+function saveCart(cart){
+
+  localStorage.setItem(
+    "rc_cart",
+    JSON.stringify(cart)
+  );
+
+}
+
+
+/* -------------------------
+   BUY NOW
+------------------------- */
+
+function getBuyNow(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem("rc_buy_now") || "null"
+    );
+
+  }catch{
+
+    return null;
+
+  }
+
+}
+
+
+/* -------------------------
+   CLIENT TOKEN
+------------------------- */
+
+function getClientToken(){
+
+  let token =
+    localStorage.getItem("rc_client_token");
+
+  if(token){
+
+    return token;
+
+  }
+
+
+  if(
+    window.crypto &&
+    crypto.randomUUID
+  ){
+
+    token = crypto.randomUUID();
+
+  }else{
+
+    token =
+      "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+        .replace(/[xy]/g,function(c){
+
+          const r =
+            Math.random()*16|0;
+
+          const v =
+            c === "x"
+              ? r
+              : (r&0x3|0x8);
+
+          return v.toString(16);
+
+        });
+
+  }
+
+
+  localStorage.setItem(
+    "rc_client_token",
+    token
+  );
+
+
+  return token;
+
+}
+
+
+/* -------------------------
+   LOAD USER
+------------------------- */
+
+async function loadUser(){
+
+  if(
+    typeof sbReady === "function" &&
+    !sbReady()
+  ){
+
+    showError(
+      "Supabase is not configured."
+    );
+
+    return false;
+
+  }
+
+
+  const result =
+    await supabaseClient
+      .auth
+      .getUser();
+
+
+  currentUser =
+    result.data?.user || null;
+
+
+  if(!currentUser){
+
+    document.getElementById(
+      "loading"
+    ).style.display = "none";
+
+    document.getElementById(
+      "loginBox"
+    ).style.display = "block";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* -------------------------
+   GET PRODUCT IDS
+------------------------- */
+
+function getRequestedItems(){
+
+  const buyNow =
+    getBuyNow();
+
+
+  if(buyNow && buyNow.id){
+
+    return [
+
+      {
+        id: buyNow.id,
+        qty: Number(buyNow.qty || 1)
+      }
+
+    ];
+
+  }
+
+
+  return getCart()
+    .map(item => ({
+
+      id: item.id,
+      qty: Number(item.qty || 1)
+
+    }))
+    .filter(item => item.id);
+
+
+}
+
+
+/* -------------------------
+   LOAD PRODUCTS
+------------------------- */
+
+async function loadCheckout(){
+
+  const allowed =
+    await loadUser();
+
+
+  if(!allowed) return;
+
+
+  const requested =
+    getRequestedItems();
+
+
+  if(!requested.length){
+
+    document.getElementById(
+      "loading"
+    ).innerHTML = `
+      <div class="empty">
+        <h2>Your cart is empty</h2>
+
+        <p>Add a product before checkout.</p>
+
+        <a class="btn" href="index.html">
+          Continue Shopping
+        </a>
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const ids =
+    requested.map(item => item.id);
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("products")
+      .select(`
+        id,
+        name,
+        price,
+        stock,
+        image_url,
+        active
+      `)
+      .in("id",ids);
+
+
+  if(error){
+
+    showError(
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  const products =
+    data || [];
+
+
+  checkoutItems =
+    requested
+      .map(item => {
+
+        const product =
+          products.find(
+            p =>
+              String(p.id) ===
+              String(item.id)
+          );
+
+
+        if(!product) return null;
+
+
+        const qty =
+          Math.max(
+            1,
+            Number(item.qty || 1)
+          );
+
+
+        return {
+
+          id:
+            product.id,
+
+          name:
+            product.name,
+
+          price:
+            Number(product.price || 0),
+
+          stock:
+            Number(product.stock || 0),
+
+          image:
+            product.image_url || "",
+
+          qty
+
+        };
+
+      })
+      .filter(Boolean);
+
+
+  if(!checkoutItems.length){
+
+    showError(
+      "Products could not be loaded."
+    );
+
+    return;
+
+  }
+
+
+  for(const item of checkoutItems){
+
+    if(!item.active && item.active !== undefined){
+
+      showError(
+        item.name +
+        " is currently unavailable."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      item.stock <= 0 ||
+      item.qty > item.stock
+    ){
+
+      showError(
+        item.name +
+        " does not have enough stock."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  renderCheckout();
+
+}
+
+
+/* -------------------------
+   RENDER CHECKOUT
+------------------------- */
+
+function renderCheckout(){
+
+  const box =
+    document.getElementById(
+      "orderItems"
+    );
+
+
+  checkoutTotal = 0;
+
+
+  box.innerHTML =
+    checkoutItems
+      .map(item => {
+
+        const lineTotal =
+          item.price * item.qty;
+
+
+        checkoutTotal +=
+          lineTotal;
+
+
+        const firstImage =
+          String(item.image)
+            .split(/[\n,]+/)
+            .map(x => x.trim())
+            .filter(Boolean)[0] || "";
+
+
+        return `
+
+          <div class="order-item">
+
+            <div class="order-image">
+
+              ${
+                firstImage
+
+                ?
+
+                `
+                <img
+                  src="${esc(firstImage)}"
+                  alt="${esc(item.name)}"
+                  onerror="this.style.display='none'"
+                >
+                `
+
+                :
+
+                "💡"
+              }
+
+            </div>
+
+
+            <div class="order-info">
+
+              <h3>
+                ${esc(item.name)}
+              </h3>
+
+              <small>
+                ₹${money(item.price)}
+                ×
+                ${item.qty}
+              </small>
+
+            </div>
+
+
+            <div class="order-price">
+              ₹${money(lineTotal)}
+            </div>
+
+          </div>
+
+        `;
+
+      })
+      .join("");
+
+
+  document.getElementById(
+    "subtotal"
+  ).textContent =
+    "₹" + money(checkoutTotal);
+
+
+  document.getElementById(
+    "total"
+  ).textContent =
+    "₹" + money(checkoutTotal);
+
+
+  document.getElementById(
+    "loading"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "checkoutArea"
+  ).style.display = "grid";
+
+
+  /* Try loading profile information */
+
+  loadProfile();
+
+}
+
+
+/* -------------------------
+   PROFILE
+------------------------- */
+
+async function loadProfile(){
+
+  if(!currentUser) return;
+
+
+  const {
+    data
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id",currentUser.id)
+      .maybeSingle();
+
+
+  if(!data) return;
+
+
+  const name =
+    data.full_name ||
+    data.name ||
+    data.customer_name ||
+    "";
+
+
+  const phone =
+    data.phone ||
+    data.mobile ||
+    data.customer_phone ||
+    "";
+
+
+  if(name){
+
+    document.getElementById(
+      "shippingName"
+    ).value =
+      name;
+
+  }
+
+
+  if(phone){
+
+    document.getElementById(
+      "shippingPhone"
+    ).value =
+      String(phone)
+        .replace(/\D/g,"")
+        .slice(-10);
+
+  }
+
+}
+
+
+/* -------------------------
+   VALIDATION
+------------------------- */
+
+function validateForm(){
+
+  const name =
+    document.getElementById(
+      "shippingName"
+    ).value.trim();
+
+
+  const phone =
+    document.getElementById(
+      "shippingPhone"
+    ).value
+      .replace(/\D/g,"");
+
+
+  const address =
+    document.getElementById(
+      "shippingAddress"
+    ).value.trim();
+
+
+  if(name.length < 2){
+
+    showMessage(
+      "Please enter your full name."
+    );
+
+    return null;
+
+  }
+
+
+  if(!/^[0-9]{10}$/.test(phone)){
+
+    showMessage(
+      "Please enter a valid 10-digit mobile number."
+    );
+
+    return null;
+
+  }
+
+
+  if(address.length < 10){
+
+    showMessage(
+      "Please enter your complete delivery address."
+    );
+
+    return null;
+
+  }
+
+
+  return {
+
+    name,
+    phone,
+    address
+
+  };
+
+}
+
+
+/* -------------------------
+   PLACE ORDER
+------------------------- */
+
+async function placeOrder(){
+
+  const details =
+    validateForm();
+
+
+  if(!details) return;
+
+
+  const button =
+    document.getElementById(
+      "placeOrderBtn"
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Placing Order...";
+
+
+  showMessage(
+    "Please wait..."
+  );
+
+
+  try{
+
+    /*
+      Items sent to Supabase RPC.
+    */
+
+    const items =
+      checkoutItems.map(item => ({
+
+        product_id:
+          item.id,
+
+        product_name:
+          item.name,
+
+        quantity:
+          item.qty,
+
+        price:
+          item.price
+
+      }));
+
+
+    const clientToken =
+      getClientToken();
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .rpc(
+          "place_order",
+          {
+
+            p_items:
+              items,
+
+            p_shipping_name:
+              details.name,
+
+            p_shipping_phone:
+              details.phone,
+
+            p_shipping_address:
+              details.address,
+
+            p_client_token:
+              clientToken
+
+          }
+        );
+
+
+    if(error){
+
+      console.error(
+        "place_order error:",
+        error
+      );
+
+      throw new Error(
+        error.message
+      );
+
+    }
+
+
+    /*
+      Get order ID from RPC result.
+    */
+
+    let orderId =
+      extractOrderId(data);
+
+
+    if(!orderId){
+
+      orderId =
+        "RC-" +
+        Date.now();
+
+    }
+
+
+    /*
+      Clear cart / buy-now after successful order.
+    */
+
+    const buyNow =
+      getBuyNow();
+
+
+    if(buyNow){
+
+      localStorage.removeItem(
+        "rc_buy_now"
+      );
+
+    }else{
+
+      localStorage.removeItem(
+        "rc_cart"
+      );
+
+    }
+
+
+    /*
+      WhatsApp message
+    */
+
+    const message =
+`RADA CREST — NEW ORDER
+
+Order ID: #${orderId}
+
+${checkoutItems.map(item => `
+Product: ${item.name}
+Quantity: ${item.qty}
+Price: ₹${money(item.price)}
+`).join("")}
+
+Total: ₹${money(checkoutTotal)}
+
+Customer:
+${details.name}
+
+Mobile:
+${details.phone}
+
+Delivery Address:
+${details.address}
+
+Payment:
+Cash on Delivery
+
+Status:
+Pending Confirmation`;
+
+
+    const whatsappNumber =
+      "919079714767";
+
+
+    const whatsappUrl =
+      "https://wa.me/" +
+      whatsappNumber +
+      "?text=" +
+      encodeURIComponent(message);
+
+
+    /*
+      Success screen
+    */
+
+    document.getElementById(
+      "checkoutArea"
+    ).innerHTML = `
+
+      <section
+        class="checkout-card"
+        style="
+          grid-column:1/-1;
+          text-align:center;
+          padding:55px 25px;
+        "
+      >
+
+        <div
+          style="
+            font-size:64px;
+            margin-bottom:15px;
+          "
+        >
+          ✓
+        </div>
+
+
+        <h1>
+          Order Placed Successfully
+        </h1>
+
+
+        <p>
+          Thank you for shopping with RADA CREST.
+        </p>
+
+
+        <div
+          style="
+            margin:25px auto;
+            max-width:420px;
+            padding:18px;
+            border-radius:15px;
+            background:#fafaf8;
+          "
+        >
+
+          <strong>
+            Order ID
+          </strong>
+
+          <div
+            style="
+              font-size:22px;
+              font-weight:900;
+              margin-top:6px;
+            "
+          >
+            #${esc(orderId)}
+          </div>
+
+        </div>
+
+
+        <p>
+          Your order has been submitted successfully.
+        </p>
+
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            justify-content:center;
+            flex-wrap:wrap;
+            margin-top:25px;
+          "
+        >
+
+          <a
+            class="btn"
+            href="${esc(whatsappUrl)}"
+            target="_blank"
+            rel="noopener"
+          >
+            📲 Send Order on WhatsApp
+          </a>
+
+
+          <a
+            class="btn"
+            href="index.html"
+          >
+            Continue Shopping
+          </a>
+
+        </div>
+
+      </section>
+
+    `;
+
+
+  }catch(error){
+
+    console.error(error);
+
+
+    showMessage(
+      "Order failed: " +
+      error.message
+    );
+
+
+    button.disabled = false;
+
+    button.textContent =
+      "Place Order";
+
+  }
+
+}
+
+
+/* -------------------------
+   EXTRACT ORDER ID
+------------------------- */
+
+function extractOrderId(data){
+
+  if(data === null || data === undefined){
+
+    return null;
+
+  }
+
+
+  if(
+    typeof data === "number" ||
+    typeof data === "string"
+  ){
+
+    return data;
+
+  }
+
+
+  if(Array.isArray(data)){
+
+    if(!data.length){
+
+      return null;
+
+    }
+
+
+    return extractOrderId(
+      data[0]
+    );
+
+  }
+
+
+  if(typeof data === "object"){
+
+    return (
+      data.id ||
+      data.order_id ||
+      data.orderId ||
+      data.order_id_number ||
+      null
+    );
+
+  }
+
+
+  return null;
+
+}
+
+
+/* -------------------------
+   MESSAGES
+------------------------- */
+
+function showMessage(text){
+
+  const msg =
+    document.getElementById(
+      "msg"
+    );
+
+
+  if(msg){
+
+    msg.textContent =
+      text;
+
+  }
+
+}
+
+
+function showError(text){
+
+  document.getElementById(
+    "loading"
+  ).innerHTML = `
+
+    <div class="empty">
+
+      <h2>
+        Something went wrong
+      </h2>
+
+      <p>
+        ${esc(text)}
+      </p>
+
+      <br>
+
+      <a
+        class="btn"
+        href="index.html"
+      >
+        Back to Shop
+      </a>
+
+    </div>
+
+  `;
+
+}
+
+
+/* -------------------------
+   START
+------------------------- */
+
+loadCheckout();
+
+</script>
+
+</body>
+</html>
