@@ -320,6 +320,25 @@ td{
   color:#ff7777;
 }
 
+/* ORDERS / CUSTOMERS */
+.order-filters{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.order-filters input,.order-filters select{background:#0d0d0d;color:#fff;border:1px solid #303030;border-radius:9px;padding:11px;outline:none}
+.order-actions button{margin:2px}
+.customer-card{border:1px solid #292929;border-radius:14px;padding:16px;margin-bottom:12px;background:#151515}
+.customer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.customer-grid div{background:#0d0d0d;border:1px solid #242424;border-radius:10px;padding:10px}
+.customer-grid small{display:block;color:#777;margin-bottom:4px}
+.customer-grid strong{font-size:13px;word-break:break-word}
+.order-status{border:0;border-radius:20px;padding:6px 10px;background:#252525;color:#fff;font-size:11px;font-weight:bold}
+.order-status.pending{background:#382e15;color:#ffd66b}
+.order-status.confirmed,.order-status.processing{background:#172c3a;color:#8fd3ff}
+.order-status.shipped{background:#242d3d;color:#b9c7ff}
+.order-status.delivered{background:#15351d;color:#7dff9b}
+.order-status.cancelled{background:#321818;color:#ff7777}
+.items-list{color:#aaa;font-size:12px;line-height:1.6}
+@media(max-width:900px){.customer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.customer-grid{grid-template-columns:1fr}.order-filters input,.order-filters select{width:100%}}
+
 /* MODAL */
 
 .modal{
@@ -744,12 +763,42 @@ td{
 
   <div class="panel">
 
-    <h2>Orders</h2>
+    <div class="panel-header">
+      <h2>Orders</h2>
+      <button class="primary" onclick="loadOrders()">↻ Refresh Orders</button>
+    </div>
 
-    <div class="empty">
-      No orders available yet.
-      <br><br>
-      Orders will automatically appear here after the customer ordering system is connected.
+    <div class="order-filters">
+      <input id="orderSearch" type="search" placeholder="Search name, phone, order..." oninput="renderOrders()">
+      <select id="orderStatusFilter" onchange="renderOrders()">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div id="ordersMessage" class="message">Loading orders...</div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTable"></tbody>
+      </table>
     </div>
 
   </div>
@@ -763,13 +812,13 @@ td{
 
   <div class="panel">
 
-    <h2>Customers</h2>
-
-    <div class="empty">
-      No customers available yet.
-      <br><br>
-      Customer accounts will appear here after the customer system is connected.
+    <div class="panel-header">
+      <h2>Customers</h2>
+      <button class="primary" onclick="loadCustomers()">↻ Refresh Customers</button>
     </div>
+
+    <div id="customersMessage" class="message">Loading customers...</div>
+    <div id="customersList"></div>
 
   </div>
 
@@ -1131,6 +1180,8 @@ let products = [];
 let categories = [];
 let editingProductId = null;
 let editingCategoryId = null;
+let orders = [];
+let customers = [];
 
 
 /* ================================
@@ -2368,6 +2419,196 @@ async function(id){
 
 
 /* ================================
+   ORDERS
+================================ */
+
+async function loadOrders(){
+
+  const message = document.getElementById("ordersMessage");
+  if(message) message.textContent = "Loading orders...";
+
+  const { data,error } = await supabase
+    .from("order_summary")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    orders = [];
+    if(message){
+      message.style.color = "#ff7777";
+      message.textContent = "Orders error: " + error.message;
+    }
+    document.getElementById("ordersTable").innerHTML = `
+      <tr><td colspan="8"><div class="empty">Could not load orders from Supabase.</div></td></tr>
+    `;
+    return;
+  }
+
+  orders = data || [];
+  if(message){
+    message.style.color = "#7dff9b";
+    message.textContent = orders.length ? `${orders.length} order(s) loaded.` : "No orders yet.";
+  }
+  renderOrders();
+  await loadCustomers();
+}
+
+function renderOrders(){
+
+  const tbody = document.getElementById("ordersTable");
+  if(!tbody) return;
+
+  const search = (document.getElementById("orderSearch")?.value || "").toLowerCase().trim();
+  const status = document.getElementById("orderStatusFilter")?.value || "";
+
+  const filtered = orders.filter(o=>{
+    const hay = [o.id,o.shipping_name,o.shipping_phone,o.shipping_address,o.status].join(" ").toLowerCase();
+    return (!search || hay.includes(search)) && (!status || o.status === status);
+  });
+
+  if(!filtered.length){
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty">No matching orders found.</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(o=>{
+    const items = Array.isArray(o.items) ? o.items : [];
+    const itemText = items.length
+      ? items.map(i=>`${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`).join("<br>")
+      : "No items";
+    const st = String(o.status || "pending").toLowerCase();
+    const date = o.created_at ? new Date(o.created_at).toLocaleString("en-IN") : "-";
+    return `
+      <tr>
+        <td><strong>#${escapeHtml(o.id)}</strong></td>
+        <td>
+          <strong>${escapeHtml(o.shipping_name || "Customer")}</strong>
+          <div style="color:#777;font-size:11px;margin-top:4px">${escapeHtml(o.shipping_phone || "")}</div>
+        </td>
+        <td><div class="items-list">${itemText}</div></td>
+        <td>₹${Number(o.total || 0).toLocaleString("en-IN")}</td>
+        <td>${escapeHtml(o.payment_method || "cod")}</td>
+        <td>
+          <select class="order-status ${escapeHtml(st)}" onchange="updateOrderStatus(${Number(o.id)},this.value)">
+            ${["pending","confirmed","processing","shipped","delivered","cancelled"].map(x=>`<option value="${x}" ${st===x?"selected":""}>${x[0].toUpperCase()+x.slice(1)}</option>`).join("")}
+          </select>
+        </td>
+        <td>${escapeHtml(date)}</td>
+        <td><button class="status-btn" onclick="viewOrder(${Number(o.id)})">View</button></td>
+      </tr>
+    `;
+  }).join("");
+}
+
+window.updateOrderStatus = async function(id,status){
+  const { error } = await supabase
+    .from("orders")
+    .update({status})
+    .eq("id",id);
+
+  if(error){
+    alert(error.message);
+    await loadOrders();
+    return;
+  }
+
+  await loadOrders();
+};
+
+window.viewOrder = function(id){
+  const o = orders.find(x=>Number(x.id)===Number(id));
+  if(!o) return;
+  const items = Array.isArray(o.items) ? o.items : [];
+  const itemLines = items.map(i=>`• ${i.product_name || "Product"} × ${i.quantity} — ₹${Number(i.unit_price || 0).toLocaleString("en-IN")}`).join("\n");
+  alert(
+    `Order #${o.id}\n\n` +
+    `Customer: ${o.shipping_name || "-"}\n` +
+    `Phone: ${o.shipping_phone || "-"}\n` +
+    `Address: ${o.shipping_address || "-"}\n` +
+    `Status: ${o.status || "pending"}\n` +
+    `Payment: ${o.payment_method || "cod"}\n` +
+    `Total: ₹${Number(o.total || 0).toLocaleString("en-IN")}\n\n` +
+    `Items:\n${itemLines || "No items"}`
+  );
+};
+
+/* ================================
+   CUSTOMERS
+================================ */
+
+async function loadCustomers(){
+
+  const message = document.getElementById("customersMessage");
+  const box = document.getElementById("customersList");
+  if(!box) return;
+
+  const source = orders.length ? orders : null;
+  let rows = source;
+
+  if(!rows){
+    const { data,error } = await supabase
+      .from("order_summary")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+    if(error){
+      console.error(error);
+      message.style.color = "#ff7777";
+      message.textContent = "Customers error: " + error.message;
+      box.innerHTML = `<div class="empty">Could not load customer data.</div>`;
+      return;
+    }
+    rows = data || [];
+    orders = rows;
+  }
+
+  const map = new Map();
+  rows.forEach(o=>{
+    const key = o.user_id || `${o.shipping_phone || ""}|${o.shipping_name || ""}`;
+    if(!map.has(key)){
+      map.set(key,{
+        user_id:o.user_id,
+        name:o.shipping_name || "Customer",
+        phone:o.shipping_phone || "",
+        address:o.shipping_address || "",
+        orders:0,
+        spent:0,
+        last:o.created_at
+      });
+    }
+    const c = map.get(key);
+    c.orders += 1;
+    c.spent += Number(o.total || 0);
+    if(new Date(o.created_at || 0) > new Date(c.last || 0)) c.last = o.created_at;
+  });
+
+  customers = Array.from(map.values()).sort((a,b)=>new Date(b.last||0)-new Date(a.last||0));
+
+  message.style.color = "#7dff9b";
+  message.textContent = customers.length ? `${customers.length} customer(s) found from orders.` : "No customers yet.";
+
+  if(!customers.length){
+    box.innerHTML = `<div class="empty">No customers available yet. Customers will appear here automatically after the first order.</div>`;
+    return;
+  }
+
+  box.innerHTML = customers.map(c=>`
+    <div class="customer-card">
+      <strong>${escapeHtml(c.name)}</strong>
+      <div class="customer-grid">
+        <div><small>Phone</small><strong>${escapeHtml(c.phone || "-")}</strong></div>
+        <div><small>Orders</small><strong>${c.orders}</strong></div>
+        <div><small>Total Spent</small><strong>₹${c.spent.toLocaleString("en-IN")}</strong></div>
+        <div><small>Last Order</small><strong>${c.last ? escapeHtml(new Date(c.last).toLocaleString("en-IN")) : "-"}</strong></div>
+      </div>
+      <div style="color:#777;font-size:12px;margin-top:10px">${escapeHtml(c.address || "No address")}</div>
+    </div>
+  `).join("");
+}
+
+
+/* ================================
    STORE SETTINGS
 ================================ */
 
@@ -2572,22 +2813,19 @@ function escapeHtml(value){
 
 
 /* ================================
-   CONNECTION
+   CONNECTION / START
 ================================ */
 
-document.getElementById(
-  "connectionStatus"
-).textContent =
-  "Connected";
-
-
-/* ================================
-   START
-================================ */
-
-await loadCategories();
-await loadProducts();
-await loadStoreSettings();
+try{
+  await loadCategories();
+  await loadProducts();
+  await loadStoreSettings();
+  await loadOrders();
+  document.getElementById("connectionStatus").textContent = "Connected";
+}catch(err){
+  console.error(err);
+  document.getElementById("connectionStatus").textContent = "Database Error";
+}
 
 </script>
 
