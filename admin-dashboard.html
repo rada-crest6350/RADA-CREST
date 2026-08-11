@@ -339,6 +339,43 @@ td{
 @media(max-width:900px){.customer-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.customer-grid{grid-template-columns:1fr}.order-filters input,.order-filters select{width:100%}}
 
+.orders-mobile-list{display:none}
+.order-mobile-card{
+  border:1px solid #292929;
+  border-radius:14px;
+  padding:16px;
+  margin-top:12px;
+  background:#111;
+}
+.order-mobile-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.order-mobile-name{font-weight:800;font-size:15px}
+.order-mobile-meta{color:#888;font-size:11px;margin-top:4px;line-height:1.5}
+.order-mobile-items{margin:14px 0;color:#bbb;font-size:12px;line-height:1.7}
+.order-mobile-total{font-size:18px;font-weight:800;margin:8px 0 14px}
+.order-mobile-status-label{display:block;color:#888;font-size:11px;font-weight:bold;margin-bottom:6px}
+.order-mobile-status{
+  width:100%;
+  padding:11px;
+  border-radius:10px;
+  background:#0d0d0d;
+  color:#fff;
+  border:1px solid #333;
+  font-weight:800;
+}
+.order-mobile-view{
+  width:100%;
+  margin-top:9px;
+  padding:10px;
+  border-radius:9px;
+  background:#252525;
+  color:#fff;
+  border:1px solid #333;
+}
+@media(max-width:700px){
+  .orders-table-wrap{display:none}
+  .orders-mobile-list{display:block}
+}
+
 /* MODAL */
 
 .modal{
@@ -783,7 +820,7 @@ td{
 
     <div id="ordersMessage" class="message">Loading orders...</div>
 
-    <div class="table-wrap">
+    <div class="table-wrap orders-table-wrap">
       <table>
         <thead>
           <tr>
@@ -800,6 +837,8 @@ td{
         <tbody id="ordersTable"></tbody>
       </table>
     </div>
+
+    <div id="ordersMobileList" class="orders-mobile-list"></div>
 
   </div>
 
@@ -1114,7 +1153,7 @@ if(!sessionData.session){
 ================================ */
 
 window.showPage =
-function(page,button){
+async function(page,button){
 
   document
     .querySelectorAll(".page")
@@ -1153,6 +1192,17 @@ function(page,button){
   document.getElementById("pageTitle")
     .textContent =
     titles[page] || "Admin";
+
+  // Load fresh data whenever these pages are opened.
+  if(page === "orders"){
+    await loadOrders();
+  }
+  if(page === "customers"){
+    await loadCustomers();
+  }
+  if(page === "store"){
+    await loadStoreSettings();
+  }
 
 };
 
@@ -2454,61 +2504,288 @@ async function loadOrders(){
   await loadCustomers();
 }
 
+function getNextOrderStatus(status){
+
+  const flow = [
+    "pending",
+    "confirmed",
+    "processing",
+    "shipped",
+    "delivered"
+  ];
+
+  const current = String(status || "pending").toLowerCase();
+  const index = flow.indexOf(current);
+
+  return index >= 0 && index < flow.length - 1
+    ? flow[index + 1]
+    : null;
+}
+
+function statusOptions(current){
+
+  const st = String(current || "pending").toLowerCase();
+  const next = getNextOrderStatus(st);
+
+  let html =
+    `<option value="${escapeHtml(st)}" selected>${escapeHtml(st.charAt(0).toUpperCase()+st.slice(1))} (Current)</option>`;
+
+  if(next){
+    html +=
+      `<option value="${next}">Move to ${next.charAt(0).toUpperCase()+next.slice(1)}</option>`;
+  }
+
+  if(st !== "cancelled" && st !== "delivered"){
+    html += `<option value="cancelled">Cancel Order</option>`;
+  }
+
+  return html;
+}
+
 function renderOrders(){
 
   const tbody = document.getElementById("ordersTable");
+  const mobile = document.getElementById("ordersMobileList");
   if(!tbody) return;
 
-  const search = (document.getElementById("orderSearch")?.value || "").toLowerCase().trim();
-  const status = document.getElementById("orderStatusFilter")?.value || "";
+  const search =
+    (document.getElementById("orderSearch")?.value || "")
+      .toLowerCase()
+      .trim();
+
+  const statusFilter =
+    (document.getElementById("orderStatusFilter")?.value || "")
+      .toLowerCase()
+      .trim();
 
   const filtered = orders.filter(o=>{
-    const hay = [o.id,o.shipping_name,o.shipping_phone,o.shipping_address,o.status].join(" ").toLowerCase();
-    return (!search || hay.includes(search)) && (!status || o.status === status);
+
+    const orderStatus =
+      String(o.status || "pending").toLowerCase();
+
+    const hay = [
+      o.id,
+      o.shipping_name,
+      o.shipping_phone,
+      o.shipping_address,
+      orderStatus
+    ].join(" ").toLowerCase();
+
+    return (!search || hay.includes(search))
+      && (!statusFilter || orderStatus === statusFilter);
+
   });
 
   if(!filtered.length){
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty">No matching orders found.</div></td></tr>`;
+
+    tbody.innerHTML =
+      `<tr><td colspan="8"><div class="empty">No matching orders found.</div></td></tr>`;
+
+    if(mobile){
+      mobile.innerHTML =
+        `<div class="empty">No matching orders found.</div>`;
+    }
+
     return;
   }
 
   tbody.innerHTML = filtered.map(o=>{
-    const items = Array.isArray(o.items) ? o.items : [];
-    const itemText = items.length
-      ? items.map(i=>`${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`).join("<br>")
+
+    const items =
+      Array.isArray(o.items) ? o.items : [];
+
+    const itemText =
+      items.length
+      ? items.map(i=>
+          `${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`
+        ).join("<br>")
       : "No items";
-    const st = String(o.status || "pending").toLowerCase();
-    const date = o.created_at ? new Date(o.created_at).toLocaleString("en-IN") : "-";
+
+    const st =
+      String(o.status || "pending").toLowerCase();
+
+    const date =
+      o.created_at
+      ? new Date(o.created_at).toLocaleString("en-IN")
+      : "-";
+
     return `
       <tr>
         <td><strong>#${escapeHtml(o.id)}</strong></td>
+
         <td>
           <strong>${escapeHtml(o.shipping_name || "Customer")}</strong>
-          <div style="color:#777;font-size:11px;margin-top:4px">${escapeHtml(o.shipping_phone || "")}</div>
+          <div style="color:#777;font-size:11px;margin-top:4px">
+            ${escapeHtml(o.shipping_phone || "")}
+          </div>
         </td>
-        <td><div class="items-list">${itemText}</div></td>
-        <td>₹${Number(o.total || 0).toLocaleString("en-IN")}</td>
-        <td>${escapeHtml(o.payment_method || "cod")}</td>
+
         <td>
-          <select class="order-status ${escapeHtml(st)}" onchange="updateOrderStatus(${Number(o.id)},this.value)">
-            ${["pending","confirmed","processing","shipped","delivered","cancelled"].map(x=>`<option value="${x}" ${st===x?"selected":""}>${x[0].toUpperCase()+x.slice(1)}</option>`).join("")}
+          <div class="items-list">${itemText}</div>
+        </td>
+
+        <td>
+          ₹${Number(o.total || 0).toLocaleString("en-IN")}
+        </td>
+
+        <td>
+          ${escapeHtml(o.payment_method || "cod")}
+        </td>
+
+        <td>
+          <select
+            class="order-status ${escapeHtml(st)}"
+            onchange="updateOrderStatus(${Number(o.id)},this.value)"
+          >
+            ${statusOptions(st)}
           </select>
         </td>
+
         <td>${escapeHtml(date)}</td>
-        <td><button class="status-btn" onclick="viewOrder(${Number(o.id)})">View</button></td>
+
+        <td>
+          <button
+            class="status-btn"
+            onclick="viewOrder(${Number(o.id)})"
+          >
+            View
+          </button>
+        </td>
       </tr>
     `;
+
   }).join("");
+
+  if(mobile){
+
+    mobile.innerHTML = filtered.map(o=>{
+
+      const items =
+        Array.isArray(o.items) ? o.items : [];
+
+      const itemText =
+        items.length
+        ? items.map(i=>
+            `${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`
+          ).join("<br>")
+        : "No items";
+
+      const st =
+        String(o.status || "pending").toLowerCase();
+
+      const date =
+        o.created_at
+        ? new Date(o.created_at).toLocaleString("en-IN")
+        : "-";
+
+      return `
+        <div class="order-mobile-card">
+
+          <div class="order-mobile-top">
+            <div>
+              <div class="order-mobile-name">
+                Order #${escapeHtml(o.id)}
+              </div>
+
+              <div class="order-mobile-meta">
+                ${escapeHtml(o.shipping_name || "Customer")}
+                ${o.shipping_phone ? " • " + escapeHtml(o.shipping_phone) : ""}
+              </div>
+            </div>
+
+            <span class="order-status ${escapeHtml(st)}">
+              ${escapeHtml(st.charAt(0).toUpperCase()+st.slice(1))}
+            </span>
+          </div>
+
+          <div class="order-mobile-items">
+            ${itemText}
+          </div>
+
+          <div class="order-mobile-total">
+            ₹${Number(o.total || 0).toLocaleString("en-IN")}
+          </div>
+
+          <div class="order-mobile-meta">
+            Payment: ${escapeHtml(o.payment_method || "cod")}<br>
+            ${escapeHtml(date)}
+          </div>
+
+          <div style="margin-top:14px">
+            <label class="order-mobile-status-label">
+              Change Order Status — Step by Step
+            </label>
+
+            <select
+              class="order-mobile-status"
+              onchange="updateOrderStatus(${Number(o.id)},this.value)"
+            >
+              ${statusOptions(st)}
+            </select>
+          </div>
+
+          <button
+            class="order-mobile-view"
+            onclick="viewOrder(${Number(o.id)})"
+          >
+            View Full Order
+          </button>
+
+        </div>
+      `;
+
+    }).join("");
+
+  }
+
 }
 
 window.updateOrderStatus = async function(id,status){
-  const { error } = await supabase
-    .from("orders")
-    .update({status})
-    .eq("id",id);
+
+  const order =
+    orders.find(o=>Number(o.id) === Number(id));
+
+  if(!order){
+    return;
+  }
+
+  const current =
+    String(order.status || "pending").toLowerCase();
+
+  const next =
+    String(status || "").toLowerCase();
+
+  if(next === current){
+    return;
+  }
+
+  const allowedNext =
+    getNextOrderStatus(current);
+
+  // Enforce the delivery flow: pending -> confirmed -> processing -> shipped -> delivered.
+  // Cancellation is allowed before delivery.
+  if(next !== allowedNext && next !== "cancelled"){
+
+    alert(
+      `Status must move step by step.\n\n` +
+      `Current: ${current}\n` +
+      `Next allowed: ${allowedNext || "No next step"}`
+    );
+
+    renderOrders();
+    return;
+  }
+
+  const { error } =
+    await supabase
+      .from("orders")
+      .update({status:next})
+      .eq("id",id);
 
   if(error){
-    alert(error.message);
+
+    alert("Could not update order status: " + error.message);
+
     await loadOrders();
     return;
   }
