@@ -20,22 +20,6 @@ const supabase =
 createClient(SUPABASE_URL, SUPABASE_KEY);
 
 window.supabase = supabase;
-
-async function getCurrentUserId(){
-  try{
-    if(typeof supabaseClient === "undefined" || !supabaseClient) return null;
-    const { data, error } = await supabaseClient.auth.getUser();
-    if(error){
-      console.warn("Could not get current user:", error.message);
-      return null;
-    }
-    return data?.user?.id || null;
-  }catch(err){
-    console.warn("Could not get current user:", err);
-    return null;
-  }
-}
-
 </script>
 
 <style>
@@ -838,7 +822,6 @@ async function placeOrder(e){
     await supabase
       .from("orders")
       .insert({
-      user_id: await getCurrentUserId(),
 
         customer_name:
           customerName,
@@ -1013,6 +996,7 @@ ${city}, ${state} - ${pincode}`;
         <a
           class="whatsapp"
           href="${whatsappUrl}"
+          target="_blank"
         >
           📲 Send Order on WhatsApp
         </a>
@@ -1030,16 +1014,6 @@ ${city}, ${state} - ${pincode}`;
     </div>
 
   `;
-
-  /* =====================================
-     AUTO OPEN WHATSAPP
-     The order is already saved in Supabase.
-     Open WhatsApp with the order details pre-filled.
-  ===================================== */
-
-  setTimeout(() => {
-    window.location.href = whatsappUrl;
-  }, 700);
 
 }
 
