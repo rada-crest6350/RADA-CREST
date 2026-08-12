@@ -705,9 +705,36 @@ function updateTotal(){
    PLACE ORDER
 ===================================== */
 
+async function getLoggedInCustomer(){
+  const { data, error } =
+    await supabase.auth.getUser();
+
+  if(error){
+    console.error(error);
+    return null;
+  }
+
+  return data?.user || null;
+}
+
+
 async function placeOrder(e){
 
   e.preventDefault();
+
+  const customer =
+    await getLoggedInCustomer();
+
+  if(!customer){
+
+    window.location.href =
+      "account.html?redirect=" +
+      encodeURIComponent(
+        window.location.href
+      );
+
+    return;
+  }
 
 
   const button =
@@ -822,6 +849,9 @@ async function placeOrder(e){
     await supabase
       .from("orders")
       .insert({
+
+        customer_id:
+          customer.id,
 
         customer_name:
           customerName,
@@ -993,16 +1023,12 @@ ${city}, ${state} - ${pincode}`;
 
       <div style="margin-top:25px;">
 
-        <p style="font-size:14px;color:#777;">
-          Opening WhatsApp with your order details...
-        </p>
-
         <a
           class="whatsapp"
           href="${whatsappUrl}"
           target="_blank"
         >
-          📲 Open WhatsApp
+          📲 Send Order on WhatsApp
         </a>
 
 
@@ -1018,28 +1044,6 @@ ${city}, ${state} - ${pincode}`;
     </div>
 
   `;
-
-
-  /* =====================================
-     AUTO OPEN WHATSAPP
-  ===================================== */
-
-  setTimeout(() => {
-
-    try{
-
-      window.location.href = whatsappUrl;
-
-    }catch(err){
-
-      console.warn(
-        "WhatsApp could not be opened automatically:",
-        err
-      );
-
-    }
-
-  }, 700);
 
 }
 
