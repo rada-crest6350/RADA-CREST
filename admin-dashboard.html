@@ -921,6 +921,8 @@ td{
 
     <div id="storeMessage" class="message"></div>
 
+    <div id="storePreview" style="margin-top:18px;display:grid;gap:12px;"></div>
+
   </div>
 
 </section>
@@ -1428,16 +1430,14 @@ function renderProducts(){
   tbody.innerHTML =
     filtered.map(product=>{
 
+      const imageUrl = normalizeImageUrl(product.image_url);
+
       const image =
-        product.image_url
+        imageUrl
         ?
-        `<img
-          class="product-img"
-          src="${escapeHtml(product.image_url)}"
-          alt=""
-        >`
+        `<img class="product-img" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(product.name || "Product")}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid';"><div class="product-img product-img-fallback" style="display:none;place-items:center;font-size:11px;color:#777;">No image</div>`
         :
-        `<div class="product-img"></div>`;
+        `<div class="product-img product-img-fallback" style="display:grid;place-items:center;font-size:11px;color:#777;">No image</div>`;
 
 
       const stock =
@@ -2965,8 +2965,19 @@ async function loadStoreSettings(){
   ).value =
     settings.store_description || "";
 
+  renderStorePreview();
+
 }
 
+
+function renderStorePreview(){
+  const box=document.getElementById("storePreview");
+  if(!box) return;
+  const logo=normalizeImageUrl(document.getElementById("siteLogo")?.value);
+  const banner=normalizeImageUrl(document.getElementById("siteBanner")?.value);
+  box.innerHTML=`<div style="border:1px solid #292929;border-radius:12px;padding:12px;background:#101010"><div style="color:#888;font-size:11px;font-weight:bold;margin-bottom:8px">LOGO PREVIEW</div>${logo?`<img src="${escapeHtml(logo)}" alt="Logo preview" style="width:72px;height:72px;object-fit:contain;border-radius:10px;background:#181818;border:1px solid #303030" onerror="this.style.display='none'">`:`<div style="color:#666;font-size:12px">No logo URL entered.</div>`}</div><div style="border:1px solid #292929;border-radius:12px;padding:12px;background:#101010"><div style="color:#888;font-size:11px;font-weight:bold;margin-bottom:8px">BANNER PREVIEW</div>${banner?`<img src="${escapeHtml(banner)}" alt="Banner preview" style="display:block;width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1px solid #303030" onerror="this.style.display='none'">`:`<div style="color:#666;font-size:12px">No banner URL entered.</div>`}</div>`;
+}
+["siteLogo","siteBanner"].forEach(id=>document.getElementById(id)?.addEventListener("input",renderStorePreview));
 
 /* ================================
    SAVE STORE SETTINGS
@@ -3072,6 +3083,17 @@ async function(){
 
 };
 
+
+/* ================================
+   IMAGE URL HELPERS
+================================ */
+
+function normalizeImageUrl(value){
+  const raw=String(value||"").trim();
+  if(!raw) return "";
+  const url=raw.startsWith("//") ? "https:"+raw : raw;
+  try{ const u=new URL(url); return (u.protocol==="http:"||u.protocol==="https:") ? u.href : ""; }catch{ return ""; }
+}
 
 /* ================================
    SAFE TEXT
