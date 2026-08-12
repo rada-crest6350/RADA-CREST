@@ -993,12 +993,16 @@ ${city}, ${state} - ${pincode}`;
 
       <div style="margin-top:25px;">
 
+        <p style="font-size:14px;color:#777;">
+          Opening WhatsApp with your order details...
+        </p>
+
         <a
           class="whatsapp"
           href="${whatsappUrl}"
           target="_blank"
         >
-          📲 Send Order on WhatsApp
+          📲 Open WhatsApp
         </a>
 
 
@@ -1014,6 +1018,28 @@ ${city}, ${state} - ${pincode}`;
     </div>
 
   `;
+
+
+  /* =====================================
+     AUTO OPEN WHATSAPP
+  ===================================== */
+
+  setTimeout(() => {
+
+    try{
+
+      window.location.href = whatsappUrl;
+
+    }catch(err){
+
+      console.warn(
+        "WhatsApp could not be opened automatically:",
+        err
+      );
+
+    }
+
+  }, 700);
 
 }
 
