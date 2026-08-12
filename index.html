@@ -44,6 +44,24 @@
   font-size:70px;
 }
 
+#homepageBannerImage{
+  display:none;
+  width:100%;
+  max-height:420px;
+  object-fit:cover;
+  border-radius:inherit;
+}
+.hero.has-banner{
+  overflow:hidden;
+}
+.hero-banner-wrap{
+  display:none;
+  width:100%;
+  margin-top:24px;
+}
+@media (max-width:800px){
+  #homepageBannerImage{max-height:280px;}
+}
 .product-actions{
   display:flex;
   gap:8px;
@@ -183,6 +201,15 @@
       Efficient • Reliable • Premium
     </small>
 
+  </div>
+
+  <div class="hero-banner-wrap">
+    <img
+      id="homepageBannerImage"
+      src=""
+      alt="RADA CREST homepage banner"
+      onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');"
+    >
   </div>
 
 </section>
@@ -343,18 +370,27 @@ function escapeHtml(value){
 }
 
 
-function getImages(url){
+function cleanImageUrl(value){
+  if(!value) return "";
+  let u = String(value).trim();
 
+  // Accept URLs pasted as [img]https://...[/img] or with quotes.
+  u = u.replace(/^\[img\]\s*/i,"")
+       .replace(/\s*\[\/img\]$/i,"")
+       .replace(/^["']+|["']+$/g,"")
+       .trim();
+
+  return /^https?:\/\/\S+$/i.test(u) ? u : "";
+}
+
+function getImages(url){
   if(!url) return [];
 
   return String(url)
     .split(/[\n,]+/)
-    .map(x => x.trim())
-    .filter(x => /^https?:\/\//i.test(x));
-
+    .map(x => cleanImageUrl(x))
+    .filter(Boolean);
 }
-
-
 
 async function loadStoreSettings(){
   try{
@@ -366,39 +402,68 @@ async function loadStoreSettings(){
       .limit(1)
       .maybeSingle();
 
-    if(error || !data) return;
+    if(error){
+      console.warn("Store settings error:", error.message);
+      return;
+    }
 
-    const siteName = data.site_name || data.name || "";
+    if(!data) return;
+
+    const siteName =
+      data.site_name ||
+      data.name ||
+      "";
+
     if(siteName){
       document.title = siteName + " — Premium Electrical";
-      document.querySelectorAll(".brand span:last-child").forEach(el=>{
+      document.querySelectorAll(".brand > span:last-child").forEach(el=>{
         el.textContent = siteName;
       });
     }
 
-    const logoUrl = data.logo_url || data.logo || "";
+    // Logo from Store Control.
+    const logoUrl = cleanImageUrl(
+      data.logo_url ||
+      data.logo ||
+      data.logoUrl ||
+      ""
+    );
+
     if(logoUrl){
       document.querySelectorAll(".brand-mark").forEach(el=>{
         el.innerHTML =
           '<img src="' + escapeHtml(logoUrl) +
-          '" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" ' +
-          'onerror="this.style.display=\'none\';">';
+          '" alt="RADA CREST Logo" ' +
+          'style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" ' +
+          'onerror="this.remove();">';
         el.style.overflow = "hidden";
       });
     }
 
-    const bannerUrl =
+    // Banner from Store Control.
+    const bannerUrl = cleanImageUrl(
       data.banner_url ||
       data.homepage_banner_url ||
+      data.homepageBannerUrl ||
       data.banner ||
-      "";
+      data.site_banner ||
+      ""
+    );
 
     if(bannerUrl){
       const hero = document.querySelector(".hero");
-      if(hero){
+      const bannerImg = document.getElementById("homepageBannerImage");
+
+      if(hero && bannerImg){
+        bannerImg.src = bannerUrl;
+        bannerImg.style.display = "block";
+        bannerImg.closest(".hero-banner-wrap").style.display = "block";
+        hero.classList.add("has-banner");
+
+        // Also use the banner as the hero background.
         hero.style.backgroundImage =
-          "linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)),url('" +
-          String(bannerUrl).replace(/'/g, "\\'") + "')";
+          "linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)),url('" +
+          bannerUrl.replace(/'/g, "\\'") + "')";
         hero.style.backgroundSize = "cover";
         hero.style.backgroundPosition = "center";
       }
@@ -536,7 +601,13 @@ function renderProductCard(p){
 
 
   const images =
-    getImages(p.image_url);
+    getImages(
+      p.image_url ||
+      p.image ||
+      p.image_url_1 ||
+      p.image_urls ||
+      ""
+    );
 
 
   const image =
@@ -901,6 +972,7 @@ async function buyNow(id){
 
 updateCartCount();
 
+loadStoreSettings();
 loadProducts();
 
 </script>
