@@ -2477,17 +2477,17 @@ async function loadOrders(){
   const message = document.getElementById("ordersMessage");
   if(message) message.textContent = "Loading orders...";
 
-  const { data,error } = await supabase
+  const { data: summaryData, error: summaryError } = await supabase
     .from("order_summary")
     .select("*")
     .order("created_at",{ascending:false});
 
-  if(error){
-    console.error(error);
+  if(summaryError){
+    console.error(summaryError);
     orders = [];
     if(message){
       message.style.color = "#ff7777";
-      message.textContent = "Orders error: " + error.message;
+      message.textContent = "Orders error: " + summaryError.message;
     }
     document.getElementById("ordersTable").innerHTML = `
       <tr><td colspan="8"><div class="empty">Could not load orders from Supabase.</div></td></tr>
@@ -2495,7 +2495,73 @@ async function loadOrders(){
     return;
   }
 
-  orders = data || [];
+  /*
+     Compatibility layer:
+     Some older orders were created by the previous checkout system and
+     stored product_name / quantity / total_amount directly on `orders`.
+     New orders use `order_items` + `order_summary`.
+     Merge both sources so old orders are not shown as empty or ₹0.
+  */
+  const [{ data: rawOrders }, { data: rawItems }] = await Promise.all([
+    supabase.from("orders").select("*").order("created_at",{ascending:false}),
+    supabase.from("order_items").select("*").order("id",{ascending:true})
+  ]);
+
+  const rawById = new Map((rawOrders || []).map(r => [Number(r.id), r]));
+  const itemsByOrder = new Map();
+  (rawItems || []).forEach(item => {
+    const key = Number(item.order_id);
+    if(!itemsByOrder.has(key)) itemsByOrder.set(key, []);
+    itemsByOrder.get(key).push(item);
+  });
+
+  orders = (summaryData || []).map(o => {
+    const raw = rawById.get(Number(o.id)) || {};
+    const viewItems = Array.isArray(o.items) ? o.items.filter(Boolean) : [];
+    const dbItems = itemsByOrder.get(Number(o.id)) || [];
+
+    let mergedItems = viewItems.length ? viewItems : dbItems;
+
+    /* Legacy checkout fallback: order itself contains one product line. */
+    if(!mergedItems.length && (raw.product_name || raw.quantity)){
+      mergedItems = [{
+        product_id: raw.product_id,
+        product_name: raw.product_name || "Product",
+        quantity: Number(raw.quantity || 1),
+        unit_price: Number(raw.unit_price ?? raw.price ?? 0)
+      }];
+    }
+
+    const legacyTotal = Number(raw.total_amount ?? raw.total ?? 0);
+    const currentTotal = Number(o.total || 0);
+
+    return {
+      ...raw,
+      ...o,
+      shipping_name: o.shipping_name || raw.shipping_name || raw.customer_name || "Customer",
+      shipping_phone: o.shipping_phone || raw.shipping_phone || raw.phone || "",
+      shipping_address: o.shipping_address || raw.shipping_address || raw.address || "",
+      payment_method: o.payment_method || raw.payment_method || "cod",
+      total: currentTotal > 0 ? currentTotal : legacyTotal,
+      items: mergedItems
+    };
+  });
+
+  /* Fill missing unit prices from the order total when the old row has quantity. */
+  orders = orders.map(o => {
+    const total = Number(o.total || 0);
+    const items = Array.isArray(o.items) ? o.items : [];
+    if(total > 0 && items.length === 1){
+      const item = items[0];
+      const qty = Number(item.quantity || 0);
+      const unit = Number(item.unit_price ?? item.price ?? 0);
+      if(unit <= 0 && qty > 0){
+        return {...o, items:[{...item, unit_price:total / qty}]};
+      }
+    }
+    return o;
+  });
+
   if(message){
     message.style.color = "#7dff9b";
     message.textContent = orders.length ? `${orders.length} order(s) loaded.` : "No orders yet.";
