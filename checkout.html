@@ -996,7 +996,6 @@ ${city}, ${state} - ${pincode}`;
         <a
           class="whatsapp"
           href="${whatsappUrl}"
-          target="_blank"
         >
           📲 Send Order on WhatsApp
         </a>
@@ -1014,6 +1013,16 @@ ${city}, ${state} - ${pincode}`;
     </div>
 
   `;
+
+  /* =====================================
+     AUTO OPEN WHATSAPP
+     The order is already saved in Supabase.
+     Open WhatsApp with the order details pre-filled.
+  ===================================== */
+
+  setTimeout(() => {
+    window.location.href = whatsappUrl;
+  }, 700);
 
 }
 
