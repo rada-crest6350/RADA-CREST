@@ -396,8 +396,10 @@ async function loadStoreSettings(){
   try{
     if(!sbReady()) return;
 
+    // Store Control saves settings in site_settings.
+    // Read the same table so logo/banner/offer changes appear on the homepage.
     const { data, error } = await supabaseClient
-      .from("store_settings")
+      .from("site_settings")
       .select("*")
       .limit(1)
       .maybeSingle();
