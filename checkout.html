@@ -842,72 +842,48 @@ async function placeOrder(e){
 
 
   /* =====================================
-     INSERT ORDER
+     CREATE ORDER — AUTHORITATIVE RPC
+     Saves the order + order_items together,
+     uses the DB product price, checks stock,
+     and keeps account/order history consistent.
   ===================================== */
 
-  const { data,error } =
-    await supabase
-      .from("orders")
-      .insert({
+  const fullShippingAddress =
+    `${address}, ${city}, ${state} - ${pincode}`;
 
-        customer_id:
-          customer.id,
-
-        customer_name:
-          customerName,
-
-        phone:
-          phone,
-
-        address:
-          address,
-
-        city:
-          city,
-
-        state:
-          state,
-
-        pincode:
-          pincode,
-
-        product_name:
-          product.name || "",
-
-        product_id:
-          product.id || null,
-
-        quantity:
-          quantity,
-
-        total_amount:
-          totalAmount,
-
-        status:
-          "Pending"
-
-      })
-      .select()
-      .single();
-
+  const { data: result, error } =
+    await supabase.rpc("place_order",{
+      p_items: [
+        {
+          product_id: Number(product.id),
+          quantity: quantity
+        }
+      ],
+      p_shipping_name: customerName,
+      p_shipping_phone: phone,
+      p_shipping_address: fullShippingAddress,
+      p_client_token: crypto.randomUUID()
+    });
 
   if(error){
-
     console.error(error);
 
     button.disabled = false;
-
-    button.textContent =
-      "Place Order";
-
-    message.style.color =
-      "#d33";
-
-    message.textContent =
-      error.message;
-
+    button.textContent = "Place Order";
+    message.style.color = "#d33";
+    message.textContent = error.message;
     return;
+  }
 
+  const orderId = result?.order_id;
+  const savedTotal = Number(result?.total ?? totalAmount);
+
+  if(!orderId){
+    button.disabled = false;
+    button.textContent = "Place Order";
+    message.style.color = "#d33";
+    message.textContent = "Order could not be created. Please try again.";
+    return;
   }
 
 
@@ -916,7 +892,7 @@ async function placeOrder(e){
   ===================================== */
 
   showSuccess(
-    data,
+    { id: orderId },
     customerName,
     phone,
     address,
@@ -924,7 +900,7 @@ async function placeOrder(e){
     state,
     pincode,
     quantity,
-    totalAmount
+    savedTotal
   );
 
 }
