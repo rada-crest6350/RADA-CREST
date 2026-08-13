@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>RADA CREST — Quality for Everyday Living</title>
+<title>RADA CREST — Premium Electrical</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -15,76 +15,131 @@
 <script src="supabase-client.js"></script>
 
 <style>
-/* ===== RADA CREST HOMEPAGE — BANNER ONLY HERO ===== */
-body{background:#f6f5f2;}
 
-.banner-section{
-  width:100%;
-  padding:22px 18px 54px;
-  box-sizing:border-box;
+.product{
+  cursor:pointer;
+  transition:.25s;
 }
 
-.banner-link{
-  display:block;
-  width:100%;
-  max-width:1500px;
-  margin:0 auto;
-  text-decoration:none;
-  color:inherit;
+.product:hover{
+  transform:translateY(-4px);
 }
 
-.home-banner{
-  width:100%;
-  position:relative;
+.product .pimg{
   overflow:hidden;
-  border-radius:28px;
-  background:#111;
-  box-shadow:0 18px 55px rgba(0,0,0,.16);
-}
-
-.home-banner img{
-  display:block;
-  width:100%;
-  height:auto;
-  max-height:560px;
-  object-fit:cover;
-  object-position:center;
-}
-
-.banner-placeholder{
-  display:none;
-  min-height:260px;
-  align-items:center;
-  justify-content:center;
-  background:#111;
-}
-
-.banner-placeholder span{
-  width:56px;
-  height:56px;
-  border:1px solid rgba(255,255,255,.25);
-  border-radius:16px;
+  min-height:220px;
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#fff;
+}
+
+.product .pimg img{
+  width:100%;
+  height:220px;
+  object-fit:contain;
+  display:block;
+}
+
+.product .pimg .no-image{
+  font-size:70px;
+}
+
+#homepageBannerImage{
+  display:none;
+  width:100%;
+  max-height:420px;
+  object-fit:cover;
+  border-radius:inherit;
+}
+.hero.has-banner{
+  overflow:hidden;
+}
+.hero-banner-wrap{
+  display:none;
+  width:100%;
+  margin-top:24px;
+}
+@media (max-width:800px){
+  #homepageBannerImage{max-height:280px;}
+}
+.product-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.product-actions button{
+  cursor:pointer;
+}
+
+.buy{
+  cursor:pointer;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:6px;
+  font-size:11px;
   font-weight:800;
-  letter-spacing:2px;
 }
 
-.banner-link:focus-visible{
-  outline:3px solid #111;
-  outline-offset:4px;
+
+/* Premium banner-first hero. Existing product/order/cart logic is unchanged. */
+.hero{
+  position:relative;
+  display:block !important;
+  padding:22px !important;
+  background:linear-gradient(135deg,#111,#1b1b1b) !important;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 24px 60px rgba(0,0,0,.18);
+}
+.hero-copy{
+  display:none !important;
+}
+.hero-banner-wrap{
+  display:none;
+  width:100%;
+  margin:0 !important;
+}
+.hero.has-banner .hero-banner-wrap{
+  display:block !important;
+}
+#homepageBannerImage{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:430px;
+  object-fit:contain;
+  border-radius:18px;
+  background:#0b0b0b;
+}
+.hero:not(.has-banner) .hero-banner-wrap{
+  display:block !important;
+}
+.hero:not(.has-banner) .hero-banner-wrap::before{
+  content:'RADA CREST  •  PREMIUM ELECTRICAL';
+  display:flex;
+  min-height:250px;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border-radius:18px;
+  background:linear-gradient(135deg,#101010,#242424);
+  color:#f5f5f5;
+  font-size:clamp(24px,4vw,48px);
+  font-weight:800;
+  letter-spacing:.04em;
+  padding:30px;
+}
+.hero:not(.has-banner) #homepageBannerImage{display:none !important;}
+@media(max-width:800px){
+  .hero{padding:10px !important;}
+  #homepageBannerImage{max-height:300px;border-radius:12px;}
 }
 
-@media(max-width:700px){
-  .banner-section{padding:14px 12px 40px;}
-  .home-banner{border-radius:20px;}
-  .home-banner img{max-height:none;}
-}
 </style>
-
-
 
 </head>
 
@@ -155,29 +210,23 @@ body{background:#f6f5f2;}
 
 
 
-<section class="banner-section" id="homeHero">
+<section class="hero">
 
-  <a
-    id="heroBannerLink"
-    class="banner-link"
-    href="#products"
-    aria-label="View featured product"
-  >
-    <div class="home-banner">
+  <div class="hero-copy">
+    <p class="eyebrow">RADA CREST • SMART ELECTRICAL</p>
+    <h1>Premium electrical essentials for everyday living.</h1>
+    <p>Reliable products, practical design and trusted support from RADA CREST.</p>
+    <a class="btn" href="#products">Explore Products →</a>
+  </div>
 
-      <img
-        id="heroBannerImage"
-        src=""
-        alt="RADA CREST featured product"
-        style="display:none;"
-      >
-
-      <div id="heroBannerFallback" class="banner-placeholder">
-        <span>RC</span>
-      </div>
-
-    </div>
-  </a>
+  <div class="hero-banner-wrap">
+    <img
+      id="homepageBannerImage"
+      src=""
+      alt="RADA CREST homepage banner"
+      onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');"
+    >
+  </div>
 
 </section>
 
@@ -337,127 +386,124 @@ function escapeHtml(value){
 }
 
 
-function getImages(url){
+function cleanImageUrl(value){
+  if(!value) return "";
+  let u = String(value).trim();
 
+  // Accept URLs pasted as [img]https://...[/img] or with quotes.
+  u = u.replace(/^\[img\]\s*/i,"")
+       .replace(/\s*\[\/img\]$/i,"")
+       .replace(/^["']+|["']+$/g,"")
+       .trim();
+
+  return /^https?:\/\/\S+$/i.test(u) ? u : "";
+}
+
+function getImages(url){
   if(!url) return [];
 
   return String(url)
     .split(/[\n,]+/)
-    .map(x => x.trim())
-    .filter(x => /^https?:\/\//i.test(x));
-
+    .map(x => cleanImageUrl(x))
+    .filter(Boolean);
 }
 
-
-
 async function loadStoreSettings(){
-
   try{
-
     if(!sbReady()) return;
 
-    const { data, error } =
-      await supabaseClient
-        .from("store_settings")
-        .select("*")
-        .limit(1)
-        .maybeSingle();
+    // Store Control saves settings in site_settings.
+    // Read the same table so logo/banner/offer changes appear on the homepage.
+    const { data, error } = await supabaseClient
+      .from("site_settings")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
 
-    if(error || !data) return;
+    if(error){
+      console.warn("Store settings error:", error.message);
+      return;
+    }
+
+    if(!data) return;
 
     const siteName =
       data.site_name ||
       data.name ||
-      "RADA CREST";
+      "";
 
-    document.title =
-      siteName + " — Quality Products";
-
-    document
-      .querySelectorAll(".brand span:last-child")
-      .forEach(el => {
+    if(siteName){
+      document.title = siteName + " — Premium Electrical";
+      document.querySelectorAll(".brand > span:last-child").forEach(el=>{
         el.textContent = siteName;
       });
-
-    /* LOGO — existing system preserved */
-    const logoUrl =
-      data.logo_url ||
-      data.logo ||
-      "";
-
-    if(logoUrl){
-      document
-        .querySelectorAll(".brand-mark")
-        .forEach(el => {
-          el.innerHTML =
-            '<img src="' +
-            escapeHtml(logoUrl) +
-            '" alt="' +
-            escapeHtml(siteName) +
-            '" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display=\'none\';">';
-          el.style.overflow = "hidden";
-        });
     }
 
-    /* HOMEPAGE BANNER */
-    const bannerUrl =
+    // Logo from Store Control.
+    const logoUrl = cleanImageUrl(
+      data.logo_url ||
+      data.logo ||
+      data.logoUrl ||
+      ""
+    );
+
+    if(logoUrl){
+      document.querySelectorAll(".brand-mark").forEach(el=>{
+        el.innerHTML =
+          '<img src="' + escapeHtml(logoUrl) +
+          '" alt="RADA CREST Logo" ' +
+          'style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" ' +
+          'onerror="this.remove();">';
+        el.style.overflow = "hidden";
+      });
+    }
+
+    // Banner from Store Control.
+    const bannerUrl = cleanImageUrl(
       data.banner_url ||
       data.homepage_banner_url ||
+      data.homepageBannerUrl ||
       data.banner ||
-      "";
+      data.site_banner ||
+      ""
+    );
 
-    const banner =
-      document.getElementById("heroBannerImage");
+    if(bannerUrl){
+      const hero = document.querySelector(".hero");
+      const bannerImg = document.getElementById("homepageBannerImage");
 
-    const fallback =
-      document.getElementById("heroBannerFallback");
+      if(hero && bannerImg){
+        bannerImg.src = bannerUrl;
+        bannerImg.style.display = "block";
+        bannerImg.closest(".hero-banner-wrap").style.display = "block";
+        hero.classList.add("has-banner");
 
-    const bannerLink =
-      document.getElementById("heroBannerLink");
-
-    /*
-      Admin can set banner_product_id.
-      When present, tapping the banner opens that exact product.
-      If it is not set, the banner safely falls back to Products.
-    */
-    const bannerProductId =
-      Number(data.banner_product_id || 0);
-
-    if(bannerLink){
-      if(bannerProductId > 0){
-        bannerLink.href =
-          "product.html?id=" +
-          encodeURIComponent(bannerProductId);
-      }else{
-        bannerLink.href = "#products";
       }
     }
 
-    if(bannerUrl && banner){
+    const offer = data.offer_text || data.offer || "";
+    if(offer){
+      const eyebrow = document.querySelector(".hero .eyebrow");
+      if(eyebrow) eyebrow.textContent = offer;
+    }
 
-      banner.onload = function(){
-        banner.style.display = "block";
-        if(fallback) fallback.style.display = "none";
-      };
+    const description =
+      data.store_description ||
+      data.description ||
+      "";
 
-      banner.onerror = function(){
-        banner.style.display = "none";
-        if(fallback) fallback.style.display = "flex";
-      };
+    if(description){
+      const paragraphs =
+        document.querySelectorAll(".hero > div:first-child > p");
 
-      banner.src = String(bannerUrl);
-
-    }else{
-
-      if(banner) banner.style.display = "none";
-      if(fallback) fallback.style.display = "flex";
-
+      if(paragraphs.length > 1){
+        paragraphs[1].textContent = description;
+      }
     }
 
   }catch(err){
     console.warn("Store settings could not be loaded:", err);
   }
-
 }
 
 async function loadProducts(){
@@ -567,7 +613,13 @@ function renderProductCard(p){
 
 
   const images =
-    getImages(p.image_url);
+    getImages(
+      p.image_url ||
+      p.image ||
+      p.image_url_1 ||
+      p.image_urls ||
+      ""
+    );
 
 
   const image =
