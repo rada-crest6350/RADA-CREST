@@ -890,6 +890,19 @@ td{
       </div>
 
       <div class="setting-field full">
+        <label>Banner Product ID</label>
+        <input
+          id="bannerProductId"
+          type="number"
+          min="1"
+          placeholder="Example: 12"
+        >
+        <small style="display:block;margin-top:6px;color:#888;">
+          Tap the homepage banner to open this product's page.
+        </small>
+      </div>
+
+      <div class="setting-field full">
         <label>Offer Text</label>
         <input id="offerText" placeholder="Example: Special Offer">
       </div>
@@ -2477,17 +2490,17 @@ async function loadOrders(){
   const message = document.getElementById("ordersMessage");
   if(message) message.textContent = "Loading orders...";
 
-  const { data: summaryData, error: summaryError } = await supabase
+  const { data,error } = await supabase
     .from("order_summary")
     .select("*")
     .order("created_at",{ascending:false});
 
-  if(summaryError){
-    console.error(summaryError);
+  if(error){
+    console.error(error);
     orders = [];
     if(message){
       message.style.color = "#ff7777";
-      message.textContent = "Orders error: " + summaryError.message;
+      message.textContent = "Orders error: " + error.message;
     }
     document.getElementById("ordersTable").innerHTML = `
       <tr><td colspan="8"><div class="empty">Could not load orders from Supabase.</div></td></tr>
@@ -2495,73 +2508,7 @@ async function loadOrders(){
     return;
   }
 
-  /*
-     Compatibility layer:
-     Some older orders were created by the previous checkout system and
-     stored product_name / quantity / total_amount directly on `orders`.
-     New orders use `order_items` + `order_summary`.
-     Merge both sources so old orders are not shown as empty or ₹0.
-  */
-  const [{ data: rawOrders }, { data: rawItems }] = await Promise.all([
-    supabase.from("orders").select("*").order("created_at",{ascending:false}),
-    supabase.from("order_items").select("*").order("id",{ascending:true})
-  ]);
-
-  const rawById = new Map((rawOrders || []).map(r => [Number(r.id), r]));
-  const itemsByOrder = new Map();
-  (rawItems || []).forEach(item => {
-    const key = Number(item.order_id);
-    if(!itemsByOrder.has(key)) itemsByOrder.set(key, []);
-    itemsByOrder.get(key).push(item);
-  });
-
-  orders = (summaryData || []).map(o => {
-    const raw = rawById.get(Number(o.id)) || {};
-    const viewItems = Array.isArray(o.items) ? o.items.filter(Boolean) : [];
-    const dbItems = itemsByOrder.get(Number(o.id)) || [];
-
-    let mergedItems = viewItems.length ? viewItems : dbItems;
-
-    /* Legacy checkout fallback: order itself contains one product line. */
-    if(!mergedItems.length && (raw.product_name || raw.quantity)){
-      mergedItems = [{
-        product_id: raw.product_id,
-        product_name: raw.product_name || "Product",
-        quantity: Number(raw.quantity || 1),
-        unit_price: Number(raw.unit_price ?? raw.price ?? 0)
-      }];
-    }
-
-    const legacyTotal = Number(raw.total_amount ?? raw.total ?? 0);
-    const currentTotal = Number(o.total || 0);
-
-    return {
-      ...raw,
-      ...o,
-      shipping_name: o.shipping_name || raw.shipping_name || raw.customer_name || "Customer",
-      shipping_phone: o.shipping_phone || raw.shipping_phone || raw.phone || "",
-      shipping_address: o.shipping_address || raw.shipping_address || raw.address || "",
-      payment_method: o.payment_method || raw.payment_method || "cod",
-      total: currentTotal > 0 ? currentTotal : legacyTotal,
-      items: mergedItems
-    };
-  });
-
-  /* Fill missing unit prices from the order total when the old row has quantity. */
-  orders = orders.map(o => {
-    const total = Number(o.total || 0);
-    const items = Array.isArray(o.items) ? o.items : [];
-    if(total > 0 && items.length === 1){
-      const item = items[0];
-      const qty = Number(item.quantity || 0);
-      const unit = Number(item.unit_price ?? item.price ?? 0);
-      if(unit <= 0 && qty > 0){
-        return {...o, items:[{...item, unit_price:total / qty}]};
-      }
-    }
-    return o;
-  });
-
+  orders = data || [];
   if(message){
     message.style.color = "#7dff9b";
     message.textContent = orders.length ? `${orders.length} order(s) loaded.` : "No orders yet.";
@@ -2586,18 +2533,6 @@ function getNextOrderStatus(status){
   return index >= 0 && index < flow.length - 1
     ? flow[index + 1]
     : null;
-}
-
-function getOrderTotal(order){
-  const savedTotal = Number(order?.total || 0);
-  if(savedTotal > 0) return savedTotal;
-
-  const items = Array.isArray(order?.items) ? order.items : [];
-  return items.reduce((sum,item)=>{
-    const qty = Number(item?.quantity || 0);
-    const unit = Number(item?.unit_price ?? item?.price ?? 0);
-    return sum + (qty * unit);
-  },0);
 }
 
 function statusOptions(current){
@@ -2674,14 +2609,9 @@ function renderOrders(){
 
     const itemText =
       items.length
-      ? items.map(i=>{
-          const qty = Number(i.quantity || 0);
-          const unit = Number(i.unit_price ?? i.price ?? 0);
-          const line = qty * unit;
-          return `${escapeHtml(i.product_name || "Product")} × ${qty}` +
-            (unit > 0 ? ` — ₹${unit.toLocaleString("en-IN")} each` : "") +
-            (line > 0 ? ` = ₹${line.toLocaleString("en-IN")}` : "");
-        }).join("<br>")
+      ? items.map(i=>
+          `${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`
+        ).join("<br>")
       : "No items";
 
     const st =
@@ -2708,7 +2638,7 @@ function renderOrders(){
         </td>
 
         <td>
-          ₹${getOrderTotal(o).toLocaleString("en-IN")}
+          ₹${Number(o.total || 0).toLocaleString("en-IN")}
         </td>
 
         <td>
@@ -2747,16 +2677,11 @@ function renderOrders(){
         Array.isArray(o.items) ? o.items : [];
 
       const itemText =
-      items.length
-      ? items.map(i=>{
-          const qty = Number(i.quantity || 0);
-          const unit = Number(i.unit_price ?? i.price ?? 0);
-          const line = qty * unit;
-          return `${escapeHtml(i.product_name || "Product")} × ${qty}` +
-            (unit > 0 ? ` — ₹${unit.toLocaleString("en-IN")} each` : "") +
-            (line > 0 ? ` = ₹${line.toLocaleString("en-IN")}` : "");
-        }).join("<br>")
-      : "No items";
+        items.length
+        ? items.map(i=>
+            `${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`
+          ).join("<br>")
+        : "No items";
 
       const st =
         String(o.status || "pending").toLowerCase();
@@ -2791,7 +2716,7 @@ function renderOrders(){
           </div>
 
           <div class="order-mobile-total">
-            ₹${getOrderTotal(o).toLocaleString("en-IN")}
+            ₹${Number(o.total || 0).toLocaleString("en-IN")}
           </div>
 
           <div class="order-mobile-meta">
@@ -2884,19 +2809,8 @@ window.updateOrderStatus = async function(id,status){
 window.viewOrder = function(id){
   const o = orders.find(x=>Number(x.id)===Number(id));
   if(!o) return;
-
   const items = Array.isArray(o.items) ? o.items : [];
-
-  const itemLines = items.map(i=>{
-    const qty = Number(i.quantity || 0);
-    const unit = Number(i.unit_price ?? i.price ?? 0);
-    const line = qty * unit;
-
-    return `• ${i.product_name || "Product"} × ${qty}` +
-      (unit > 0 ? ` — ₹${unit.toLocaleString("en-IN")} each` : "") +
-      (line > 0 ? ` = ₹${line.toLocaleString("en-IN")}` : "");
-  }).join("\n");
-
+  const itemLines = items.map(i=>`• ${i.product_name || "Product"} × ${i.quantity} — ₹${Number(i.unit_price || 0).toLocaleString("en-IN")}`).join("\n");
   alert(
     `Order #${o.id}\n\n` +
     `Customer: ${o.shipping_name || "-"}\n` +
@@ -2904,7 +2818,7 @@ window.viewOrder = function(id){
     `Address: ${o.shipping_address || "-"}\n` +
     `Status: ${o.status || "pending"}\n` +
     `Payment: ${o.payment_method || "cod"}\n` +
-    `Total: ₹${getOrderTotal(o).toLocaleString("en-IN")}\n\n` +
+    `Total: ₹${Number(o.total || 0).toLocaleString("en-IN")}\n\n` +
     `Items:\n${itemLines || "No items"}`
   );
 };
@@ -3041,6 +2955,15 @@ async function loadStoreSettings(){
     settings.banner_url || "";
 
 
+  const bannerProductInput =
+    document.getElementById("bannerProductId");
+
+  if(bannerProductInput){
+    bannerProductInput.value =
+      settings.banner_product_id ?? "";
+  }
+
+
   document.getElementById(
     "offerText"
   ).value =
@@ -3096,6 +3019,13 @@ async function(){
       document.getElementById(
         "siteBanner"
       ).value.trim(),
+
+    banner_product_id:
+      (
+        document.getElementById(
+          "bannerProductId"
+        )?.value.trim() || ""
+      ),
 
     offer_text:
       document.getElementById(
