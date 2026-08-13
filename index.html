@@ -59,10 +59,8 @@
   width:100%;
   margin-top:24px;
 }
-@media (max-width: 800px) {
-    #homepageBannerImage {
-        max-height: 300/px; /* ya 280px */
-    }
+@media (max-width:800px){
+  #homepageBannerImage{max-height:280px;}
 }
 .product-actions{
   display:flex;
@@ -108,13 +106,14 @@
 .hero.has-banner .hero-banner-wrap{
   display:block !important;
 }
-#homepageBannerImage {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;        /* Height auto ki jagah 100% force karein */
-    min-height: 100% !important;    /* Isse image container jitni hi tall ho jayegi */
-    object-fit: cover !important;   /* Isse image fit ho jayegi aur space nahi rahega */
-    border-radius: 18px;  
+#homepageBannerImage{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:430px;
+  object-fit:contain;
+  border-radius:18px;
+  background:#0b0b0b;
 }
 .hero:not(.has-banner) .hero-banner-wrap{
   display:block !important;
@@ -137,7 +136,7 @@
 .hero:not(.has-banner) #homepageBannerImage{display:none !important;}
 @media(max-width:800px){
   .hero{padding:10px !important;}
-  #homepageBannerImage{max-height:420px;border-radius:12px;}
+  #homepageBannerImage{max-height:300px;border-radius:12px;}
 }
 
 </style>
@@ -416,7 +415,6 @@ async function loadStoreSettings(){
     if(!sbReady()) return;
 
     // Store Control saves settings in site_settings.
-    // Read the same table so logo/banner/offer changes appear on the homepage.
     const { data, error } = await supabaseClient
       .from("site_settings")
       .select("*")
@@ -461,7 +459,7 @@ async function loadStoreSettings(){
       });
     }
 
-    // Banner from Store Control.
+    // Banner Image URL
     const bannerUrl = cleanImageUrl(
       data.banner_url ||
       data.homepage_banner_url ||
@@ -471,13 +469,18 @@ async function loadStoreSettings(){
       ""
     );
 
-    // Banner Link from Store Control
+    // Banner Product ID from Store Control (Screen 1 me jahan '2' daala hai)
+    const bannerProductId =
+      data.banner_product_id ||
+      data.banner_product ||
+      data.bannerProductId ||
+      "";
+
+    // Alternative direct URL link if available
     const bannerLinkUrl =
       data.banner_link ||
       data.homepage_banner_link ||
-      data.homepageBannerLink ||
       data.bannerLink ||
-      data.link ||
       "";
 
     if(bannerUrl){
@@ -491,14 +494,22 @@ async function loadStoreSettings(){
         bannerImg.closest(".hero-banner-wrap").style.display = "block";
         hero.classList.add("has-banner");
 
-        // Banner pe link set karne ka logic:
-        if(bannerLink && bannerLinkUrl){
-          bannerLink.href = bannerLinkUrl;
-          bannerLink.style.cursor = "pointer";
-        } else if(bannerLink) {
-          bannerLink.removeAttribute("href");
-          bannerLink.style.cursor = "default";
+        // Banner click redirect logic
+        if(bannerLink){
+          if(bannerProductId){
+            // Jab Banner Product ID ho (jaise 2), to product.html?id=2 par bhejega
+            bannerLink.href = "product.html?id=" + encodeURIComponent(bannerProductId);
+            bannerLink.style.cursor = "pointer";
+          } else if(bannerLinkUrl){
+            // Agar full link dala ho
+            bannerLink.href = bannerLinkUrl;
+            bannerLink.style.cursor = "pointer";
+          } else {
+            bannerLink.removeAttribute("href");
+            bannerLink.style.cursor = "default";
+          }
         }
+
       }
     }
 
