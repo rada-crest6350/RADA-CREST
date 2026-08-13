@@ -718,6 +718,11 @@ async function placeOrder(){
 
     /*
       1. CREATE ORDER
+
+      IMPORTANT:
+      The database schema used by the account/admin pages stores:
+      user_id, total, shipping_name, shipping_phone,
+      shipping_address and payment_method.
     */
 
     const {
@@ -727,82 +732,46 @@ async function placeOrder(){
       await supabaseClient
         .from("orders")
         .insert({
-
-          customer_id:
-            user.id,
-
-          customer_name:
-            name,
-
-          customer_phone:
-            phone,
-
-          customer_email:
-            user.email || null,
-
-          total_amount:
-            cartTotal,
-
-          status:
-            "pending",
-
-          payment_status:
-            "pending",
-
-          shipping_address:
-            address
-
+          user_id: user.id,
+          status: "pending",
+          payment_method: "cod",
+          total: cartTotal,
+          shipping_name: name,
+          shipping_phone: phone,
+          shipping_address: address
         })
         .select()
         .single();
 
-
     if(orderError){
-
       throw orderError;
-
     }
 
 
     /*
       2. CREATE ORDER ITEMS
+
+      The database column is unit_price (not price).
+      This is what the account/admin order views read.
     */
 
     const cart = getCart();
 
-
     const orderItems =
       cartProducts.map(product => {
-
         const item =
           cart.find(
-            x =>
-              Number(x.id) ===
-              Number(product.id)
+            x => Number(x.id) === Number(product.id)
           );
 
-
         return {
-
-          order_id:
-            order.id,
-
-          product_id:
-            product.id,
-
-          product_name:
-            product.name,
-
-          quantity:
-            Number(item?.qty || 1),
-
-          price:
-            Number(product.price || 0)
-
+          order_id: order.id,
+          product_id: product.id,
+          product_name: product.name,
+          quantity: Number(item?.qty || 1),
+          unit_price: Number(product.price || 0)
         };
-
       });
-
 
     const {
       error: itemError
@@ -811,11 +780,8 @@ async function placeOrder(){
         .from("order_items")
         .insert(orderItems);
 
-
     if(itemError){
-
       throw itemError;
-
     }
 
 
