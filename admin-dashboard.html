@@ -2555,133 +2555,97 @@ function statusOptions(current){
   return html;
 }
 
-function renderOrders(){
+function renderOrders() {
+    const tbody = document.getElementById("ordersTable");
+    const mobile = document.getElementById("ordersMobileList");
 
-  const tbody = document.getElementById("ordersTable");
-  const mobile = document.getElementById("ordersMobileList");
-  if(!tbody) return;
+    if (!tbody && !mobile) return;
 
-  const search =
-    (document.getElementById("orderSearch")?.value || "")
-      .toLowerCase()
-      .trim();
+    // Search and Filter values fetch karna
+    const searchInput = document.getElementById("orderSearch");
+    const search = (searchInput ? searchInput.value : "").toLowerCase().trim();
 
-  const statusFilter =
-    (document.getElementById("orderStatusFilter")?.value || "")
-      .toLowerCase()
-      .trim();
+    const statusFilterInput = document.getElementById("orderStatusFilter");
+    const statusFilter = (statusFilterInput ? statusFilterInput.value : "").toLowerCase().trim();
 
-  const filtered = orders.filter(o=>{
+    // Orders Filter logic
+    const filtered = (window.orders || orders || []).filter(o => {
+        const orderStatus = String(o.status || "pending").toLowerCase();
+        
+        // Dynamic fields handling (Customer details missing issue fix)
+        const name = o.shipping_name || o.customer_name || o.full_name || o.name || "";
+        const phone = o.shipping_phone || o.phone || o.mobile || o.contact || "";
+        const address = o.shipping_address || o.address || "";
 
-    const orderStatus =
-      String(o.status || "pending").toLowerCase();
+        const key = [
+            o.id,
+            name,
+            phone,
+            address,
+            orderStatus
+        ].join(" ").toLowerCase();
 
-    const name = o.shipping_name || o.customer_name || o.full_name || o.name || "";
-    const phone = o.shipping_phone || o.phone || o.mobile || o.contact || "";
-    const address = o.shipping_address || o.address || "";
+        return (!search || key.includes(search)) && 
+               (!statusFilter || orderStatus === statusFilter);
+    });
 
-    const key = [
-        o.id,
-        name,
-        phone,
-        address,
-        orderStatus
-    ].join(" ").toLowerCase();
-
-    return (!search || hay.includes(search))
-      && (!statusFilter || orderStatus === statusFilter);
-
-  });
-
-  if(!filtered.length){
-
-    tbody.innerHTML =
-      `<tr><td colspan="8"><div class="empty">No matching orders found.</div></td></tr>`;
-
-    if(mobile){
-      mobile.innerHTML =
-        `<div class="empty">No matching orders found.</div>`;
+    // Agar koi order filter me na mile
+    if (!filtered.length) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8"><div class="empty">No matching orders found.</div></td></tr>';
+        if (mobile) mobile.innerHTML = '<div class="empty">No matching orders found.</div>';
+        return;
     }
 
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(o=>{
-
-    const items =
-      Array.isArray(o.items) ? o.items : [];
-
-    const itemText =
-      items.length
-      ? items.map(i=>
-          `${escapeHtml(i.product_name || "Product")} × ${Number(i.quantity || 0)}`
-        ).join("<br>")
-      : "No items";
-
-    const st =
-      String(o.status || "pending").toLowerCase();
-
-    const date =
-      o.created_at
-      ? new Date(o.created_at).toLocaleString("en-IN")
-      : "-";
-
-    return `
-      <tr>
-        <td><strong>#${escapeHtml(o.id)}</strong></td>
-
-        // Variable definitions (loop ke start me rakh sakte hain)
+    // Orders HTML generation
+    const htmlContent = filtered.map(o => {
         const name = o.shipping_name || o.customer_name || o.full_name || o.name || "Customer";
         const phone = o.shipping_phone || o.phone || o.mobile || o.contact || "No Phone";
-   
-        // HTML output:
-        <td>
-           <strong>${escapeHtml(name)}</strong>
-           <div style="color:#aaa;font-size:11px;margin-top:4px">
-               ${escapeHtml(phone)}
-           </div>
-       </td>
+        
+        // Items logic
+        const items = Array.isArray(o.items) ? o.items : [];
+        const itemText = items.length 
+            ? items.map(i => `${escapeHtml(i.product_name || i.name || "Product")} × ${i.quantity || 1}`).join(", ") 
+            : "No items";
 
+        // Date formatting
+        const date = o.created_at ? new Date(o.created_at).toLocaleString('en-IN') : "";
 
-        <td>
-          <div class="items-list">${itemText}</div>
-        </td>
+        return `
+            <div class="order-card" style="background: #121212; border: 1px solid #222; border-radius: 12px; padding: 16px; margin-bottom: 16px; color: #fff;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="font-size:16px;">Order #${escapeHtml(o.id)}</strong>
+                    <span style="background: #332a00; color: #ffcc00; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight:600;">
+                        ${escapeHtml(o.status || "Pending")}
+                    </span>
+                </div>
 
-        <td>
-          ₹${Number(o.total || 0).toLocaleString("en-IN")}
-        </td>
+                <div style="margin-top: 10px; font-size: 15px;">
+                    👤 <strong>${escapeHtml(name)}</strong>
+                </div>
+                <div style="color: #aaa; font-size: 13px; margin-top:2px;">
+                    📞 ${escapeHtml(phone)}
+                </div>
 
-        <td>
-          ${escapeHtml(o.payment_method || "cod")}
-        </td>
+                <div style="margin-top: 10px; font-size: 13px; color: #ddd; background: #1a1a1a; padding: 8px; border-radius:6px;">
+                    📦 ${escapeHtml(itemText)}
+                </div>
 
-        <td>
-          <select
-            class="order-status ${escapeHtml(st)}"
-            onchange="updateOrderStatus(${Number(o.id)},this.value)"
-          >
-            ${statusOptions(st)}
-          </select>
-        </td>
+                <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color:#fff;">
+                    ₹${o.total_price || o.total || 0}
+                </div>
 
-        <td>${escapeHtml(date)}</td>
+                <div style="color: #666; font-size: 11px; margin-top: 6px;">
+                    ${date}
+                </div>
+            </div>
+        `;
+    }).join("");
 
-        <td>
-          <button
-            class="status-btn"
-            onclick="viewOrder(${Number(o.id)})"
-          >
-            View
-          </button>
-        </td>
-      </tr>
-    `;
+    // Mobile & Table render
+    if (mobile) mobile.innerHTML = htmlContent;
+    if (tbody) tbody.innerHTML = htmlContent;
+}
 
-  }).join("");
-
-  if(mobile){
-
-    mobile.innerHTML = filtered.map(o=>{
 
       const items =
         Array.isArray(o.items) ? o.items : [];
