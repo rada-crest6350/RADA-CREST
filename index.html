@@ -68,34 +68,26 @@
 }
 
 
-/* =========================================================
-   RADA CREST PREMIUM HOMEPAGE
-   Visual-only redesign. Existing product/cart/auth logic
-   remains unchanged.
-   ========================================================= */
+/* ================= RADA CREST PREMIUM HOMEPAGE ================= */
 
 body{
-  background:#f7f6f3;
+  background:#f6f5f2;
 }
 
 .premium-hero{
-  position:relative;
-  min-height:560px;
-  margin:34px auto 72px;
+  margin:28px auto 70px;
   max-width:1400px;
-  padding:70px 7%;
+  min-height:560px;
+  padding:58px 5%;
   border-radius:32px;
   overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:55px;
+  position:relative;
   color:#fff;
   background:
-    radial-gradient(circle at 82% 24%,rgba(255,255,255,.11),transparent 27%),
-    radial-gradient(circle at 12% 88%,rgba(255,255,255,.06),transparent 25%),
-    linear-gradient(135deg,#090909 0%,#151515 48%,#252525 100%);
-  box-shadow:0 28px 80px rgba(0,0,0,.20);
+    radial-gradient(circle at 78% 22%,rgba(255,255,255,.10),transparent 28%),
+    radial-gradient(circle at 8% 90%,rgba(255,255,255,.06),transparent 25%),
+    linear-gradient(135deg,#080808 0%,#151515 55%,#242424 100%);
+  box-shadow:0 25px 70px rgba(0,0,0,.18);
 }
 
 .premium-hero::before{
@@ -103,44 +95,51 @@ body{
   position:absolute;
   width:520px;
   height:520px;
-  border:1px solid rgba(255,255,255,.08);
+  right:-240px;
+  top:-250px;
+  border:1px solid rgba(255,255,255,.10);
   border-radius:50%;
-  right:-190px;
-  top:-210px;
 }
 
 .premium-hero::after{
   content:"";
   position:absolute;
-  width:330px;
-  height:330px;
-  border:1px solid rgba(255,255,255,.06);
+  width:360px;
+  height:360px;
+  left:-250px;
+  bottom:-250px;
+  border:1px solid rgba(255,255,255,.07);
   border-radius:50%;
-  left:-190px;
-  bottom:-210px;
+}
+
+.premium-hero-content{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,520px);
+  align-items:center;
+  gap:50px;
+  min-height:440px;
 }
 
 .premium-hero-copy{
-  position:relative;
-  z-index:3;
   max-width:650px;
 }
 
-.premium-label{
+.premium-kicker{
   display:inline-flex;
   align-items:center;
   gap:10px;
   margin-bottom:22px;
   font-size:12px;
-  font-weight:800;
   letter-spacing:4px;
-  text-transform:uppercase;
-  color:#d7d7d7;
+  font-weight:800;
+  color:#d5d5d5;
 }
 
-.premium-label::before{
+.premium-kicker::before{
   content:"";
-  width:34px;
+  width:32px;
   height:1px;
   background:#fff;
   opacity:.7;
@@ -148,32 +147,32 @@ body{
 
 .premium-hero h1{
   margin:0;
-  font-size:clamp(44px,6vw,78px);
+  font-size:clamp(48px,6vw,78px);
   line-height:.98;
-  letter-spacing:-3.5px;
-  font-weight:800;
+  letter-spacing:-3px;
+  font-weight:850;
 }
 
 .premium-hero h1 span{
-  color:#a7a7a7;
+  color:#a8a8a8;
 }
 
-.premium-hero-text{
+#heroDescription{
   max-width:560px;
-  margin:28px 0 34px;
+  margin:28px 0 32px;
+  color:#c7c7c7;
   font-size:17px;
   line-height:1.7;
-  color:#c4c4c4;
 }
 
-.premium-hero-actions{
+.premium-actions{
   display:flex;
+  gap:18px;
   align-items:center;
-  gap:24px;
   flex-wrap:wrap;
 }
 
-.premium-shop-btn{
+.premium-primary{
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -184,169 +183,125 @@ body{
   color:#111 !important;
   font-weight:800;
   text-decoration:none;
-  transition:.25s ease;
 }
 
-.premium-shop-btn:hover{
-  transform:translateY(-3px);
-  box-shadow:0 14px 35px rgba(255,255,255,.12);
-}
-
-.premium-discover{
+.premium-secondary{
   color:#fff !important;
   text-decoration:none;
-  font-size:14px;
   font-weight:700;
-  opacity:.72;
-  transition:.2s ease;
+  opacity:.75;
 }
 
-.premium-discover:hover{
-  opacity:1;
+.premium-banner-wrap{
+  width:100%;
+  max-width:520px;
+  justify-self:end;
 }
 
-.premium-visual{
+.premium-banner-frame{
   position:relative;
-  z-index:3;
-  width:390px;
-  height:390px;
-  flex:0 0 390px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  min-height:330px;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.17);
+  border-radius:28px;
+  background:rgba(255,255,255,.055);
+  box-shadow:0 30px 75px rgba(0,0,0,.35);
+  backdrop-filter:blur(10px);
 }
 
-.premium-orbit{
-  position:absolute;
-  border:1px solid rgba(255,255,255,.13);
-  border-radius:50%;
+.premium-banner-image{
+  width:100%;
+  height:306px;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+  border-radius:20px;
+  background:#111;
 }
 
-.premium-orbit.one{
-  width:350px;
-  height:350px;
-}
-
-.premium-orbit.two{
-  width:255px;
-  height:255px;
-}
-
-.premium-showcase{
-  position:relative;
-  z-index:5;
-  width:245px;
-  min-height:285px;
-  padding:30px;
+.premium-banner-fallback{
+  min-height:306px;
+  border-radius:20px;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:26px;
-  background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.035));
-  backdrop-filter:blur(16px);
-  box-shadow:0 30px 75px rgba(0,0,0,.38);
+  align-items:flex-start;
+  padding:38px;
+  background:
+    radial-gradient(circle at 85% 15%,rgba(255,255,255,.12),transparent 25%),
+    linear-gradient(145deg,#202020,#0b0b0b);
 }
 
-.premium-showcase-top{
+.premium-banner-fallback span{
   font-size:11px;
-  letter-spacing:3px;
+  letter-spacing:4px;
   font-weight:800;
-  color:#bdbdbd;
-}
-
-.premium-showcase strong{
-  margin-top:18px;
-  font-size:31px;
-  line-height:1.02;
-  letter-spacing:-1px;
-}
-
-.premium-showcase-line{
-  width:55px;
-  height:2px;
-  margin:24px 0 15px;
-  background:#fff;
-}
-
-.premium-showcase small{
   color:#aaa;
+}
+
+.premium-banner-fallback strong{
+  margin-top:18px;
+  font-size:42px;
+  line-height:.95;
+  letter-spacing:-2px;
+}
+
+.premium-banner-fallback small{
+  margin-top:22px;
+  color:#999;
   font-size:12px;
-}
-
-.premium-products-head{
-  margin-bottom:30px;
-}
-
-.premium-products-head .eyebrow{
-  letter-spacing:3px;
-}
-
-.premium-products-head h2{
-  letter-spacing:-1.5px;
 }
 
 @media(max-width:900px){
   .premium-hero{
-    margin:20px 16px 55px;
-    padding:50px 28px;
+    margin:18px 14px 50px;
+    padding:42px 24px;
     min-height:auto;
-    flex-direction:column;
-    align-items:flex-start;
+  }
+
+  .premium-hero-content{
+    grid-template-columns:1fr;
+    gap:36px;
+    min-height:auto;
+  }
+
+  .premium-banner-wrap{
+    max-width:none;
   }
 
   .premium-hero h1{
     font-size:48px;
-    letter-spacing:-2.5px;
   }
 
-  .premium-hero-text{
+  #heroDescription{
     font-size:15px;
-  }
-
-  .premium-visual{
-    width:100%;
-    height:310px;
-    flex-basis:310px;
-  }
-
-  .premium-orbit.one{
-    width:280px;
-    height:280px;
-  }
-
-  .premium-orbit.two{
-    width:200px;
-    height:200px;
-  }
-
-  .premium-showcase{
-    width:210px;
-    min-height:245px;
   }
 }
 
 @media(max-width:520px){
   .premium-hero{
-    padding:42px 22px;
     border-radius:24px;
+    padding:38px 20px;
   }
 
   .premium-hero h1{
     font-size:42px;
+    letter-spacing:-2px;
   }
 
-  .premium-hero-actions{
-    gap:16px;
-  }
-
-  .premium-shop-btn{
+  .premium-primary{
     width:100%;
   }
 
-  .premium-visual{
-    height:280px;
-    flex-basis:280px;
+  .premium-banner-frame,
+  .premium-banner-image,
+  .premium-banner-fallback{
+    min-height:270px;
+    height:270px;
+  }
+
+  .premium-banner-fallback strong{
+    font-size:34px;
   }
 }
 
@@ -421,69 +376,54 @@ body{
 
 
 
-<section class="hero premium-hero">
+<section class="hero premium-hero" id="homeHero">
 
-  <div class="premium-hero-copy">
+  <div class="premium-hero-content">
 
-    <span class="premium-label">
-      RADA CREST
-    </span>
+    <div class="premium-hero-copy">
 
-    <h1>
-      Quality made<br>
-      <span>for everyday living.</span>
-    </h1>
+      <span class="premium-kicker">RADA CREST</span>
 
-    <p class="premium-hero-text">
-      Explore a carefully selected collection of products
-      designed to bring quality, style and convenience
-      into everyday life.
-    </p>
+      <h1>
+        Quality for<br>
+        <span>everyday living.</span>
+      </h1>
 
-    <div class="premium-hero-actions">
+      <p id="heroDescription">
+        Discover quality products selected for modern,
+        comfortable and beautiful everyday living.
+      </p>
 
-      <a
-        class="premium-shop-btn"
-        href="#products"
-      >
-        Explore Collection →
-      </a>
+      <div class="premium-actions">
+        <a class="premium-primary" href="#products">
+          Explore Collection →
+        </a>
 
-      <a
-        class="premium-discover"
-        href="#why"
-      >
-        Discover RADA CREST
-      </a>
+        <a class="premium-secondary" href="#why">
+          Discover RADA CREST
+        </a>
+      </div>
 
     </div>
 
-  </div>
+    <div class="premium-banner-wrap">
+      <div class="premium-banner-frame">
 
+        <img
+          id="heroBannerImage"
+          class="premium-banner-image"
+          src=""
+          alt="RADA CREST banner"
+          style="display:none;"
+        >
 
-  <div class="premium-visual">
+        <div id="heroBannerFallback" class="premium-banner-fallback">
+          <span>RADA CREST</span>
+          <strong>QUALITY<br>MEETS STYLE</strong>
+          <small>Curated for everyday life</small>
+        </div>
 
-    <div class="premium-orbit one"></div>
-    <div class="premium-orbit two"></div>
-
-    <div class="premium-showcase">
-
-      <span class="premium-showcase-top">
-        RADA CREST
-      </span>
-
-      <strong>
-        QUALITY<br>
-        MEETS<br>
-        STYLE
-      </strong>
-
-      <span class="premium-showcase-line"></span>
-
-      <small>
-        Curated for everyday life
-      </small>
-
+      </div>
     </div>
 
   </div>
@@ -497,7 +437,7 @@ body{
   class="section"
 >
 
-  <div class="section-head premium-products-head">
+  <div class="section-head">
 
     <div>
 
@@ -653,10 +593,170 @@ function getImages(url){
   return String(url)
     .split(/[\n,]+/)
     .map(x => x.trim())
-    .filter(Boolean);
+    .filter(x => /^https?:\/\//i.test(x));
 
 }
 
+
+
+async function loadStoreSettings(){
+
+  try{
+
+    if(!sbReady()) return;
+
+    const { data, error } =
+      await supabaseClient
+        .from("store_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+
+    if(error || !data) return;
+
+
+    const siteName =
+      data.site_name ||
+      data.name ||
+      "";
+
+    if(siteName){
+
+      document.title =
+        siteName +
+        " — Quality for Everyday Living";
+
+      document
+        .querySelectorAll(".brand span:last-child")
+        .forEach(el => {
+          el.textContent = siteName;
+        });
+
+    }
+
+
+    /* LOGO */
+    const logoUrl =
+      data.logo_url ||
+      data.logo ||
+      "";
+
+    if(logoUrl){
+
+      document
+        .querySelectorAll(".brand-mark")
+        .forEach(el => {
+
+          el.innerHTML =
+            '<img src="' +
+            escapeHtml(logoUrl) +
+            '" alt="' +
+            escapeHtml(siteName || "RADA CREST") +
+            '" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" ' +
+            'onerror="this.style.display=\'none\';">';
+
+          el.style.overflow = "hidden";
+
+        });
+
+    }
+
+
+    /* HOMEPAGE BANNER */
+    const bannerUrl =
+      data.banner_url ||
+      data.homepage_banner_url ||
+      data.banner ||
+      "";
+
+    const banner =
+      document.getElementById("heroBannerImage");
+
+    const fallback =
+      document.getElementById("heroBannerFallback");
+
+    if(bannerUrl && banner){
+
+      banner.onload = function(){
+
+        banner.style.display = "block";
+
+        if(fallback){
+          fallback.style.display = "none";
+        }
+
+      };
+
+      banner.onerror = function(){
+
+        banner.style.display = "none";
+
+        if(fallback){
+          fallback.style.display = "flex";
+        }
+
+      };
+
+      banner.src = String(bannerUrl);
+
+    }else{
+
+      if(banner){
+        banner.style.display = "none";
+      }
+
+      if(fallback){
+        fallback.style.display = "flex";
+      }
+
+    }
+
+
+    /* OFFER */
+    const offer =
+      data.offer_text ||
+      data.offer ||
+      "";
+
+    if(offer){
+
+      const kicker =
+        document.querySelector(".premium-kicker");
+
+      if(kicker){
+        kicker.textContent = offer;
+      }
+
+    }
+
+
+    /* DESCRIPTION */
+    const description =
+      data.store_description ||
+      data.description ||
+      "";
+
+    if(description){
+
+      const desc =
+        document.getElementById("heroDescription");
+
+      if(desc){
+        desc.textContent = description;
+      }
+
+    }
+
+  }catch(err){
+
+    console.warn(
+      "Store settings could not be loaded:",
+      err
+    );
+
+  }
+
+}
 
 async function loadProducts(){
 
