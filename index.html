@@ -85,6 +85,60 @@
   font-weight:800;
 }
 
+
+/* Premium banner-first hero. Existing product/order/cart logic is unchanged. */
+.hero{
+  position:relative;
+  display:block !important;
+  padding:22px !important;
+  background:linear-gradient(135deg,#111,#1b1b1b) !important;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 24px 60px rgba(0,0,0,.18);
+}
+.hero-copy{
+  display:none !important;
+}
+.hero-banner-wrap{
+  display:none;
+  width:100%;
+  margin:0 !important;
+}
+.hero.has-banner .hero-banner-wrap{
+  display:block !important;
+}
+#homepageBannerImage{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:430px;
+  object-fit:contain;
+  border-radius:18px;
+  background:#0b0b0b;
+}
+.hero:not(.has-banner) .hero-banner-wrap{
+  display:block !important;
+}
+.hero:not(.has-banner) .hero-banner-wrap::before{
+  content:'RADA CREST  •  PREMIUM ELECTRICAL';
+  display:flex;
+  min-height:250px;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border-radius:18px;
+  background:linear-gradient(135deg,#101010,#242424);
+  color:#f5f5f5;
+  font-size:clamp(24px,4vw,48px);
+  font-weight:800;
+  letter-spacing:.04em;
+  padding:30px;
+}
+.hero:not(.has-banner) #homepageBannerImage{display:none !important;}
+@media(max-width:800px){
+  .hero{padding:10px !important;}
+  #homepageBannerImage{max-height:300px;border-radius:12px;}
+}
+
 </style>
 
 </head>
@@ -158,49 +212,11 @@
 
 <section class="hero">
 
-  <div>
-
-    <p class="eyebrow">
-      RADA CREST • SMART ELECTRICAL
-    </p>
-
-    <h1>
-      Light up your home.
-      <br>
-      <em>Upgrade your everyday.</em>
-    </h1>
-
-    <p>
-      Premium LED lighting and electrical
-      essentials designed for modern homes.
-    </p>
-
-    <a
-      class="btn"
-      href="#products"
-    >
-      Shop Now →
-    </a>
-
-  </div>
-
-
-  <div class="hero-card">
-
-    <span>
-      NEW
-    </span>
-
-    <strong>
-      LED
-      <br>
-      COLLECTION
-    </strong>
-
-    <small>
-      Efficient • Reliable • Premium
-    </small>
-
+  <div class="hero-copy">
+    <p class="eyebrow">RADA CREST • SMART ELECTRICAL</p>
+    <h1>Premium electrical essentials for everyday living.</h1>
+    <p>Reliable products, practical design and trusted support from RADA CREST.</p>
+    <a class="btn" href="#products">Explore Products →</a>
   </div>
 
   <div class="hero-banner-wrap">
@@ -462,12 +478,6 @@ async function loadStoreSettings(){
         bannerImg.closest(".hero-banner-wrap").style.display = "block";
         hero.classList.add("has-banner");
 
-        // Also use the banner as the hero background.
-        hero.style.backgroundImage =
-          "linear-gradient(rgba(0,0,0,.28),rgba(0,0,0,.28)),url('" +
-          bannerUrl.replace(/'/g, "\\'") + "')";
-        hero.style.backgroundSize = "cover";
-        hero.style.backgroundPosition = "center";
       }
     }
 
