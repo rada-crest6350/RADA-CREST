@@ -2577,16 +2577,16 @@ function renderOrders(){
       String(o.status || "pending").toLowerCase();
 
     const name = o.shipping_name || o.customer_name || o.full_name || o.name || "";
-const phone = o.shipping_phone || o.phone || o.mobile || o.contact || "";
-const address = o.shipping_address || o.address || "";
+    const phone = o.shipping_phone || o.phone || o.mobile || o.contact || "";
+    const address = o.shipping_address || o.address || "";
 
-const key = [
-    o.id,
-    name,
-    phone,
-    address,
-    orderStatus
-].join(" ").toLowerCase();
+    const key = [
+        o.id,
+        name,
+        phone,
+        address,
+        orderStatus
+    ].join(" ").toLowerCase();
 
     return (!search || hay.includes(search))
       && (!statusFilter || orderStatus === statusFilter);
