@@ -220,12 +220,14 @@
   </div>
 
   <div class="hero-banner-wrap">
-    <img
-      id="homepageBannerImage"
-      src=""
-      alt="RADA CREST homepage banner"
-      onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');"
-    >
+    <a id="homepageBannerLink" href="javascript:void(0)" style="display:block; text-decoration:none;">
+      <img
+        id="homepageBannerImage"
+        src=""
+        alt="RADA CREST homepage banner"
+        onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');"
+      >
+    </a>
   </div>
 
 </section>
@@ -468,9 +470,19 @@ async function loadStoreSettings(){
       ""
     );
 
+    // Banner Link from Store Control
+    const bannerLinkUrl =
+      data.banner_link ||
+      data.homepage_banner_link ||
+      data.homepageBannerLink ||
+      data.bannerLink ||
+      data.link ||
+      "";
+
     if(bannerUrl){
       const hero = document.querySelector(".hero");
       const bannerImg = document.getElementById("homepageBannerImage");
+      const bannerLink = document.getElementById("homepageBannerLink");
 
       if(hero && bannerImg){
         bannerImg.src = bannerUrl;
@@ -478,6 +490,14 @@ async function loadStoreSettings(){
         bannerImg.closest(".hero-banner-wrap").style.display = "block";
         hero.classList.add("has-banner");
 
+        // Banner pe link set karne ka logic:
+        if(bannerLink && bannerLinkUrl){
+          bannerLink.href = bannerLinkUrl;
+          bannerLink.style.cursor = "pointer";
+        } else if(bannerLink) {
+          bannerLink.removeAttribute("href");
+          bannerLink.style.cursor = "default";
+        }
       }
     }
 
