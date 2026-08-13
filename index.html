@@ -106,14 +106,13 @@
 .hero.has-banner .hero-banner-wrap{
   display:block !important;
 }
-#homepageBannerImage{
-  display:block;
-  width:100%;
-  height:auto;
-  max-height:430px;
-  object-fit:contain;
-  border-radius:18px;
-  background:#0b0b0b;
+#homepageBannerImage {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;        /* Height auto ki jagah 100% force karein */
+    min-height: 100% !important;    /* Isse image container jitni hi tall ho jayegi */
+    object-fit: cover !important;   /* Isse image fit ho jayegi aur space nahi rahega */
+    border-radius: 18px;
 }
 .hero:not(.has-banner) .hero-banner-wrap{
   display:block !important;
