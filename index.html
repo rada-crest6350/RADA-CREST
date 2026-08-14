@@ -631,21 +631,61 @@ async function loadProducts(){
 
 
   const q =
-    searchInput.value.trim();
+  searchInput.value.trim();
 
+const category =
+  document.getElementById("categoryFilter")?.value || "";
 
-  let query =
-    supabaseClient
-      .from("products")
-      .select("*")
-      .eq("active",true)
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
+const priceSort =
+  document.getElementById("priceFilter")?.value || "";
 
+const stockFilter =
+  document.getElementById("stockFilter")?.value || "";
+
+let query =
+  supabaseClient
+    .from("products")
+    .select("*")
+    .eq("active",true);
+
+if(q){
+  query = query.ilike(
+    "name",
+    "%" + q + "%"
+  );
+}
+
+if(category){
+  query = query.eq(
+    "category",
+    category
+  );
+}
+
+if(stockFilter === "in"){
+  query = query.gt("stock",0);
+}
+
+if(stockFilter === "out"){
+  query = query.lte("stock",0);
+}
+
+if(priceSort === "low"){
+  query = query.order(
+    "price",
+    {ascending:true}
+  );
+}else if(priceSort === "high"){
+  query = query.order(
+    "price",
+    {ascending:false}
+  );
+}else{
+  query = query.order(
+    "created_at",
+    {ascending:false}
+  );
+}
 
   if(q){
 
