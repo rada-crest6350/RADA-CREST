@@ -55,10 +55,17 @@
       .rc-main{height:340px}
       .rc-actions{grid-template-columns:1fr}
       .rc-info h1{font-size:34px}
+      .rc-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;justify-content:center;align-items:center;cursor:pointer}
+      .rc-modal img{max-width:90%;max-height:90%;border-radius:10px}
     }
+    
   </style>
 </head>
-
+  
+<div id="rcModal" class="rc-modal" onclick="this.style.display='none'">
+  <img id="modalImg" src="">
+</div>
+  
 <body>
 <main class="section rc-wrap">
   <a class="rc-back" href="index.html">← Continue Shopping</a>
@@ -422,46 +429,66 @@ function addToCart(){
   }
 }
 
-async function buyNow(){
-  const quantity = getQty();
-  if(quantity === null) return;
+async function loadReviews(){
+  const box = document.getElementById("reviews");
+  if(!box) return;
 
   try{
     const {
-      data: { user },
+      data,
       error
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient
+      .from("product_reviews")
+      .select("*")
+      .eq("product_id", product.id)
+      .order("created_at", {ascending:false});
 
     if(error){
       console.error(error);
-    }
-
-    if(!user){
-      window.location.href =
-        "account.html?redirect=" +
-        encodeURIComponent(
-          "product.html?id=" + product.id
-        );
+      box.innerHTML = "<p>Reviews will appear here.</p>";
       return;
     }
 
-    localStorage.setItem(
-      "rc_buy_now",
-      JSON.stringify({
-        id: product.id,
-        qty: quantity
-      })
-    );
+    if(!data || !data.length){
+      box.innerHTML = "<p>No reviews yet.</p>";
+      return;
+    }
 
-    window.location.href = "checkout.html?buy_now=1";
+    box.innerHTML = data.map(review=>{
+      const rating = Math.min(
+        5,
+        Math.max(1, Number(review.rating) || 1)
+      );
+
+      let photosHtml = '';
+      if (review.photo_urls && Array.isArray(review.photo_urls)) {
+        photosHtml = review.photo_urls.map(url => `
+          <img src="${esc(url)}" 
+               style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin: 5px 5px 0 0; border: 1px solid #eee; cursor: pointer;" 
+               onclick="document.getElementById('modalImg').src='${esc(url)}'; document.getElementById('rcModal').style.display='flex';" />
+        `).join('');
+      }
+
+      return `
+        <div class="rc-review">
+          <div class="rc-stars">
+            ${"★".repeat(rating)}${"☆".repeat(5 - rating)}
+          </div>
+
+          <p>${esc(review.review || "")}</p>
+
+          <div style="display:flex; flex-wrap:wrap;">${photosHtml}</div>
+
+          <small>
+            ${esc(review.customer_name || "Customer")}
+          </small>
+        </div>
+      `;
+    }).join("");
 
   }catch(error){
     console.error(error);
-    const message = document.getElementById("msg");
-    if(message){
-      message.textContent =
-        "Unable to continue. Please try again.";
-    }
+    box.innerHTML = "<p>Reviews will appear here.</p>";
   }
 }
 
