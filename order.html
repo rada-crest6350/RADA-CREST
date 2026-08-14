@@ -531,9 +531,7 @@ body{
 
 const box =
   document.getElementById("orderContent");
-
-const message =
-  document.getElementById("pageMessage");
+.getElementById("pageMessage");
 
 function esc(value){
   return String(value ?? "")
@@ -856,50 +854,269 @@ async function submitReview(){
 
     const photoUrls = [];
 
-    /* Upload photos. */
+const box = document.getElementById("orderContent");
+const message = document.getElementById("pageMessage");
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function money(value){
+  return "₹" + Number(value || 0).toLocaleString("en-IN");
+}
+
+function formatDate(value){
+  try{
+    return new Date(value).toLocaleString(
+      "en-IN",
+      {
+        day:"2-digit",
+        month:"long",
+        year:"numeric",
+        hour:"numeric",
+        minute:"2-digit",
+        hour12:true
+      }
+    );
+  }catch{
+    return "-";
+  }
+}
+
+function cleanImage(value){
+  if(!value) return "";
+  let url = String(value).trim();
+  url = url
+    .replace(/^\[img\]\s*/i,"")
+    .replace(/\s*\[\/img\]$/i,"")
+    .replace(/^["']+|["']+$/g,"")
+    .trim();
+
+  return /^https?:\/\/\S+$/i.test(url) ? url : "";
+}
+
+function statusClass(status){
+  return String(status || "pending")
+    .toLowerCase()
+    .replace(/[^a-z]/g,"");
+}
+
+/* -----------------------------
+   TRACKING
+----------------------------- */
+
+function getTrackingSteps(status){
+  const current = String(status || "pending").toLowerCase().trim();
+
+  if(current === "cancelled"){
+    return { cancelled: true, index: -1 };
+  }
+
+  const steps = ["pending", "confirmed", "packed", "shipped", "delivered"];
+  let index = steps.indexOf(current);
+
+  if(current === "processing"){
+    index = 2;
+  }
+
+  if(index < 0){
+    index = 0;
+  }
+
+  return { cancelled: false, index: index };
+}
+
+function renderTracking(status){
+  const tracking = getTrackingSteps(status);
+
+  if(tracking.cancelled){
+    return `
+      <div class="tracking">
+        <h2>Order Tracking</h2>
+        <div class="status status-cancelled">Order Cancelled</div>
+      </div>
+    `;
+  }
+
+  const labels = [
+    ["pending","Order Placed"],
+    ["confirmed","Confirmed"],
+    ["packed","Packed"],
+    ["shipped","Shipped"],
+    ["delivered","Delivered"]
+  ];
+
+  return `
+    <div class="tracking">
+      <h2>Order Tracking</h2>
+      <div class="steps">
+        ${labels.map((item, index) => {
+          const done = index < tracking.index;
+          const active = index === tracking.index;
+          return `
+            <div class="step ${done ? "done" : ""} ${active ? "active" : ""}">
+              <div class="circle">
+                ${done || active ? "✓" : index + 1}
+              </div>
+              <div class="step-label">${item[1]}</div>
+              ${index < labels.length - 1 ? `<div class="step-line"></div>` : ""}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+/* =============================
+   PRODUCT REVIEW SYSTEM (SAFE)
+============================= */
+let reviewProductId = null;
+let reviewRating = 0;
+let reviewUser = null;
+
+const reviewModal = document.getElementById("reviewModal");
+const reviewProductName = document.getElementById("reviewProductName");
+const reviewText = document.getElementById("reviewText");
+const reviewPhotos = document.getElementById("reviewPhotos");
+const reviewPreview = document.getElementById("reviewPreview");
+const reviewMessage = document.getElementById("reviewMessage");
+const reviewSubmitButton = document.getElementById("reviewSubmit");
+const reviewStars = document.querySelectorAll(".review-star");
+
+reviewStars.forEach(star => {
+  star.addEventListener("click", () => {
+    reviewRating = Number(star.dataset.rating);
+    reviewStars.forEach(s => {
+      s.classList.toggle("selected", Number(s.dataset.rating) <= reviewRating);
+    });
+  });
+});
+
+if(reviewPhotos){
+  reviewPhotos.addEventListener("change", () => {
+    reviewPreview.innerHTML = "";
+    const files = Array.from(reviewPhotos.files || []);
+    if(files.length > 5){
+      reviewPhotos.value = "";
+      reviewMessage.innerHTML = "Maximum 5 photos allowed.";
+      return;
+    }
+    reviewMessage.innerHTML = "";
+    files.forEach(file => {
+      if(!file.type.startsWith("image/")) return;
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      reviewPreview.appendChild(img);
+    });
+  });
+}
+
+async function openReview(productId, productName){
+  reviewProductId = Number(productId);
+  reviewRating = 0;
+  if(reviewProductName) reviewProductName.textContent = productName;
+  if(reviewText) reviewText.value = "";
+  if(reviewPhotos) reviewPhotos.value = "";
+  if(reviewPreview) reviewPreview.innerHTML = "";
+  if(reviewMessage) reviewMessage.innerHTML = "";
+  
+  reviewStars.forEach(star => star.classList.remove("selected"));
+
+  const { data: { user } } = await window.supabaseClient.auth.getUser();
+  if(!user){
+    alert("Please login first.");
+    return;
+  }
+  reviewUser = user;
+
+  const { data: existingReview, error } = await window.supabaseClient
+    .from("product_reviews")
+    .select("*")
+    .eq("product_id", reviewProductId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if(error){
+    console.warn("Review check:", error.message);
+  }
+
+  if(existingReview){
+    reviewRating = Number(existingReview.rating || 0);
+    if(reviewText) reviewText.value = existingReview.review || "";
+    reviewStars.forEach(star => {
+      star.classList.toggle("selected", Number(star.dataset.rating) <= reviewRating);
+    });
+    if(reviewMessage) reviewMessage.innerHTML = "You already reviewed this product. You can update your review.";
+    if(reviewSubmitButton) reviewSubmitButton.textContent = "Update Review";
+  } else {
+    if(reviewSubmitButton) reviewSubmitButton.textContent = "Submit Review";
+  }
+
+  if(reviewModal) reviewModal.classList.add("show");
+}
+
+function closeReview(){
+  if(reviewModal) reviewModal.classList.remove("show");
+}
+
+async function submitReview(){
+  if(!reviewProductId){
+    if(reviewMessage) reviewMessage.innerHTML = "Product not selected.";
+    return;
+  }
+  if(!reviewRating){
+    if(reviewMessage) reviewMessage.innerHTML = "Please select a star rating.";
+    return;
+  }
+  const text = reviewText ? reviewText.value.trim() : "";
+  if(text.length < 2){
+    if(reviewMessage) reviewMessage.innerHTML = "Please write your review.";
+    return;
+  }
+  const files = reviewPhotos ? Array.from(reviewPhotos.files || []) : [];
+  if(files.length > 5){
+    if(reviewMessage) reviewMessage.innerHTML = "Maximum 5 photos allowed.";
+    return;
+  }
+
+  if(reviewSubmitButton){
+    reviewSubmitButton.disabled = true;
+    reviewSubmitButton.textContent = "Submitting...";
+  }
+  if(reviewMessage) reviewMessage.innerHTML = "Please wait...";
+
+  try{
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
+    if(!user) throw new Error("Please login again.");
+
+    const photoUrls = [];
     for(const file of files){
-      if(!file.type.startsWith("image/")){
-        continue;
-      }
-      if(file.size > 5 * 1024 * 1024){
-        throw new Error(
-          "Each photo must be below 5MB."
-        );
-      }
+      if(!file.type.startsWith("image/")) continue;
+      if(file.size > 5 * 1024 * 1024) throw new Error("Each photo must be below 5MB.");
 
-      const extension = file.name
-        .split(".")
-        .pop()
-        .toLowerCase();
-
+      const extension = file.name.split(".").pop().toLowerCase();
       const fileName = `${user.id}/review-${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
 
-      const { error:uploadError } = await supabaseClient.storage
+      const { error: uploadError } = await window.supabaseClient.storage
         .from("product-review-images")
-        .upload(
-          fileName,
-          file,
-          {
-            cacheControl:"3600",
-            upsert:false
-          }
-        );
+        .upload(fileName, file, { cacheControl: "3600", upsert: false });
 
-      if(uploadError){
-        throw uploadError;
-      }
+      if(uploadError) throw uploadError;
 
-      const { data:publicUrlData } = supabaseClient.storage
+      const { data: publicUrlData } = window.supabaseClient.storage
         .from("product-review-images")
         .getPublicUrl(fileName);
 
-      photoUrls.push(
-        publicUrlData.publicUrl
-      );
+      photoUrls.push(publicUrlData.publicUrl);
     }
 
-    /* Submit through secure database function. Database itself verifies DELIVERED order. */
-    const { data, error } = await supabaseClient.rpc(
+    const { data, error } = await window.supabaseClient.rpc(
       "submit_product_review",
       {
         p_product_id: reviewProductId,
@@ -909,38 +1126,210 @@ async function submitReview(){
       }
     );
 
-    if(error){
-      throw error;
+    if(error) throw error;
+
+    if(reviewMessage) reviewMessage.innerHTML = "✓ Review submitted successfully!";
+    if(reviewSubmitButton){
+      reviewSubmitButton.textContent = "Review Submitted";
+      reviewSubmitButton.disabled = true;
     }
 
-    reviewMessage.innerHTML = "✓ Review submitted successfully!";
-    reviewSubmitButton.textContent = "Review Submitted";
-    reviewSubmitButton.disabled = true;
-
-    setTimeout(() => {
-      closeReview();
-    },1200);
+    setTimeout(() => { closeReview(); }, 1200);
 
   }catch(error){
-    console.error(
-      "Review submit error:",
-      error
-    );
-    reviewMessage.innerHTML = "❌ " + (error.message || "Unable to submit review.");
-    reviewSubmitButton.disabled = false;
-    reviewSubmitButton.textContent = "Submit Review";
+    console.error("Review submit error:", error);
+    if(reviewMessage) reviewMessage.innerHTML = "❌ " + (error.message || "Unable to submit review.");
+    if(reviewSubmitButton){
+      reviewSubmitButton.disabled = false;
+      reviewSubmitButton.textContent = "Submit Review";
+    }
   }
 }
 
-/* Close when clicking outside modal. */
-reviewModal.addEventListener(
-  "click",
-  event => {
-    if(event.target === reviewModal){
-      closeReview();
-    }
+if(reviewModal){
+  reviewModal.addEventListener("click", event => {
+    if(event.target === reviewModal) closeReview();
+  });
+}
+
+
+/* -----------------------------
+   LOAD ORDER
+----------------------------- */
+
+async function loadOrder(){
+  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+
+  const supabaseClient = window.supabase?.createClient 
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+    : window.supabaseClient;
+
+  window.supabaseClient = supabaseClient;
+  
+  if(!window.supabaseClient){
+    message.innerHTML = `<div class="card error">Supabase is not configured.</div>`;
+    return;
   }
-);
+
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("id");
+
+  if(!orderId){
+    message.innerHTML = `<div class="card error">Order ID is missing.</div>`;
+    return;
+  }
+
+  const { data: { user } } = await supabaseClient.auth.getUser();
+
+  if(!user){
+    location.href = "account.html?redirect=" + encodeURIComponent("order.html?id=" + orderId);
+    return;
+  }
+
+  /* ORDER */
+  const { data: order, error: orderError } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if(orderError){
+    message.innerHTML = `<div class="card error">${esc(orderError.message)}</div>`;
+    return;
+  }
+
+  if(!order){
+    message.innerHTML = `<div class="card error">This order was not found.</div>`;
+    return;
+  }
+
+  /* ORDER ITEMS */
+  const { data: items, error: itemError } = await supabaseClient
+    .from("order_items")
+    .select("*")
+    .eq("order_id", order.id);
+
+  if(itemError){
+    console.warn("Order items:", itemError.message);
+  }
+
+  const orderItems = items || [];
+
+  /* PRODUCT IMAGES */
+  const productIds = orderItems.map(item => item.product_id).filter(Boolean);
+  let productMap = new Map();
+
+  if(productIds.length){
+    const { data: products } = await supabaseClient
+      .from("products")
+      .select("id,image_url,image")
+      .in("id", productIds);
+
+    (products || []).forEach(product => {
+      productMap.set(String(product.id), product);
+    });
+  }
+
+  /* TOTAL */
+  const calculatedTotal = orderItems.reduce(
+    (sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0),
+    0
+  );
+
+  const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
+  const status = String(order.status || "pending").toLowerCase();
+
+  /* ITEMS HTML */
+  const itemsHtml = orderItems.length ? orderItems.map(item => {
+    const product = productMap.get(String(item.product_id));
+    const image = cleanImage(product?.image_url || product?.image || "");
+    const quantity = Number(item.quantity || 1);
+    const price = Number(item.unit_price ?? item.price ?? 0);
+
+    const reviewButton = status === "delivered" && item.product_id
+      ? `
+        <button
+          class="review-btn"
+          onclick="openReview(${Number(item.product_id)}, '${esc(item.product_name || "Product").replace(/'/g,"&#039;")}')"
+        >
+          ⭐ Rate & Review
+        </button>
+      `
+      : "";
+
+    return `
+      <div class="item">
+        <div class="item-left">
+          ${image ? `<img class="item-image" src="${esc(image)}" alt="${esc(item.product_name || "Product")}" onerror="this.style.display='none'">` : `<div class="item-image"></div>`}
+          <div>
+            <div class="item-name">${esc(item.product_name || "Product")}</div>
+            <div class="item-qty">Quantity: ${quantity} × ${money(price)}</div>
+            ${reviewButton}
+          </div>
+        </div>
+        <div class="item-price">${money(price * quantity)}</div>
+      </div>
+    `;
+  }).join("") : `<div class="empty">Order item details are unavailable.</div>`;
+
+  /* PAGE */
+  box.innerHTML = `
+    <div class="card">
+      <div class="order-head">
+        <div>
+          <div class="order-id">Order #${esc(order.id)}</div>
+          <div class="date">${esc(formatDate(order.created_at))}</div>
+          <div class="status status-${statusClass(status)}">${esc(status)}</div>
+        </div>
+        <div class="total">${money(total)}</div>
+      </div>
+      ${renderTracking(status)}
+    </div>
+
+    <div class="card">
+      <h2>Order Items</h2>
+      <div class="items">${itemsHtml}</div>
+    </div>
+
+    <div class="card">
+      <h2>Delivery Details</h2>
+      <div class="info-grid">
+        <div class="info-box">
+          <strong>Customer</strong>
+          <span>${esc(order.shipping_name || order.customer_name || user.email || "-")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Phone</strong>
+          <span>${esc(order.shipping_phone || order.customer_phone || "-")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Email</strong>
+          <span>${esc(order.customer_email || user.email || "-")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Payment</strong>
+          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+        </div>
+      </div>
+      ${order.shipping_address ? `<div class="info-box" style="margin-top:15px;"><strong>Delivery Address</strong><span>${esc(order.shipping_address)}</span></div>` : ""}
+    </div>
+
+    <div class="card">
+      <h2>Need Help?</h2>
+      <p style="color:#666;line-height:1.6;">If you have any issue with this order, contact RADA CREST support.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://wa.me/919079714767?text=${encodeURIComponent("Hello RADA CREST, I need help regarding Order #" + order.id)}" target="_blank">WhatsApp Support</a>
+        <a class="btn secondary" href="index.html#products">Continue Shopping</a>
+        <a class="btn secondary" href="account.html">My Account</a>
+      </div>
+    </div>
+  `;
+}
+
+loadOrder();
+
 
 
 /* -----------------------------
