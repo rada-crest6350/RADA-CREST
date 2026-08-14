@@ -231,7 +231,31 @@
 
 </section>
 
+<div class="product-filters">
+  <select id="categoryFilter" onchange="loadProducts()">
+    <option value="">All Categories</option>
+  </select>
 
+  <select id="priceFilter" onchange="loadProducts()">
+    <option value="">Sort by Price</option>
+    <option value="low">Price: Low to High</option>
+    <option value="high">Price: High to Low</option>
+  </select>
+
+  <select id="stockFilter" onchange="loadProducts()">
+    <option value="">All Products</option>
+    <option value="in">In Stock</option>
+    <option value="out">Out of Stock</option>
+  </select>
+
+  <button
+    type="button"
+    class="filter-reset"
+    onclick="resetFilters()"
+  >
+    Reset
+  </button>
+</div>
 
 <section
   id="products"
