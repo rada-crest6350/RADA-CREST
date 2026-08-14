@@ -374,6 +374,90 @@ body{
     font-size:14px;
   }
 }
+  <div id="reviewModal" class="review-modal">
+
+  <div class="review-box">
+
+    <div class="review-head">
+      <div>
+        <h2 style="margin:0;">Rate & Review</h2>
+        <div
+          id="reviewProductName"
+          style="color:#666;margin-top:5px;"
+        ></div>
+      </div>
+
+      <button
+        class="review-close"
+        onclick="closeReview()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div
+      style="margin-top:20px;font-weight:800;"
+    >
+      Your Rating
+    </div>
+
+    <div class="review-stars">
+
+      <button class="review-star" data-rating="1">★</button>
+      <button class="review-star" data-rating="2">★</button>
+      <button class="review-star" data-rating="3">★</button>
+      <button class="review-star" data-rating="4">★</button>
+      <button class="review-star" data-rating="5">★</button>
+
+    </div>
+
+    <textarea
+      id="reviewText"
+      class="review-text"
+      placeholder="How was your product? Write your review..."
+    ></textarea>
+
+    <div class="review-upload">
+
+      <strong>Add Product Photos</strong>
+
+      <div
+        style="color:#777;font-size:13px;margin:5px 0 10px;"
+      >
+        You can upload up to 5 photos.
+      </div>
+
+      <input
+        id="reviewPhotos"
+        type="file"
+        accept="image/*"
+        multiple
+      >
+
+      <div
+        id="reviewPreview"
+        class="review-preview"
+      ></div>
+
+    </div>
+
+    <div
+      id="reviewMessage"
+      class="review-message"
+    ></div>
+
+    <button
+      id="reviewSubmit"
+      class="review-submit"
+      onclick="submitReview()"
+    >
+      Submit Review
+    </button>
+
+  </div>
+
+</div>
+  
 </style>
 </head>
 
@@ -593,6 +677,423 @@ function renderTracking(status){
 }
 
 
+/* =============================
+   PRODUCT REVIEW SYSTEM
+============================= */
+
+let reviewProductId = null;
+let reviewRating = 0;
+let reviewUser = null;
+
+const reviewModal =
+  document.getElementById("reviewModal");
+
+const reviewProductName =
+  document.getElementById("reviewProductName");
+
+const reviewText =
+  document.getElementById("reviewText");
+
+const reviewPhotos =
+  document.getElementById("reviewPhotos");
+
+const reviewPreview =
+  document.getElementById("reviewPreview");
+
+const reviewMessage =
+  document.getElementById("reviewMessage");
+
+const reviewSubmitButton =
+  document.getElementById("reviewSubmit");
+
+const reviewStars =
+  document.querySelectorAll(".review-star");
+
+
+reviewStars.forEach(star => {
+
+  star.addEventListener("click", () => {
+
+    reviewRating =
+      Number(star.dataset.rating);
+
+    reviewStars.forEach(s => {
+
+      s.classList.toggle(
+        "selected",
+        Number(s.dataset.rating) <= reviewRating
+      );
+
+    });
+
+  });
+
+});
+
+
+reviewPhotos.addEventListener("change", () => {
+
+  reviewPreview.innerHTML = "";
+
+  const files =
+    Array.from(reviewPhotos.files || []);
+
+  if(files.length > 5){
+
+    reviewPhotos.value = "";
+
+    reviewMessage.innerHTML =
+      "Maximum 5 photos allowed.";
+
+    return;
+  }
+
+  reviewMessage.innerHTML = "";
+
+  files.forEach(file => {
+
+    if(!file.type.startsWith("image/")){
+      return;
+    }
+
+    const img =
+      document.createElement("img");
+
+    img.src =
+      URL.createObjectURL(file);
+
+    reviewPreview.appendChild(img);
+
+  });
+
+});
+
+
+async function openReview(
+  productId,
+  productName
+){
+
+  reviewProductId =
+    Number(productId);
+
+  reviewRating = 0;
+
+  reviewProductName.textContent =
+    productName;
+
+  reviewText.value = "";
+
+  reviewPhotos.value = "";
+
+  reviewPreview.innerHTML = "";
+
+  reviewMessage.innerHTML = "";
+
+  reviewStars.forEach(star => {
+    star.classList.remove("selected");
+  });
+
+  const {
+    data:{
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+  if(!user){
+
+    alert("Please login first.");
+
+    return;
+  }
+
+  reviewUser = user;
+
+  /*
+    Check whether this customer has already
+    reviewed this product.
+  */
+
+  const {
+    data:existingReview,
+    error
+  } =
+    await supabaseClient
+      .from("product_reviews")
+      .select("*")
+      .eq("product_id",reviewProductId)
+      .eq("user_id",user.id)
+      .maybeSingle();
+
+  if(error){
+
+    console.warn(
+      "Review check:",
+      error.message
+    );
+
+  }
+
+  if(existingReview){
+
+    reviewRating =
+      Number(existingReview.rating || 0);
+
+    reviewText.value =
+      existingReview.review || "";
+
+    reviewStars.forEach(star => {
+
+      star.classList.toggle(
+        "selected",
+        Number(star.dataset.rating) <= reviewRating
+      );
+
+    });
+
+    reviewMessage.innerHTML =
+      "You already reviewed this product. You can update your review.";
+
+    reviewSubmitButton.textContent =
+      "Update Review";
+
+  }else{
+
+    reviewSubmitButton.textContent =
+      "Submit Review";
+
+  }
+
+  reviewModal.classList.add("show");
+}
+
+
+function closeReview(){
+
+  reviewModal.classList.remove("show");
+
+}
+
+
+async function submitReview(){
+
+  if(!reviewProductId){
+
+    reviewMessage.innerHTML =
+      "Product not selected.";
+
+    return;
+  }
+
+  if(!reviewRating){
+
+    reviewMessage.innerHTML =
+      "Please select a star rating.";
+
+    return;
+  }
+
+  const text =
+    reviewText.value.trim();
+
+  if(text.length < 2){
+
+    reviewMessage.innerHTML =
+      "Please write your review.";
+
+    return;
+  }
+
+  const files =
+    Array.from(reviewPhotos.files || []);
+
+  if(files.length > 5){
+
+    reviewMessage.innerHTML =
+      "Maximum 5 photos allowed.";
+
+    return;
+  }
+
+  reviewSubmitButton.disabled = true;
+
+  reviewSubmitButton.textContent =
+    "Submitting...";
+
+  reviewMessage.innerHTML =
+    "Please wait...";
+
+  try{
+
+    const {
+      data:{
+        user
+      }
+    } =
+      await supabaseClient.auth.getUser();
+
+    if(!user){
+
+      throw new Error(
+        "Please login again."
+      );
+
+    }
+
+    const photoUrls = [];
+
+    /*
+      Upload photos.
+    */
+
+    for(const file of files){
+
+      if(!file.type.startsWith("image/")){
+        continue;
+      }
+
+      if(file.size > 5 * 1024 * 1024){
+
+        throw new Error(
+          "Each photo must be below 5MB."
+        );
+
+      }
+
+      const extension =
+        file.name
+          .split(".")
+          .pop()
+          .toLowerCase();
+
+      const fileName =
+        `${user.id}/review-${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+
+      const {
+        error:uploadError
+      } =
+        await supabaseClient.storage
+          .from("product-review-images")
+          .upload(
+            fileName,
+            file,
+            {
+              cacheControl:"3600",
+              upsert:false
+            }
+          );
+
+      if(uploadError){
+
+        throw uploadError;
+
+      }
+
+      const {
+        data:publicUrlData
+      } =
+        supabaseClient.storage
+          .from("product-review-images")
+          .getPublicUrl(fileName);
+
+      photoUrls.push(
+        publicUrlData.publicUrl
+      );
+
+    }
+
+
+    /*
+      Submit through secure database function.
+      Database itself verifies DELIVERED order.
+    */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.rpc(
+        "submit_product_review",
+        {
+          p_product_id:
+            reviewProductId,
+
+          p_rating:
+            reviewRating,
+
+          p_review:
+            text,
+
+          p_photo_urls:
+            photoUrls
+        }
+      );
+
+    if(error){
+
+      throw error;
+
+    }
+
+    reviewMessage.innerHTML =
+      "✓ Review submitted successfully!";
+
+    reviewSubmitButton.textContent =
+      "Review Submitted";
+
+    reviewSubmitButton.disabled = true;
+
+    setTimeout(() => {
+
+      closeReview();
+
+    },1200);
+
+  }catch(error){
+
+    console.error(
+      "Review submit error:",
+      error
+    );
+
+    reviewMessage.innerHTML =
+      "❌ " +
+      (error.message ||
+       "Unable to submit review.");
+
+    reviewSubmitButton.disabled =
+      false;
+
+    reviewSubmitButton.textContent =
+      "Submit Review";
+
+  }
+
+}
+
+
+/*
+  Close when clicking outside modal.
+*/
+
+reviewModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === reviewModal){
+
+      closeReview();
+
+    }
+
+  }
+);
+// review functions...
+
+// existing function
+loadOrder();
+  
 /* -----------------------------
    LOAD ORDER
 ----------------------------- */
