@@ -1178,12 +1178,7 @@ function addToCart(id){
 }
 
   
-async function toggleWishlist(productId){
-
-  if(!sbReady()){
-    alert("Supabase is not configured.");
-    return;
-  }
+async async function toggleWishlist(productId){
 
   const {
     data:{user}
@@ -1201,12 +1196,12 @@ async function toggleWishlist(productId){
       .from("wishlists")
       .select("id")
       .eq("user_id",user.id)
-      .eq("product_id",productId)
+      .eq("product_id",Number(productId))
       .maybeSingle();
 
   if(checkError){
     console.error(checkError);
-    alert("Unable to update wishlist.");
+    alert("Wishlist error: " + checkError.message);
     return;
   }
 
@@ -1237,7 +1232,7 @@ async function toggleWishlist(productId){
 
     if(error){
       console.error(error);
-      alert("Unable to add to wishlist.");
+      alert("Unable to add to wishlist: " + error.message);
       return;
     }
 
