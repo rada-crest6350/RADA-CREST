@@ -730,6 +730,24 @@ if(priceSort === "low"){
 
 }
 
+  function resetFilters(){
+
+  const category =
+    document.getElementById("categoryFilter");
+
+  const price =
+    document.getElementById("priceFilter");
+
+  const stock =
+    document.getElementById("stockFilter");
+
+  if(category) category.value = "";
+  if(price) price.value = "";
+  if(stock) stock.value = "";
+
+  loadProducts();
+}
+  
   async function loadFilterCategories(){
 
   const select =
