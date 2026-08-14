@@ -648,13 +648,6 @@ let query =
     .select("*")
     .eq("active",true);
 
-if(q){
-  query = query.ilike(
-    "name",
-    "%" + q + "%"
-  );
-}
-
 if(category){
   query = query.eq(
     "category",
@@ -737,7 +730,41 @@ if(priceSort === "low"){
 
 }
 
+  async function loadFilterCategories(){
 
+  const select =
+    document.getElementById("categoryFilter");
+
+  if(!select || !sbReady()) return;
+
+  const {data,error} =
+    await supabaseClient
+      .from("products")
+      .select("category")
+      .eq("active",true);
+
+  if(error){
+    console.warn(
+      "Category filter error:",
+      error.message
+    );
+    return;
+  }
+
+  const categories =
+    [...new Set(
+      (data || [])
+        .map(p => String(p.category || "").trim())
+        .filter(Boolean)
+    )].sort();
+
+  select.innerHTML =
+    '<option value="">All Categories</option>' +
+    categories.map(category =>
+      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
+    ).join("");
+  }
+  
 function renderProductCard(p){
 
   const price =
