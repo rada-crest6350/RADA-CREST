@@ -374,7 +374,35 @@ body{
     font-size:14px;
   }
 }
-  <div id="reviewModal" class="review-modal">
+  
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="topbar">
+
+    <a class="brand" href="index.html">
+      <span class="brand-mark">RC</span>
+      <span>RADA CREST</span>
+    </a>
+
+    <a class="back" href="account.html">
+      ← My Account
+    </a>
+
+  </div>
+
+  <div id="pageMessage"></div>
+
+  <div id="orderContent"></div>
+
+</div>
+
+<!-- Review Modal (Sahi jagah body me move kiya gaya hai) -->
+<div id="reviewModal" class="review-modal">
 
   <div class="review-box">
 
@@ -457,34 +485,18 @@ body{
   </div>
 
 </div>
-  
-</style>
-</head>
-
-<body>
-
-<div class="page">
-
-  <div class="topbar">
-
-    <a class="brand" href="index.html">
-      <span class="brand-mark">RC</span>
-      <span>RADA CREST</span>
-    </a>
-
-    <a class="back" href="account.html">
-      ← My Account
-    </a>
-
-  </div>
-
-  <div id="pageMessage"></div>
-
-  <div id="orderContent"></div>
-
-</div>
 
 <script>
+
+// Supabase Client Global Setup
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+
+const supabaseClient = window.supabase?.createClient 
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+  : window.supabaseClient;
+
+window.supabaseClient = supabaseClient;
 
 const box =
   document.getElementById("orderContent");
@@ -1100,16 +1112,6 @@ loadOrder();
 
 async function loadOrder(){
   
-// Supabase Client Fix for order.html
-const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
-
-const supabaseClient = window.supabase?.createClient 
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
-  : window.supabaseClient;
-
-window.supabaseClient = supabaseClient;
-  
   if(!window.supabaseClient){
 
     message.innerHTML =
@@ -1316,223 +1318,4 @@ window.supabaseClient = supabaseClient;
                   class="item-image"
                   src="${esc(image)}"
                   alt="${esc(item.product_name || "Product")}"
-                  onerror="this.style.display='none'"
-                >`
-
-                :
-
-                `<div class="item-image"></div>`
-              }
-
-              <div>
-
-                <div class="item-name">
-                  ${esc(
-                    item.product_name ||
-                    "Product"
-                  )}
-                </div>
-
-                <div class="item-qty">
-                  Quantity: ${quantity}
-                  × ${money(price)}
-                </div>
-
-              </div>
-
-            </div>
-
-            <div class="item-price">
-              ${money(price * quantity)}
-            </div>
-
-          </div>
-        `;
-
-      }).join("")
-
-      :
-
-      `<div class="empty">
-        Order item details are unavailable.
-      </div>`;
-
-
-  /* PAGE */
-
-  box.innerHTML = `
-
-    <div class="card">
-
-      <div class="order-head">
-
-        <div>
-
-          <div class="order-id">
-            Order #${esc(order.id)}
-          </div>
-
-          <div class="date">
-            ${esc(formatDate(order.created_at))}
-          </div>
-
-          <div class="status status-${statusClass(status)}">
-            ${esc(status)}
-          </div>
-
-        </div>
-
-        <div class="total">
-          ${money(total)}
-        </div>
-
-      </div>
-
-      ${renderTracking(status)}
-
-    </div>
-
-
-    <div class="card">
-
-      <h2>Order Items</h2>
-
-      <div class="items">
-        ${itemsHtml}
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      <h2>Delivery Details</h2>
-
-      <div class="info-grid">
-
-        <div class="info-box">
-
-          <strong>Customer</strong>
-
-          <span>
-            ${esc(order.shipping_name || order.customer_name || user.email || "-")}
-          </span>
-
-        </div>
-
-
-        <div class="info-box">
-
-          <strong>Phone</strong>
-
-          <span>
-            ${esc(order.shipping_phone || order.customer_phone || "-")}
-          </span>
-
-        </div>
-
-
-        <div class="info-box">
-
-          <strong>Email</strong>
-
-          <span>
-            ${esc(order.customer_email || user.email || "-")}
-          </span>
-
-        </div>
-
-
-        <div class="info-box">
-
-          <strong>Payment</strong>
-
-          <span>
-            ${esc(order.payment_method || "COD")}
-            ${
-              order.payment_status
-                ? " • " + esc(order.payment_status)
-                : ""
-            }
-          </span>
-
-        </div>
-
-      </div>
-
-
-      ${
-        order.shipping_address
-
-        ?
-
-        `<div
-          class="info-box"
-          style="margin-top:15px;"
-        >
-
-          <strong>Delivery Address</strong>
-
-          <span>
-            ${esc(order.shipping_address)}
-          </span>
-
-        </div>`
-
-        :
-
-        ""
-      }
-
-    </div>
-
-
-    <div class="card">
-
-      <h2>Need Help?</h2>
-
-      <p style="color:#666;line-height:1.6;">
-        If you have any issue with this order,
-        contact RADA CREST support.
-      </p>
-
-      <div class="actions">
-
-        <a
-          class="btn primary"
-          href="https://wa.me/919079714767?text=${encodeURIComponent(
-            "Hello RADA CREST, I need help regarding Order #" +
-            order.id
-          )}"
-          target="_blank"
-        >
-          WhatsApp Support
-        </a>
-
-        <a
-          class="btn secondary"
-          href="index.html#products"
-        >
-          Continue Shopping
-        </a>
-
-        <a
-          class="btn secondary"
-          href="account.html"
-        >
-          My Account
-        </a>
-
-      </div>
-
-    </div>
-
-  `;
-}
-
-loadOrder();
-
-</script>
-
-</body>
-</html>
+  
