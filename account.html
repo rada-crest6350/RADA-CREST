@@ -1448,6 +1448,412 @@ client.auth.onAuthStateChange(
 init();
 
 </script>
+<script>
 
+/*
+  RADA CREST
+  Extra account features
+  Existing account/order code untouched.
+*/
+
+
+/* -----------------------------
+   CLICK ORDER → ORDER PAGE
+----------------------------- */
+
+const rcOrdersList =
+  document.getElementById("ordersList");
+
+if(rcOrdersList){
+
+  rcOrdersList.addEventListener(
+    "click",
+    function(event){
+
+      const card =
+        event.target.closest(".order-card");
+
+      if(!card) return;
+
+      const orderIdElement =
+        card.querySelector(".order-id");
+
+      if(!orderIdElement) return;
+
+      const text =
+        orderIdElement.textContent.trim();
+
+      const orderId =
+        text.replace(/^Order\s*#/i,"").trim();
+
+      if(!orderId) return;
+
+      window.location.href =
+        "order.html?id=" +
+        encodeURIComponent(orderId);
+
+    }
+  );
+
+}
+
+
+/* -----------------------------
+   MAKE ORDER CARDS LOOK CLICKABLE
+----------------------------- */
+
+const rcOrderStyle =
+  document.createElement("style");
+
+rcOrderStyle.textContent = `
+
+#ordersList .order-card{
+  cursor:pointer;
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+#ordersList .order-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 30px rgba(0,0,0,.08);
+  border-color:#c8b27c;
+}
+
+#ordersList .order-card::after{
+  content:"View Order →";
+  display:block;
+  margin-top:14px;
+  color:#8a641c;
+  font-size:13px;
+  font-weight:800;
+}
+
+`;
+
+document.head.appendChild(
+  rcOrderStyle
+);
+
+
+/* -----------------------------
+   WISHLIST SECTION
+----------------------------- */
+
+async function rcLoadWishlist(){
+
+  const accountView =
+    document.getElementById("accountView");
+
+  if(!accountView) return;
+
+  /*
+    Prevent duplicate wishlist section.
+  */
+  if(document.getElementById("rcWishlistSection")){
+    return;
+  }
+
+  const section =
+    document.createElement("section");
+
+  section.id =
+    "rcWishlistSection";
+
+  section.style.marginTop =
+    "28px";
+
+  section.innerHTML = `
+
+    <h2>My Wishlist</h2>
+
+    <div
+      id="rcWishlistList"
+      class="orders"
+    >
+      <div class="empty">
+        Loading wishlist...
+      </div>
+    </div>
+
+  `;
+
+  /*
+    Put wishlist below orders.
+  */
+
+  accountView.appendChild(section);
+
+
+  const {
+    data:{
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+  if(!user){
+
+    section.remove();
+
+    return;
+  }
+
+
+  const {
+    data:wishlists,
+    error
+  } =
+    await supabaseClient
+      .from("wishlists")
+      .select("*")
+      .eq("user_id",user.id)
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+
+  const list =
+    document.getElementById(
+      "rcWishlistList"
+    );
+
+
+  if(error){
+
+    list.innerHTML = `
+      <div class="empty">
+        Wishlist could not be loaded.
+      </div>
+    `;
+
+    console.warn(
+      "Wishlist:",
+      error.message
+    );
+
+    return;
+  }
+
+
+  if(!wishlists || !wishlists.length){
+
+    list.innerHTML = `
+      <div class="empty">
+
+        Your wishlist is empty.
+
+        <br><br>
+
+        <a
+          class="button secondary"
+          href="index.html#products"
+        >
+          Browse Products
+        </a>
+
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const productIds =
+    wishlists
+      .map(item => item.product_id)
+      .filter(Boolean);
+
+
+  if(!productIds.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        Your wishlist is empty.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const {
+    data:products,
+    error:productError
+  } =
+    await supabaseClient
+      .from("products")
+      .select("*")
+      .in("id",productIds);
+
+
+  if(productError){
+
+    list.innerHTML = `
+      <div class="empty">
+        Wishlist products could not be loaded.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  if(!products || !products.length){
+
+    list.innerHTML = `
+      <div class="empty">
+        Your wishlist is empty.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    products.map(product => `
+
+      <article
+        class="order-card rc-wishlist-card"
+        data-product-id="${product.id}"
+      >
+
+        <div
+          class="order-top"
+        >
+
+          <div>
+
+            <div class="order-id">
+              ${rcEsc(product.name)}
+            </div>
+
+            <div class="order-date">
+              ${
+                product.category
+                  ? rcEsc(product.category)
+                  : "RADA CREST Product"
+              }
+            </div>
+
+          </div>
+
+          <div class="total">
+            ₹${Number(
+              product.price || 0
+            ).toLocaleString("en-IN")}
+          </div>
+
+        </div>
+
+        <div
+          class="meta"
+          style="margin-top:12px;"
+        >
+
+          <span class="badge">
+            View Product →
+          </span>
+
+        </div>
+
+      </article>
+
+    `).join("");
+
+
+  document
+    .querySelectorAll(".rc-wishlist-card")
+    .forEach(card => {
+
+      card.addEventListener(
+        "click",
+        function(){
+
+          const id =
+            this.dataset.productId;
+
+          window.location.href =
+            "product.html?id=" +
+            encodeURIComponent(id);
+
+        }
+      );
+
+    });
+
+}
+
+
+function rcEsc(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/*
+  Wait for the existing account system
+  to finish showing the account.
+*/
+
+async function rcStartExtraAccountFeatures(){
+
+  const accountView =
+    document.getElementById("accountView");
+
+  if(!accountView) return;
+
+  /*
+    If already logged in and account view
+    is visible, load immediately.
+  */
+
+  if(!accountView.classList.contains("hidden")){
+
+    await rcLoadWishlist();
+
+    return;
+  }
+
+
+  /*
+    Otherwise wait for Supabase auth.
+  */
+
+  if(window.supabaseClient){
+
+    supabaseClient.auth.onAuthStateChange(
+      async function(event,session){
+
+        if(session?.user){
+
+          setTimeout(
+            rcLoadWishlist,
+            300
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+rcStartExtraAccountFeatures();
+
+     </script>
+  
 </body>
 </html>
