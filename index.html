@@ -186,7 +186,28 @@
   .hero{padding:10px !important;}
   #homepageBannerImage{max-height:420px;border-radius:12px;}
 }
+.wishlist-btn{
+  cursor:pointer;
+  border:1px solid #d8d2c7;
+  background:#fff;
+  color:#171717;
+  border-radius:10px;
+  padding:10px 12px;
+  font:inherit;
+  font-weight:750;
+}
 
+.wishlist-btn:hover{
+  border-color:#b08a3c;
+  color:#9a742c;
+}
+
+.wishlist-btn.active{
+  background:#171717;
+  color:#fff;
+  border-color:#171717;
+}
+  
 </style>
 
 </head>
@@ -977,7 +998,13 @@ function renderProductCard(p){
             >
               Buy Now
             </button>
-
+            <button
+              class="wishlist-btn"
+              type="button"
+              onclick="toggleWishlist(${p.id})"
+            >
+              ♡ Wishlist
+            </button>
             `
 
             :
