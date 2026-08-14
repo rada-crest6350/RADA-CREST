@@ -579,7 +579,17 @@ function renderTracking(status){
 ----------------------------- */
 
 async function loadOrder(){
+  
+// Supabase Client Fix for order.html
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 
+const supabaseClient = window.supabase?.createClient 
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+  : window.supabaseClient;
+
+window.supabaseClient = supabaseClient;
+  
   if(!window.supabaseClient){
 
     message.innerHTML =
