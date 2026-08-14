@@ -971,54 +971,62 @@ function renderProductCard(p){
 
 
         <div
-          class="product-actions"
-          onclick="event.stopPropagation()"
-        >
+  class="product-actions"
+  onclick="event.stopPropagation()"
+>
 
-          ${
-            stock > 0
+  ${
+    stock > 0
 
-            ?
+    ?
 
-            `
+    `
 
-            <button
-              class="btn small"
-              type="button"
-              onclick="addToCart(${p.id})"
-            >
-              Add to Cart
-            </button>
+    <button
+      class="btn small"
+      type="button"
+      onclick="addToCart(${p.id})"
+    >
+      Add to Cart
+    </button>
 
+    <button
+      class="buy"
+      type="button"
+      onclick="buyNow(${p.id})"
+    >
+      Buy Now
+    </button>
 
-            <button
-              class="buy"
-              type="button"
-              onclick="buyNow(${p.id})"
-            >
-              Buy Now
-            </button>
-            <button
-              class="wishlist-btn"
-              type="button"
-              onclick="toggleWishlist(${p.id})"
-            >
-              ♡ Wishlist
-            </button>
-            `
+    <button
+      class="wishlist-btn"
+      type="button"
+      onclick="toggleWishlist(${p.id})"
+    >
+      ♡ Wishlist
+    </button>
 
-            :
+    `
 
-            `<button
-              class="btn small"
-              disabled
-            >
-              Out of Stock
-            </button>`
-          }
+    :
 
-        </div>
+    `<button
+      class="btn small"
+      disabled
+    >
+      Out of Stock
+    </button>
 
+    <button
+      class="wishlist-btn"
+      type="button"
+      onclick="toggleWishlist(${p.id})"
+    >
+      ♡ Wishlist
+    </button>`
+  }
+
+</div>
 
       </div>
 
