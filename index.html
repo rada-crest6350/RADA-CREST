@@ -138,6 +138,7 @@
   #homepageBannerImage{max-height:420px;border-radius:12px;}
 }
 
+/* Product Filters Styling */
 .product-filters{
   display:flex;
   gap:10px;
@@ -164,7 +165,7 @@
 .product-filters select:focus{
   outline:none;
   border-color:#b08a3c;
-  box-shadow:0 0 0 3px rgba(176,138,60,.10);
+  box-shadow:0 0 3px rgba(176,138,60,.10);
 }
 
 .filter-reset{
@@ -187,28 +188,6 @@
   .filter-reset{
     grid-column:1 / -1;
   }
-}
-
-.wishlist-btn{
-  cursor:pointer;
-  border:1px solid #d8d2c7;
-  background:#fff;
-  color:#171717;
-  border-radius:10px;
-  padding:10px 12px;
-  font:inherit;
-  font-weight:750;
-}
-
-.wishlist-btn:hover{
-  border-color:#b08a3c;
-  color:#9a742c;
-}
-
-.wishlist-btn.active{
-  background:#171717;
-  color:#fff;
-  border-color:#171717;
 }
 
 </style>
@@ -304,36 +283,39 @@
 
 </section>
 
-<div class="product-filters">
-  <select id="categoryFilter" onchange="loadProducts()">
-    <option value="">All Categories</option>
-  </select>
 
-  <select id="priceFilter" onchange="loadProducts()">
-    <option value="">Sort by Price</option>
-    <option value="low">Price: Low to High</option>
-    <option value="high">Price: High to Low</option>
-  </select>
-
-  <select id="stockFilter" onchange="loadProducts()">
-    <option value="">All Products</option>
-    <option value="in">In Stock</option>
-    <option value="out">Out of Stock</option>
-  </select>
-
-  <button
-    type="button"
-    class="filter-reset"
-    onclick="resetFilters()"
-  >
-    Reset
-  </button>
-</div>
 
 <section
   id="products"
   class="section"
 >
+
+  <!-- Filter Section Added Here -->
+  <div class="product-filters">
+    <select id="categoryFilter" onchange="loadProducts()">
+      <option value="">All Categories</option>
+    </select>
+
+    <select id="priceFilter" onchange="loadProducts()">
+      <option value="">Sort by Price</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+    </select>
+
+    <select id="stockFilter" onchange="loadProducts()">
+      <option value="">All Products</option>
+      <option value="in">In Stock</option>
+      <option value="out">Out of Stock</option>
+    </select>
+
+    <button
+      type="button"
+      class="filter-reset"
+      onclick="resetFilters()"
+    >
+      Reset
+    </button>
+  </div>
 
   <div class="section-head">
 
@@ -467,7 +449,7 @@
 
 
 
-<script[span_0](start_span)[span_0](end_span)>
+<script>
 
 let products = [];
 
@@ -646,54 +628,24 @@ async function loadProducts(){
 
 
   const q =
-  searchInput.value.trim();
+    searchInput.value.trim();
 
-const category =
-  document.getElementById("categoryFilter")?.value || "";
+  const category =
+    document.getElementById("categoryFilter")?.value || "";
 
-const priceSort =
-  document.getElementById("priceFilter")?.value || "";
+  const priceSort =
+    document.getElementById("priceFilter")?.value || "";
 
-const stockFilter =
-  document.getElementById("stockFilter")?.value || "";
+  const stockFilter =
+    document.getElementById("stockFilter")?.value || "";
 
-let query =
-  supabaseClient
-    .from("products")
-    .select("*")
-    .eq("active",true);
 
-if(category){
-  query = query.eq(
-    "category",
-    category
-  );
-}
+  let query =
+    supabaseClient
+      .from("products")
+      .select("*")
+      .eq("active",true);
 
-if(stockFilter === "in"){
-  query = query.gt("stock",0);
-}
-
-if(stockFilter === "out"){
-  query = query.lte("stock",0);
-}
-
-if(priceSort === "low"){
-  query = query.order(
-    "price",
-    {ascending:true}
-  );
-}else if(priceSort === "high"){
-  query = query.order(
-    "price",
-    {ascending:false}
-  );
-}else{
-  query = query.order(
-    "created_at",
-    {ascending:false}
-  );
-}
 
   if(q){
 
@@ -703,6 +655,29 @@ if(priceSort === "low"){
         "%" + q + "%"
       );
 
+  }
+
+
+  if(category){
+    query = query.eq("category", category);
+  }
+
+
+  if(stockFilter === "in"){
+    query = query.gt("stock", 0);
+  }
+
+  if(stockFilter === "out"){
+    query = query.lte("stock", 0);
+  }
+
+
+  if(priceSort === "low"){
+    query = query.order("price", {ascending: true});
+  }else if(priceSort === "high"){
+    query = query.order("price", {ascending: false});
+  }else{
+    query = query.order("created_at", {ascending: false});
   }
 
 
@@ -745,6 +720,41 @@ if(priceSort === "low"){
 
 }
 
+
+async function loadFilterCategories(){
+
+  const select =
+    document.getElementById("categoryFilter");
+
+  if(!select || !sbReady()) return;
+
+  const {data,error} =
+    await supabaseClient
+      .from("products")
+      .select("category")
+      .eq("active",true);
+
+  if(error){
+    console.warn("Category filter error:", error.message);
+    return;
+  }
+
+  const categories =
+    [...new Set(
+      (data || [])
+        .map(p => String(p.category || "").trim())
+        .filter(Boolean)
+    )].sort();
+
+  select.innerHTML =
+    '<option value="">All Categories</option>' +
+    categories.map(category =>
+      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
+    ).join("");
+
+}
+
+
 function resetFilters(){
 
   const category =
@@ -761,43 +771,10 @@ function resetFilters(){
   if(stock) stock.value = "";
 
   loadProducts();
+
 }
-  
-async function loadFilterCategories(){
 
-  const select =
-    document.getElementById("categoryFilter");
 
-  if(!select || !sbReady()) return;
-
-  const {data,error} =
-    await supabaseClient
-      .from("products")
-      .select("category")
-      .eq("active",true);
-
-  if(error){
-    console.warn(
-      "Category filter error:",
-      error.message
-    );
-    return;
-  }
-
-  const categories =
-    [...new Set(
-      (data || [])
-        .map(p => String(p.category || "").trim())
-        .filter(Boolean)
-    )].sort();
-
-  select.innerHTML =
-    '<option value="">All Categories</option>' +
-    categories.map(category =>
-      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
-    ).join("");
-}
-  
 function renderProductCard(p){
 
   const price =
@@ -965,62 +942,48 @@ function renderProductCard(p){
 
 
         <div
-  class="product-actions"
-  onclick="event.stopPropagation()"
->
+          class="product-actions"
+          onclick="event.stopPropagation()"
+        >
 
-  ${
-    stock > 0
+          ${
+            stock > 0
 
-    ?
+            ?
 
-    `
+            `
 
-    <button
-      class="btn small"
-      type="button"
-      onclick="addToCart(${p.id})"
-    >
-      Add to Cart
-    </button>
+            <button
+              class="btn small"
+              type="button"
+              onclick="addToCart(${p.id})"
+            >
+              Add to Cart
+            </button>
 
-    <button
-      class="buy"
-      type="button"
-      onclick="buyNow(${p.id})"
-    >
-      Buy Now
-    </button>
 
-    <button
-      class="wishlist-btn"
-      type="button"
-      onclick="toggleWishlist(${p.id})"
-    >
-      ♡ Wishlist
-    </button>
+            <button
+              class="buy"
+              type="button"
+              onclick="buyNow(${p.id})"
+            >
+              Buy Now
+            </button>
 
-    `
+            `
 
-    :
+            :
 
-    `<button
-      class="btn small"
-      disabled
-    >
-      Out of Stock
-    </button>
+            `<button
+              class="btn small"
+              disabled
+            >
+              Out of Stock
+            </button>`
+          }
 
-    <button
-      class="wishlist-btn"
-      type="button"
-      onclick="toggleWishlist(${p.id})"
-    >
-      ♡ Wishlist
-    </button>`
-  }
+        </div>
 
-</div>
 
       </div>
 
@@ -1154,70 +1117,7 @@ function addToCart(id){
 
 }
 
-  
-async function toggleWishlist(productId){
 
-  const {
-    data:{user}
-  } = await supabaseClient.auth.getUser();
-
-  if(!user){
-    window.location.href =
-      "account.html?redirect=" +
-      encodeURIComponent("index.html#products");
-    return;
-  }
-
-  const {data:existing,error:checkError} =
-    await supabaseClient
-      .from("wishlists")
-      .select("id")
-      .eq("user_id",user.id)
-      .eq("product_id",Number(productId))
-      .maybeSingle();
-
-  if(checkError){
-    console.error(checkError);
-    alert("Wishlist error: " + checkError.message);
-    return;
-  }
-
-  if(existing){
-
-    const {error} =
-      await supabaseClient
-        .from("wishlists")
-        .delete()
-        .eq("id",existing.id);
-
-    if(error){
-      alert("Unable to remove from wishlist.");
-      return;
-    }
-
-    alert("Removed from wishlist.");
-
-  }else{
-
-    const {error} =
-      await supabaseClient
-        .from("wishlists")
-        .insert({
-          user_id:user.id,
-          product_id:Number(productId)
-        });
-
-    if(error){
-      console.error(error);
-      alert("Unable to add to wishlist: " + error.message);
-      return;
-    }
-
-    alert("Added to wishlist ❤️");
-  }
-}
-
-  
 async function buyNow(id){
 
   const product =
