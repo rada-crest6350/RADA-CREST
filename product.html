@@ -491,19 +491,23 @@ async function loadReviews(){
     }
 
     box.innerHTML = data.map(review=>{
-      const rating = Math.min(
-        5,
-        Math.max(1, Number(review.rating) || 1)
-      );
+      const rating = Math.min(5, Math.max(1, Number(review.rating) || 1));
+      
+      // Yahan se photos show karne ka logic shuru hota hai
+      let photosHtml = '';
+      if (review.photo_urls && Array.isArray(review.photo_urls)) {
+        photosHtml = review.photo_urls.map(url => `
+          <img src="${esc(url)}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin: 5px 5px 0 0; border: 1px solid #eee;" />
+        `).join('');
+      }
 
       return `
         <div class="rc-review">
           <div class="rc-stars">
             ${"★".repeat(rating)}${"☆".repeat(5 - rating)}
           </div>
-
           <p>${esc(review.review || "")}</p>
-
+          <div style="display:flex; flex-wrap:wrap;">${photosHtml}</div>
           <small>
             ${esc(review.customer_name || "Customer")}
           </small>
@@ -516,6 +520,7 @@ async function loadReviews(){
     box.innerHTML = "<p>Reviews will appear here.</p>";
   }
 }
+  
 
 async function loadProduct(){
   if(typeof sbReady !== "function" || !sbReady()){
