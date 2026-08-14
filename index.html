@@ -1152,7 +1152,75 @@ function addToCart(id){
 
 }
 
+  
+async function toggleWishlist(productId){
 
+  if(!sbReady()){
+    alert("Supabase is not configured.");
+    return;
+  }
+
+  const {
+    data:{user}
+  } = await supabaseClient.auth.getUser();
+
+  if(!user){
+    window.location.href =
+      "account.html?redirect=" +
+      encodeURIComponent("index.html#products");
+    return;
+  }
+
+  const {data:existing,error:checkError} =
+    await supabaseClient
+      .from("wishlists")
+      .select("id")
+      .eq("user_id",user.id)
+      .eq("product_id",productId)
+      .maybeSingle();
+
+  if(checkError){
+    console.error(checkError);
+    alert("Unable to update wishlist.");
+    return;
+  }
+
+  if(existing){
+
+    const {error} =
+      await supabaseClient
+        .from("wishlists")
+        .delete()
+        .eq("id",existing.id);
+
+    if(error){
+      alert("Unable to remove from wishlist.");
+      return;
+    }
+
+    alert("Removed from wishlist.");
+
+  }else{
+
+    const {error} =
+      await supabaseClient
+        .from("wishlists")
+        .insert({
+          user_id:user.id,
+          product_id:Number(productId)
+        });
+
+    if(error){
+      console.error(error);
+      alert("Unable to add to wishlist.");
+      return;
+    }
+
+    alert("Added to wishlist ❤️");
+  }
+}
+
+  
 async function buyNow(id){
 
   const product =
