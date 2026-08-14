@@ -16,178 +16,452 @@
 
 <style>
 
-.product{
-  cursor:pointer;
-  transition:.25s;
+:root {
+  --bg-color: #faf9f6;
+  --card-bg: #ffffff;
+  --text-main: #111111;
+  --text-muted: #666666;
+  --accent: #111111;
+  --border-color: #eae5dc;
+  --radius: 16px;
 }
 
-.product:hover{
-  transform:translateY(-4px);
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-.product .pimg{
-  overflow:hidden;
-  min-height:220px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+/* Premium Header */
+.header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.product .pimg img{
-  width:100%;
-  height:220px;
-  object-fit:contain;
-  display:block;
+.brand {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  letter-spacing: -0.02em;
 }
 
-.product .pimg .no-image{
-  font-size:70px;
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  background: var(--text-main);
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
 }
 
-#homepageBannerImage{
-  display:none;
-  width:100%;
-  max-height:420px;
-  object-fit:cover;
-  border-radius:inherit;
-}
-.hero.has-banner{
-  overflow:hidden;
-}
-.hero-banner-wrap{
-  display:none;
-  width:100%;
-  margin-top:24px;
-}
-@media (max-width:800px){
-  #homepageBannerImage{max-height:280px;}
-}
-.product-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
+.search {
+  display: flex;
+  align-items: center;
+  background: #f0ede6;
+  border-radius: 12px;
+  padding: 4px 12px;
+  width: 300px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.product-actions button{
-  cursor:pointer;
+.search:focus-within {
+  background: #fff;
+  border-color: #d0c8bc;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
 }
 
-.buy{
-  cursor:pointer;
+.search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 8px;
+  width: 100%;
+  font-size: 14px;
 }
 
-.badge{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:6px;
-  font-size:11px;
-  font-weight:800;
+.search button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-muted);
 }
 
+nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
 
-/* Premium banner-first hero. Existing product/order/cart logic is unchanged. */
-.hero{
-  position:relative;
-  display:block !important;
-  padding:22px !important;
-  background:linear-gradient(135deg,#111,#1b1b1b) !important;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 24px 60px rgba(0,0,0,.18);
+nav a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.2s;
 }
-.hero-copy{
-  display:none !important;
+
+nav a:hover {
+  color: var(--text-main);
 }
-.hero-banner-wrap{
-  display:none;
-  width:100%;
-  margin:0 !important;
+
+/* Hero & Banner Styling */
+.hero {
+  position: relative;
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 20px;
+  display: block !important;
 }
-.hero.has-banner .hero-banner-wrap{
-  display:block !important;
+
+.hero-copy {
+  display: none !important;
 }
+
+.hero-banner-wrap {
+  display: block;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  background: #111;
+}
+
 #homepageBannerImage {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;        
-    min-height: 100% !important;    
-    object-fit: cover !important;   
-    border-radius: 18px;
-}
-.hero:not(.has-banner) .hero-banner-wrap{
-  display:block !important;
-}
-.hero:not(.has-banner) .hero-banner-wrap::before{
-  content:'RADA CREST  •  PREMIUM ELECTRICAL';
-  display:flex;
-  min-height:250px;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  border-radius:18px;
-  background:linear-gradient(135deg,#101010,#242424);
-  color:#f5f5f5;
-  font-size:clamp(24px,4vw,48px);
-  font-weight:800;
-  letter-spacing:.04em;
-  padding:30px;
-}
-.hero:not(.has-banner) #homepageBannerImage{display:none !important;}
-@media(max-width:800px){
-  .hero{padding:10px !important;}
-  #homepageBannerImage{max-height:420px;border-radius:12px;}
+  display: block !important;
+  width: 100% !important;
+  height: 420px !important;
+  object-fit: cover !important;
+  transition: transform 0.5s ease;
 }
 
-/* Product Filters Styling */
-.product-filters{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:0 0 22px;
-  padding:14px;
-  background:#fff;
-  border:1px solid #e5e0d5;
-  border-radius:16px;
+#homepageBannerImage:hover {
+  transform: scale(1.02);
+}
+
+.hero:not(.has-banner) .hero-banner-wrap::before {
+  content: 'RADA CREST  •  PREMIUM ELECTRICAL';
+  display: flex;
+  min-height: 320px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(135deg, #111111, #2a2a2a);
+  color: #fff;
+  font-size: clamp(22px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: .05em;
+  padding: 30px;
+}
+
+/* Product Section & Filters */
+.section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.product-filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 32px;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .product-filters select,
-.filter-reset{
-  border:1px solid #d8d2c7;
-  background:#fffdf8;
-  color:#171717;
-  border-radius:10px;
-  padding:11px 13px;
-  font:inherit;
-  font-size:14px;
-  cursor:pointer;
+.filter-reset {
+  border: 1px solid var(--border-color);
+  background: #faf8f5;
+  color: var(--text-main);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
 }
 
-.product-filters select:focus{
-  outline:none;
-  border-color:#b08a3c;
-  box-shadow:0 0 3px rgba(176,138,60,.10);
+.product-filters select:hover,
+.filter-reset:hover {
+  border-color: #b0a494;
 }
 
-.filter-reset{
-  background:#171717;
-  color:#fff;
-  border-color:#171717;
+.product-filters select:focus {
+  border-color: var(--text-main);
+  background: #fff;
 }
 
-@media(max-width:600px){
-  .product-filters{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-  }
+.filter-reset {
+  background: var(--text-main);
+  color: #fff;
+  border-color: var(--text-main);
+  font-weight: 600;
+}
 
-  .product-filters select,
-  .filter-reset{
-    width:100%;
-  }
+.filter-reset:hover {
+  background: #333;
+}
 
-  .filter-reset{
-    grid-column:1 / -1;
-  }
+.section-head {
+  margin-bottom: 24px;
+}
+
+.section-head .eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.section-head h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+/* Modern Product Grid & Cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.product {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+.product:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.08);
+  border-color: #dcd4c7;
+}
+
+.product .pimg {
+  overflow: hidden;
+  height: 240px;
+  background: #f7f5f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.product .pimg img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
+  box-sizing: border-box;
+  transition: transform 0.5s ease;
+}
+
+.product:hover .pimg img {
+  transform: scale(1.05);
+}
+
+.product .pbody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.product .pbody small {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.product .pbody h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.product .pbody div:nth-of-type(1) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.product b {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.product del {
+  color: #999;
+  font-size: 13px;
+}
+
+.badge {
+  background: #111;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.product-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.product-actions button,
+.product-actions .buy,
+.btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s, transform 0.1s;
+  border: 1px solid var(--text-main);
+}
+
+.product-actions button:active,
+.product-actions .buy:active {
+  transform: scale(0.97);
+}
+
+.product-actions .btn.small,
+.product-actions button {
+  background: #fff;
+  color: var(--text-main);
+}
+
+.product-actions button:hover {
+  background: #f4f4f4;
+}
+
+.product-actions .buy {
+  background: var(--text-main);
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-actions .buy:hover {
+  background: #333;
+}
+
+/* Why Us Section */
+.why {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 40px 20px;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.why h2 {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 6px 0 24px;
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.benefits > div {
+  background: #faf8f5;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.benefits b {
+  display: block;
+  font-size: 15px;
+  margin: 8px 0 4px;
+}
+
+.benefits small {
+  color: var(--text-muted);
+}
+
+/* Footer */
+footer {
+  max-width: 1200px;
+  margin: 40px auto 20px;
+  padding: 20px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+footer a {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media(max-width:768px) {
+  .header { padding: 12px 16px; }
+  .search { display: none; } /* Mobile view compact */
+  .product-filters { display: grid; grid-template-columns: 1fr 1fr; }
+  .filter-reset { grid-column: 1 / -1; }
+  #homepageBannerImage { height: 260px !important; }
+  footer { flex-direction: column; gap: 12px; text-align: center; }
 }
 
 </style>
@@ -197,72 +471,26 @@
 
 <body>
 
-
 <header class="header">
-
-  <a
-    class="brand"
-    href="index.html"
-  >
-
-    <span class="brand-mark">
-      RC
-    </span>
-
-    <span>
-      RADA <b>CREST</b>
-    </span>
-
+  <a class="brand" href="index.html">
+    <span class="brand-mark">RC</span>
+    <span>RADA <b>CREST</b></span>
   </a>
 
-
   <div class="search">
-
-    <input
-      id="search"
-      type="search"
-      placeholder="Search products..."
-      autocomplete="off"
-      oninput="loadProducts()"
-    >
-
-    <button
-      type="button"
-      onclick="loadProducts()"
-    >
-      ⌕
-    </button>
-
+    <input id="search" type="search" placeholder="Search products..." autocomplete="off" oninput="loadProducts()">
+    <button type="button" onclick="loadProducts()">⌕</button>
   </div>
 
-
   <nav>
-
-    <a href="#products">
-      Shop
-    </a>
-
-    <a href="#why">
-      Why Us
-    </a>
-
-    <a href="account.html">
-      Account
-    </a>
-
-    <a href="cart.html">
-      🛒
-      <span id="cartCount">0</span>
-    </a>
-
+    <a href="#products">Shop</a>
+    <a href="#why">Why Us</a>
+    <a href="account.html">Account</a>
+    <a href="cart.html">🛒 <span id="cartCount">0</span></a>
   </nav>
-
 </header>
 
-
-
 <section class="hero">
-
   <div class="hero-copy">
     <p class="eyebrow">RADA CREST • SMART ELECTRICAL</p>
     <h1>Premium electrical essentials for everyday living.</h1>
@@ -272,25 +500,13 @@
 
   <div class="hero-banner-wrap">
     <a id="homepageBannerLink" href="javascript:void(0)" style="display:block; text-decoration:none;">
-      <img
-        id="homepageBannerImage"
-        src=""
-        alt="RADA CREST homepage banner"
-        onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');"
-      >
+      <img id="homepageBannerImage" src="" alt="RADA CREST homepage banner" onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');">
     </a>
   </div>
-
 </section>
 
-
-
-<section
-  id="products"
-  class="section"
->
-
-  <!-- Filter Section Added Here -->
+<section id="products" class="section">
+  <!-- Filters Section -->
   <div class="product-filters">
     <select id="categoryFilter" onchange="loadProducts()">
       <option value="">All Categories</option>
@@ -308,179 +524,72 @@
       <option value="out">Out of Stock</option>
     </select>
 
-    <button
-      type="button"
-      class="filter-reset"
-      onclick="resetFilters()"
-    >
-      Reset
-    </button>
+    <button type="button" class="filter-reset" onclick="resetFilters()">Reset</button>
   </div>
 
   <div class="section-head">
-
     <div>
-
-      <p class="eyebrow">
-        RADA CREST COLLECTION
-      </p>
-
-      <h2>
-        Featured Products
-      </h2>
-
+      <p class="eyebrow">RADA CREST COLLECTION</p>
+      <h2>Featured Products</h2>
     </div>
-
   </div>
 
-
-  <div
-    id="grid"
-    class="grid"
-  >
-
-    <p>
-      Loading products...
-    </p>
-
+  <div id="grid" class="grid">
+    <p>Loading products...</p>
   </div>
-
 </section>
 
-
-
-<section
-  id="why"
-  class="why"
->
-
+<section id="why" class="why">
   <div>
-
-    <p class="eyebrow">
-      WHY RADA CREST
-    </p>
-
-    <h2>
-      Built for everyday trust.
-    </h2>
-
+    <p class="eyebrow">WHY RADA CREST</p>
+    <h2>Built for everyday trust.</h2>
   </div>
-
 
   <div class="benefits">
-
-    <div>
-      ✓
-      <b>Quality Products</b>
-      <small>
-        Made for daily use
-      </small>
-    </div>
-
-
-    <div>
-      ✓
-      <b>Warranty Support</b>
-      <small>
-        Clear product warranty
-      </small>
-    </div>
-
-
-    <div>
-      ✓
-      <b>Secure Packaging</b>
-      <small>
-        Carefully packed
-      </small>
-    </div>
-
-
-    <div>
-      ✓
-      <b>Customer Support</b>
-      <small>
-        Help when you need it
-      </small>
-    </div>
-
+    <div>✓ <b>Quality Products</b> <small>Made for daily use</small></div>
+    <div>✓ <b>Warranty Support</b> <small>Clear product warranty</small></div>
+    <div>✓ <b>Secure Packaging</b> <small>Carefully packed</small></div>
+    <div>✓ <b>Customer Support</b> <small>Help when you need it</small></div>
   </div>
-
 </section>
 
-
-
 <footer>
-
   <div class="brand">
-
-    <span class="brand-mark">
-      RC
-    </span>
-
-    <span>
-      RADA <b>CREST</b>
-    </span>
-
+    <span class="brand-mark">RC</span>
+    <span>RADA <b>CREST</b></span>
   </div>
-
-
   <div>
-
-    <a href="admin.html">
-      Admin
-    </a>
-
-    ·
-
-    <a href="account.html">
-      Account
-    </a>
-
-    ·
-
-    <a href="cart.html">
-      Cart
-    </a>
-
+    <a href="admin.html">Admin</a> · 
+    <a href="account.html">Account</a> · 
+    <a href="cart.html">Cart</a>
   </div>
-
 </footer>
-
-
 
 <script>
 
 let products = [];
 
-
 function escapeHtml(value){
-
   return String(value ?? "")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
-
 }
-
 
 function cleanImageUrl(value){
   if(!value) return "";
   let u = String(value).trim();
-
   u = u.replace(/^\[img\]\s*/i,"")
        .replace(/\s*\[\/img\]$/i,"")
        .replace(/^["']+|["']+$/g,"")
        .trim();
-
   return /^https?:\/\/\S+$/i.test(u) ? u : "";
 }
 
 function getImages(url){
   if(!url) return [];
-
   return String(url)
     .split(/[\n,]+/)
     .map(x => cleanImageUrl(x))
@@ -490,70 +599,34 @@ function getImages(url){
 async function loadStoreSettings(){
   try{
     if(!sbReady()) return;
-
     const { data, error } = await supabaseClient
       .from("site_settings")
       .select("*")
       .limit(1)
       .maybeSingle();
 
-    if(error){
-      console.warn("Store settings error:", error.message);
-      return;
-    }
-
+    if(error){ console.warn("Store settings error:", error.message); return; }
     if(!data) return;
 
-    const siteName =
-      data.site_name ||
-      data.name ||
-      "";
-
+    const siteName = data.site_name || data.name || "";
     if(siteName){
       document.title = siteName + " — Premium Electrical";
       document.querySelectorAll(".brand > span:last-child").forEach(el=>{
-        el.textContent = siteName;
+        el.innerHTML = siteName.includes("CREST") ? 'RADA <b>CREST</b>' : siteName;
       });
     }
 
-    const logoUrl = cleanImageUrl(
-      data.logo_url ||
-      data.logo ||
-      data.logoUrl ||
-      ""
-    );
-
+    const logoUrl = cleanImageUrl(data.logo_url || data.logo || data.logoUrl || "");
     if(logoUrl){
       document.querySelectorAll(".brand-mark").forEach(el=>{
-        el.innerHTML =
-          '<img src="' + escapeHtml(logoUrl) +
-          '" alt="RADA CREST Logo" ' +
-          'style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" ' +
-          'onerror="this.remove();">';
+        el.innerHTML = '<img src="' + escapeHtml(logoUrl) + '" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.remove();">';
         el.style.overflow = "hidden";
       });
     }
 
-    const bannerUrl = cleanImageUrl(
-      data.banner_url ||
-      data.homepage_banner_url ||
-      data.homepageBannerUrl ||
-      data.banner ||
-      data.site_banner ||
-      ""
-    );
-
-    const bannerProductId =
-      data.banner_product_id ||
-      data.banner_product ||
-      data.bannerProductId ||
-      "";
-
-    const bannerLinkUrl =
-      data.banner_link ||
-      data.homepage_banner_link ||
-      data.bannerLink ||
-      "";
+    const bannerUrl = cleanImageUrl(data.banner_url || data.homepage_banner_url || data.banner || "");
+    const bannerProductId = data.banner_product_id || data.banner_product || "";
+    const bannerLinkUrl = data.banner_link || data.homepage_banner_link || "";
 
     if(bannerUrl){
       const hero = document.querySelector(".hero");
@@ -563,22 +636,17 @@ async function loadStoreSettings(){
       if(hero && bannerImg){
         bannerImg.src = bannerUrl;
         bannerImg.style.display = "block";
-        bannerImg.closest(".hero-banner-wrap").style.display = "block";
         hero.classList.add("has-banner");
 
         if(bannerLink){
           if(bannerProductId){
             bannerLink.href = "product.html?id=" + encodeURIComponent(bannerProductId);
-            bannerLink.style.cursor = "pointer";
           } else if(bannerLinkUrl){
             bannerLink.href = bannerLinkUrl;
-            bannerLink.style.cursor = "pointer";
           } else {
             bannerLink.removeAttribute("href");
-            bannerLink.style.cursor = "default";
           }
         }
-
       }
     }
 
@@ -587,590 +655,187 @@ async function loadStoreSettings(){
       const eyebrow = document.querySelector(".hero .eyebrow");
       if(eyebrow) eyebrow.textContent = offer;
     }
-
-    const description =
-      data.store_description ||
-      data.description ||
-      "";
-
-    if(description){
-      const paragraphs =
-        document.querySelectorAll(".hero > div:first-child > p");
-
-      if(paragraphs.length > 1){
-        paragraphs[1].textContent = description;
-      }
-    }
-
   }catch(err){
     console.warn("Store settings could not be loaded:", err);
   }
 }
 
 async function loadProducts(){
-
-  const grid =
-    document.getElementById("grid");
-
-
+  const grid = document.getElementById("grid");
   if(!sbReady()){
-
-    grid.innerHTML =
-      "<p>Supabase configuration is missing.</p>";
-
+    grid.innerHTML = "<p>Supabase configuration is missing.</p>";
     return;
-
   }
 
+  const searchInput = document.getElementById("search");
+  const q = searchInput.value.trim();
+  const category = document.getElementById("categoryFilter")?.value || "";
+  const priceSort = document.getElementById("priceFilter")?.value || "";
+  const stockFilter = document.getElementById("stockFilter")?.value || "";
 
-  const searchInput =
-    document.getElementById("search");
-
-
-  const q =
-    searchInput.value.trim();
-
-  const category =
-    document.getElementById("categoryFilter")?.value || "";
-
-  const priceSort =
-    document.getElementById("priceFilter")?.value || "";
-
-  const stockFilter =
-    document.getElementById("stockFilter")?.value || "";
-
-
-  let query =
-    supabaseClient
-      .from("products")
-      .select("*")
-      .eq("active",true);
-
+  let query = supabaseClient.from("products").select("*").eq("active", true);
 
   if(q){
-
-    query =
-      query.ilike(
-        "name",
-        "%" + q + "%"
-      );
-
+    query = query.ilike("name", "%" + q + "%");
   }
-
 
   if(category){
     query = query.eq("category", category);
   }
 
-
   if(stockFilter === "in"){
     query = query.gt("stock", 0);
-  }
-
-  if(stockFilter === "out"){
+  } else if(stockFilter === "out"){
     query = query.lte("stock", 0);
   }
 
-
   if(priceSort === "low"){
     query = query.order("price", {ascending: true});
-  }else if(priceSort === "high"){
+  } else if(priceSort === "high"){
     query = query.order("price", {ascending: false});
-  }else{
+  } else {
     query = query.order("created_at", {ascending: false});
   }
 
-
-  const {
-    data,
-    error
-  } =
-    await query;
-
+  const { data, error } = await query;
 
   if(error){
-
-    grid.innerHTML =
-      `<p>${escapeHtml(error.message)}</p>`;
-
+    grid.innerHTML = `<p>${escapeHtml(error.message)}</p>`;
     return;
-
   }
 
-
-  products =
-    data || [];
-
+  products = data || [];
 
   if(!products.length){
-
-    grid.innerHTML =
-      "<p>No products found.</p>";
-
+    grid.innerHTML = "<p>No products found.</p>";
     return;
-
   }
 
-
-  grid.innerHTML =
-    products.map(
-      p => renderProductCard(p)
-    ).join("");
-
-
+  grid.innerHTML = products.map(p => renderProductCard(p)).join("");
 }
-
 
 async function loadFilterCategories(){
-
-  const select =
-    document.getElementById("categoryFilter");
-
+  const select = document.getElementById("categoryFilter");
   if(!select || !sbReady()) return;
 
-  const {data,error} =
-    await supabaseClient
-      .from("products")
-      .select("category")
-      .eq("active",true);
+  const {data, error} = await supabaseClient.from("products").select("category").eq("active", true);
+  if(error) return;
 
-  if(error){
-    console.warn("Category filter error:", error.message);
-    return;
-  }
+  const categories = [...new Set((data || []).map(p => String(p.category || "").trim()).filter(Boolean))].sort();
 
-  const categories =
-    [...new Set(
-      (data || [])
-        .map(p => String(p.category || "").trim())
-        .filter(Boolean)
-    )].sort();
-
-  select.innerHTML =
-    '<option value="">All Categories</option>' +
-    categories.map(category =>
-      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
-    ).join("");
-
+  select.innerHTML = '<option value="">All Categories</option>' + 
+    categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("");
 }
 
-
 function resetFilters(){
-
-  const category =
-    document.getElementById("categoryFilter");
-
-  const price =
-    document.getElementById("priceFilter");
-
-  const stock =
-    document.getElementById("stockFilter");
+  const category = document.getElementById("categoryFilter");
+  const price = document.getElementById("priceFilter");
+  const stock = document.getElementById("stockFilter");
 
   if(category) category.value = "";
   if(price) price.value = "";
   if(stock) stock.value = "";
 
   loadProducts();
-
 }
-
 
 function renderProductCard(p){
-
-  const price =
-    Number(p.price || 0);
-
-
-  const oldPrice =
-    Number(p.old_price || 0);
-
-
-  const discount =
-    Number(p.discount_percent || 0);
-
-
-  const stock =
-    Number(p.stock || 0);
-
-
-  const images =
-    getImages(
-      p.image_url ||
-      p.image ||
-      p.image_url_1 ||
-      p.image_urls ||
-      ""
-    );
-
-
-  const image =
-    images.length
-      ? images[0]
-      : "";
-
+  const price = Number(p.price || 0);
+  const oldPrice = Number(p.old_price || 0);
+  const discount = Number(p.discount_percent || 0);
+  const stock = Number(p.stock || 0);
+  const images = getImages(p.image_url || p.image || "");
+  const image = images.length ? images[0] : "";
 
   return `
-
-    <article
-      class="product"
-      onclick="openProduct(${p.id})"
-    >
-
-
+    <article class="product" onclick="openProduct(${p.id})">
       <div class="pimg">
-
-        ${
-          image
-
-          ?
-
-          `<img
-            src="${escapeHtml(image)}"
-            alt="${escapeHtml(p.name)}"
-            loading="lazy"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
-          >
-          <span
-            class="no-image"
-            style="display:none"
-          >
-            💡
-          </span>`
-
-          :
-
-          `<span class="no-image">
-            💡
-          </span>`
-        }
-
+        ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` : ""}
+        <span class="no-image" style="display:${image ? 'none' : 'block'}; font-size:40px;">💡</span>
       </div>
-
 
       <div class="pbody">
-
-
-        ${
-          p.category
-
-          ?
-
-          `<small>
-            ${escapeHtml(p.category)}
-          </small>`
-
-          :
-
-          ""
-        }
-
-
-        <h3>
-          ${escapeHtml(p.name)}
-        </h3>
-
+        ${p.category ? `<small>${escapeHtml(p.category)}</small>` : ""}
+        <h3>${escapeHtml(p.name)}</h3>
 
         <div>
-
-          <b>
-            ₹${price.toLocaleString("en-IN")}
-          </b>
-
-
-          ${
-            oldPrice > price
-
-            ?
-
-            `<del>
-              ₹${oldPrice.toLocaleString("en-IN")}
-            </del>`
-
-            :
-
-            ""
-          }
-
-
-          ${
-            discount > 0
-
-            ?
-
-            `<span class="badge">
-              ${discount}% OFF
-            </span>`
-
-            :
-
-            ""
-          }
-
+          <b>₹${price.toLocaleString("en-IN")}</b>
+          ${oldPrice > price ? `<del>₹${oldPrice.toLocaleString("en-IN")}</del>` : ""}
+          ${discount > 0 ? `<span class="badge">${discount}% OFF</span>` : ""}
         </div>
 
+        ${p.warranty ? `<small>🛡️ ${escapeHtml(p.warranty)}</small>` : ""}
+        ${stock > 0 ? `<small>📦 In Stock</small>` : `<small style="color:#d9534f;">Out of Stock</small>`}
 
-        ${
-          p.warranty
-
-          ?
-
-          `<small>
-            🛡️ ${escapeHtml(p.warranty)}
-          </small>`
-
-          :
-
-          ""
-        }
-
-
-        ${
-          stock > 0
-
-          ?
-
-          `<small>
-            📦 In Stock
-          </small>`
-
-          :
-
-          `<small>
-            Out of Stock
-          </small>`
-        }
-
-
-        <div
-          class="product-actions"
-          onclick="event.stopPropagation()"
-        >
-
-          ${
-            stock > 0
-
-            ?
-
-            `
-
-            <button
-              class="btn small"
-              type="button"
-              onclick="addToCart(${p.id})"
-            >
-              Add to Cart
-            </button>
-
-
-            <button
-              class="buy"
-              type="button"
-              onclick="buyNow(${p.id})"
-            >
-              Buy Now
-            </button>
-
-            `
-
-            :
-
-            `<button
-              class="btn small"
-              disabled
-            >
-              Out of Stock
-            </button>`
-          }
-
+        <div class="product-actions" onclick="event.stopPropagation()">
+          ${stock > 0 ? `
+            <button class="btn small" type="button" onclick="addToCart(${p.id})">Add to Cart</button>
+            <button class="buy" type="button" onclick="buyNow(${p.id})">Buy Now</button>
+          ` : `
+            <button class="btn small" disabled style="opacity:0.6; cursor:not-allowed; width:100%;">Out of Stock</button>
+          `}
         </div>
-
-
       </div>
-
     </article>
-
   `;
-
 }
-
 
 function openProduct(id){
-
-  window.location.href =
-    "product.html?id=" +
-    encodeURIComponent(id);
-
+  window.location.href = "product.html?id=" + encodeURIComponent(id);
 }
-
 
 function getCart(){
-
-  try{
-
-    return JSON.parse(
-      localStorage.getItem("rc_cart") ||
-      "[]"
-    );
-
-  }catch{
-
-    return [];
-
-  }
-
+  try{ return JSON.parse(localStorage.getItem("rc_cart") || "[]"); }
+  catch{ return []; }
 }
-
 
 function saveCart(cart){
-
-  localStorage.setItem(
-    "rc_cart",
-    JSON.stringify(cart)
-  );
-
-
+  localStorage.setItem("rc_cart", JSON.stringify(cart));
   updateCartCount();
-
 }
-
 
 function updateCartCount(){
-
-  const cart =
-    getCart();
-
-
-  const count =
-    cart.reduce(
-      (sum,item) =>
-        sum + Number(item.qty || 0),
-      0
-    );
-
-
-  const element =
-    document.getElementById(
-      "cartCount"
-    );
-
-
-  if(element){
-
-    element.textContent =
-      count;
-
-  }
-
+  const cart = getCart();
+  const count = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const element = document.getElementById("cartCount");
+  if(element) element.textContent = count;
 }
-
 
 function addToCart(id){
-
-  const product =
-    products.find(
-      p =>
-        Number(p.id) ===
-        Number(id)
-    );
-
-
+  const product = products.find(p => Number(p.id) === Number(id));
   if(!product) return;
 
-
-  const cart =
-    getCart();
-
-
-  const existing =
-    cart.find(
-      item =>
-        Number(item.id) ===
-        Number(id)
-    );
-
+  const cart = getCart();
+  const existing = cart.find(item => Number(item.id) === Number(id));
 
   if(existing){
-
-    existing.qty =
-      Number(existing.qty) + 1;
-
-  }else{
-
-    cart.push({
-
-      id: Number(id),
-
-      qty: 1
-
-    });
-
+    existing.qty = Number(existing.qty) + 1;
+  } else {
+    cart.push({ id: Number(id), qty: 1 });
   }
-
 
   saveCart(cart);
-
-
-  alert(
-    product.name +
-    " added to cart."
-  );
-
+  alert(product.name + " added to cart.");
 }
-
 
 async function buyNow(id){
-
-  const product =
-    products.find(
-      p =>
-        Number(p.id) ===
-        Number(id)
-    );
-
-
+  const product = products.find(p => Number(p.id) === Number(id));
   if(!product) return;
 
-
-  const {
-    data: {
-      user
-    }
-  } =
-    await supabaseClient
-      .auth
-      .getUser();
-
-
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if(!user){
-
-    window.location.href =
-      "account.html?redirect=" +
-      encodeURIComponent(
-        "index.html#products"
-      );
-
+    window.location.href = "account.html?redirect=" + encodeURIComponent("index.html#products");
     return;
-
   }
-
-
-  window.location.href =
-    "product.html?id=" +
-    encodeURIComponent(
-      product.id
-    );
-
+  window.location.href = "product.html?id=" + encodeURIComponent(product.id);
 }
 
-
 updateCartCount();
-
 loadStoreSettings();
 loadFilterCategories();
 loadProducts();
 
 </script>
-
 
 </body>
 </html>
