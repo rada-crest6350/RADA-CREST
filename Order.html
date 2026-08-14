@@ -1,0 +1,1008 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Order Details — RADA CREST</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#f7f5ef;
+  color:#171717;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.page{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#171717;
+  font-weight:800;
+}
+
+.brand-mark{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:#171717;
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+}
+
+.back{
+  text-decoration:none;
+  color:#555;
+  font-weight:700;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e0d5;
+  border-radius:22px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.order-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
+}
+
+.order-id{
+  font-size:24px;
+  font-weight:900;
+}
+
+.date{
+  color:#777;
+  margin-top:6px;
+}
+
+.total{
+  font-size:25px;
+  font-weight:900;
+}
+
+.status{
+  display:inline-block;
+  margin-top:12px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#eee;
+  font-size:13px;
+  font-weight:800;
+  text-transform:capitalize;
+}
+
+.status-delivered{
+  background:#e2f5e8;
+  color:#267144;
+}
+
+.status-cancelled{
+  background:#fde4e4;
+  color:#a33a3a;
+}
+
+.status-shipped{
+  background:#e5eefc;
+  color:#315b9b;
+}
+
+.status-confirmed,
+.status-processing,
+.status-packed{
+  background:#fff0cf;
+  color:#8a641c;
+}
+
+/* TRACKING */
+
+.tracking{
+  margin-top:28px;
+}
+
+.tracking h2,
+.card h2{
+  margin-top:0;
+}
+
+.steps{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:25px;
+}
+
+.step{
+  text-align:center;
+  position:relative;
+}
+
+.circle{
+  width:42px;
+  height:42px;
+  margin:auto;
+  border-radius:50%;
+  background:#ddd;
+  color:#777;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  position:relative;
+  z-index:2;
+}
+
+.step.active .circle,
+.step.done .circle{
+  background:#171717;
+  color:#fff;
+}
+
+.step-label{
+  margin-top:10px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.step-line{
+  position:absolute;
+  top:20px;
+  left:50%;
+  width:100%;
+  height:3px;
+  background:#ddd;
+  z-index:1;
+}
+
+.step:last-child .step-line{
+  display:none;
+}
+
+.step.done .step-line{
+  background:#171717;
+}
+
+/* ITEMS */
+
+.items{
+  display:grid;
+  gap:12px;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:14px 0;
+  border-bottom:1px solid #eee;
+}
+
+.item:last-child{
+  border-bottom:0;
+}
+
+.item-left{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.item-image{
+  width:65px;
+  height:65px;
+  border-radius:12px;
+  background:#f2f0ea;
+  object-fit:contain;
+}
+
+.item-name{
+  font-weight:800;
+}
+
+.item-qty{
+  color:#777;
+  font-size:13px;
+  margin-top:5px;
+}
+
+.item-price{
+  font-weight:900;
+  white-space:nowrap;
+}
+
+/* INFO */
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.info-box{
+  background:#f8f6f0;
+  border-radius:14px;
+  padding:15px;
+}
+
+.info-box strong{
+  display:block;
+  margin-bottom:7px;
+}
+
+.info-box span{
+  color:#555;
+  line-height:1.6;
+}
+
+/* BUTTONS */
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  display:inline-block;
+  border:0;
+  border-radius:12px;
+  padding:13px 18px;
+  text-decoration:none;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.primary{
+  background:#171717;
+  color:#fff;
+}
+
+.secondary{
+  background:#fff;
+  color:#171717;
+  border:1px solid #d8d2c7;
+}
+
+.empty{
+  text-align:center;
+  padding:45px 15px;
+  color:#777;
+}
+
+.error{
+  color:#a33a3a;
+}
+
+@media(max-width:700px){
+
+  .page{
+    padding:12px;
+  }
+
+  .order-head{
+    flex-direction:column;
+  }
+
+  .total{
+    font-size:22px;
+  }
+
+  .steps{
+    grid-template-columns:1fr;
+    gap:15px;
+  }
+
+  .step{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+  }
+
+  .circle{
+    margin:0;
+    flex:none;
+  }
+
+  .step-line{
+    display:none;
+  }
+
+  .step-label{
+    margin:0;
+  }
+
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+
+  .item{
+    align-items:flex-start;
+  }
+
+  .item-price{
+    font-size:14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <div class="topbar">
+
+    <a class="brand" href="index.html">
+      <span class="brand-mark">RC</span>
+      <span>RADA CREST</span>
+    </a>
+
+    <a class="back" href="account.html">
+      ← My Account
+    </a>
+
+  </div>
+
+  <div id="pageMessage"></div>
+
+  <div id="orderContent"></div>
+
+</div>
+
+<script>
+
+const box =
+  document.getElementById("orderContent");
+
+const message =
+  document.getElementById("pageMessage");
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function money(value){
+  return "₹" +
+    Number(value || 0).toLocaleString("en-IN");
+}
+
+function formatDate(value){
+
+  try{
+
+    return new Date(value).toLocaleString(
+      "en-IN",
+      {
+        day:"2-digit",
+        month:"long",
+        year:"numeric",
+        hour:"numeric",
+        minute:"2-digit",
+        hour12:true
+      }
+    );
+
+  }catch{
+    return "-";
+  }
+}
+
+function cleanImage(value){
+
+  if(!value) return "";
+
+  let url = String(value).trim();
+
+  url = url
+    .replace(/^\[img\]\s*/i,"")
+    .replace(/\s*\[\/img\]$/i,"")
+    .replace(/^["']+|["']+$/g,"")
+    .trim();
+
+  return /^https?:\/\/\S+$/i.test(url)
+    ? url
+    : "";
+}
+
+function statusClass(status){
+
+  return String(status || "pending")
+    .toLowerCase()
+    .replace(/[^a-z]/g,"");
+}
+
+
+/* -----------------------------
+   TRACKING
+----------------------------- */
+
+function getTrackingSteps(status){
+
+  const current =
+    String(status || "pending")
+      .toLowerCase()
+      .trim();
+
+  if(current === "cancelled"){
+    return {
+      cancelled:true,
+      index:-1
+    };
+  }
+
+  const steps = [
+    "pending",
+    "confirmed",
+    "packed",
+    "shipped",
+    "delivered"
+  ];
+
+  let index =
+    steps.indexOf(current);
+
+  /*
+    If your admin uses "processing",
+    treat it as packed-stage progress.
+  */
+  if(current === "processing"){
+    index = 2;
+  }
+
+  if(index < 0){
+    index = 0;
+  }
+
+  return {
+    cancelled:false,
+    index:index
+  };
+}
+
+function renderTracking(status){
+
+  const tracking =
+    getTrackingSteps(status);
+
+  if(tracking.cancelled){
+
+    return `
+      <div class="tracking">
+
+        <h2>Order Tracking</h2>
+
+        <div class="status status-cancelled">
+          Order Cancelled
+        </div>
+
+      </div>
+    `;
+  }
+
+  const labels = [
+    ["pending","Order Placed"],
+    ["confirmed","Confirmed"],
+    ["packed","Packed"],
+    ["shipped","Shipped"],
+    ["delivered","Delivered"]
+  ];
+
+  return `
+    <div class="tracking">
+
+      <h2>Order Tracking</h2>
+
+      <div class="steps">
+
+        ${
+          labels.map((item,index)=>{
+
+            const done =
+              index < tracking.index;
+
+            const active =
+              index === tracking.index;
+
+            return `
+              <div class="step ${done ? "done" : ""} ${active ? "active" : ""}">
+
+                <div class="circle">
+                  ${
+                    done || active
+                      ? "✓"
+                      : index + 1
+                  }
+                </div>
+
+                <div class="step-label">
+                  ${item[1]}
+                </div>
+
+                ${
+                  index < labels.length - 1
+                    ? `<div class="step-line"></div>`
+                    : ""
+                }
+
+              </div>
+            `;
+
+          }).join("")
+        }
+
+      </div>
+
+    </div>
+  `;
+}
+
+
+/* -----------------------------
+   LOAD ORDER
+----------------------------- */
+
+async function loadOrder(){
+
+  if(!window.supabaseClient){
+
+    message.innerHTML =
+      `<div class="card error">
+        Supabase is not configured.
+      </div>`;
+
+    return;
+  }
+
+  const params =
+    new URLSearchParams(location.search);
+
+  const orderId =
+    params.get("id");
+
+  if(!orderId){
+
+    message.innerHTML =
+      `<div class="card error">
+        Order ID is missing.
+      </div>`;
+
+    return;
+  }
+
+  const {
+    data:{
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+  if(!user){
+
+    location.href =
+      "account.html?redirect=" +
+      encodeURIComponent(
+        "order.html?id=" + orderId
+      );
+
+    return;
+  }
+
+
+  /* ORDER */
+
+  const {
+    data:order,
+    error:orderError
+  } =
+    await supabaseClient
+      .from("orders")
+      .select("*")
+      .eq("id",orderId)
+      .eq("user_id",user.id)
+      .maybeSingle();
+
+  if(orderError){
+
+    message.innerHTML =
+      `<div class="card error">
+        ${esc(orderError.message)}
+      </div>`;
+
+    return;
+  }
+
+  if(!order){
+
+    message.innerHTML =
+      `<div class="card error">
+        This order was not found.
+      </div>`;
+
+    return;
+  }
+
+
+  /* ORDER ITEMS */
+
+  const {
+    data:items,
+    error:itemError
+  } =
+    await supabaseClient
+      .from("order_items")
+      .select("*")
+      .eq("order_id",order.id);
+
+  if(itemError){
+
+    console.warn(
+      "Order items:",
+      itemError.message
+    );
+  }
+
+
+  const orderItems =
+    items || [];
+
+
+  /* PRODUCT IMAGES */
+
+  const productIds =
+    orderItems
+      .map(item => item.product_id)
+      .filter(Boolean);
+
+  let productMap =
+    new Map();
+
+  if(productIds.length){
+
+    const {
+      data:products
+    } =
+      await supabaseClient
+        .from("products")
+        .select("id,image_url,image")
+        .in("id",productIds);
+
+    (products || []).forEach(product=>{
+      productMap.set(
+        String(product.id),
+        product
+      );
+    });
+  }
+
+
+  /* TOTAL */
+
+  const calculatedTotal =
+    orderItems.reduce(
+      (sum,item)=>
+        sum +
+        Number(
+          item.quantity || 0
+        ) *
+        Number(
+          item.unit_price ??
+          item.price ??
+          0
+        ),
+      0
+    );
+
+  const total =
+    Number(order.total || 0) > 0
+      ? Number(order.total)
+      : calculatedTotal;
+
+
+  const status =
+    String(
+      order.status || "pending"
+    ).toLowerCase();
+
+
+  /* ITEMS HTML */
+
+  const itemsHtml =
+    orderItems.length
+
+      ?
+
+      orderItems.map(item=>{
+
+        const product =
+          productMap.get(
+            String(item.product_id)
+          );
+
+        const image =
+          cleanImage(
+            product?.image_url ||
+            product?.image ||
+            ""
+          );
+
+        const quantity =
+          Number(item.quantity || 1);
+
+        const price =
+          Number(
+            item.unit_price ??
+            item.price ??
+            0
+          );
+
+        return `
+          <div class="item">
+
+            <div class="item-left">
+
+              ${
+                image
+
+                ?
+
+                `<img
+                  class="item-image"
+                  src="${esc(image)}"
+                  alt="${esc(item.product_name || "Product")}"
+                  onerror="this.style.display='none'"
+                >`
+
+                :
+
+                `<div class="item-image"></div>`
+              }
+
+              <div>
+
+                <div class="item-name">
+                  ${esc(
+                    item.product_name ||
+                    "Product"
+                  )}
+                </div>
+
+                <div class="item-qty">
+                  Quantity: ${quantity}
+                  × ${money(price)}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="item-price">
+              ${money(price * quantity)}
+            </div>
+
+          </div>
+        `;
+
+      }).join("")
+
+      :
+
+      `<div class="empty">
+        Order item details are unavailable.
+      </div>`;
+
+
+  /* PAGE */
+
+  box.innerHTML = `
+
+    <div class="card">
+
+      <div class="order-head">
+
+        <div>
+
+          <div class="order-id">
+            Order #${esc(order.id)}
+          </div>
+
+          <div class="date">
+            ${esc(formatDate(order.created_at))}
+          </div>
+
+          <div class="status status-${statusClass(status)}">
+            ${esc(status)}
+          </div>
+
+        </div>
+
+        <div class="total">
+          ${money(total)}
+        </div>
+
+      </div>
+
+      ${renderTracking(status)}
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Order Items</h2>
+
+      <div class="items">
+        ${itemsHtml}
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Delivery Details</h2>
+
+      <div class="info-grid">
+
+        <div class="info-box">
+
+          <strong>Customer</strong>
+
+          <span>
+            ${esc(order.shipping_name || order.customer_name || user.email || "-")}
+          </span>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <strong>Phone</strong>
+
+          <span>
+            ${esc(order.shipping_phone || order.customer_phone || "-")}
+          </span>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <strong>Email</strong>
+
+          <span>
+            ${esc(order.customer_email || user.email || "-")}
+          </span>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <strong>Payment</strong>
+
+          <span>
+            ${esc(order.payment_method || "COD")}
+            ${
+              order.payment_status
+                ? " • " + esc(order.payment_status)
+                : ""
+            }
+          </span>
+
+        </div>
+
+      </div>
+
+
+      ${
+        order.shipping_address
+
+        ?
+
+        `<div
+          class="info-box"
+          style="margin-top:15px;"
+        >
+
+          <strong>Delivery Address</strong>
+
+          <span>
+            ${esc(order.shipping_address)}
+          </span>
+
+        </div>`
+
+        :
+
+        ""
+      }
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Need Help?</h2>
+
+      <p style="color:#666;line-height:1.6;">
+        If you have any issue with this order,
+        contact RADA CREST support.
+      </p>
+
+      <div class="actions">
+
+        <a
+          class="btn primary"
+          href="https://wa.me/?text=${encodeURIComponent(
+            "Hello RADA CREST, I need help regarding Order #" +
+            order.id
+          )}"
+          target="_blank"
+        >
+          WhatsApp Support
+        </a>
+
+        <a
+          class="btn secondary"
+          href="index.html#products"
+        >
+          Continue Shopping
+        </a>
+
+        <a
+          class="btn secondary"
+          href="account.html"
+        >
+          My Account
+        </a>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
+loadOrder();
+
+</script>
+
+</body>
+</html>
