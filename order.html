@@ -720,10 +720,8 @@ async function submitReview(){
     return;
   }
 
-  // Product ID ko alag-alag jagah se dhoondhne ki koshish karein
-  const prodId = window.currentReviewProductId || window.activeReviewProductId || (document.getElementById("reviewProductId") ? document.getElementById("reviewProductId").value : null);
-
-  if(!prodId){
+  // openReview wala global variable seedha use karein
+  if(!window.reviewProductId){
     if(messageBox) messageBox.textContent = "Error: Product ID is missing. Please reopen the review popup.";
     return;
   }
@@ -735,13 +733,10 @@ async function submitReview(){
   if(messageBox) messageBox.textContent = "Processing review and photos...";
 
   try {
-    let ratingValue = 5; 
-    const starBtn = document.querySelector(".review-star[data-rating].active");
+    let ratingValue = window.reviewRating || 5; 
+    const starBtn = document.querySelector(".review-star[data-rating].selected, .review-star[data-rating].active");
     if(starBtn) {
-      ratingValue = Number(starBtn.getAttribute("data-rating")) || 5;
-    } else {
-      const activeStarsCount = document.querySelectorAll(".review-star.active").length;
-      if(activeStarsCount > 0) ratingValue = activeStarsCount;
+      ratingValue = Number(starBtn.getAttribute("data-rating")) || ratingValue;
     }
 
     if(files && files.length > 0){
@@ -770,19 +765,23 @@ async function submitReview(){
       }
     }
 
-    const custName = window.currentCustomerName || "Customer";
     const { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user){
+      if(messageBox) messageBox.textContent = "Please login first.";
+      return;
+    }
 
+    // Upsert use kar rahe hain taaki agar review pehle se ho toh update ho jaye, naya ho toh insert ho jaye
     const { error: insertError } = await supabaseClient
       .from("product_reviews")
-      .insert({
-        product_id: prodId,
-        customer_name: custName,
+      .upsert({
+        product_id: window.reviewProductId,
+        user_id: user.id,
+        customer_name: user.user_metadata?.full_name || user.email || "Customer",
         rating: ratingValue,
         review: reviewText,
-        photo_urls: photoUrls.length > 0 ? photoUrls : null,
-        user_id: user ? user.id : null
-      });
+        photo_urls: photoUrls.length > 0 ? photoUrls : null
+      }, { onConflict: 'product_id,user_id' });
 
     if(insertError){
       console.error("Database error:", insertError);
@@ -792,7 +791,8 @@ async function submitReview(){
 
     if(messageBox) messageBox.textContent = "Review submitted successfully!";
     setTimeout(() => {
-      if(typeof closeReview === "function") closeReview();
+      const reviewModal = document.getElementById("reviewModal");
+      if(reviewModal) reviewModal.classList.remove("show");
       location.reload();
     }, 1500);
 
