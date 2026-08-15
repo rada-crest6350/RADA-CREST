@@ -74,7 +74,7 @@
       line-height: 1.6;
     }
 
-    /* Premium Order Card */
+    /* Order Card */
     .order-card {
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
@@ -84,7 +84,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
     }
 
     .order-info h3 {
@@ -107,11 +106,9 @@
       border-radius: 30px;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    /* Form Fields */
     label {
       display: block;
       margin-top: 22px;
@@ -133,7 +130,6 @@
       font-family: inherit;
       background-color: #ffffff;
       color: var(--text-main);
-      transition: all 0.25s ease;
     }
 
     select:focus, textarea:focus {
@@ -147,7 +143,6 @@
       min-height: 130px;
     }
 
-    /* Modern Dropzone Style Upload Box */
     .file-upload-box {
       background: #f8fafc;
       border: 2px dashed var(--border);
@@ -155,20 +150,8 @@
       padding: 20px;
       text-align: center;
       margin-top: 8px;
-      transition: border-color 0.2s;
-    }
-    .file-upload-box:hover {
-      border-color: var(--accent);
     }
 
-    .file-upload-box input {
-      border: none;
-      background: transparent;
-      padding: 0;
-      cursor: pointer;
-    }
-
-    /* Policy Highlight Box */
     .policy-box {
       background: #eef2ff;
       border: 1px solid #c7d2fe;
@@ -185,11 +168,6 @@
       padding: 0;
     }
 
-    .policy-box li {
-      margin-bottom: 4px;
-    }
-
-    /* High-End Button */
     .submit-btn {
       background: var(--accent);
       color: #fff;
@@ -200,17 +178,12 @@
       font-weight: 700;
       border-radius: 14px;
       cursor: pointer;
-      transition: all 0.2s ease, transform 0.1s ease;
       box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+      transition: background 0.2s;
     }
 
     .submit-btn:hover {
       background: var(--accent-hover);
-      box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
-    }
-
-    .submit-btn:active {
-      transform: scale(0.99);
     }
 
     #returnMsg {
@@ -220,56 +193,32 @@
       text-align: center;
     }
 
-    /* Missing ID Error Screen */
-    .error-state {
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 20px;
+      border-radius: 12px;
       text-align: center;
-      padding: 40px 20px;
-    }
-    .error-state h2 {
-      color: var(--danger);
-      margin-bottom: 10px;
-    }
-    .error-state p {
-      color: var(--text-muted);
-      margin-bottom: 25px;
-    }
-    .error-btn {
-      display: inline-block;
-      background: var(--primary);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    @media (max-width: 650px) {
-      .container {
-        padding: 25px 20px;
-      }
-      .order-card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-      }
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
 <div class="container" id="mainContainer">
-  <a href="order.html" id="backLink" class="back-link">&larr; Back to Order Details</a>
+  <a href="order.html" id="backLink" class="back-link">&larr; Back to Orders</a>
   
   <h1 class="header-title">Return & Replacement</h1>
-  <p class="subtitle">Facing issues with your order? Submit your request below for quick assistance.</p>
+  <p class="subtitle">Submit your request for this specific order below.</p>
 
   <!-- Order Details Display Card -->
   <div class="order-card" id="orderCardWrapper">
     <div class="order-info">
       <h3 id="displayOrderId">Loading Order...</h3>
-      <p id="displayProductDetails">Please wait while we fetch your details</p>
+      <p id="displayProductDetails">Fetching product details...</p>
     </div>
-    <div class="badge" id="orderStatusBadge">Secure</div>
+    <div class="badge" id="orderStatusBadge">Verifying</div>
   </div>
 
   <!-- Return Request Form -->
@@ -281,8 +230,8 @@
       <option value="Replacement">Replacement</option>
     </select>
 
-    <label for="returnReason">Select Reason</label>
-    <select id="returnReason" required>
+    <label for="requestReason">Select Reason</label>
+    <select id="requestReason" required>
       <option value="">-- Choose Issue Reason --</option>
       <option value="Product damaged">Product damaged / Broken</option>
       <option value="Wrong product received">Wrong product received</option>
@@ -297,7 +246,7 @@
     <label for="returnDesc">Detailed Description</label>
     <textarea id="returnDesc" placeholder="Describe the problem clearly..." required></textarea>
 
-    <!-- Photo and Unboxing Video Upload -->
+    <!-- Photo & Video Upload -->
     <label for="returnMedia">Upload Photos / Unboxing Video (Up to 5 files)</label>
     <div class="file-upload-box">
       <input type="file" id="returnMedia" multiple accept="image/*,video/*">
@@ -307,9 +256,9 @@
     <div class="policy-box">
       <strong>Quick Guidelines:</strong>
       <ul>
-        <li>Requests must be raised within the valid return window.</li>
-        <li>Ensure items include original packaging, tags, and accessories.</li>
-        <li>Inspection & processing usually takes 2-3 business days.</li>
+        <li>Raise request within the valid return policy window.</li>
+        <li>Include original packaging, tags, and accessories.</li>
+        <li>Processing takes 2-3 business days post inspection.</li>
       </ul>
     </div>
 
@@ -321,7 +270,6 @@
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Supabase Configuration
   const SUPABASE_URL = "AAPKA_SUPABASE_URL"; 
   const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -329,14 +277,14 @@
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('id');
 
-  // Handle Missing Order ID Gracefully
   window.addEventListener('DOMContentLoaded', async () => {
+    // Agar URL mein ID nahi hai, toh error dikhao taaki user ko pata chale ki galat tarike se aaye hain
     if (!orderId) {
       document.getElementById("mainContainer").innerHTML = `
-        <div class="error-state">
-          <h2>Order ID is missing</h2>
-          <p>Please navigate from your orders page to submit a return or replacement request.</p>
-          <a href="order.html" class="error-btn">Go to Orders</a>
+        <div class="error-box">
+          <h3>Order ID Missing!</h3>
+          <p>Kripya apne Orders page se kisi specific order par click karke Return/Replacement page par aayein.</p>
+          <a href="order.html" style="color: #4f46e5; font-weight: 700; text-decoration: underline;">Go to My Orders</a>
         </div>
       `;
       return;
@@ -346,23 +294,31 @@
     document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
 
     try {
+      // Supabase se WAHI EXACT order fetch karo jo URL mein diya gaya hai
       const { data, error } = await supabaseClient
         .from('orders')
         .select('*')
         .eq('id', orderId)
         .single();
 
-      if (data) {
-        const productName = data.product_name || data.item_name || "RADA-CREST Product";
-        const productPrice = data.total_amount || data.price || "999";
-        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
-        document.getElementById("orderStatusBadge").textContent = data.status || "Delivered";
-      } else {
-        document.getElementById("displayProductDetails").textContent = `Order Verified Successfully`;
+      if (error || !data) {
+        document.getElementById("displayProductDetails").textContent = `Order #${orderId} (Details not found)`;
+        document.getElementById("orderStatusBadge").textContent = "Valid";
+        return;
       }
+
+      // Database se aane wali real product details set karo
+      const productName = data.product_name || data.item_name || "RADA-CREST Product";
+      const productPrice = data.total_amount || data.price || "0";
+      const orderStatus = data.status || "Delivered";
+
+      document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
+      document.getElementById("orderStatusBadge").textContent = orderStatus;
+
     } catch (err) {
-      console.error("Fetch error:", err);
-      document.getElementById("displayProductDetails").textContent = `Order #${orderId} Verified`;
+      console.error("Error fetching order:", err);
+      document.getElementById("displayProductDetails").textContent = `Order ID: #${orderId}`;
+      document.getElementById("orderStatusBadge").textContent = "Verified";
     }
   });
 
@@ -372,7 +328,7 @@
     const msg = document.getElementById("returnMsg");
     const submitBtn = document.getElementById("submitBtn");
     const requestType = document.getElementById("requestType").value;
-    const reason = document.getElementById("returnReason").value;
+    const reason = document.getElementById("requestReason").value;
     const description = document.getElementById("returnDesc").value.trim();
     const fileInput = document.getElementById("returnMedia");
     const files = fileInput ? fileInput.files : [];
@@ -380,7 +336,7 @@
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
     msg.style.color = "var(--accent)";
-    msg.textContent = "Uploading files & submitting request...";
+    msg.textContent = "Uploading media files & submitting request...";
 
     try {
       const { data: { user } } = await supabaseClient.auth.getUser();
@@ -405,7 +361,6 @@
             .upload(fileName, file);
 
           if (uploadError) {
-            console.error("Storage upload error:", uploadError);
             msg.style.color = "var(--danger)";
             msg.textContent = "Upload Error: " + uploadError.message;
             submitBtn.disabled = false;
@@ -435,7 +390,6 @@
         });
 
       if (insertError) {
-        console.error("Database error:", insertError);
         msg.style.color = "var(--danger)";
         msg.textContent = "Database Error: " + insertError.message;
         submitBtn.disabled = false;
@@ -451,7 +405,6 @@
       }, 2000);
 
     } catch (err) {
-      console.error("Error:", err);
       msg.style.color = "var(--danger)";
       msg.textContent = "Something went wrong: " + err.message;
       submitBtn.disabled = false;
