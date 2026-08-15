@@ -711,73 +711,95 @@ function closeReview(){
 }
 
 async function submitReview(){
-  const ratingBtn = document.querySelector(".review-star.active"); // ya jo bhi aapka rating select karne ka tareeqa ho
   const textInput = document.getElementById("reviewText");
   const fileInput = document.getElementById("reviewPhotos");
   const messageBox = document.getElementById("reviewMessage");
 
-  if(!textInput || !fileInput) return;
+  if(!textInput){
+    if(messageBox) messageBox.textContent = "Review text box not found.";
+    return;
+  }
 
   const reviewText = textInput.value.trim();
-  const files = fileInput.files;
+  const files = fileInput ? fileInput.files : [];
   let photoUrls = [];
 
-  if(messageBox) messageBox.textContent = "Uploading photos & submitting review...";
+  if(messageBox) messageBox.textContent = "Processing review and photos...";
 
   try {
-    // Agar photos select ki gayi hain toh loop chala kar upload karein
+    // 1. Star rating value nikalna
+    let ratingValue = 5; 
+    const starBtn = document.querySelector(".review-star[data-rating].active");
+    if(starBtn) {
+      ratingValue = Number(starBtn.getAttribute("data-rating")) || 5;
+    } else {
+      // Agar koi dusra tareeqa ho active stars count karne ka
+      const activeStarsCount = document.querySelectorAll(".review-star.active").length;
+      if(activeStarsCount > 0) ratingValue = activeStarsCount;
+    }
+
+    // 2. Multiple photos (max 5) ko Supabase Storage mein upload karna
     if(files && files.length > 0){
-      const limit = Math.min(files.length, 5); // Max 5 photos limit
+      const limit = Math.min(files.length, 5); // Maximum 5 photos limit
       
       for(let i = 0; i < limit; i++){
         const file = files[i];
         const fileName = `review_${Date.now()}_${i}_${file.name}`;
         
-        const { data, error } = await supabaseClient.storage
-          .from("reviews-media") // Apne bucket ka naam yahan check kar lein
+        const { error: uploadError } = await supabaseClient.storage
+          .from("reviews-media") // Apne Supabase storage bucket ka naam yahan confirm kar lein
           .upload(fileName, file);
 
-        if(!error){
-          const { data: publicUrlData } = supabaseClient.storage
-            .from("reviews-media")
-            .getPublicUrl(fileName);
-            
-          if(publicUrlData && publicUrlData.publicUrl){
-            photoUrls.push(publicUrlData.publicUrl);
-          }
+        if(uploadError){
+          console.error("Storage upload error:", uploadError);
+          continue;
+        }
+
+        const { data: publicUrlData } = supabaseClient.storage
+          .from("reviews-media")
+          .getPublicUrl(fileName);
+          
+        if(publicUrlData && publicUrlData.publicUrl){
+          photoUrls.push(publicUrlData.publicUrl);
         }
       }
     }
 
-    // Database mein insert karein (photo_urls array ke sath)
+    // 3. Global variables ya order details se Product ID aur Order ID lena
+    const prodId = window.currentReviewProductId || window.activeReviewProductId;
+    const ordId = window.currentReviewOrderId || new URLSearchParams(location.search).get("id");
+    const custName = window.currentCustomerName || "Customer";
+
+    // 4. Database mein multiple photo URLs array (`photo_urls`) ke sath insert/upsert karna
     const { error: insertError } = await supabaseClient
       .from("product_reviews")
-      .insert({
-        product_id: currentProductId, // Jo bhi aapke variable ka naam ho
-        order_id: currentOrderId,     // Jo bhi aapke order ID ka variable ho
-        customer_name: currentCustomerName,
-        rating: selectedRating,       // Jo rating user ne di ho
+      .upsert({
+        product_id: prodId,
+        order_id: ordId,
+        customer_name: custName,
+        rating: ratingValue,
         review: reviewText,
-        photo_urls: photoUrls         // Yeh multiple photos ka array save karega
-      });
+        photo_urls: photoUrls.length > 0 ? photoUrls : null
+      }, { onConflict: 'order_id,product_id' });
 
     if(insertError){
-      console.error(insertError);
-      if(messageBox) messageBox.textContent = "Error submitting review. Please try again.";
+      console.error("Database error:", insertError);
+      if(messageBox) messageBox.textContent = "Error: " + insertError.message;
       return;
     }
 
     if(messageBox) messageBox.textContent = "Review submitted successfully!";
     setTimeout(() => {
-      closeReview();
+      if(typeof closeReview === "function") closeReview();
       location.reload();
     }, 1500);
 
   } catch(err){
-    console.error(err);
-    if(messageBox) messageBox.textContent = "Something went wrong.";
+    console.error("Catch error:", err);
+    if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
 }
+  
   
 /* -----------------------------
    LOAD ORDER
