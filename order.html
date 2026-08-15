@@ -720,7 +720,7 @@ async function submitReview(){
     return;
   }
 
-  // openReview wala global variable seedha use karein
+  // Yahan hum openReview wale variable ko check kar rahe hain
   if(!window.reviewProductId){
     if(messageBox) messageBox.textContent = "Error: Product ID is missing. Please reopen the review popup.";
     return;
@@ -734,9 +734,9 @@ async function submitReview(){
 
   try {
     let ratingValue = window.reviewRating || 5; 
-    const starBtn = document.querySelector(".review-star[data-rating].selected, .review-star[data-rating].active");
-    if(starBtn) {
-      ratingValue = Number(starBtn.getAttribute("data-rating")) || ratingValue;
+    const starBtn = document.querySelector(".review-star.selected, .review-star.active");
+    if(starBtn && starBtn.dataset.rating) {
+      ratingValue = Number(starBtn.dataset.rating) || ratingValue;
     }
 
     if(files && files.length > 0){
@@ -771,7 +771,6 @@ async function submitReview(){
       return;
     }
 
-    // Upsert use kar rahe hain taaki agar review pehle se ho toh update ho jaye, naya ho toh insert ho jaye
     const { error: insertError } = await supabaseClient
       .from("product_reviews")
       .upsert({
