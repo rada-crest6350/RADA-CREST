@@ -476,7 +476,8 @@ body{
     <div class="review-upload">
       <strong>Add Product Photos</strong>
       <div style="color:#777;font-size:13px;margin:5px 0 10px;">You can upload up to 5 photos.</div>
-      <input id="reviewPhotos" type="file" accept="image/*" multiple>
+      <label>Upload Photos:</label>
+      <input id="reviewPhotos" type="file" accept="image/*" multiple accept="image/*">
       <div id="reviewPreview" class="review-preview"></div>
     </div>
     <div id="reviewMessage" class="review-message"></div>
@@ -729,7 +730,7 @@ async function submitReview(){
 
   const reviewText = textInput.value.trim();
   const files = fileInput ? fileInput.files : [];
-  let photoUrls = [];
+  let photoUrls = []; // Yahan spelling 'photoUrls' rakhi hai (U capital)
 
   if(messageBox) messageBox.textContent = "Processing review and photos...";
 
@@ -748,37 +749,36 @@ async function submitReview(){
         const fileName = `review_${Date.now()}_${i}_${file.name}`;
         
         // Supabase Storage upload
-        const { error: uploadError } = await supabaseClient.storage
+        const { error: uploadError } = await window.supabaseClient.storage
           .from("product-review-images")
           .upload(fileName, file);
 
         if(uploadError){
           console.error("Storage upload error:", uploadError);
-          // Yahan screen par error dikha denge taaki pata chale kya dikkat hai
           if(messageBox) messageBox.textContent = "Upload Error: " + uploadError.message;
           return; 
         }
 
-        const { data: publicUrlData } = supabaseClient.storage
+        const { data: publicUrlData } = window.supabaseClient.storage
           .from("product-review-images")
           .getPublicUrl(fileName);
           
         if(publicUrlData && publicUrlData.publicUrl){
           photoUrls.push(publicUrlData.publicUrl);
         } else {
-          const publicUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/product-review-images/${fileName}`;
+          const publicUrl = `${window.supabaseClient.supabaseUrl}/storage/v1/object/public/product-review-images/${fileName}`;
           photoUrls.push(publicUrl);
         }
       }
     }
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
     if(!user){
       if(messageBox) messageBox.textContent = "Please login first.";
       return;
     }
 
-    const { error: insertError } = await supabaseClient
+    const { error: insertError } = await window.supabaseClient
       .from("product_reviews")
       .upsert({
         product_id: prodId,
@@ -786,7 +786,7 @@ async function submitReview(){
         customer_name: user.user_metadata?.full_name || user.email || "Customer",
         rating: ratingValue,
         review: reviewText,
-        photo_urls: photoUrls.length > 0 ? photoUrls : null
+        photo_urls: photoUrls.length > 0 ? photoUrls : null // Yahan bhi sahi variable hai
       }, { onConflict: 'product_id,user_id' });
 
     if(insertError){
