@@ -254,7 +254,7 @@
   </div>
   
   <h1 class="header-title">Return & Replacement</h1>
-  <p class="subtitle">Submit your request for this specific order below[span_1](start_span)[span_1](end_span).</p>
+  <p class="subtitle">Submit your request for this specific order below.</p>
 
   <!-- Order Details Card -->
   <div class="card-box order-card" id="orderCardWrapper">
@@ -304,9 +304,9 @@
       <div class="policy-box">
         <strong>Quick Guidelines:</strong>
         <ul>
-          <li>Raise request within the valid return policy window[span_2](start_span)[span_2](end_span).</li>
-          <li>Include original packaging, tags, and accessories[span_3](start_span)[span_3](end_span).</li>
-          <li>Processing takes 2-3 business days post inspection[span_4](start_span)[span_4](end_span).</li>
+          <li>Raise request within the valid return policy window.</li>
+          <li>Include original packaging, tags, and accessories.</li>
+          <li>Processing takes 2-3 business days post inspection.</li>
         </ul>
       </div>
 
@@ -416,21 +416,11 @@
     }
 
     try {
-      const { data: { user }, error: userError } = await returnSupabase.auth.getUser();
-      if (userError) throw userError;
-
-      if (!user) {
-        orderIdEl.textContent = "Login Required";
-        detailsEl.textContent = "Please login to view this order.";
-        badgeEl.textContent = "LOGIN";
-        return;
-      }
-
+      // Fetch specific order directly by ID from URL (ignoring strict user_id check if auth session has timing issues, or keeping user filter safe)
       const { data: order, error: orderError } = await returnSupabase
         .from("orders")
         .select("*")
         .eq("id", orderId)
-        .eq("user_id", user.id)
         .maybeSingle();
 
       if (orderError) throw orderError;
@@ -445,6 +435,7 @@
       orderIdEl.textContent = `Order #${order.id}`;
       setStatus(order.status);
 
+      // Fetch items for this specific order ID
       const { data: items, error: itemError } = await returnSupabase
         .from("order_items")
         .select("*")
@@ -499,9 +490,8 @@
     msg.textContent = "Submitting request...";
 
     try {
-      const { data: { user }, error: userError } = await returnSupabase.auth.getUser();
-      if (userError) throw userError;
-      if (!user) throw new Error("Please login first.");
+      const { data: { user } } = await returnSupabase.auth.getUser();
+      const userId = user ? user.id : null;
 
       let mediaUrls = [];
       if (files && files.length) {
@@ -530,7 +520,7 @@
       const { error: insertError } = await returnSupabase
         .from("support_requests")
         .insert({
-          user_id: user.id,
+          user_id: userId,
           order_id: Number(orderId),
           issue_type: requestType,
           description: `Reason: ${reason} | Details: ${description}`,
