@@ -420,7 +420,22 @@ body{
   margin-top:10px;
   font-size:14px;
 }
-
+.action-btn.return-btn {
+  background: #0f172a;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  transition: background 0.2s;
+}
+.action-btn.return-btn:hover {
+  background: #1e293b;
+}
+  
 @media(max-width:700px){
   .page{ padding:12px; }
   .order-head{ flex-direction:column; }
@@ -978,7 +993,7 @@ async function loadOrder(){
         <a class="btn primary" href="https://wa.me/919079714767?text=${encodeURIComponent("Hello RADA CREST, I need help regarding Order #" + order.id)}" target="_blank">WhatsApp Support</a>
         <a class="btn secondary" href="index.html#products">Continue Shopping</a>
         <a class="btn secondary" href="account.html">My Account</a>
-        <a href="return.html?id=${order.id}">Return / Replace</a>
+        <a href="return.html?id=${order.id}">class="action-btn Return / Replace</a>
       </div>
     </div>
   `;
