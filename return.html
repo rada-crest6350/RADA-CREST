@@ -204,10 +204,10 @@
   <!-- Order Details Display Card -->
   <div class="order-card" id="orderCardWrapper">
     <div class="order-info">
-      <h3 id="displayOrderId">Order ID: #46</h3>
-      <p id="displayProductDetails">Lala • ₹999</p>
+      <h3 id="displayOrderId">Loading Order...</h3>
+      <p id="displayProductDetails">Fetching product details...</p>
     </div>
-    <div class="badge" id="orderStatusBadge">COD • Pending</div>
+    <div class="badge" id="orderStatusBadge">Loading</div>
   </div>
 
   <!-- Return Request Form -->
@@ -266,9 +266,35 @@
   const urlParams = new URLSearchParams(window.location.search);
   let orderId = urlParams.get('id') || "46";
 
-  // Back link set karna dynamic ID ke sath
   document.getElementById("backLink").href = `order.html?id=${orderId}`;
   document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
+
+  // Supabase se real order status fetch karna
+  window.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const { data, error } = await supabaseClient
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .maybeSingle();
+
+      if (data) {
+        const productName = data.product_name || data.item_name || data.title || "Lala";
+        const productPrice = data.total_amount || data.price || "999";
+        const orderStatus = data.status || "Delivered"; // Database wala status
+
+        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
+        document.getElementById("orderStatusBadge").textContent = orderStatus;
+      } else {
+        document.getElementById("displayProductDetails").textContent = `Lala • ₹999`;
+        document.getElementById("orderStatusBadge").textContent = "Delivered";
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      document.getElementById("displayProductDetails").textContent = `Lala • ₹999`;
+      document.getElementById("orderStatusBadge").textContent = "Delivered";
+    }
+  });
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
