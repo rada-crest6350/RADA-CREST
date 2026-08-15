@@ -720,6 +720,14 @@ async function submitReview(){
     return;
   }
 
+  // Product ID ko alag-alag jagah se dhoondhne ki koshish karein
+  const prodId = window.currentReviewProductId || window.activeReviewProductId || (document.getElementById("reviewProductId") ? document.getElementById("reviewProductId").value : null);
+
+  if(!prodId){
+    if(messageBox) messageBox.textContent = "Error: Product ID is missing. Please reopen the review popup.";
+    return;
+  }
+
   const reviewText = textInput.value.trim();
   const files = fileInput ? fileInput.files : [];
   let photoUrls = [];
@@ -762,9 +770,7 @@ async function submitReview(){
       }
     }
 
-    const prodId = window.currentReviewProductId || window.activeReviewProductId;
     const custName = window.currentCustomerName || "Customer";
-
     const { data: { user } } = await supabaseClient.auth.getUser();
 
     const { error: insertError } = await supabaseClient
