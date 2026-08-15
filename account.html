@@ -1250,8 +1250,42 @@ async function loadOrders(user){
 
 
             ${addressHTML}
+            
+  <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
 
-          </article>
+  <a
+    href="order.html?id=${encodeURIComponent(order.id)}"
+    style="
+      display:inline-block;
+      padding:12px 18px;
+      border-radius:10px;
+      background:#f5f1e8;
+      color:#111;
+      text-decoration:none;
+      font-weight:600;
+    "
+  >
+    View Order →
+  </a>
+
+  <a
+    href="return.html?id=${encodeURIComponent(order.id)}"
+    style="
+      display:inline-block;
+      padding:12px 18px;
+      border-radius:10px;
+      background:#111;
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+    "
+  >
+    Return / Replace
+  </a>
+
+</div>
+</article>
+
         `;
 
       })
