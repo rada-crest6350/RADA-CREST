@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Return, Refund & Support - RADA-CREST</title>
+  <title>Return & Replacement - RADA-CREST</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,55 +13,12 @@
       color: #333;
     }
     .container {
-      max-width: 800px;
+      max-width: 700px;
       margin: 0 auto;
       background: #fff;
       padding: 30px;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    h1, h2 {
-      color: #111;
-    }
-    p, li {
-      line-height: 1.6;
-      color: #555;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    .support-box {
-      margin-top: 30px;
-      background: #f1f3f5;
-      padding: 20px;
-      border-radius: 6px;
-    }
-    .support-box input, .support-box textarea, .support-box select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    .support-box button {
-      background: #000;
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-weight: bold;
-      width: 100%;
-    }
-    .support-box button:hover {
-      background: #333;
-    }
-    #msg {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
     }
     .back-link {
       display: inline-block;
@@ -73,108 +30,273 @@
     .back-link:hover {
       text-decoration: underline;
     }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+    .order-summary-box {
+      background: #fdfdfd;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .order-summary-box h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: #222;
+    }
+    .product-info {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    select, textarea, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+    textarea {
+      resize: vertical;
+    }
+    .policy-notes {
+      background: #f1f3f5;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #444;
+      margin: 20px 0;
+    }
+    .policy-notes ul {
+      margin: 5px 0 0 20px;
+      padding: 0;
+    }
+    .submit-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 14px;
+      width: 100%;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .submit-btn:hover {
+      background: #333;
+    }
+    #returnMsg {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <a href="index.html" class="back-link">&larr; Home par wapas jayein</a>
+  <a href="order.html" class="back-link">&larr; Back to Order</a>
   
-  <h1>Return, Refund & Delivery Policy</h1>
-  <p>Humari koshish hamesha yeh rehti hai ki aapko behtareen product mile. Lekin agar delivery ke baad koi samasya aati hai, toh aap neeche diye gaye niyamo ke tahat madad le sakte hain:</p>
+  <h1>Return / Replacement Request</h1>
+  <p class="subtitle">We're sorry your product didn't work out. Tell us what happened and we'll help you.</p>
 
-  <h2>1. Return & Replacement (Wapsi aur Badlaav)</h2>
-  <ul>
-    <li>Aap product milne ke <strong>3 se 7 dinon</strong> ke andar return ya replacement ke liye request kar sakte hain.</li>
-    <li>Product original packaging, tags, aur unused condition mein hona chahiye.</li>
-  </ul>
+  <!-- Order & Product Info Box -->
+  <div class="order-summary-box" id="orderSummaryBox">
+    <h3>Order Details</h3>
+    <div class="product-info" id="displayOrderId">Order ID: Loading...</div>
+    <div class="product-info" id="displayProductDetails">Product: Loading...</div>
+  </div>
 
-  <h2>2. Refund Process (Pese Wapsi)</h2>
-  <ul>
-    <li>Online payment karne par refund aapke original payment source par 3-5 working days mein bhej diya jata hai.</li>
-    <li>COD (Cash on Delivery) ke mamle mein, customer ki bank details ya UPI ID lekar refund transfer kiya jata hai.</li>
-  </ul>
-
-  <h2>3. Damaged / Defective Items</h2>
-  <ul>
-    <li>Agar tula hua ya kharab product mila hai, toh unboxing ki video ya photo ke sath turant humein report karein.</li>
-  </ul>
-
-  <!-- Customer Support / Raise Issue Form -->
-  <div class="support-box">
-    <h2>Help & Support Request Form</h2>
-    <p>Agar aapko order se judi koi bhi samasya hai, toh yahan details bharkar request bhej sakte hain:</p>
+  <!-- Form for Return -->
+  <form id="returnForm" onsubmit="handleReturnSubmit(event)">
     
-    <label for="orderId">Order ID (Agar hai):</label>
-    <input type="text" id="orderId" placeholder="Jaise: 46">
-
-    <label for="issueType">Samasya ka prakar (Issue Type):</label>
-    <select id="issueType">
-      <option value="Return / Replacement">Return / Replacement</option>
-      <option value="Refund Issue">Refund Issue</option>
-      <option value="Damaged Product">Damaged Product (Tuta hua product)</option>
-      <option value="Other">Anya (Other)</option>
+    <label for="requestType">Select Request Type:</label>
+    <select id="requestType" required>
+      <option value="Return & Refund">Return & Refund</option>
+      <option value="Replacement">Replacement</option>
     </select>
 
-    <label for="issueDesc">Apni samasya विस्तार se likhein:</label>
-    <textarea id="issueDesc" rows="4" placeholder="Apni problem yahan batayein..."></textarea>
+    <label for="returnReason">Select Reason:</label>
+    <select id="returnReason" required>
+      <option value="">-- Choose Reason --</option>
+      <option value="Product damaged">Product damaged (Tuta hua)</option>
+      <option value="Wrong product received">Wrong product received (Galat item)</option>
+      <option value="Product not working">Product not working (Kaam nahi kar raha)</option>
+      <option value="Product is different from description">Product is different from description</option>
+      <option value="Missing parts/accessories">Missing parts/accessories</option>
+      <option value="Quality issue">Quality issue</option>
+      <option value="Changed my mind">Changed my mind</option>
+      <option value="Other">Other</option>
+    </select>
 
-    <button onclick="submitSupportIssue()">Request Submit Karein</button>
-    <div id="msg"></div>
-  </div>
+    <label for="returnDesc">Tell us more (Description):</label>
+    <textarea id="returnDesc" rows="4" placeholder="Please explain the issue with the product..." required></textarea>
+
+    <label for="returnPhotos">Upload Photos (Up to 5 photos):</label>
+    <input type="file" id="returnPhotos" multiple accept="image/*">
+
+    <!-- Policy Box -->
+    <div class="policy-notes">
+      <strong>Return Policy Highlights:</strong>
+      <ul>
+        <li>Return requests must be submitted within valid delivery window.</li>
+        <li>Product should be returned in acceptable original condition.</li>
+        <li>Refund/Replacement is processed after inspection.</li>
+      </ul>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">Submit Return Request</button>
+    <div id="returnMsg"></div>
+  </form>
 </div>
 
-<!-- Supabase CDN -->
+<!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Supabase Client initialize (Aapke project ke anusar)
+  // Supabase Initialization (Aapke project credentials ke mutabiq)
   const SUPABASE_URL = "AAPKA_SUPABASE_URL"; 
   const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  async function submitSupportIssue(){
-    const orderId = document.getElementById("orderId").value.trim();
-    const issueType = document.getElementById("issueType").value;
-    const issueDesc = document.getElementById("issueDesc").value.trim();
-    const msg = document.getElementById("msg");
+  // URL se Order ID nikalna (e.g., return.html?id=46)
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('id');
 
-    if(!issueDesc){
-      msg.style.color = "red";
-      msg.textContent = "Kripya apni samasya (description) zaroor likhein.";
+  window.addEventListener('DOMContentLoaded', async () => {
+    if (!orderId) {
+      document.getElementById("orderSummaryBox").innerHTML = "<p style='color:red;'>Error: No Order ID provided in URL.</p>";
       return;
     }
 
-    // User check
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if(!user){
+    document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
+
+    // Optional: Database se order ki details fetch karna taaki product ka naam dikh sake
+    try {
+      const { data, error } = await supabaseClient
+        .from('orders') // ya aapka jo bhi orders table ho
+        .select('*')
+        .eq('id', orderId)
+        .single();
+
+      if (data) {
+        // Aapke table structure ke hisab se product name ya items display karna
+        document.getElementById("displayProductDetails").textContent = `Details loaded successfully for Order #${orderId}`;
+      }
+    } catch (err) {
+      console.log("Could not fetch extra order details, proceeding with ID.");
+    }
+  });
+
+  async function handleReturnSubmit(event) {
+    event.preventDefault();
+    
+    const msg = document.getElementById("returnMsg");
+    const submitBtn = document.getElementById("submitBtn");
+    const requestType = document.getElementById("requestType").value;
+    const reason = document.getElementById("returnReason").value;
+    const description = document.getElementById("returnDesc").value.trim();
+    const fileInput = document.getElementById("returnPhotos");
+    const files = fileInput ? fileInput.files : [];
+
+    if (!orderId) {
       msg.style.color = "red";
-      msg.textContent = "Pehle login karna zaroori hai.";
+      msg.textContent = "Invalid Order ID.";
       return;
     }
 
+    submitBtn.disabled = true;
     msg.style.color = "blue";
-    msg.textContent = "Request bhej rahe hain...";
+    msg.textContent = "Submitting return request and uploading photos...";
 
-    // Database mein support_requests table mein data insert karne ke liye
-    const { error } = await supabaseClient
-      .from("support_requests")
-      .insert({
-        user_id: user.id,
-        order_id: orderId ? Number(orderId) : null,
-        issue_type: issueType,
-        description: issueDesc,
-        status: "Pending"
-      });
+    try {
+      // User check
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        msg.style.color = "red";
+        msg.textContent = "Please login first.";
+        submitBtn.disabled = false;
+        return;
+      }
 
-    if(error){
-      console.error("Error:", error);
-      msg.style.color = "red";
-      msg.textContent = "Error: " + error.message;
-    } else {
+      let photoUrls = [];
+
+      // Agar photos select ki hain toh Supabase Storage mein upload karna
+      if (files && files.length > 0) {
+        const limit = Math.min(files.length, 5);
+        for (let i = 0; i < limit; i++) {
+          const file = files[i];
+          const fileName = `return_${orderId}_${Date.now()}_${i}_${file.name}`;
+          
+          const { error: uploadError } = await supabaseClient.storage
+            .from("product-review-images") // Aap chahein toh naya bucket bhi bana sakte hain ya isi mein rakh sakte hain
+            .upload(fileName, file);
+
+          if (uploadError) {
+            console.error("Storage upload error:", uploadError);
+            msg.style.color = "red";
+            msg.textContent = "Photo Upload Error: " + uploadError.message;
+            submitBtn.disabled = false;
+            return;
+          }
+
+          const { data: publicUrlData } = supabaseClient.storage
+            .from("product-review-images")
+            .getPublicUrl(fileName);
+            
+          if (publicUrlData && publicUrlData.publicUrl) {
+            photoUrls.push(publicUrlData.publicUrl);
+          }
+        }
+      }
+
+      // Database table mein insert karna (Ensure karein ki support_requests ya returns table ho)
+      const { error: insertError } = await supabaseClient
+        .from("support_requests") // Ya agar alag table ho jaise 'returns', toh wo likhein
+        .insert({
+          user_id: user.id,
+          order_id: Number(orderId),
+          issue_type: requestType, // Return & Refund ya Replacement
+          description: `Reason: ${reason} | Details: ${description}`,
+          photo_urls: photoUrls.length > 0 ? photoUrls : null,
+          status: "Requested"
+        });
+
+      if (insertError) {
+        console.error("Database error:", insertError);
+        msg.style.color = "red";
+        msg.textContent = "Database Error: " + insertError.message;
+        submitBtn.disabled = false;
+        return;
+      }
+
       msg.style.color = "green";
-      msg.textContent = "Aapki request safalpurvak bhej di gayi hai. Hum jald hi aapse sampark karenge.";
-      document.getElementById("orderId").value = "";
-      document.getElementById("issueDesc").value = "";
+      msg.textContent = "✓ Return request submitted successfully! Our team will review it.";
+      
+      setTimeout(() => {
+        window.location.href = `order.html?id=${orderId}`;
+      }, 2500);
+
+    } catch (err) {
+      console.error("Error:", err);
+      msg.style.color = "red";
+      msg.textContent = "Something went wrong: " + err.message;
+      submitBtn.disabled = false;
     }
   }
 </script>
