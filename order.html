@@ -720,16 +720,13 @@ async function submitReview(){
     return;
   }
 
-  // Yahan hum openReview wale variable ko check kar rahe hain
-  if(!window.reviewProductId){
-  // Agar window.reviewProductId na mile, toh direct variable check karein
-  const prodId = window.reviewProductId || (typeof reviewProductId !== 'undefined' ? reviewProductId : null);
+  const prodId = typeof reviewProductId !== 'undefined' ? reviewProductId : null;
 
   if(!prodId){
     if(messageBox) messageBox.textContent = "Error: Product ID is missing. Please reopen the review popup.";
     return;
   }
-    
+
   const reviewText = textInput.value.trim();
   const files = fileInput ? fileInput.files : [];
   let photoUrls = [];
@@ -737,7 +734,7 @@ async function submitReview(){
   if(messageBox) messageBox.textContent = "Processing review and photos...";
 
   try {
-    let ratingValue = window.reviewRating || 5; 
+    let ratingValue = typeof reviewRating !== 'undefined' ? reviewRating : 5; 
     const starBtn = document.querySelector(".review-star.selected, .review-star.active");
     if(starBtn && starBtn.dataset.rating) {
       ratingValue = Number(starBtn.dataset.rating) || ratingValue;
@@ -778,7 +775,7 @@ async function submitReview(){
     const { error: insertError } = await supabaseClient
       .from("product_reviews")
       .upsert({
-        product_id: window.reviewProductId,
+        product_id: prodId,
         user_id: user.id,
         customer_name: user.user_metadata?.full_name || user.email || "Customer",
         rating: ratingValue,
@@ -803,7 +800,7 @@ async function submitReview(){
     console.error("Catch error:", err);
     if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
-}
+}   
 
 /* -----------------------------
    LOAD ORDER
