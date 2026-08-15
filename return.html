@@ -201,13 +201,13 @@
   <h1 class="header-title">Return & Replacement</h1>
   <p class="subtitle">Submit your request for this specific order below.</p>
 
-  <!-- Order Details Card (Instant Fallback Setup) -->
+  <!-- Order Details Card -->
   <div class="order-card" id="orderCardWrapper">
     <div class="order-info">
-      <h3 id="displayOrderId">Order ID: #...</h3>
-      <p id="displayProductDetails">Order Item</p>
+      <h3 id="displayOrderId">Loading Order...</h3>
+      <p id="displayProductDetails">Fetching details...</p>
     </div>
-    <div class="badge" id="orderStatusBadge">Delivered</div>
+    <div class="badge" id="orderStatusBadge">Loading</div>
   </div>
 
   <!-- Return Request Form -->
@@ -259,20 +259,50 @@
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Apni original SUPABASE URL aur Key yahan daalein (jo aapki doosri working files mein hai)
   const SUPABASE_URL = "AAPKA_SUPABASE_URL"; 
   const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // URL se turant ID nikalna
   const urlParams = new URLSearchParams(window.location.search);
-  const orderId = urlParams.get('id') || "46";
+  const orderId = urlParams.get('id');
 
-  // Page khulte hi bina kisi delay ke ID set kar do
-  document.getElementById("backLink").href = `order.html?id=${orderId}`;
-  document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
-  document.getElementById("displayProductDetails").textContent = `Product Item (Order #${orderId})`;
-  document.getElementById("orderStatusBadge").textContent = "Delivered";
+  window.addEventListener('DOMContentLoaded', async () => {
+    if (!orderId) {
+      document.getElementById("displayOrderId").textContent = "Order ID Missing";
+      document.getElementById("displayProductDetails").textContent = "Invalid URL";
+      document.getElementById("orderStatusBadge").textContent = "Error";
+      return;
+    }
+
+    document.getElementById("backLink").href = `order.html?id=${orderId}`;
+    document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
+
+    try {
+      // Supabase se actual order fetch karo
+      const { data, error } = await supabaseClient
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .maybeSingle();
+
+      if (data) {
+        // Tumhare database ke alag-alag column names ko map karna
+        const productName = data.product_name || data.item_name || data.title || data.name || data.product_title || `Order Item #${orderId}`;
+        const productPrice = data.total_amount || data.price || data.amount || data.total || "0";
+        const orderStatus = data.status || "Delivered";
+
+        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
+        document.getElementById("orderStatusBadge").textContent = orderStatus;
+      } else {
+        document.getElementById("displayProductDetails").textContent = `Product #${orderId}`;
+        document.getElementById("orderStatusBadge").textContent = "Delivered";
+      }
+    } catch (err) {
+      console.error("Error fetching order:", err);
+      document.getElementById("displayProductDetails").textContent = `Product #${orderId}`;
+      document.getElementById("orderStatusBadge").textContent = "Delivered";
+    }
+  });
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
