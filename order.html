@@ -785,7 +785,7 @@ async function submitReview(){
       return;
     }
 
-    if(messageBox) messageBox.textContent = "Review submitted successfully!";
+    if(messageBox messageBox.textContent = "Review submitted successfully!";
     setTimeout(() => {
       if(typeof closeReview === "function") closeReview();
       location.reload();
@@ -796,7 +796,6 @@ async function submitReview(){
     if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
 }
-  
   
 /* -----------------------------
    LOAD ORDER
