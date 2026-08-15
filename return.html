@@ -185,7 +185,6 @@
       background: var(--accent-hover);
     }
 
-
     #orderProducts {
       margin-top: 14px;
       display: grid;
@@ -305,9 +304,9 @@
     <div class="policy-box">
       <strong>Quick Guidelines:</strong>
       <ul>
-        <li>Raise request within the valid return policy window.</li>
-        <li>Include original packaging, tags, and accessories.</li>
-        <li>Processing takes 2-3 business days post inspection.</li>
+        <li>Raise request within the valid return policy window.[span_1](start_span)[span_1](end_span)</li>
+        <li>Include original packaging, tags, and accessories.[span_2](start_span)[span_2](end_span)</li>
+        <li>Processing takes 2-3 business days post inspection.[span_3](start_span)[span_3](end_span)</li>
       </ul>
     </div>
 
@@ -323,11 +322,6 @@
 
 <script>
 (function () {
-  /*
-   * IMPORTANT:
-   * Keep all variables inside this IIFE so config.js / supabase-client.js
-   * cannot cause duplicate "const" declaration errors.
-   */
   const returnSupabase =
     window.supabaseClient ||
     window.supabase.createClient(
@@ -335,11 +329,8 @@
       "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL"
     );
 
-  const urlParams =
-    new URLSearchParams(window.location.search);
-
-  const orderId =
-    urlParams.get("id");
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get("id");
 
   function esc(value) {
     return String(value ?? "")
@@ -357,61 +348,33 @@
 
   function cleanImage(value) {
     if (!value) return "";
-
     const s = String(value).trim();
-
-    if (
-      !s ||
-      s === "null" ||
-      s === "undefined" ||
-      s === "image" ||
-      s === "image_url"
-    ) {
+    if (!s || s === "null" || s === "undefined" || s === "image" || s === "image_url") {
       return "";
     }
-
     return s;
   }
 
   function setStatus(status) {
-    const badge =
-      document.getElementById("orderStatusBadge");
-
-    const value =
-      String(status || "pending");
-
+    const badge = document.getElementById("orderStatusBadge");
+    const value = String(status || "pending");
     badge.textContent = value;
-
-    const delivered =
-      value.toLowerCase() === "delivered";
-
-    badge.style.background =
-      delivered ? "#dcfce7" : "#e0e7ff";
-
-    badge.style.color =
-      delivered ? "#166534" : "#3730a3";
+    const delivered = value.toLowerCase() === "delivered";
+    badge.style.background = delivered ? "#dcfce7" : "#e0e7ff";
+    badge.style.color = delivered ? "#166534" : "#3730a3";
   }
 
   function renderProducts(items, products) {
-    const box =
-      document.getElementById("orderProducts");
-
+    const box = document.getElementById("orderProducts");
     const productMap = new Map();
 
     (products || []).forEach(product => {
-      productMap.set(
-        String(product.id),
-        product
-      );
+      productMap.set(String(product.id), product);
     });
 
     if (!items || !items.length) {
       box.innerHTML = `
-        <div style="
-          margin-top:10px;
-          font-size:13px;
-          color:#64748b;
-        ">
+        <div style="margin-top:10px; font-size:13px; color:#64748b;">
           Product details are unavailable for this order.
         </div>
       `;
@@ -419,33 +382,11 @@
     }
 
     box.innerHTML = items.map(item => {
-      const product =
-        productMap.get(
-          String(item.product_id)
-        ) || {};
-
-      const name =
-        item.product_name ||
-        product.name ||
-        "Product";
-
-      const quantity =
-        Number(item.quantity || 1);
-
-      const price =
-        Number(
-          item.unit_price ??
-          item.price ??
-          0
-        );
-
-      const image =
-        cleanImage(
-          product.image_url ||
-          product.image ||
-          item.image_url ||
-          item.image
-        );
+      const product = productMap.get(String(item.product_id)) || {};
+      const name = item.product_name || product.name || "Product";
+      const quantity = Number(item.quantity || 1);
+      const price = Number(item.unit_price ?? item.price ?? 0);
+      const image = cleanImage(product.image_url || product.image || item.image_url || item.image);
 
       return `
         <div class="return-product">
@@ -455,33 +396,16 @@
                 <img
                   src="${esc(image)}"
                   alt="${esc(name)}"
-                  onerror="
-                    this.style.display='none';
-                    this.nextElementSibling.style.display='block'
-                  "
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
                 >
-                <div
-                  class="return-product-placeholder"
-                  style="display:none"
-                ></div>
+                <div class="return-product-placeholder" style="display:none"></div>
               `
-              : `
-                <div class="return-product-placeholder"></div>
-              `
+              : `<div class="return-product-placeholder"></div>`
           }
-
           <div class="return-product-info">
-            <div class="return-product-name">
-              ${esc(name)}
-            </div>
-
+            <div class="return-product-name">${esc(name)}</div>
             <div class="return-product-meta">
-              Quantity: ${quantity}
-              ${
-                price > 0
-                  ? " • " + money(price) + " each"
-                  : ""
-              }
+              Quantity: ${quantity} ${price > 0 ? " • " + money(price) + " each" : ""}
             </div>
           </div>
         </div>
@@ -490,401 +414,193 @@
   }
 
   async function loadReturnOrder() {
-    const orderIdEl =
-      document.getElementById("displayOrderId");
-
-    const detailsEl =
-      document.getElementById(
-        "displayProductDetails"
-      );
-
-    const badgeEl =
-      document.getElementById(
-        "orderStatusBadge"
-      );
+    const orderIdEl = document.getElementById("displayOrderId");
+    const detailsEl = document.getElementById("displayProductDetails");
+    const badgeEl = document.getElementById("orderStatusBadge");
 
     if (!orderId) {
-      orderIdEl.textContent =
-        "Order ID Missing";
-
-      detailsEl.textContent =
-        "Invalid URL";
-
-      badgeEl.textContent =
-        "ERROR";
-
+      orderIdEl.textContent = "Order ID Missing";
+      detailsEl.textContent = "Invalid URL";
+      badgeEl.textContent = "ERROR";
       return;
     }
 
-    const backLink =
-      document.getElementById("backLink");
-
+    const backLink = document.getElementById("backLink");
     if (backLink) {
-      backLink.href =
-        `order.html?id=${encodeURIComponent(orderId)}`;
+      backLink.href = `order.html?id=${encodeURIComponent(orderId)}`;
     }
 
     try {
-      const {
-        data: { user },
-        error: userError
-      } =
-        await returnSupabase.auth.getUser();
-
-      if (userError) {
-        throw userError;
-      }
+      const { data: { user }, error: userError } = await returnSupabase.auth.getUser();
+      if (userError) throw userError;
 
       if (!user) {
-        orderIdEl.textContent =
-          "Login Required";
-
-        detailsEl.textContent =
-          "Please login to view this order.";
-
-        badgeEl.textContent =
-          "LOGIN";
-
+        orderIdEl.textContent = "Login Required";
+        detailsEl.textContent = "Please login to view this order.";
+        badgeEl.textContent = "LOGIN";
         return;
       }
 
-      /*
-       * Same ownership check as order.html:
-       * order id + logged-in user's id.
-       */
-      const {
-        data: order,
-        error: orderError
-      } =
-        await returnSupabase
-          .from("orders")
-          .select("*")
-          .eq("id", orderId)
-          .eq("user_id", user.id)
-          .maybeSingle();
+      const { data: order, error: orderError } = await returnSupabase
+        .from("orders")
+        .select("*")
+        .eq("id", orderId)
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-      if (orderError) {
-        throw orderError;
-      }
+      if (orderError) throw orderError;
 
       if (!order) {
-        orderIdEl.textContent =
-          "Order Not Found";
-
-        detailsEl.textContent =
-          "This order does not belong to your account or no longer exists.";
-
-        badgeEl.textContent =
-          "ERROR";
-
+        orderIdEl.textContent = "Order Not Found";
+        detailsEl.textContent = "This order does not belong to your account or no longer exists.";
+        badgeEl.textContent = "ERROR";
         return;
       }
 
-      orderIdEl.textContent =
-        `Order #${order.id}`;
-
+      orderIdEl.textContent = `Order #${order.id}`;
       setStatus(order.status);
 
-      /*
-       * Correct data path:
-       * orders -> order_items -> products
-       */
-      const {
-        data: items,
-        error: itemError
-      } =
-        await returnSupabase
-          .from("order_items")
-          .select("*")
-          .eq("order_id", order.id);
+      const { data: items, error: itemError } = await returnSupabase
+        .from("order_items")
+        .select("*")
+        .eq("order_id", order.id);
 
       if (itemError) {
-        console.warn(
-          "Order items:",
-          itemError.message
-        );
+        console.warn("Order items:", itemError.message);
       }
 
-      const orderItems =
-        items || [];
-
-      const productIds =
-        orderItems
-          .map(item => item.product_id)
-          .filter(Boolean);
-
+      const orderItems = items || [];
+      const productIds = orderItems.map(item => item.product_id).filter(Boolean);
       let products = [];
 
       if (productIds.length) {
-        const {
-          data,
-          error: productError
-        } =
-          await returnSupabase
-            .from("products")
-            .select(
-              "id,name,image_url,image"
-            )
-            .in("id", productIds);
+        const { data, error: productError } = await returnSupabase
+          .from("products")
+          .select("id,name,image_url,image")
+          .in("id", productIds);
 
         if (productError) {
-          console.warn(
-            "Products:",
-            productError.message
-          );
+          console.warn("Products:", productError.message);
         } else {
-          products =
-            data || [];
+          products = data || [];
         }
       }
 
-      renderProducts(
-        orderItems,
-        products
+      renderProducts(orderItems, products);
+
+      const calculatedTotal = orderItems.reduce(
+        (sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0),
+        0
       );
 
-      const calculatedTotal =
-        orderItems.reduce(
-          (sum, item) =>
-            sum +
-            Number(item.quantity || 0) *
-            Number(
-              item.unit_price ??
-              item.price ??
-              0
-            ),
-          0
-        );
+      const total = Number(order.total_amount ?? order.total ?? order.grand_total ?? 0) || calculatedTotal;
 
-      const total =
-        Number(
-          order.total_amount ??
-          order.total ??
-          order.grand_total ??
-          0
-        ) || calculatedTotal;
-
-      detailsEl.textContent =
-        orderItems.length
-          ? `${orderItems.length} product${orderItems.length === 1 ? "" : "s"} • ${money(total)}`
-          : `Order total: ${money(total)}`;
+      detailsEl.textContent = orderItems.length
+        ? `${orderItems.length} product${orderItems.length === 1 ? "" : "s"} • ${money(total)}`
+        : `Order total: ${money(total)}`;
 
     } catch (error) {
-      console.error(
-        "Return order loading error:",
-        error
-      );
-
-      orderIdEl.textContent =
-        `Order #${orderId}`;
-
-      detailsEl.textContent =
-        "Unable to load order details.";
-
-      badgeEl.textContent =
-        "ERROR";
+      console.error("Return order loading error:", error);
+      orderIdEl.textContent = `Order #${orderId}`;
+      detailsEl.textContent = "Unable to load order details.";
+      badgeEl.textContent = "ERROR";
     }
   }
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
 
-    const msg =
-      document.getElementById("returnMsg");
-
-    const submitBtn =
-      document.getElementById("submitBtn");
-
-    const requestType =
-      document.getElementById(
-        "requestType"
-      ).value;
-
-    const reason =
-      document.getElementById(
-        "requestReason"
-      ).value;
-
-    const description =
-      document.getElementById(
-        "returnDesc"
-      ).value.trim();
-
-    const fileInput =
-      document.getElementById(
-        "returnMedia"
-      );
-
-    const files =
-      fileInput
-        ? fileInput.files
-        : [];
+    const msg = document.getElementById("returnMsg");
+    const submitBtn = document.getElementById("submitBtn");
+    const requestType = document.getElementById("requestType").value;
+    const reason = document.getElementById("requestReason").value;
+    const description = document.getElementById("returnDesc").value.trim();
+    const fileInput = document.getElementById("returnMedia");
+    const files = fileInput ? fileInput.files : [];
 
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
-
-    msg.style.color =
-      "var(--accent)";
-
-    msg.textContent =
-      "Uploading files & submitting request...";
+    msg.style.color = "var(--accent)";
+    msg.textContent = "Uploading files & submitting request...";
 
     try {
-      const {
-        data: { user },
-        error: userError
-      } =
-        await returnSupabase.auth.getUser();
-
-      if (userError) {
-        throw userError;
-      }
+      const { data: { user }, error: userError } = await returnSupabase.auth.getUser();
+      if (userError) throw userError;
 
       if (!user) {
-        throw new Error(
-          "Please login first to submit a request."
-        );
+        throw new Error("Please login first to submit a request.");
       }
 
-      const {
-        data: ownedOrder,
-        error: ownedOrderError
-      } =
-        await returnSupabase
-          .from("orders")
-          .select("id")
-          .eq("id", orderId)
-          .eq("user_id", user.id)
-          .maybeSingle();
+      const { data: ownedOrder, error: ownedOrderError } = await returnSupabase
+        .from("orders")
+        .select("id")
+        .eq("id", orderId)
+        .eq("user_id", user.id)
+        .maybeSingle();
 
-      if (ownedOrderError) {
-        throw ownedOrderError;
-      }
+      if (ownedOrderError) throw ownedOrderError;
 
       if (!ownedOrder) {
-        throw new Error(
-          "This order is not available for your account."
-        );
+        throw new Error("This order is not available for your account.");
       }
 
       let mediaUrls = [];
 
       if (files && files.length) {
-        const limit =
-          Math.min(files.length, 5);
+        const limit = Math.min(files.length, 5);
 
         for (let i = 0; i < limit; i++) {
-          const file =
-            files[i];
+          const file = files[i];
+          const safeName = String(file.name || "file").replace(/[^a-zA-Z0-9._-]/g, "_");
+          const fileName = `return_${orderId}_${Date.now()}_${i}_${safeName}`;
 
-          const safeName =
-            String(
-              file.name || "file"
-            ).replace(
-              /[^a-zA-Z0-9._-]/g,
-              "_"
-            );
+          const { error: uploadError } = await returnSupabase.storage
+            .from("product-review-images")
+            .upload(fileName, file);
 
-          const fileName =
-            `return_${orderId}_${Date.now()}_${i}_${safeName}`;
+          if (uploadError) throw uploadError;
 
-          const {
-            error: uploadError
-          } =
-            await returnSupabase.storage
-              .from(
-                "product-review-images"
-              )
-              .upload(
-                fileName,
-                file
-              );
+          const { data: publicUrlData } = returnSupabase.storage
+            .from("product-review-images")
+            .getPublicUrl(fileName);
 
-          if (uploadError) {
-            throw uploadError;
-          }
-
-          const {
-            data: publicUrlData
-          } =
-            returnSupabase.storage
-              .from(
-                "product-review-images"
-              )
-              .getPublicUrl(
-                fileName
-              );
-
-          if (
-            publicUrlData?.publicUrl
-          ) {
-            mediaUrls.push(
-              publicUrlData.publicUrl
-            );
+          if (publicUrlData?.publicUrl) {
+            mediaUrls.push(publicUrlData.publicUrl);
           }
         }
       }
 
-      const {
-        error: insertError
-      } =
-        await returnSupabase
-          .from("support_requests")
-          .insert({
-            user_id: user.id,
-            order_id: Number(orderId),
-            issue_type: requestType,
-            description:
-              `Reason: ${reason} | Details: ${description}`,
-            photo_urls:
-              mediaUrls.length
-                ? mediaUrls
-                : null,
-            status: "Requested"
-          });
+      const { error: insertError } = await returnSupabase
+        .from("support_requests")
+        .insert({
+          user_id: user.id,
+          order_id: Number(orderId),
+          issue_type: requestType,
+          description: `Reason: ${reason} | Details: ${description}`,
+          photo_urls: mediaUrls.length ? mediaUrls : null,
+          status: "Requested"
+        });
 
-      if (insertError) {
-        throw insertError;
-      }
+      if (insertError) throw insertError;
 
-      msg.style.color =
-        "var(--success)";
-
-      msg.textContent =
-        "✓ Return request submitted successfully! Redirecting...";
+      msg.style.color = "var(--success)";
+      msg.textContent = "✓ Return request submitted successfully! Redirecting...";
 
       setTimeout(() => {
-        window.location.href =
-          `order.html?id=${encodeURIComponent(orderId)}`;
+        window.location.href = `order.html?id=${encodeURIComponent(orderId)}`;
       }, 2000);
 
     } catch (error) {
-      console.error(
-        "Return request error:",
-        error
-      );
-
-      msg.style.color =
-        "var(--danger)";
-
-      msg.textContent =
-        error.message ||
-        "Something went wrong.";
-
+      console.error("Return request error:", error);
+      msg.style.color = "var(--danger)";
+      msg.textContent = error.message || "Something went wrong.";
       submitBtn.disabled = false;
       submitBtn.style.opacity = "1";
     }
   }
 
-  // Expose only the form handler required by the inline onsubmit.
-  window.handleReturnSubmit =
-    handleReturnSubmit;
-
-  // Start loading after the page is ready.
-  window.addEventListener(
-    "DOMContentLoaded",
-    loadReturnOrder
-  );
+  window.handleReturnSubmit = handleReturnSubmit;
+  window.addEventListener("DOMContentLoaded", loadReturnOrder);
 })();
 </script>
 
