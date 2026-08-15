@@ -765,7 +765,9 @@ async function submitReview(){
     const prodId = window.currentReviewProductId || window.activeReviewProductId;
     const custName = window.currentCustomerName || "Customer";
 
-    // order_id hata diya gaya hai taaki schema error na aaye
+    // Current logged-in user ki details lein
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
     const { error: insertError } = await supabaseClient
       .from("product_reviews")
       .insert({
@@ -773,7 +775,8 @@ async function submitReview(){
         customer_name: custName,
         rating: ratingValue,
         review: reviewText,
-        photo_urls: photoUrls.length > 0 ? photoUrls : null
+        photo_urls: photoUrls.length > 0 ? photoUrls : null,
+        user_id: user ? user.id : null
       });
 
     if(insertError){
@@ -792,7 +795,8 @@ async function submitReview(){
     console.error("Catch error:", err);
     if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
-} 
+}
+  
   
 /* -----------------------------
    LOAD ORDER
