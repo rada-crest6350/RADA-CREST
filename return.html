@@ -74,7 +74,6 @@
       line-height: 1.6;
     }
 
-    /* Order Card */
     .order-card {
       background: #f8fafc;
       border: 1.5px solid #e2e8f0;
@@ -205,10 +204,10 @@
   <!-- Order Details Display Card -->
   <div class="order-card" id="orderCardWrapper">
     <div class="order-info">
-      <h3 id="displayOrderId">Loading Order...</h3>
-      <p id="displayProductDetails">Fetching product details...</p>
+      <h3 id="displayOrderId">Order ID: #46</h3>
+      <p id="displayProductDetails">Lala • ₹999</p>
     </div>
-    <div class="badge" id="orderStatusBadge">Verifying</div>
+    <div class="badge" id="orderStatusBadge">COD • Pending</div>
   </div>
 
   <!-- Return Request Form -->
@@ -265,42 +264,11 @@
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const urlParams = new URLSearchParams(window.location.search);
-  let orderId = urlParams.get('id');
+  let orderId = urlParams.get('id') || "46";
 
-  // Fallback taaki agar URL se ID turant na mile toh localStorage ya default use ho
-  if (!orderId) {
-    orderId = localStorage.getItem("current_order_id") || "46";
-  }
-
-  window.addEventListener('DOMContentLoaded', async () => {
-    document.getElementById("backLink").href = `order.html?id=${orderId}`;
-    document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
-
-    try {
-      // Supabase se exact order fetch karna
-      const { data, error } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .eq('id', orderId)
-        .maybeSingle();
-
-      if (data) {
-        const productName = data.product_name || data.item_name || data.title || "RADA-CREST Product";
-        const productPrice = data.total_amount || data.price || "999";
-        const orderStatus = data.status || "Delivered";
-
-        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
-        document.getElementById("orderStatusBadge").textContent = orderStatus;
-      } else {
-        document.getElementById("displayProductDetails").textContent = `Order #${orderId} Verified`;
-        document.getElementById("orderStatusBadge").textContent = "Active";
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      document.getElementById("displayProductDetails").textContent = `Order #${orderId}`;
-      document.getElementById("orderStatusBadge").textContent = "Verified";
-    }
-  });
+  // Back link set karna dynamic ID ke sath
+  document.getElementById("backLink").href = `order.html?id=${orderId}`;
+  document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
