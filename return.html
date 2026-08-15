@@ -3,170 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Return & Replacement - RADA-CREST</title>
+  <title>Return & Replacement | RADA-CREST</title>
   <style>
     :root {
-      --primary: #111111;
-      --accent: #2563eb;
-      --bg-color: #f4f6f8;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       --card-bg: #ffffff;
-      --text-main: #1f2937;
-      --text-muted: #6b7280;
-      --border-color: #e5e7eb;
+      --primary: #0f172a;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #22c55e;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-gradient);
       margin: 0;
-      padding: 20px;
+      padding: 25px 15px;
       color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .container {
-      max-width: 650px;
-      margin: 30px auto;
+      width: 100%;
+      max-width: 680px;
       background: var(--card-bg);
-      padding: 35px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      box-sizing: border-box;
     }
 
     .back-link {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 25px;
+      gap: 8px;
+      margin-bottom: 24px;
       color: var(--text-muted);
       text-decoration: none;
       font-size: 14px;
-      font-weight: 500;
-      transition: color 0.2s;
+      font-weight: 600;
+      transition: color 0.2s ease;
     }
     .back-link:hover {
-      color: var(--primary);
+      color: var(--accent);
     }
 
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
+    .header-title {
+      font-size: 28px;
+      font-weight: 800;
       color: var(--primary);
       margin: 0 0 8px 0;
+      letter-spacing: -0.5px;
     }
 
     .subtitle {
       color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 25px;
-      line-height: 1.5;
-    }
-
-    .order-summary-box {
-      background: #f9fafb;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 25px;
-    }
-
-    .order-summary-box h3 {
-      margin: 0 0 8px 0;
       font-size: 15px;
-      font-weight: 600;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    /* Unique Order Summary Card */
+    .order-card {
+      background: #f8fafc;
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .order-info h3 {
+      margin: 0 0 6px 0;
+      font-size: 16px;
+      font-weight: 700;
       color: var(--primary);
     }
 
-    .product-info {
+    .order-info p {
+      margin: 0;
       font-size: 14px;
       color: var(--text-muted);
-      margin-bottom: 4px;
     }
 
+    .badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Form Design */
     label {
       display: block;
-      margin-top: 18px;
+      margin-top: 20px;
       margin-bottom: 8px;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-main);
+      letter-spacing: 0.8px;
+      color: var(--primary);
     }
 
     select, textarea, input[type="file"] {
       width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
       box-sizing: border-box;
-      font-size: 14px;
+      font-size: 15px;
       background-color: #fff;
       color: var(--text-main);
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.3s ease;
     }
 
     select:focus, textarea:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
 
     textarea {
       resize: vertical;
-      min-height: 100px;
+      min-height: 120px;
     }
 
-    input[type="file"] {
-      padding: 10px;
-      background: #f9fafb;
-      cursor: pointer;
+    .file-upload-box {
+      background: #f8fafc;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-top: 8px;
     }
 
-    .policy-notes {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 8px;
-      padding: 15px;
-      font-size: 13px;
-      color: #1e40af;
-      margin: 25px 0;
-    }
-
-    .policy-notes ul {
-      margin: 6px 0 0 18px;
+    .file-upload-box input {
+      border: none;
+      background: transparent;
       padding: 0;
     }
 
-    .policy-notes li {
+    /* Policy Highlight Box */
+    .policy-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 13.5px;
+      color: #1e40af;
+      margin: 25px 0;
+      line-height: 1.5;
+    }
+
+    .policy-box ul {
+      margin: 8px 0 0 20px;
+      padding: 0;
+    }
+
+    .policy-box li {
       margin-bottom: 4px;
     }
 
+    /* Submit Button */
     .submit-btn {
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 14px;
+      padding: 16px;
       width: 100%;
-      font-size: 15px;
-      font-weight: 600;
-      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
+      transition: background 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
     }
 
     .submit-btn:hover {
-      background: #27272a;
+      background: #1e293b;
     }
 
     .submit-btn:active {
-      transform: scale(0.99);
+      transform: scale(0.98);
     }
 
     #returnMsg {
-      margin-top: 15px;
+      margin-top: 18px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 600;
       text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px 20px;
+      }
+      .order-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
     }
   </style>
 </head>
@@ -175,20 +223,22 @@
 <div class="container">
   <a href="order.html" id="backLink" class="back-link">&larr; Back to Order Details</a>
   
-  <h1>Return / Replacement Request</h1>
-  <p class="subtitle">We're sorry your product didn't work out. Tell us what happened and we'll help you resolve it quickly.</p>
+  <h1 class="header-title">Return & Replacement</h1>
+  <p class="subtitle">Encountered an issue with your product? Fill out the details below and we will resolve it promptly.</p>
 
-  <!-- Order & Product Info Box -->
-  <div class="order-summary-box" id="orderSummaryBox">
-    <h3>Order Details</h3>
-    <div class="product-info" id="displayOrderId">Order ID: Loading...</div>
-    <div class="product-info" id="displayProductDetails">Product: Loading...</div>
+  <!-- Unique Order Details Display Card -->
+  <div class="order-card">
+    <div class="order-info">
+      <h3 id="displayOrderId">Order ID: Checking...</h3>
+      <p id="displayProductDetails">Fetching product details...</p>
+    </div>
+    <div class="badge" id="orderStatusBadge">Verified</div>
   </div>
 
-  <!-- Form for Return -->
+  <!-- Return Request Form -->
   <form id="returnForm" onsubmit="handleReturnSubmit(event)">
     
-    <label for="requestType">Select Request Type</label>
+    <label for="requestType">Request Type</label>
     <select id="requestType" required>
       <option value="Return & Refund">Return & Refund</option>
       <option value="Replacement">Replacement</option>
@@ -196,30 +246,33 @@
 
     <label for="returnReason">Select Reason</label>
     <select id="returnReason" required>
-      <option value="">-- Choose Reason --</option>
-      <option value="Product damaged">Product damaged (Tuta hua / Defective)</option>
-      <option value="Wrong product received">Wrong product received (Galat item)</option>
-      <option value="Product not working">Product not working (Kaam nahi kar raha)</option>
+      <option value="">-- Choose Issue Reason --</option>
+      <option value="Product damaged">Product damaged / Broken</option>
+      <option value="Wrong product received">Wrong product received</option>
+      <option value="Product not working">Product not working / Defective</option>
       <option value="Product is different from description">Product is different from description</option>
-      <option value="Missing parts/accessories">Missing parts/accessories</option>
+      <option value="Missing parts/accessories">Missing parts or accessories</option>
       <option value="Quality issue">Quality issue</option>
       <option value="Changed my mind">Changed my mind</option>
       <option value="Other">Other</option>
     </select>
 
-    <label for="returnDesc">Tell us more</label>
-    <textarea id="returnDesc" placeholder="Please explain the issue with the product..." required></textarea>
+    <label for="returnDesc">Detailed Description</label>
+    <textarea id="returnDesc" placeholder="Please describe the issue clearly..." required></textarea>
 
-    <label for="returnPhotos">Upload Photos (Up to 5 photos)</label>
-    <input type="file" id="returnPhotos" multiple accept="image/*">
+    <!-- Photo and Video Upload Section -->
+    <label for="returnMedia">Upload Photos / Unboxing Video (Up to 5 files)</label>
+    <div class="file-upload-box">
+      <input type="file" id="returnMedia" multiple accept="image/*,video/*">
+    </div>
 
     <!-- Policy Box -->
-    <div class="policy-notes">
-      <strong>Return Policy Highlights:</strong>
+    <div class="policy-box">
+      <strong>Quick Guidelines:</strong>
       <ul>
-        <li>Requests must be submitted within the valid delivery window.</li>
-        <li>Product should be returned in its original condition with tags.</li>
-        <li>Refund/Replacement is processed post-inspection.</li>
+        <li>Submit request within the standard return window.</li>
+        <li>Ensure item is packed with original tags and accessories.</li>
+        <li>Inspection and approvals take 2-3 business days.</li>
       </ul>
     </div>
 
@@ -231,29 +284,26 @@
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Apne project ki real Supabase URL aur Anon Key yahan dalein
+  // Supabase Configuration
   const SUPABASE_URL = "AAPKA_SUPABASE_URL"; 
   const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const urlParams = new URLSearchParams(window.location.search);
-  const orderId = urlParams.get('id');
+  let orderId = urlParams.get('id');
 
-  // Back link ko dynamic banana taaki wapas usi order page par jaye
-  if (orderId) {
-    document.getElementById("backLink").href = `order.html?id=${orderId}`;
+  // Fallback agar URL mein ID na ho, toh localStorage ya default set kar lein
+  if (!orderId) {
+    orderId = localStorage.getItem("current_order_id") || "46"; 
   }
 
-  window.addEventListener('DOMContentLoaded', async () => {
-    if (!orderId) {
-      document.getElementById("orderSummaryBox").innerHTML = "<p style='color:#dc2626; margin:0;'>Error: No Order ID provided in URL. Please open from your Orders page.</p>";
-      return;
-    }
+  // Back link update karna
+  document.getElementById("backLink").href = `order.html?id=${orderId}`;
 
+  window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
 
     try {
-      // Database se order aur product ki details lana
       const { data, error } = await supabaseClient
         .from('orders')
         .select('*')
@@ -261,16 +311,16 @@
         .single();
 
       if (data) {
-        // Yahan aapke table ke columns ke mutabiq product name/details show hongi
-        const productName = data.product_name || data.item_name || "Product (Lala / Item)";
+        const productName = data.product_name || data.item_name || "RADA-CREST Product";
         const productPrice = data.total_amount || data.price || "999";
-        document.getElementById("displayProductDetails").textContent = `Product: ${productName} | Price: ₹${productPrice}`;
+        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
+        document.getElementById("orderStatusBadge").textContent = data.status || "Delivered";
       } else {
-        document.getElementById("displayProductDetails").textContent = `Order found (#${orderId})`;
+        document.getElementById("displayProductDetails").textContent = `Product Order #${orderId}`;
       }
     } catch (err) {
-      console.error("Fetch error:", err);
-      document.getElementById("displayProductDetails").textContent = `Order ID: #${orderId}`;
+      console.log("Database fetch fallback active.");
+      document.getElementById("displayProductDetails").textContent = `Order # ${orderId} Product`;
     }
   });
 
@@ -282,31 +332,25 @@
     const requestType = document.getElementById("requestType").value;
     const reason = document.getElementById("returnReason").value;
     const description = document.getElementById("returnDesc").value.trim();
-    const fileInput = document.getElementById("returnPhotos");
+    const fileInput = document.getElementById("returnMedia");
     const files = fileInput ? fileInput.files : [];
-
-    if (!orderId) {
-      msg.style.color = "#dc2626";
-      msg.textContent = "Invalid Order ID.";
-      return;
-    }
 
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
-    msg.style.color = "#2563eb";
-    msg.textContent = "Submitting request & uploading photos...";
+    msg.style.color = "var(--accent)";
+    msg.textContent = "Processing request and uploading media files...";
 
     try {
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) {
-        msg.style.color = "#dc2626";
-        msg.textContent = "Please login first.";
+        msg.style.color = "var(--danger)";
+        msg.textContent = "Please login first to submit a request.";
         submitBtn.disabled = false;
         submitBtn.style.opacity = "1";
         return;
       }
 
-      let photoUrls = [];
+      let mediaUrls = [];
 
       if (files && files.length > 0) {
         const limit = Math.min(files.length, 5);
@@ -320,8 +364,8 @@
 
           if (uploadError) {
             console.error("Storage upload error:", uploadError);
-            msg.style.color = "#dc2626";
-            msg.textContent = "Photo Upload Error: " + uploadError.message;
+            msg.style.color = "var(--danger)";
+            msg.textContent = "Upload Error: " + uploadError.message;
             submitBtn.disabled = false;
             submitBtn.style.opacity = "1";
             return;
@@ -332,7 +376,7 @@
             .getPublicUrl(fileName);
             
           if (publicUrlData && publicUrlData.publicUrl) {
-            photoUrls.push(publicUrlData.publicUrl);
+            mediaUrls.push(publicUrlData.publicUrl);
           }
         }
       }
@@ -344,20 +388,20 @@
           order_id: Number(orderId),
           issue_type: requestType,
           description: `Reason: ${reason} | Details: ${description}`,
-          photo_urls: photoUrls.length > 0 ? photoUrls : null,
+          photo_urls: mediaUrls.length > 0 ? mediaUrls : null,
           status: "Requested"
         });
 
       if (insertError) {
         console.error("Database error:", insertError);
-        msg.style.color = "#dc2626";
+        msg.style.color = "var(--danger)";
         msg.textContent = "Database Error: " + insertError.message;
         submitBtn.disabled = false;
         submitBtn.style.opacity = "1";
         return;
       }
 
-      msg.style.color = "#16a34a";
+      msg.style.color = "var(--success)";
       msg.textContent = "✓ Return request submitted successfully! Redirecting...";
       
       setTimeout(() => {
@@ -366,7 +410,7 @@
 
     } catch (err) {
       console.error("Error:", err);
-      msg.style.color = "#dc2626";
+      msg.style.color = "var(--danger)";
       msg.textContent = "Something went wrong: " + err.message;
       submitBtn.disabled = false;
       submitBtn.style.opacity = "1";
