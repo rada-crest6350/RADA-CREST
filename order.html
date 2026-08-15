@@ -711,92 +711,74 @@ function closeReview(){
 }
 
 async function submitReview(){
-  const reviewText = document.getElementById("reviewText");
-  const reviewPhotos = document.getElementById("reviewPhotos");
-  const reviewMessage = document.getElementById("reviewMessage");
-  const reviewSubmitButton = document.getElementById("reviewSubmit");
+  const ratingBtn = document.querySelector(".review-star.active"); // ya jo bhi aapka rating select karne ka tareeqa ho
+  const textInput = document.getElementById("reviewText");
+  const fileInput = document.getElementById("reviewPhotos");
+  const messageBox = document.getElementById("reviewMessage");
 
-  if(!reviewProductId){
-    if(reviewMessage) reviewMessage.innerHTML = "Product not selected.";
-    return;
-  }
-  if(!reviewRating){
-    if(reviewMessage) reviewMessage.innerHTML = "Please select a star rating.";
-    return;
-  }
-  const text = reviewText ? reviewText.value.trim() : "";
-  if(text.length < 2){
-    if(reviewMessage) reviewMessage.innerHTML = "Please write your review.";
-    return;
-  }
-  const files = reviewPhotos ? Array.from(reviewPhotos.files || []) : [];
-  if(files.length > 5){
-    if(reviewMessage) reviewMessage.innerHTML = "Maximum 5 photos allowed.";
-    return;
-  }
+  if(!textInput || !fileInput) return;
 
-  if(reviewSubmitButton){
-    reviewSubmitButton.disabled = true;
-    reviewSubmitButton.textContent = "Submitting...";
-  }
-  if(reviewMessage) reviewMessage.innerHTML = "Please wait...";
+  const reviewText = textInput.value.trim();
+  const files = fileInput.files;
+  let photoUrls = [];
 
-  try{
-    const { data: { user } } = await window.supabaseClient.auth.getUser();
-    if(!user) throw new Error("Please login again.");
+  if(messageBox) messageBox.textContent = "Uploading photos & submitting review...";
 
-    const photoUrls = [];
-    for(const file of files){
-      if(!file.type.startsWith("image/")) continue;
-      if(file.size > 5 * 1024 * 1024) throw new Error("Each photo must be below 5MB.");
+  try {
+    // Agar photos select ki gayi hain toh loop chala kar upload karein
+    if(files && files.length > 0){
+      const limit = Math.min(files.length, 5); // Max 5 photos limit
+      
+      for(let i = 0; i < limit; i++){
+        const file = files[i];
+        const fileName = `review_${Date.now()}_${i}_${file.name}`;
+        
+        const { data, error } = await supabaseClient.storage
+          .from("reviews-media") // Apne bucket ka naam yahan check kar lein
+          .upload(fileName, file);
 
-      const extension = file.name.split(".").pop().toLowerCase();
-      const fileName = `${user.id}/review-${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
-
-      const { error: uploadError } = await window.supabaseClient.storage
-        .from("product-review-images")
-        .upload(fileName, file, { cacheControl: "3600", upsert: false });
-
-      if(uploadError) throw uploadError;
-
-      const { data: publicUrlData } = window.supabaseClient.storage
-        .from("product-review-images")
-        .getPublicUrl(fileName);
-
-      photoUrls.push(publicUrlData.publicUrl);
-    }
-
-    const { data, error } = await window.supabaseClient.rpc(
-      "submit_product_review",
-      {
-        p_product_id: reviewProductId,
-        p_rating: reviewRating,
-        p_review: text,
-        p_photo_urls: photoUrls
+        if(!error){
+          const { data: publicUrlData } = supabaseClient.storage
+            .from("reviews-media")
+            .getPublicUrl(fileName);
+            
+          if(publicUrlData && publicUrlData.publicUrl){
+            photoUrls.push(publicUrlData.publicUrl);
+          }
+        }
       }
-    );
-
-    if(error) throw error;
-
-    if(reviewMessage) reviewMessage.innerHTML = "✓ Review submitted successfully!";
-    if(reviewSubmitButton){
-      reviewSubmitButton.textContent = "Review Submitted";
-      reviewSubmitButton.disabled = true;
     }
 
-    setTimeout(() => { closeReview(); }, 1200);
+    // Database mein insert karein (photo_urls array ke sath)
+    const { error: insertError } = await supabaseClient
+      .from("product_reviews")
+      .insert({
+        product_id: currentProductId, // Jo bhi aapke variable ka naam ho
+        order_id: currentOrderId,     // Jo bhi aapke order ID ka variable ho
+        customer_name: currentCustomerName,
+        rating: selectedRating,       // Jo rating user ne di ho
+        review: reviewText,
+        photo_urls: photoUrls         // Yeh multiple photos ka array save karega
+      });
 
-  }catch(error){
-    console.error("Review submit error:", error);
-    if(reviewMessage) reviewMessage.innerHTML = "❌ " + (error.message || "Unable to submit review.");
-    if(reviewSubmitButton){
-      reviewSubmitButton.disabled = false;
-      reviewSubmitButton.textContent = "Submit Review";
+    if(insertError){
+      console.error(insertError);
+      if(messageBox) messageBox.textContent = "Error submitting review. Please try again.";
+      return;
     }
+
+    if(messageBox) messageBox.textContent = "Review submitted successfully!";
+    setTimeout(() => {
+      closeReview();
+      location.reload();
+    }, 1500);
+
+  } catch(err){
+    console.error(err);
+    if(messageBox) messageBox.textContent = "Something went wrong.";
   }
 }
-
-
+  
 /* -----------------------------
    LOAD ORDER
 ----------------------------- */
