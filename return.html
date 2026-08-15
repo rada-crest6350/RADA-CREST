@@ -322,21 +322,24 @@
 <script src="supabase-client.js"></script>
 
 <script>
-  // Same Supabase connection used by the working order page.
-  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
-
-  const supabaseClient =
+(function () {
+  /*
+   * IMPORTANT:
+   * Keep all variables inside this IIFE so config.js / supabase-client.js
+   * cannot cause duplicate "const" declaration errors.
+   */
+  const returnSupabase =
     window.supabaseClient ||
     window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
+      "https://ynpsnkvrjhaxdynmurzj.supabase.co",
+      "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL"
     );
 
-  window.supabaseClient = supabaseClient;
+  const urlParams =
+    new URLSearchParams(window.location.search);
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const orderId = urlParams.get("id");
+  const orderId =
+    urlParams.get("id");
 
   function esc(value) {
     return String(value ?? "")
@@ -354,6 +357,7 @@
 
   function cleanImage(value) {
     if (!value) return "";
+
     const s = String(value).trim();
 
     if (
@@ -370,8 +374,11 @@
   }
 
   function setStatus(status) {
-    const badge = document.getElementById("orderStatusBadge");
-    const value = String(status || "pending");
+    const badge =
+      document.getElementById("orderStatusBadge");
+
+    const value =
+      String(status || "pending");
 
     badge.textContent = value;
 
@@ -392,7 +399,10 @@
     const productMap = new Map();
 
     (products || []).forEach(product => {
-      productMap.set(String(product.id), product);
+      productMap.set(
+        String(product.id),
+        product
+      );
     });
 
     if (!items || !items.length) {
@@ -410,7 +420,9 @@
 
     box.innerHTML = items.map(item => {
       const product =
-        productMap.get(String(item.product_id)) || {};
+        productMap.get(
+          String(item.product_id)
+        ) || {};
 
       const name =
         item.product_name ||
@@ -435,25 +447,28 @@
           item.image
         );
 
-      const imageHtml = image
-        ? `
-          <img
-            src="${esc(image)}"
-            alt="${esc(name)}"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
-          >
-          <div
-            class="return-product-placeholder"
-            style="display:none"
-          ></div>
-        `
-        : `
-          <div class="return-product-placeholder"></div>
-        `;
-
       return `
         <div class="return-product">
-          ${imageHtml}
+          ${
+            image
+              ? `
+                <img
+                  src="${esc(image)}"
+                  alt="${esc(name)}"
+                  onerror="
+                    this.style.display='none';
+                    this.nextElementSibling.style.display='block'
+                  "
+                >
+                <div
+                  class="return-product-placeholder"
+                  style="display:none"
+                ></div>
+              `
+              : `
+                <div class="return-product-placeholder"></div>
+              `
+          }
 
           <div class="return-product-info">
             <div class="return-product-name">
@@ -462,7 +477,11 @@
 
             <div class="return-product-meta">
               Quantity: ${quantity}
-              ${price > 0 ? " • " + money(price) + " each" : ""}
+              ${
+                price > 0
+                  ? " • " + money(price) + " each"
+                  : ""
+              }
             </div>
           </div>
         </div>
@@ -470,93 +489,124 @@
     }).join("");
   }
 
-  window.addEventListener("DOMContentLoaded", async () => {
+  async function loadReturnOrder() {
     const orderIdEl =
       document.getElementById("displayOrderId");
 
     const detailsEl =
-      document.getElementById("displayProductDetails");
+      document.getElementById(
+        "displayProductDetails"
+      );
 
     const badgeEl =
-      document.getElementById("orderStatusBadge");
+      document.getElementById(
+        "orderStatusBadge"
+      );
 
     if (!orderId) {
-      orderIdEl.textContent = "Order ID Missing";
-      detailsEl.textContent = "Invalid URL";
-      badgeEl.textContent = "Error";
+      orderIdEl.textContent =
+        "Order ID Missing";
+
+      detailsEl.textContent =
+        "Invalid URL";
+
+      badgeEl.textContent =
+        "ERROR";
+
       return;
     }
 
-    document.getElementById("backLink").href =
-      `order.html?id=${encodeURIComponent(orderId)}`;
+    const backLink =
+      document.getElementById("backLink");
+
+    if (backLink) {
+      backLink.href =
+        `order.html?id=${encodeURIComponent(orderId)}`;
+    }
 
     try {
       const {
         data: { user },
         error: userError
-      } = await supabaseClient.auth.getUser();
+      } =
+        await returnSupabase.auth.getUser();
 
-      if (userError || !user) {
-        orderIdEl.textContent = "Login Required";
+      if (userError) {
+        throw userError;
+      }
+
+      if (!user) {
+        orderIdEl.textContent =
+          "Login Required";
+
         detailsEl.textContent =
           "Please login to view this order.";
-        badgeEl.textContent = "LOGIN";
+
+        badgeEl.textContent =
+          "LOGIN";
+
         return;
       }
 
       /*
-       * Get the actual order and verify ownership.
-       * This is the same order lookup pattern used by order.html.
+       * Same ownership check as order.html:
+       * order id + logged-in user's id.
        */
       const {
         data: order,
         error: orderError
-      } = await supabaseClient
-        .from("orders")
-        .select("*")
-        .eq("id", orderId)
-        .eq("user_id", user.id)
-        .maybeSingle();
+      } =
+        await returnSupabase
+          .from("orders")
+          .select("*")
+          .eq("id", orderId)
+          .eq("user_id", user.id)
+          .maybeSingle();
 
       if (orderError) {
         throw orderError;
       }
 
       if (!order) {
-        orderIdEl.textContent = "Order Not Found";
+        orderIdEl.textContent =
+          "Order Not Found";
+
         detailsEl.textContent =
           "This order does not belong to your account or no longer exists.";
-        badgeEl.textContent = "ERROR";
+
+        badgeEl.textContent =
+          "ERROR";
+
         return;
       }
 
       orderIdEl.textContent =
-        `Order ID: #${order.id}`;
+        `Order #${order.id}`;
 
-      setStatus(order.status || "pending");
+      setStatus(order.status);
 
       /*
-       * FIX:
-       * Product information is not stored directly in orders.
-       * It is read from order_items, then product images are read
-       * from products.
+       * Correct data path:
+       * orders -> order_items -> products
        */
       const {
         data: items,
         error: itemError
-      } = await supabaseClient
-        .from("order_items")
-        .select("*")
-        .eq("order_id", order.id);
+      } =
+        await returnSupabase
+          .from("order_items")
+          .select("*")
+          .eq("order_id", order.id);
 
       if (itemError) {
         console.warn(
-          "Order items could not be loaded:",
+          "Order items:",
           itemError.message
         );
       }
 
-      const orderItems = items || [];
+      const orderItems =
+        items || [];
 
       const productIds =
         orderItems
@@ -569,22 +619,42 @@
         const {
           data,
           error: productError
-        } = await supabaseClient
-          .from("products")
-          .select("id,name,image_url,image")
-          .in("id", productIds);
+        } =
+          await returnSupabase
+            .from("products")
+            .select(
+              "id,name,image_url,image"
+            )
+            .in("id", productIds);
 
         if (productError) {
           console.warn(
-            "Product details could not be loaded:",
+            "Products:",
             productError.message
           );
         } else {
-          products = data || [];
+          products =
+            data || [];
         }
       }
 
-      renderProducts(orderItems, products);
+      renderProducts(
+        orderItems,
+        products
+      );
+
+      const calculatedTotal =
+        orderItems.reduce(
+          (sum, item) =>
+            sum +
+            Number(item.quantity || 0) *
+            Number(
+              item.unit_price ??
+              item.price ??
+              0
+            ),
+          0
+        );
 
       const total =
         Number(
@@ -592,28 +662,29 @@
           order.total ??
           order.grand_total ??
           0
-        );
+        ) || calculatedTotal;
 
       detailsEl.textContent =
         orderItems.length
           ? `${orderItems.length} product${orderItems.length === 1 ? "" : "s"} • ${money(total)}`
           : `Order total: ${money(total)}`;
 
-    } catch (err) {
+    } catch (error) {
       console.error(
-        "Return page order loading error:",
-        err
+        "Return order loading error:",
+        error
       );
 
       orderIdEl.textContent =
-        `Order ID: #${orderId}`;
+        `Order #${orderId}`;
 
       detailsEl.textContent =
-        "Unable to load product details right now.";
+        "Unable to load order details.";
 
-      badgeEl.textContent = "ERROR";
+      badgeEl.textContent =
+        "ERROR";
     }
-  });
+  }
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
@@ -625,113 +696,127 @@
       document.getElementById("submitBtn");
 
     const requestType =
-      document.getElementById("requestType").value;
+      document.getElementById(
+        "requestType"
+      ).value;
 
     const reason =
-      document.getElementById("requestReason").value;
+      document.getElementById(
+        "requestReason"
+      ).value;
 
     const description =
-      document.getElementById("returnDesc")
-        .value.trim();
+      document.getElementById(
+        "returnDesc"
+      ).value.trim();
 
     const fileInput =
-      document.getElementById("returnMedia");
+      document.getElementById(
+        "returnMedia"
+      );
 
     const files =
-      fileInput ? fileInput.files : [];
-
-    if (!orderId) {
-      msg.style.color = "var(--danger)";
-      msg.textContent = "Order ID is missing.";
-      return;
-    }
+      fileInput
+        ? fileInput.files
+        : [];
 
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
-    msg.style.color = "var(--accent)";
+
+    msg.style.color =
+      "var(--accent)";
+
     msg.textContent =
       "Uploading files & submitting request...";
 
     try {
       const {
-        data: { user }
-      } = await supabaseClient.auth.getUser();
+        data: { user },
+        error: userError
+      } =
+        await returnSupabase.auth.getUser();
 
-      if (!user) {
-        msg.style.color = "var(--danger)";
-        msg.textContent =
-          "Please login first to submit a request.";
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = "1";
-        return;
+      if (userError) {
+        throw userError;
       }
 
-      // Verify ownership again before creating the request.
+      if (!user) {
+        throw new Error(
+          "Please login first to submit a request."
+        );
+      }
+
       const {
         data: ownedOrder,
         error: ownedOrderError
-      } = await supabaseClient
-        .from("orders")
-        .select("id")
-        .eq("id", orderId)
-        .eq("user_id", user.id)
-        .maybeSingle();
+      } =
+        await returnSupabase
+          .from("orders")
+          .select("id")
+          .eq("id", orderId)
+          .eq("user_id", user.id)
+          .maybeSingle();
 
       if (ownedOrderError) {
         throw ownedOrderError;
       }
 
       if (!ownedOrder) {
-        msg.style.color = "var(--danger)";
-        msg.textContent =
-          "This order is not available for your account.";
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = "1";
-        return;
+        throw new Error(
+          "This order is not available for your account."
+        );
       }
 
       let mediaUrls = [];
 
-      if (files && files.length > 0) {
+      if (files && files.length) {
         const limit =
           Math.min(files.length, 5);
 
         for (let i = 0; i < limit; i++) {
-          const file = files[i];
+          const file =
+            files[i];
 
           const safeName =
-            String(file.name || "file")
-              .replace(/[^a-zA-Z0-9._-]/g, "_");
+            String(
+              file.name || "file"
+            ).replace(
+              /[^a-zA-Z0-9._-]/g,
+              "_"
+            );
 
           const fileName =
             `return_${orderId}_${Date.now()}_${i}_${safeName}`;
 
           const {
             error: uploadError
-          } = await supabaseClient.storage
-            .from("product-review-images")
-            .upload(fileName, file);
+          } =
+            await returnSupabase.storage
+              .from(
+                "product-review-images"
+              )
+              .upload(
+                fileName,
+                file
+              );
 
           if (uploadError) {
-            msg.style.color = "var(--danger)";
-            msg.textContent =
-              "Upload Error: " +
-              uploadError.message;
-
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = "1";
-            return;
+            throw uploadError;
           }
 
           const {
             data: publicUrlData
-          } = supabaseClient.storage
-            .from("product-review-images")
-            .getPublicUrl(fileName);
+          } =
+            returnSupabase.storage
+              .from(
+                "product-review-images"
+              )
+              .getPublicUrl(
+                fileName
+              );
 
           if (
-            publicUrlData &&
-            publicUrlData.publicUrl
+            publicUrlData?.publicUrl
           ) {
             mediaUrls.push(
               publicUrlData.publicUrl
@@ -742,33 +827,29 @@
 
       const {
         error: insertError
-      } = await supabaseClient
-        .from("support_requests")
-        .insert({
-          user_id: user.id,
-          order_id: Number(orderId),
-          issue_type: requestType,
-          description:
-            `Reason: ${reason} | Details: ${description}`,
-          photo_urls:
-            mediaUrls.length > 0
-              ? mediaUrls
-              : null,
-          status: "Requested"
-        });
+      } =
+        await returnSupabase
+          .from("support_requests")
+          .insert({
+            user_id: user.id,
+            order_id: Number(orderId),
+            issue_type: requestType,
+            description:
+              `Reason: ${reason} | Details: ${description}`,
+            photo_urls:
+              mediaUrls.length
+                ? mediaUrls
+                : null,
+            status: "Requested"
+          });
 
       if (insertError) {
-        msg.style.color = "var(--danger)";
-        msg.textContent =
-          "Database Error: " +
-          insertError.message;
-
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = "1";
-        return;
+        throw insertError;
       }
 
-      msg.style.color = "var(--success)";
+      msg.style.color =
+        "var(--success)";
+
       msg.textContent =
         "✓ Return request submitted successfully! Redirecting...";
 
@@ -777,21 +858,34 @@
           `order.html?id=${encodeURIComponent(orderId)}`;
       }, 2000);
 
-    } catch (err) {
+    } catch (error) {
       console.error(
         "Return request error:",
-        err
+        error
       );
 
-      msg.style.color = "var(--danger)";
+      msg.style.color =
+        "var(--danger)";
+
       msg.textContent =
-        "Something went wrong: " +
-        err.message;
+        error.message ||
+        "Something went wrong.";
 
       submitBtn.disabled = false;
       submitBtn.style.opacity = "1";
     }
   }
+
+  // Expose only the form handler required by the inline onsubmit.
+  window.handleReturnSubmit =
+    handleReturnSubmit;
+
+  // Start loading after the page is ready.
+  window.addEventListener(
+    "DOMContentLoaded",
+    loadReturnOrder
+  );
+})();
 </script>
 
 </body>
