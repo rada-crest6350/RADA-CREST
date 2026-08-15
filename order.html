@@ -765,7 +765,6 @@ async function submitReview(){
     const prodId = window.currentReviewProductId || window.activeReviewProductId;
     const custName = window.currentCustomerName || "Customer";
 
-    // Current logged-in user ki details lein
     const { data: { user } } = await supabaseClient.auth.getUser();
 
     const { error: insertError } = await supabaseClient
@@ -785,7 +784,7 @@ async function submitReview(){
       return;
     }
 
-    if(messageBox messageBox.textContent = "Review submitted successfully!";
+    if(messageBox) messageBox.textContent = "Review submitted successfully!";
     setTimeout(() => {
       if(typeof closeReview === "function") closeReview();
       location.reload();
@@ -796,7 +795,7 @@ async function submitReview(){
     if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
 }
-  
+
 /* -----------------------------
    LOAD ORDER
 ----------------------------- */
