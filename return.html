@@ -5,105 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Return & Replacement - RADA-CREST</title>
   <style>
+    :root {
+      --primary: #111111;
+      --accent: #2563eb;
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
       margin: 0;
       padding: 20px;
-      color: #333;
+      color: var(--text-main);
     }
+
     .container {
-      max-width: 700px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      max-width: 650px;
+      margin: 30px auto;
+      background: var(--card-bg);
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
+
     .back-link {
-      display: inline-block;
-      margin-bottom: 20px;
-      color: #000;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 25px;
+      color: var(--text-muted);
       text-decoration: none;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
     }
     .back-link:hover {
-      text-decoration: underline;
+      color: var(--primary);
     }
+
     h1 {
       font-size: 24px;
-      margin-bottom: 5px;
+      font-weight: 700;
+      color: var(--primary);
+      margin: 0 0 8px 0;
     }
+
     .subtitle {
-      color: #666;
+      color: var(--text-muted);
       font-size: 14px;
       margin-bottom: 25px;
+      line-height: 1.5;
     }
+
     .order-summary-box {
-      background: #fdfdfd;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 15px;
-      margin-bottom: 20px;
+      background: #f9fafb;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 25px;
     }
+
     .order-summary-box h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
-      color: #222;
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
     }
+
     .product-info {
       font-size: 14px;
-      color: #555;
-      margin-bottom: 5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
     }
+
     label {
       display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: bold;
-      font-size: 14px;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
     }
+
     select, textarea, input[type="file"] {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       box-sizing: border-box;
       font-size: 14px;
+      background-color: #fff;
+      color: var(--text-main);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+
+    select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
     textarea {
       resize: vertical;
+      min-height: 100px;
     }
+
+    input[type="file"] {
+      padding: 10px;
+      background: #f9fafb;
+      cursor: pointer;
+    }
+
     .policy-notes {
-      background: #f1f3f5;
-      padding: 12px;
-      border-radius: 6px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 15px;
       font-size: 13px;
-      color: #444;
-      margin: 20px 0;
+      color: #1e40af;
+      margin: 25px 0;
     }
+
     .policy-notes ul {
-      margin: 5px 0 0 20px;
+      margin: 6px 0 0 18px;
       padding: 0;
     }
+
+    .policy-notes li {
+      margin-bottom: 4px;
+    }
+
     .submit-btn {
-      background: #000;
+      background: var(--primary);
       color: #fff;
       border: none;
       padding: 14px;
       width: 100%;
-      font-size: 16px;
-      font-weight: bold;
-      border-radius: 4px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 10px;
+      transition: background 0.2s, transform 0.1s;
     }
+
     .submit-btn:hover {
-      background: #333;
+      background: #27272a;
     }
+
+    .submit-btn:active {
+      transform: scale(0.99);
+    }
+
     #returnMsg {
       margin-top: 15px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 500;
       text-align: center;
     }
   </style>
@@ -111,10 +173,10 @@
 <body>
 
 <div class="container">
-  <a href="order.html" class="back-link">&larr; Back to Order</a>
+  <a href="order.html" id="backLink" class="back-link">&larr; Back to Order Details</a>
   
   <h1>Return / Replacement Request</h1>
-  <p class="subtitle">We're sorry your product didn't work out. Tell us what happened and we'll help you.</p>
+  <p class="subtitle">We're sorry your product didn't work out. Tell us what happened and we'll help you resolve it quickly.</p>
 
   <!-- Order & Product Info Box -->
   <div class="order-summary-box" id="orderSummaryBox">
@@ -126,16 +188,16 @@
   <!-- Form for Return -->
   <form id="returnForm" onsubmit="handleReturnSubmit(event)">
     
-    <label for="requestType">Select Request Type:</label>
+    <label for="requestType">Select Request Type</label>
     <select id="requestType" required>
       <option value="Return & Refund">Return & Refund</option>
       <option value="Replacement">Replacement</option>
     </select>
 
-    <label for="returnReason">Select Reason:</label>
+    <label for="returnReason">Select Reason</label>
     <select id="returnReason" required>
       <option value="">-- Choose Reason --</option>
-      <option value="Product damaged">Product damaged (Tuta hua)</option>
+      <option value="Product damaged">Product damaged (Tuta hua / Defective)</option>
       <option value="Wrong product received">Wrong product received (Galat item)</option>
       <option value="Product not working">Product not working (Kaam nahi kar raha)</option>
       <option value="Product is different from description">Product is different from description</option>
@@ -145,19 +207,19 @@
       <option value="Other">Other</option>
     </select>
 
-    <label for="returnDesc">Tell us more (Description):</label>
-    <textarea id="returnDesc" rows="4" placeholder="Please explain the issue with the product..." required></textarea>
+    <label for="returnDesc">Tell us more</label>
+    <textarea id="returnDesc" placeholder="Please explain the issue with the product..." required></textarea>
 
-    <label for="returnPhotos">Upload Photos (Up to 5 photos):</label>
+    <label for="returnPhotos">Upload Photos (Up to 5 photos)</label>
     <input type="file" id="returnPhotos" multiple accept="image/*">
 
     <!-- Policy Box -->
     <div class="policy-notes">
       <strong>Return Policy Highlights:</strong>
       <ul>
-        <li>Return requests must be submitted within valid delivery window.</li>
-        <li>Product should be returned in acceptable original condition.</li>
-        <li>Refund/Replacement is processed after inspection.</li>
+        <li>Requests must be submitted within the valid delivery window.</li>
+        <li>Product should be returned in its original condition with tags.</li>
+        <li>Refund/Replacement is processed post-inspection.</li>
       </ul>
     </div>
 
@@ -169,37 +231,46 @@
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Supabase Initialization (Aapke project credentials ke mutabiq)
+  // Apne project ki real Supabase URL aur Anon Key yahan dalein
   const SUPABASE_URL = "AAPKA_SUPABASE_URL"; 
   const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // URL se Order ID nikalna (e.g., return.html?id=46)
   const urlParams = new URLSearchParams(window.location.search);
   const orderId = urlParams.get('id');
 
+  // Back link ko dynamic banana taaki wapas usi order page par jaye
+  if (orderId) {
+    document.getElementById("backLink").href = `order.html?id=${orderId}`;
+  }
+
   window.addEventListener('DOMContentLoaded', async () => {
     if (!orderId) {
-      document.getElementById("orderSummaryBox").innerHTML = "<p style='color:red;'>Error: No Order ID provided in URL.</p>";
+      document.getElementById("orderSummaryBox").innerHTML = "<p style='color:#dc2626; margin:0;'>Error: No Order ID provided in URL. Please open from your Orders page.</p>";
       return;
     }
 
     document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
 
-    // Optional: Database se order ki details fetch karna taaki product ka naam dikh sake
     try {
+      // Database se order aur product ki details lana
       const { data, error } = await supabaseClient
-        .from('orders') // ya aapka jo bhi orders table ho
+        .from('orders')
         .select('*')
         .eq('id', orderId)
         .single();
 
       if (data) {
-        // Aapke table structure ke hisab se product name ya items display karna
-        document.getElementById("displayProductDetails").textContent = `Details loaded successfully for Order #${orderId}`;
+        // Yahan aapke table ke columns ke mutabiq product name/details show hongi
+        const productName = data.product_name || data.item_name || "Product (Lala / Item)";
+        const productPrice = data.total_amount || data.price || "999";
+        document.getElementById("displayProductDetails").textContent = `Product: ${productName} | Price: ₹${productPrice}`;
+      } else {
+        document.getElementById("displayProductDetails").textContent = `Order found (#${orderId})`;
       }
     } catch (err) {
-      console.log("Could not fetch extra order details, proceeding with ID.");
+      console.error("Fetch error:", err);
+      document.getElementById("displayProductDetails").textContent = `Order ID: #${orderId}`;
     }
   });
 
@@ -215,28 +286,28 @@
     const files = fileInput ? fileInput.files : [];
 
     if (!orderId) {
-      msg.style.color = "red";
+      msg.style.color = "#dc2626";
       msg.textContent = "Invalid Order ID.";
       return;
     }
 
     submitBtn.disabled = true;
-    msg.style.color = "blue";
-    msg.textContent = "Submitting return request and uploading photos...";
+    submitBtn.style.opacity = "0.7";
+    msg.style.color = "#2563eb";
+    msg.textContent = "Submitting request & uploading photos...";
 
     try {
-      // User check
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) {
-        msg.style.color = "red";
+        msg.style.color = "#dc2626";
         msg.textContent = "Please login first.";
         submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
         return;
       }
 
       let photoUrls = [];
 
-      // Agar photos select ki hain toh Supabase Storage mein upload karna
       if (files && files.length > 0) {
         const limit = Math.min(files.length, 5);
         for (let i = 0; i < limit; i++) {
@@ -244,14 +315,15 @@
           const fileName = `return_${orderId}_${Date.now()}_${i}_${file.name}`;
           
           const { error: uploadError } = await supabaseClient.storage
-            .from("product-review-images") // Aap chahein toh naya bucket bhi bana sakte hain ya isi mein rakh sakte hain
+            .from("product-review-images")
             .upload(fileName, file);
 
           if (uploadError) {
             console.error("Storage upload error:", uploadError);
-            msg.style.color = "red";
+            msg.style.color = "#dc2626";
             msg.textContent = "Photo Upload Error: " + uploadError.message;
             submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
             return;
           }
 
@@ -265,13 +337,12 @@
         }
       }
 
-      // Database table mein insert karna (Ensure karein ki support_requests ya returns table ho)
       const { error: insertError } = await supabaseClient
-        .from("support_requests") // Ya agar alag table ho jaise 'returns', toh wo likhein
+        .from("support_requests")
         .insert({
           user_id: user.id,
           order_id: Number(orderId),
-          issue_type: requestType, // Return & Refund ya Replacement
+          issue_type: requestType,
           description: `Reason: ${reason} | Details: ${description}`,
           photo_urls: photoUrls.length > 0 ? photoUrls : null,
           status: "Requested"
@@ -279,24 +350,26 @@
 
       if (insertError) {
         console.error("Database error:", insertError);
-        msg.style.color = "red";
+        msg.style.color = "#dc2626";
         msg.textContent = "Database Error: " + insertError.message;
         submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
         return;
       }
 
-      msg.style.color = "green";
-      msg.textContent = "✓ Return request submitted successfully! Our team will review it.";
+      msg.style.color = "#16a34a";
+      msg.textContent = "✓ Return request submitted successfully! Redirecting...";
       
       setTimeout(() => {
         window.location.href = `order.html?id=${orderId}`;
-      }, 2500);
+      }, 2000);
 
     } catch (err) {
       console.error("Error:", err);
-      msg.style.color = "red";
+      msg.style.color = "#dc2626";
       msg.textContent = "Something went wrong: " + err.message;
       submitBtn.disabled = false;
+      submitBtn.style.opacity = "1";
     }
   }
 </script>
