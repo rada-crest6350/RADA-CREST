@@ -747,13 +747,16 @@ async function submitReview(){
         const file = files[i];
         const fileName = `review_${Date.now()}_${i}_${file.name}`;
         
+        // Supabase Storage upload
         const { error: uploadError } = await supabaseClient.storage
-          .from("reviews-media")
+          .from("product-review-images")
           .upload(fileName, file);
 
         if(uploadError){
           console.error("Storage upload error:", uploadError);
-          continue;
+          // Yahan screen par error dikha denge taaki pata chale kya dikkat hai
+          if(messageBox) messageBox.textContent = "Upload Error: " + uploadError.message;
+          return; 
         }
 
         const { data: publicUrlData } = supabaseClient.storage
@@ -763,7 +766,6 @@ async function submitReview(){
         if(publicUrlData && publicUrlData.publicUrl){
           photoUrls.push(publicUrlData.publicUrl);
         } else {
-          // Fallback agar direct property na mile
           const publicUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/product-review-images/${fileName}`;
           photoUrls.push(publicUrl);
         }
@@ -789,7 +791,7 @@ async function submitReview(){
 
     if(insertError){
       console.error("Database error:", insertError);
-      if(messageBox) messageBox.textContent = "Error: " + insertError.message;
+      if(messageBox) messageBox.textContent = "Database Error: " + insertError.message;
       return;
     }
 
@@ -804,8 +806,8 @@ async function submitReview(){
     console.error("Catch error:", err);
     if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
-}   
-
+}
+  
 /* -----------------------------
    LOAD ORDER
 ----------------------------- */
