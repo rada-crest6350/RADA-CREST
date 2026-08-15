@@ -482,8 +482,10 @@ async function loadReviews(){
 
           <p>${esc(review.review || "")}</p>
 
-          <div style="display:flex; flex-wrap:wrap;">${photosHtml}</div>
-
+               <div style="display:flex; flex-wrap:nowrap; overflow-x:auto; padding-bottom: 10px; -webkit-overflow-scrolling: touch;">
+                  ${photosHtml}
+               </div>
+          
           <small>
             ${esc(review.customer_name || "Customer")}
           </small>
