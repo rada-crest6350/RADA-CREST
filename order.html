@@ -722,10 +722,14 @@ async function submitReview(){
 
   // Yahan hum openReview wale variable ko check kar rahe hain
   if(!window.reviewProductId){
+      // Agar window.reviewProductId na mile, toh direct variable check karein
+  const prodId = window.reviewProductId || (typeof reviewProductId !== 'undefined' ? reviewProductId : null);
+
+  if(!prodId){
     if(messageBox) messageBox.textContent = "Error: Product ID is missing. Please reopen the review popup.";
     return;
   }
-
+    
   const reviewText = textInput.value.trim();
   const files = fileInput ? fileInput.files : [];
   let photoUrls = [];
