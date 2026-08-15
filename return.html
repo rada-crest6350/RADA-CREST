@@ -185,6 +185,65 @@
       background: var(--accent-hover);
     }
 
+
+    #orderProducts {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .return-product {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .return-product:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .return-product img,
+    .return-product-placeholder {
+      width: 58px;
+      height: 58px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #e2e8f0;
+      flex: 0 0 58px;
+    }
+
+    .return-product-info {
+      min-width: 0;
+    }
+
+    .return-product-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      word-break: break-word;
+    }
+
+    .return-product-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 28px 20px;
+      }
+
+      .order-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+      }
+    }
+
     #returnMsg {
       margin-top: 18px;
       font-size: 14px;
@@ -206,6 +265,7 @@
     <div class="order-info">
       <h3 id="displayOrderId">Loading Order...</h3>
       <p id="displayProductDetails">Fetching details...</p>
+      <div id="orderProducts"></div>
     </div>
     <div class="badge" id="orderStatusBadge">Loading</div>
   </div>
@@ -258,73 +318,373 @@
 
 <!-- Supabase Client Library -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+
 <script>
-  const SUPABASE_URL = "AAPKA_SUPABASE_URL"; 
-  const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Same Supabase connection used by the working order page.
+  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+
+  const supabaseClient =
+    window.supabaseClient ||
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+  window.supabaseClient = supabaseClient;
 
   const urlParams = new URLSearchParams(window.location.search);
-  const orderId = urlParams.get('id');
+  const orderId = urlParams.get("id");
 
-  window.addEventListener('DOMContentLoaded', async () => {
-    if (!orderId) {
-      document.getElementById("displayOrderId").textContent = "Order ID Missing";
-      document.getElementById("displayProductDetails").textContent = "Invalid URL";
-      document.getElementById("orderStatusBadge").textContent = "Error";
+  function esc(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function money(value) {
+    const n = Number(value || 0);
+    return "₹" + n.toLocaleString("en-IN");
+  }
+
+  function cleanImage(value) {
+    if (!value) return "";
+    const s = String(value).trim();
+
+    if (
+      !s ||
+      s === "null" ||
+      s === "undefined" ||
+      s === "image" ||
+      s === "image_url"
+    ) {
+      return "";
+    }
+
+    return s;
+  }
+
+  function setStatus(status) {
+    const badge = document.getElementById("orderStatusBadge");
+    const value = String(status || "pending");
+
+    badge.textContent = value;
+
+    const delivered =
+      value.toLowerCase() === "delivered";
+
+    badge.style.background =
+      delivered ? "#dcfce7" : "#e0e7ff";
+
+    badge.style.color =
+      delivered ? "#166534" : "#3730a3";
+  }
+
+  function renderProducts(items, products) {
+    const box =
+      document.getElementById("orderProducts");
+
+    const productMap = new Map();
+
+    (products || []).forEach(product => {
+      productMap.set(String(product.id), product);
+    });
+
+    if (!items || !items.length) {
+      box.innerHTML = `
+        <div style="
+          margin-top:10px;
+          font-size:13px;
+          color:#64748b;
+        ">
+          Product details are unavailable for this order.
+        </div>
+      `;
       return;
     }
 
-    document.getElementById("backLink").href = `order.html?id=${orderId}`;
-    document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
+    box.innerHTML = items.map(item => {
+      const product =
+        productMap.get(String(item.product_id)) || {};
+
+      const name =
+        item.product_name ||
+        product.name ||
+        "Product";
+
+      const quantity =
+        Number(item.quantity || 1);
+
+      const price =
+        Number(
+          item.unit_price ??
+          item.price ??
+          0
+        );
+
+      const image =
+        cleanImage(
+          product.image_url ||
+          product.image ||
+          item.image_url ||
+          item.image
+        );
+
+      const imageHtml = image
+        ? `
+          <img
+            src="${esc(image)}"
+            alt="${esc(name)}"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+          >
+          <div
+            class="return-product-placeholder"
+            style="display:none"
+          ></div>
+        `
+        : `
+          <div class="return-product-placeholder"></div>
+        `;
+
+      return `
+        <div class="return-product">
+          ${imageHtml}
+
+          <div class="return-product-info">
+            <div class="return-product-name">
+              ${esc(name)}
+            </div>
+
+            <div class="return-product-meta">
+              Quantity: ${quantity}
+              ${price > 0 ? " • " + money(price) + " each" : ""}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    const orderIdEl =
+      document.getElementById("displayOrderId");
+
+    const detailsEl =
+      document.getElementById("displayProductDetails");
+
+    const badgeEl =
+      document.getElementById("orderStatusBadge");
+
+    if (!orderId) {
+      orderIdEl.textContent = "Order ID Missing";
+      detailsEl.textContent = "Invalid URL";
+      badgeEl.textContent = "Error";
+      return;
+    }
+
+    document.getElementById("backLink").href =
+      `order.html?id=${encodeURIComponent(orderId)}`;
 
     try {
-      // Supabase se actual order fetch karo
-      const { data, error } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .eq('id', orderId)
+      const {
+        data: { user },
+        error: userError
+      } = await supabaseClient.auth.getUser();
+
+      if (userError || !user) {
+        orderIdEl.textContent = "Login Required";
+        detailsEl.textContent =
+          "Please login to view this order.";
+        badgeEl.textContent = "LOGIN";
+        return;
+      }
+
+      /*
+       * Get the actual order and verify ownership.
+       * This is the same order lookup pattern used by order.html.
+       */
+      const {
+        data: order,
+        error: orderError
+      } = await supabaseClient
+        .from("orders")
+        .select("*")
+        .eq("id", orderId)
+        .eq("user_id", user.id)
         .maybeSingle();
 
-      if (data) {
-        // Tumhare database ke alag-alag column names ko map karna
-        const productName = data.product_name || data.item_name || data.title || data.name || data.product_title || `Order Item #${orderId}`;
-        const productPrice = data.total_amount || data.price || data.amount || data.total || "0";
-        const orderStatus = data.status || "Delivered";
-
-        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
-        document.getElementById("orderStatusBadge").textContent = orderStatus;
-      } else {
-        document.getElementById("displayProductDetails").textContent = `Product #${orderId}`;
-        document.getElementById("orderStatusBadge").textContent = "Delivered";
+      if (orderError) {
+        throw orderError;
       }
+
+      if (!order) {
+        orderIdEl.textContent = "Order Not Found";
+        detailsEl.textContent =
+          "This order does not belong to your account or no longer exists.";
+        badgeEl.textContent = "ERROR";
+        return;
+      }
+
+      orderIdEl.textContent =
+        `Order ID: #${order.id}`;
+
+      setStatus(order.status || "pending");
+
+      /*
+       * FIX:
+       * Product information is not stored directly in orders.
+       * It is read from order_items, then product images are read
+       * from products.
+       */
+      const {
+        data: items,
+        error: itemError
+      } = await supabaseClient
+        .from("order_items")
+        .select("*")
+        .eq("order_id", order.id);
+
+      if (itemError) {
+        console.warn(
+          "Order items could not be loaded:",
+          itemError.message
+        );
+      }
+
+      const orderItems = items || [];
+
+      const productIds =
+        orderItems
+          .map(item => item.product_id)
+          .filter(Boolean);
+
+      let products = [];
+
+      if (productIds.length) {
+        const {
+          data,
+          error: productError
+        } = await supabaseClient
+          .from("products")
+          .select("id,name,image_url,image")
+          .in("id", productIds);
+
+        if (productError) {
+          console.warn(
+            "Product details could not be loaded:",
+            productError.message
+          );
+        } else {
+          products = data || [];
+        }
+      }
+
+      renderProducts(orderItems, products);
+
+      const total =
+        Number(
+          order.total_amount ??
+          order.total ??
+          order.grand_total ??
+          0
+        );
+
+      detailsEl.textContent =
+        orderItems.length
+          ? `${orderItems.length} product${orderItems.length === 1 ? "" : "s"} • ${money(total)}`
+          : `Order total: ${money(total)}`;
+
     } catch (err) {
-      console.error("Error fetching order:", err);
-      document.getElementById("displayProductDetails").textContent = `Product #${orderId}`;
-      document.getElementById("orderStatusBadge").textContent = "Delivered";
+      console.error(
+        "Return page order loading error:",
+        err
+      );
+
+      orderIdEl.textContent =
+        `Order ID: #${orderId}`;
+
+      detailsEl.textContent =
+        "Unable to load product details right now.";
+
+      badgeEl.textContent = "ERROR";
     }
   });
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
-    
-    const msg = document.getElementById("returnMsg");
-    const submitBtn = document.getElementById("submitBtn");
-    const requestType = document.getElementById("requestType").value;
-    const reason = document.getElementById("requestReason").value;
-    const description = document.getElementById("returnDesc").value.trim();
-    const fileInput = document.getElementById("returnMedia");
-    const files = fileInput ? fileInput.files : [];
+
+    const msg =
+      document.getElementById("returnMsg");
+
+    const submitBtn =
+      document.getElementById("submitBtn");
+
+    const requestType =
+      document.getElementById("requestType").value;
+
+    const reason =
+      document.getElementById("requestReason").value;
+
+    const description =
+      document.getElementById("returnDesc")
+        .value.trim();
+
+    const fileInput =
+      document.getElementById("returnMedia");
+
+    const files =
+      fileInput ? fileInput.files : [];
+
+    if (!orderId) {
+      msg.style.color = "var(--danger)";
+      msg.textContent = "Order ID is missing.";
+      return;
+    }
 
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
     msg.style.color = "var(--accent)";
-    msg.textContent = "Uploading files & submitting request...";
+    msg.textContent =
+      "Uploading files & submitting request...";
 
     try {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const {
+        data: { user }
+      } = await supabaseClient.auth.getUser();
+
       if (!user) {
         msg.style.color = "var(--danger)";
-        msg.textContent = "Please login first to submit a request.";
+        msg.textContent =
+          "Please login first to submit a request.";
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
+        return;
+      }
+
+      // Verify ownership again before creating the request.
+      const {
+        data: ownedOrder,
+        error: ownedOrderError
+      } = await supabaseClient
+        .from("orders")
+        .select("id")
+        .eq("id", orderId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (ownedOrderError) {
+        throw ownedOrderError;
+      }
+
+      if (!ownedOrder) {
+        msg.style.color = "var(--danger)";
+        msg.textContent =
+          "This order is not available for your account.";
         submitBtn.disabled = false;
         submitBtn.style.opacity = "1";
         return;
@@ -333,62 +693,101 @@
       let mediaUrls = [];
 
       if (files && files.length > 0) {
-        const limit = Math.min(files.length, 5);
+        const limit =
+          Math.min(files.length, 5);
+
         for (let i = 0; i < limit; i++) {
           const file = files[i];
-          const fileName = `return_${orderId}_${Date.now()}_${i}_${file.name}`;
-          
-          const { error: uploadError } = await supabaseClient.storage
+
+          const safeName =
+            String(file.name || "file")
+              .replace(/[^a-zA-Z0-9._-]/g, "_");
+
+          const fileName =
+            `return_${orderId}_${Date.now()}_${i}_${safeName}`;
+
+          const {
+            error: uploadError
+          } = await supabaseClient.storage
             .from("product-review-images")
             .upload(fileName, file);
 
           if (uploadError) {
             msg.style.color = "var(--danger)";
-            msg.textContent = "Upload Error: " + uploadError.message;
+            msg.textContent =
+              "Upload Error: " +
+              uploadError.message;
+
             submitBtn.disabled = false;
             submitBtn.style.opacity = "1";
             return;
           }
 
-          const { data: publicUrlData } = supabaseClient.storage
+          const {
+            data: publicUrlData
+          } = supabaseClient.storage
             .from("product-review-images")
             .getPublicUrl(fileName);
-            
-          if (publicUrlData && publicUrlData.publicUrl) {
-            mediaUrls.push(publicUrlData.publicUrl);
+
+          if (
+            publicUrlData &&
+            publicUrlData.publicUrl
+          ) {
+            mediaUrls.push(
+              publicUrlData.publicUrl
+            );
           }
         }
       }
 
-      const { error: insertError } = await supabaseClient
+      const {
+        error: insertError
+      } = await supabaseClient
         .from("support_requests")
         .insert({
           user_id: user.id,
           order_id: Number(orderId),
           issue_type: requestType,
-          description: `Reason: ${reason} | Details: ${description}`,
-          photo_urls: mediaUrls.length > 0 ? mediaUrls : null,
+          description:
+            `Reason: ${reason} | Details: ${description}`,
+          photo_urls:
+            mediaUrls.length > 0
+              ? mediaUrls
+              : null,
           status: "Requested"
         });
 
       if (insertError) {
         msg.style.color = "var(--danger)";
-        msg.textContent = "Database Error: " + insertError.message;
+        msg.textContent =
+          "Database Error: " +
+          insertError.message;
+
         submitBtn.disabled = false;
         submitBtn.style.opacity = "1";
         return;
       }
 
       msg.style.color = "var(--success)";
-      msg.textContent = "✓ Return request submitted successfully! Redirecting...";
-      
+      msg.textContent =
+        "✓ Return request submitted successfully! Redirecting...";
+
       setTimeout(() => {
-        window.location.href = `order.html?id=${orderId}`;
+        window.location.href =
+          `order.html?id=${encodeURIComponent(orderId)}`;
       }, 2000);
 
     } catch (err) {
+      console.error(
+        "Return request error:",
+        err
+      );
+
       msg.style.color = "var(--danger)";
-      msg.textContent = "Something went wrong: " + err.message;
+      msg.textContent =
+        "Something went wrong: " +
+        err.message;
+
       submitBtn.disabled = false;
       submitBtn.style.opacity = "1";
     }
