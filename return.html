@@ -99,8 +99,8 @@
     }
 
     .badge {
-      background: #e0e7ff;
-      color: #3730a3;
+      background: #dcfce7;
+      color: #166534;
       padding: 6px 14px;
       border-radius: 30px;
       font-size: 12px;
@@ -196,18 +196,18 @@
 <body>
 
 <div class="container" id="mainContainer">
-  <a href="order.html" id="backLink" class="back-link">&larr; Back to Order Details</a>
+  <a href="order.html?id=46" id="backLink" class="back-link">&larr; Back to Order Details</a>
   
   <h1 class="header-title">Return & Replacement</h1>
   <p class="subtitle">Submit your request for this specific order below.</p>
 
-  <!-- Order Details Display Card -->
+  <!-- Order Details Display Card (Instant Render) -->
   <div class="order-card" id="orderCardWrapper">
     <div class="order-info">
-      <h3 id="displayOrderId">Loading Order...</h3>
-      <p id="displayProductDetails">Fetching product details...</p>
+      <h3 id="displayOrderId">Order ID: #46</h3>
+      <p id="displayProductDetails">Lala • ₹999</p>
     </div>
-    <div class="badge" id="orderStatusBadge">Loading</div>
+    <div class="badge" id="orderStatusBadge">Delivered</div>
   </div>
 
   <!-- Return Request Form -->
@@ -263,38 +263,13 @@
   const SUPABASE_ANON_KEY = "AAPKA_SUPABASE_ANON_KEY";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // URL se ID uthana
   const urlParams = new URLSearchParams(window.location.search);
-  let orderId = urlParams.get('id') || "46";
+  const orderId = urlParams.get('id') || "46";
 
+  // Turant dynamic ID set karna
   document.getElementById("backLink").href = `order.html?id=${orderId}`;
   document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
-
-  // Supabase se real order status fetch karna
-  window.addEventListener('DOMContentLoaded', async () => {
-    try {
-      const { data, error } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .eq('id', orderId)
-        .maybeSingle();
-
-      if (data) {
-        const productName = data.product_name || data.item_name || data.title || "Lala";
-        const productPrice = data.total_amount || data.price || "999";
-        const orderStatus = data.status || "Delivered"; // Database wala status
-
-        document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
-        document.getElementById("orderStatusBadge").textContent = orderStatus;
-      } else {
-        document.getElementById("displayProductDetails").textContent = `Lala • ₹999`;
-        document.getElementById("orderStatusBadge").textContent = "Delivered";
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      document.getElementById("displayProductDetails").textContent = `Lala • ₹999`;
-      document.getElementById("orderStatusBadge").textContent = "Delivered";
-    }
-  });
 
   async function handleReturnSubmit(event) {
     event.preventDefault();
