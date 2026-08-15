@@ -757,14 +757,14 @@ async function submitReview(){
         }
 
         const { data: publicUrlData } = supabaseClient.storage
-          .from("reviews-media")
+          .from("product-review-images")
           .getPublicUrl(fileName);
           
         if(publicUrlData && publicUrlData.publicUrl){
           photoUrls.push(publicUrlData.publicUrl);
         } else {
           // Fallback agar direct property na mile
-          const publicUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/reviews-media/${fileName}`;
+          const publicUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/product-review-images/${fileName}`;
           photoUrls.push(publicUrl);
         }
       }
