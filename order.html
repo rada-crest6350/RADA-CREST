@@ -762,6 +762,10 @@ async function submitReview(){
           
         if(publicUrlData && publicUrlData.publicUrl){
           photoUrls.push(publicUrlData.publicUrl);
+        } else {
+          // Fallback agar direct property na mile
+          const publicUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/reviews-media/${fileName}`;
+          photoUrls.push(publicUrl);
         }
       }
     }
