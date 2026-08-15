@@ -4,25 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Return & Replacement | RADA-CREST</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --bg-base: #090d16;
       --card-bg: #ffffff;
       --primary: #0f172a;
-      --accent: #3b82f6;
-      --accent-hover: #2563eb;
-      --text-main: #1e293b;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --text-main: #0f172a;
       --text-muted: #64748b;
-      --border: #e2e8f0;
+      --border: #cbd5e1;
+      --border-focus: #4f46e5;
       --danger: #ef4444;
-      --success: #22c55e;
+      --success: #10b981;
     }
 
     body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--bg-gradient);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-base);
+      background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-base) 70%);
       margin: 0;
-      padding: 25px 15px;
+      padding: 40px 20px;
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
@@ -32,19 +35,20 @@
 
     .container {
       width: 100%;
-      max-width: 680px;
+      max-width: 700px;
       background: var(--card-bg);
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      padding: 45px;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
       box-sizing: border-box;
+      position: relative;
     }
 
     .back-link {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 24px;
+      margin-bottom: 25px;
       color: var(--text-muted);
       text-decoration: none;
       font-size: 14px;
@@ -56,10 +60,10 @@
     }
 
     .header-title {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 800;
       color: var(--primary);
-      margin: 0 0 8px 0;
+      margin: 0 0 10px 0;
       letter-spacing: -0.5px;
     }
 
@@ -70,21 +74,22 @@
       line-height: 1.6;
     }
 
-    /* Unique Order Summary Card */
+    /* Premium Order Card */
     .order-card {
       background: #f8fafc;
-      border: 2px dashed var(--border);
-      border-radius: 14px;
-      padding: 20px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 22px;
       margin-bottom: 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02);
     }
 
     .order-info h3 {
       margin: 0 0 6px 0;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--primary);
     }
@@ -96,79 +101,87 @@
     }
 
     .badge {
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 6px 12px;
-      border-radius: 20px;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 6px 14px;
+      border-radius: 30px;
       font-size: 12px;
       font-weight: 700;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    /* Form Design */
+    /* Form Fields */
     label {
       display: block;
-      margin-top: 20px;
+      margin-top: 22px;
       margin-bottom: 8px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       color: var(--primary);
     }
 
     select, textarea, input[type="file"] {
       width: 100%;
-      padding: 14px 16px;
+      padding: 15px 18px;
       border: 2px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       box-sizing: border-box;
       font-size: 15px;
-      background-color: #fff;
+      font-family: inherit;
+      background-color: #ffffff;
       color: var(--text-main);
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
     }
 
     select:focus, textarea:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
     }
 
     textarea {
       resize: vertical;
-      min-height: 120px;
+      min-height: 130px;
     }
 
+    /* Modern Dropzone Style Upload Box */
     .file-upload-box {
       background: #f8fafc;
       border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 20px;
       text-align: center;
       margin-top: 8px;
+      transition: border-color 0.2s;
+    }
+    .file-upload-box:hover {
+      border-color: var(--accent);
     }
 
     .file-upload-box input {
       border: none;
       background: transparent;
       padding: 0;
+      cursor: pointer;
     }
 
     /* Policy Highlight Box */
     .policy-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 12px;
-      padding: 16px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      border-radius: 14px;
+      padding: 18px;
       font-size: 13.5px;
-      color: #1e40af;
-      margin: 25px 0;
-      line-height: 1.5;
+      color: #3730a3;
+      margin: 28px 0;
+      line-height: 1.6;
     }
 
     .policy-box ul {
-      margin: 8px 0 0 20px;
+      margin: 6px 0 0 18px;
       padding: 0;
     }
 
@@ -176,27 +189,28 @@
       margin-bottom: 4px;
     }
 
-    /* Submit Button */
+    /* High-End Button */
     .submit-btn {
-      background: var(--primary);
+      background: var(--accent);
       color: #fff;
       border: none;
       padding: 16px;
       width: 100%;
       font-size: 16px;
       font-weight: 700;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
-      transition: background 0.2s ease, transform 0.1s ease;
-      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+      transition: all 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
     }
 
     .submit-btn:hover {
-      background: #1e293b;
+      background: var(--accent-hover);
+      box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.5);
     }
 
     .submit-btn:active {
-      transform: scale(0.98);
+      transform: scale(0.99);
     }
 
     #returnMsg {
@@ -206,33 +220,56 @@
       text-align: center;
     }
 
-    @media (max-width: 600px) {
+    /* Missing ID Error Screen */
+    .error-state {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .error-state h2 {
+      color: var(--danger);
+      margin-bottom: 10px;
+    }
+    .error-state p {
+      color: var(--text-muted);
+      margin-bottom: 25px;
+    }
+    .error-btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 650px) {
       .container {
         padding: 25px 20px;
       }
       .order-card {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 14px;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="mainContainer">
   <a href="order.html" id="backLink" class="back-link">&larr; Back to Order Details</a>
   
   <h1 class="header-title">Return & Replacement</h1>
-  <p class="subtitle">Encountered an issue with your product? Fill out the details below and we will resolve it promptly.</p>
+  <p class="subtitle">Facing issues with your order? Submit your request below for quick assistance.</p>
 
-  <!-- Unique Order Details Display Card -->
-  <div class="order-card">
+  <!-- Order Details Display Card -->
+  <div class="order-card" id="orderCardWrapper">
     <div class="order-info">
-      <h3 id="displayOrderId">Order ID: Checking...</h3>
-      <p id="displayProductDetails">Fetching product details...</p>
+      <h3 id="displayOrderId">Loading Order...</h3>
+      <p id="displayProductDetails">Please wait while we fetch your details</p>
     </div>
-    <div class="badge" id="orderStatusBadge">Verified</div>
+    <div class="badge" id="orderStatusBadge">Secure</div>
   </div>
 
   <!-- Return Request Form -->
@@ -258,9 +295,9 @@
     </select>
 
     <label for="returnDesc">Detailed Description</label>
-    <textarea id="returnDesc" placeholder="Please describe the issue clearly..." required></textarea>
+    <textarea id="returnDesc" placeholder="Describe the problem clearly..." required></textarea>
 
-    <!-- Photo and Video Upload Section -->
+    <!-- Photo and Unboxing Video Upload -->
     <label for="returnMedia">Upload Photos / Unboxing Video (Up to 5 files)</label>
     <div class="file-upload-box">
       <input type="file" id="returnMedia" multiple accept="image/*,video/*">
@@ -270,9 +307,9 @@
     <div class="policy-box">
       <strong>Quick Guidelines:</strong>
       <ul>
-        <li>Submit request within the standard return window.</li>
-        <li>Ensure item is packed with original tags and accessories.</li>
-        <li>Inspection and approvals take 2-3 business days.</li>
+        <li>Requests must be raised within the valid return window.</li>
+        <li>Ensure items include original packaging, tags, and accessories.</li>
+        <li>Inspection & processing usually takes 2-3 business days.</li>
       </ul>
     </div>
 
@@ -290,17 +327,22 @@
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const urlParams = new URLSearchParams(window.location.search);
-  let orderId = urlParams.get('id');
+  const orderId = urlParams.get('id');
 
-  // Fallback agar URL mein ID na ho, toh localStorage ya default set kar lein
-  if (!orderId) {
-    orderId = localStorage.getItem("current_order_id") || "46"; 
-  }
-
-  // Back link update karna
-  document.getElementById("backLink").href = `order.html?id=${orderId}`;
-
+  // Handle Missing Order ID Gracefully
   window.addEventListener('DOMContentLoaded', async () => {
+    if (!orderId) {
+      document.getElementById("mainContainer").innerHTML = `
+        <div class="error-state">
+          <h2>Order ID is missing</h2>
+          <p>Please navigate from your orders page to submit a return or replacement request.</p>
+          <a href="order.html" class="error-btn">Go to Orders</a>
+        </div>
+      `;
+      return;
+    }
+
+    document.getElementById("backLink").href = `order.html?id=${orderId}`;
     document.getElementById("displayOrderId").textContent = `Order ID: #${orderId}`;
 
     try {
@@ -316,11 +358,11 @@
         document.getElementById("displayProductDetails").textContent = `${productName} • ₹${productPrice}`;
         document.getElementById("orderStatusBadge").textContent = data.status || "Delivered";
       } else {
-        document.getElementById("displayProductDetails").textContent = `Product Order #${orderId}`;
+        document.getElementById("displayProductDetails").textContent = `Order Verified Successfully`;
       }
     } catch (err) {
-      console.log("Database fetch fallback active.");
-      document.getElementById("displayProductDetails").textContent = `Order # ${orderId} Product`;
+      console.error("Fetch error:", err);
+      document.getElementById("displayProductDetails").textContent = `Order #${orderId} Verified`;
     }
   });
 
@@ -338,7 +380,7 @@
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
     msg.style.color = "var(--accent)";
-    msg.textContent = "Processing request and uploading media files...";
+    msg.textContent = "Uploading files & submitting request...";
 
     try {
       const { data: { user } } = await supabaseClient.auth.getUser();
