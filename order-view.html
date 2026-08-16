@@ -857,13 +857,22 @@ async function loadOrder(){
     return;
   }
 
-  /* ORDER */
-  const { data: order, error: orderError } = await supabaseClient
-    .from("orders")
+    /* ORDER */
+  let { data: order, error: orderError } = await supabaseClient
+    .from("order_summary")
     .select("*")
     .eq("id", orderId)
-    .eq("user_id", user.id)
     .maybeSingle();
+
+  if(orderError || !order){
+    const resOrders = await supabaseClient
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .maybeSingle();
+    order = resOrders.data;
+    orderError = resOrders.error;
+  }
 
   if(orderError){
     message.innerHTML = `<div class="card error">${esc(orderError.message)}</div>`;
