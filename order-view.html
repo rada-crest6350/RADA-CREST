@@ -886,15 +886,20 @@ async function loadOrder(){
 
   const orderItems = items || [];
 
-  /* PRODUCT IMAGES */
+    /* PRODUCT IMAGES */
   const productIds = orderItems.map(item => item.product_id).filter(Boolean);
   let productMap = new Map();
 
   if(productIds.length){
-    const { data: products } = await supabaseClient
+    // Sabhi columns select kar rahe hain taaki koi bhi image column chhoote nahi
+    const { data: products, error: prodError } = await supabaseClient
       .from("products")
-      .select("id,image_url,image,image_2")
+      .select("*")
       .in("id", productIds);
+
+    if(prodError){
+      console.warn("Product fetch error:", prodError.message);
+    }
 
     (products || []).forEach(product => {
       productMap.set(String(product.id), product);
@@ -913,14 +918,21 @@ async function loadOrder(){
   /* ITEMS HTML */
   const itemsHtml = orderItems.length ? orderItems.map(item => {
     const product = productMap.get(String(item.product_id));
-    const image = cleanImage(
+    
+    // Yahan saare possible image column names check ho rahe hain
+    const rawImage = 
       item.image_url || 
       item.image || 
       product?.image_url || 
-      product?.image_2 || 
       product?.image || 
-      ""
-    );
+      product?.image_2 || 
+      product?.img || 
+      product?.thumbnail || 
+      product?.photo || 
+      product?.picture || 
+      "";
+
+    const image = cleanImage(rawImage);
     const quantity = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
 
