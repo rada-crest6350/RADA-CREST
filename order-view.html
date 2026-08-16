@@ -827,44 +827,44 @@ async function submitReview(){
    LOAD ORDER
 ----------------------------- */
 
-async function loadOrder(){
-  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+async function loadOrder() {
+  const SUPABASE_URL = "https://yngankarjheadymarzuj.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // Jo key pehle se hai wahi rehne dena
 
   const supabaseClient = window.supabase?.createClient 
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
     : window.supabaseClient;
 
   window.supabaseClient = supabaseClient;
-  
-  if(!window.supabaseClient){
-    message.innerHTML = `<div class="card error">Supabase is not configured.</div>`;
+
+  if (!window.supabaseClient) {
+    if(typeof message !== 'undefined') message.innerHTML = '<div class="card error">Supabase is not configured.</div>';
     return;
   }
 
   const params = new URLSearchParams(location.search);
   const orderId = params.get("id");
 
-  if(!orderId){
-    message.innerHTML = `<div class="card error">Order ID is missing.</div>`;
+  if (!orderId) {
+    if(typeof message !== 'undefined') message.innerHTML = '<div class="card error">Order ID is missing.</div>';
     return;
   }
 
   const { data: { user } } = await supabaseClient.auth.getUser();
 
-  if(!user){
-    location.href = "account.html?redirect=" + encodeURIComponent("order.html?id=" + orderId);
+  if (!user) {
+    location.href = "account.html?redirect=" + encodeURIComponent("order-view.html?id=" + orderId);
     return;
   }
 
-    /* ORDER */
+  /* ORDER */
   let { data: order, error: orderError } = await supabaseClient
     .from("order_summary")
     .select("*")
     .eq("id", orderId)
     .maybeSingle();
 
-  if(orderError || !order){
+  if (orderError || !order) {
     const resOrders = await supabaseClient
       .from("orders")
       .select("*")
@@ -874,29 +874,17 @@ async function loadOrder(){
     orderError = resOrders.error;
   }
 
-  if(orderError){
-    message.innerHTML = `<div class="card error">${esc(orderError.message)}</div>`;
+  if (orderError) {
+    if(typeof message !== 'undefined') message.innerHTML = `<div class="card error">${esc(orderError.message)}</div>`;
     return;
   }
 
-  if(!order){
-    message.innerHTML = `<div class="card error">This order was not found.</div>`;
+  if (!order) {
+    if(typeof message !== 'undefined') message.innerHTML = `<div class="card error">This order was not found.</div>`;
     return;
   }
 
   /* ORDER ITEMS */
-  const { data: items, error: itemError } = await supabaseClient
-    .from("order_items")
-    .select("*")
-    .eq("order_id", order.id);
-
-  if(itemError){
-    console.warn("Order items:", itemError.message);
-  }
-
-  const orderItems = items || [];
-
-    /* ORDER ITEMS */
   const { data: items, error: itemsError } = await supabaseClient
     .from("order_items")
     .select("*")
@@ -904,11 +892,10 @@ async function loadOrder(){
 
   if (items && items.length > 0) {
     for (let item of items) {
-      // Agar item mein direct image nahi hai, toh products table se laao
       if (!item.image_url && !item.image && item.product_id) {
         const { data: prod } = await supabaseClient
           .from("products")
-          .select("*")
+          .select("image_url, image, img, photo")
           .eq("id", item.product_id)
           .maybeSingle();
 
@@ -918,6 +905,17 @@ async function loadOrder(){
       }
     }
   }
+
+  // Ab original render function call ho jayega jo aapke code mein pehle se hai
+  if (typeof renderOrderDetails === 'function') {
+    renderOrderDetails(order, items);
+  } else if (typeof renderOrder === 'function') {
+    renderOrder(order, items);
+  }
+}
+
+// Function call
+loadOrder();
 
   /* TOTAL */
   const calculatedTotal = orderItems.reduce(
