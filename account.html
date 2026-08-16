@@ -57,7 +57,7 @@
                     <div>
                         <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Password</label>
                         <div class="relative">
-                            <input type="password" id="login-password" required placeholder="Your password" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
+                            <input type="password" id="login-password" required minlength="8" maxlength="16" placeholder="8–16 characters" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
                             <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 text-sm">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
@@ -97,7 +97,8 @@
                     <div>
                         <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Password</label>
                         <div class="relative">
-                            <input type="password" id="signup-password" required minlength="6" placeholder="At least 6 characters" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
+                            <input type="password" id="signup-password" required minlength="8" maxlength="16" placeholder="8–16 characters" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
+                        <span class="text-[10px] text-neutral-400 mt-1 block">Password must be 8–16 characters.</span>
                             <button type="button" onclick="togglePassword('signup-password', this)" class="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 text-sm">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
@@ -192,6 +193,13 @@
             }
         }
 
+        // Password hard limit: never allow more than 16 characters.
+        document.addEventListener('input', (event) => {
+            if (event.target.matches('#login-password, #signup-password') && event.target.value.length > 16) {
+                event.target.value = event.target.value.slice(0, 16);
+            }
+        });
+
         // Show/Hide Password
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
@@ -235,6 +243,10 @@
             const mobile = document.getElementById('signup-mobile').value.trim();
             const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value;
+
+            if (password.length < 8 || password.length > 16) {
+                throw new Error('Password must be 8–16 characters.');
+            }
 
             if (!/^\d{10}$/.test(mobile)) {
                 showAlert('Please enter a valid 10-digit mobile number.');
@@ -314,6 +326,9 @@
             const password = document.getElementById('login-password').value;
 
             try {
+                if (password.length < 8 || password.length > 16) {
+                    throw new Error('Password must be 8–16 characters.');
+                }
                 if (!identifier || !password) {
                     throw new Error('Please enter your email/mobile number and password.');
                 }
