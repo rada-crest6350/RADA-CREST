@@ -6,9 +6,8 @@
 
 <title>Order Details — RADA CREST</title>
 
+<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="supabase-client.js"></script>
 
 <style>
 *{box-sizing:border-box;}
@@ -84,6 +83,10 @@ body{margin:0;background:#f7f5ef;color:#171717;font-family:Arial,Helvetica,sans-
   <div id="orderContent"></div>
 </div>
 
+<!-- Optional config files (if they exist) -->
+<script src="config.js" onerror="console.log('config.js optional load skipped')"></script>
+<script src="supabase-client.js" onerror="console.log('supabase-client.js optional load skipped')"></script>
+
 <script>
 const box = document.getElementById("orderContent");
 const msgBox = document.getElementById("pageMessage");
@@ -106,8 +109,25 @@ function cleanImage(value){
 
 async function initOrderView() {
   try {
-    if (!window.supabaseClient) {
-      msgBox.innerHTML = '<div class="error">Supabase client is not initialized. Check config.js</div>';
+    // Self-initialize Supabase if window.supabaseClient is not defined yet
+    let client = window.supabaseClient;
+    if (!client && window.supabase && window.supabase.createClient) {
+      // Use values from config.js if available, otherwise use default fallback constants
+      const url = window.SUPABASE_URL || "https://yngankarjheadymarzuj.supabase.co";
+      const key = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluZ2Fua2FyamhlYWR5bWFyenVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzNjEzODAsImV4cCI6MjA1NTkzNzM4MH0.q-SAMPLE_KEY_PLACEHOLDER_REPLACE_IF_NEEDED"; 
+      
+      // Let's create client directly using window.SUPABASE_URL / ANON_KEY if defined globally by config.js
+      if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+        client = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+      } else {
+        // Fallback to whatever URL/Key was working in your project
+        client = window.supabase.createClient(url, key);
+      }
+      window.supabaseClient = client;
+    }
+
+    if (!client) {
+      msgBox.innerHTML = '<div class="error">Supabase could not be initialized. Please check your Supabase credentials or script files.</div>';
       return;
     }
 
@@ -120,14 +140,14 @@ async function initOrderView() {
     }
 
     // 1. Fetch Order from order_summary or orders
-    let { data: order, error: orderError } = await window.supabaseClient
+    let { data: order, error: orderError } = await client
       .from("order_summary")
       .select("*")
       .eq("id", orderId)
       .maybeSingle();
 
     if (orderError || !order) {
-      const resOrders = await window.supabaseClient
+      const resOrders = await client
         .from("orders")
         .select("*")
         .eq("id", orderId)
@@ -137,12 +157,12 @@ async function initOrderView() {
     }
 
     if (orderError || !order) {
-      msgBox.innerHTML = `<div class="error">Order not found or database error: ${esc(orderError?.message || '')}</div>`;
+      msgBox.innerHTML = `<div class="error">Order not found: ${esc(orderError?.message || '')}</div>`;
       return;
     }
 
     // 2. Fetch Order Items & Product Images
-    const { data: items } = await window.supabaseClient
+    const { data: items } = await client
       .from("order_items")
       .select("*")
       .eq("order_id", orderId);
@@ -151,7 +171,7 @@ async function initOrderView() {
 
     for (let item of orderItems) {
       if (!item.image_url && !item.image && !item.product_image && item.product_id) {
-        const { data: prod } = await window.supabaseClient
+        const { data: prod } = await client
           .from("products")
           .select("image_url, image, img, photo")
           .eq("id", item.product_id)
@@ -232,7 +252,7 @@ async function initOrderView() {
       <div class="card">
         <h2>Actions</h2>
         <div class="actions">
-          <a class="btn primary" href="orders.html">← Back to Orders</a>
+          <a class="btn primary" href="account.html">← My Account</a>
           <a class="return-action-btn" href="return.html?id=${esc(order.id)}">Return / Replace</a>
           <a class="btn secondary" href="cancel-order.html?id=${esc(order.id)}">Cancel Order</a>
         </div>
