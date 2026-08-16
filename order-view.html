@@ -849,37 +849,28 @@ async function loadOrder(){
     return;
   }
 
-  let { data: { user } } = await supabaseClient.auth.getUser();
-  if (!user) {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const sessionRes = await supabaseClient.auth.getSession();
-    user = sessionRes?.data?.session?.user;
-  }
+  const { data: { user } } = await supabaseClient.auth.getUser();
 
   if(!user){
-    location.href = "account.html?redirect=" + encodeURIComponent("order-view.html?id=" + orderId);
+    location.href = "account.html?redirect=" + encodeURIComponent("order.html?id=" + orderId);
     return;
   }
 
   /* ORDER */
-  let { data: order, error: orderError } = await supabaseClient
-    .from("order_summary")
+  const { data: order, error: orderError } = await supabaseClient
+    .from("orders")
     .select("*")
     .eq("id", orderId)
+    .eq("user_id", user.id)
     .maybeSingle();
 
-  if(orderError || !order){
-    const resOrders = await supabaseClient
-      .from("orders")
-      .select("*")
-      .eq("id", orderId)
-      .maybeSingle();
-    order = resOrders.data;
-    orderError = resOrders.error;
+  if(orderError){
+    message.innerHTML = `<div class="card error">${esc(orderError.message)}</div>`;
+    return;
   }
 
-  if(orderError || !order){
-    message.innerHTML = `<div class="card error">${esc(orderError?.message || "This order was not found.")}</div>`;
+  if(!order){
+    message.innerHTML = `<div class="card error">This order was not found.</div>`;
     return;
   }
 
@@ -890,4 +881,131 @@ async function loadOrder(){
     .eq("order_id", order.id);
 
   if(itemError){
-    console.war
+    console.warn("Order items:", itemError.message);
+  }
+
+  const orderItems = items || [];
+
+  /* PRODUCT IMAGES */
+  const productIds = orderItems.map(item => item.product_id).filter(Boolean);
+  let productMap = new Map();
+
+  if(productIds.length){
+    const { data: products } = await supabaseClient
+      .from("products")
+      .select("id,image_url,image")
+      .in("id", productIds);
+
+    (products || []).forEach(product => {
+      productMap.set(String(product.id), product);
+    });
+  }
+
+  /* TOTAL */
+  const calculatedTotal = orderItems.reduce(
+    (sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0),
+    0
+  );
+
+  const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
+  const status = String(order.status || "pending").toLowerCase();
+
+  /* ITEMS HTML */
+  const itemsHtml = orderItems.length ? orderItems.map(item => {
+    const product = productMap.get(String(item.product_id));
+    const image = cleanImage(product?.image_url || product?.image || "");
+    const quantity = Number(item.quantity || 1);
+    const price = Number(item.unit_price ?? item.price ?? 0);
+
+    const reviewButton = status === "delivered" && item.product_id
+      ? `
+        <button
+          class="review-btn"
+          onclick="openReview(${Number(item.product_id)}, '${esc(item.product_name || "Product").replace(/'/g,"&#039;")}')"
+        >
+          ⭐ Rate & Review
+        </button>
+      `
+      : "";
+
+    return `
+      <div class="item">
+        <div class="item-left">
+          ${image ? `<img class="item-image" src="${esc(image)}" alt="${esc(item.product_name || "Product")}" onerror="this.style.display='none'">` : `<div class="item-image"></div>`}
+          <div>
+            <div class="item-name">${esc(item.product_name || "Product")}</div>
+            <div class="item-qty">Quantity: ${quantity} × ${money(price)}</div>
+            ${reviewButton}
+          </div>
+        </div>
+        <div class="item-price">${money(price * quantity)}</div>
+      </div>
+    `;
+  }).join("") : `<div class="empty">Order item details are unavailable.</div>`;
+
+  /* PAGE */
+  box.innerHTML = `
+    <div class="card">
+      <div class="order-head">
+        <div>
+          <div class="order-id">Order #${esc(order.id)}</div>
+          <div class="date">${esc(formatDate(order.created_at))}</div>
+          <div class="status status-${statusClass(status)}">${esc(status)}</div>
+        </div>
+        <div class="total">${money(total)}</div>
+      </div>
+      ${renderTracking(status)}
+    </div>
+
+    <div class="card">
+      <h2>Order Items</h2>
+      <div class="items">${itemsHtml}</div>
+    </div>
+
+    <div class="card">
+      <h2>Delivery Details</h2>
+      <div class="info-grid">
+        <div class="info-box">
+          <strong>Customer</strong>
+          <span>${esc(order.shipping_name || order.customer_name || user.email || "-")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Phone</strong>
+          <span>${esc(order.shipping_phone || order.customer_phone || "-")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Email</strong>
+          <span>${esc(order.customer_email || user.email || "-")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Payment</strong>
+          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+        </div>
+      </div>
+      ${order.shipping_address ? `<div class="info-box" style="margin-top:15px;"><strong>Delivery Address</strong><span>${esc(order.shipping_address)}</span></div>` : ""}
+    </div>
+
+    <div class="card">
+      <h2>Need Help?</h2>
+      <p style="color:#666;line-height:1.6;">If you have any issue with this order, contact RADA CREST support.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://wa.me/919079714767?text=${encodeURIComponent("Hello RADA CREST, I need help regarding Order #" + order.id)}" target="_blank">WhatsApp Support</a>
+        <a class="btn secondary" href="index.html#products">Continue Shopping</a>
+        <a class="btn secondary" href="account.html">My Account</a>
+        <a href="return.html?id=${esc(order.id)}" class="return-action-btn">Return / Replace</a>
+        <a href="cancel-order.html?id=${encodeURIComponent(order.id)}"
+           class="btn secondary"
+        >
+           Cancel Order
+        </a>
+    </div>
+    </div>
+  `;
+}
+
+loadOrder();
+
+</script>
+
+</body>
+</html>
