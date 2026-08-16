@@ -745,7 +745,7 @@ async function submitReview(){
 
   const reviewText = textInput.value.trim();
   const files = fileInput ? fileInput.files : [];
-  let photoUrls = []; // Yahan spelling 'photoUrls' rakhi hai (U capital)
+  let photoUrls = [];
 
   if(messageBox) messageBox.textContent = "Processing review and photos...";
 
@@ -763,7 +763,6 @@ async function submitReview(){
         const file = files[i];
         const fileName = `review_${Date.now()}_${i}_${file.name}`;
         
-        // Supabase Storage upload
         const { error: uploadError } = await window.supabaseClient.storage
           .from("product-review-images")
           .upload(fileName, file);
@@ -801,7 +800,7 @@ async function submitReview(){
         customer_name: user.user_metadata?.full_name || user.email || "Customer",
         rating: ratingValue,
         review: reviewText,
-        photo_urls: photoUrls.length > 0 ? photoUrls : null // Yahan bhi sahi variable hai
+        photo_urls: photoUrls.length > 0 ? photoUrls : null
       }, { onConflict: 'product_id,user_id' });
 
     if(insertError){
@@ -829,7 +828,7 @@ async function submitReview(){
 
 async function loadOrder() {
   const SUPABASE_URL = "https://yngankarjheadymarzuj.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."; // Jo key pehle se hai wahi rehne dena
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 
   const supabaseClient = window.supabase?.createClient 
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
@@ -850,7 +849,12 @@ async function loadOrder() {
     return;
   }
 
-  const { data: { user } } = await supabaseClient.auth.getUser();
+  let { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const sessionRes = await supabaseClient.auth.getSession();
+    user = sessionRes?.data?.session?.user;
+  }
 
   if (!user) {
     location.href = "account.html?redirect=" + encodeURIComponent("order-view.html?id=" + orderId);
@@ -880,147 +884,4 @@ async function loadOrder() {
   }
 
   if (!order) {
-    if(typeof message !== 'undefined') message.innerHTML = `<div class="card error">This order was not found.</div>`;
-    return;
-  }
-
-  /* ORDER ITEMS */
-  const { data: items, error: itemsError } = await supabaseClient
-    .from("order_items")
-    .select("*")
-    .eq("order_id", orderId);
-
-  if (items && items.length > 0) {
-    for (let item of items) {
-      // Products table se image fetch karo agar available ho
-      if (!item.image_url && !item.image && !item.product_image && item.product_id) {
-        const { data: prod } = await supabaseClient
-          .from("products")
-          .select("image_url, image, img, photo")
-          .eq("id", item.product_id)
-          .maybeSingle();
-
-        if (prod) {
-          const imgUrl = prod.image_url || prod.image || prod.img || prod.photo || '';
-          item.image_url = imgUrl;
-          item.image = imgUrl;
-          item.product_image = imgUrl;
-        }
-      } else {
-        // Agar items table mein hi pehle se koi image field hai toh sabhi ko barabar kar do
-        const existingImg = item.image_url || item.image || item.product_image || '';
-        item.image_url = existingImg;
-        item.image = existingImg;
-        item.product_image = existingImg;
-      }
-    }
-  }
-
-  /* TOTAL */
-  const calculatedTotal = orderItems.reduce(
-    (sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0),
-    0
-  );
-
-  const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
-  const status = String(order.status || "pending").toLowerCase();
-
-  /* ITEMS HTML */
-  const itemsHtml = orderItems.length ? orderItems.map(item => {
-    const product = productMap.get(String(item.product_id));
-    const image = cleanImage(product?.image_url || product?.image || "");
-    const quantity = Number(item.quantity || 1);
-    const price = Number(item.unit_price ?? item.price ?? 0);
-
-    const reviewButton = status === "delivered" && item.product_id
-      ? `
-        <button
-          class="review-btn"
-          onclick="openReview(${Number(item.product_id)}, '${esc(item.product_name || "Product").replace(/'/g,"&#039;")}')"
-        >
-          ⭐ Rate & Review
-        </button>
-      `
-      : "";
-
-    return `
-      <div class="item">
-        <div class="item-left">
-          ${image ? `<img class="item-image" src="${esc(image)}" alt="${esc(item.product_name || "Product")}" onerror="this.style.display='none'">` : `<div class="item-image"></div>`}
-          <div>
-            <div class="item-name">${esc(item.product_name || "Product")}</div>
-            <div class="item-qty">Quantity: ${quantity} × ${money(price)}</div>
-            ${reviewButton}
-          </div>
-        </div>
-        <div class="item-price">${money(price * quantity)}</div>
-      </div>
-    `;
-  }).join("") : `<div class="empty">Order item details are unavailable.</div>`;
-
-  /* PAGE */
-  box.innerHTML = `
-    <div class="card">
-      <div class="order-head">
-        <div>
-          <div class="order-id">Order #${esc(order.id)}</div>
-          <div class="date">${esc(formatDate(order.created_at))}</div>
-          <div class="status status-${statusClass(status)}">${esc(status)}</div>
-        </div>
-        <div class="total">${money(total)}</div>
-      </div>
-      ${renderTracking(status)}
-    </div>
-
-    <div class="card">
-      <h2>Order Items</h2>
-      <div class="items">${itemsHtml}</div>
-    </div>
-
-    <div class="card">
-      <h2>Delivery Details</h2>
-      <div class="info-grid">
-        <div class="info-box">
-          <strong>Customer</strong>
-          <span>${esc(order.shipping_name || order.customer_name || user.email || "-")}</span>
-        </div>
-        <div class="info-box">
-          <strong>Phone</strong>
-          <span>${esc(order.shipping_phone || order.customer_phone || "-")}</span>
-        </div>
-        <div class="info-box">
-          <strong>Email</strong>
-          <span>${esc(order.customer_email || user.email || "-")}</span>
-        </div>
-        <div class="info-box">
-          <strong>Payment</strong>
-          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
-        </div>
-      </div>
-      ${order.shipping_address ? `<div class="info-box" style="margin-top:15px;"><strong>Delivery Address</strong><span>${esc(order.shipping_address)}</span></div>` : ""}
-    </div>
-
-    <div class="card">
-      <h2>Need Help?</h2>
-      <p style="color:#666;line-height:1.6;">If you have any issue with this order, contact RADA CREST support.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://wa.me/919079714767?text=${encodeURIComponent("Hello RADA CREST, I need help regarding Order #" + order.id)}" target="_blank">WhatsApp Support</a>
-        <a class="btn secondary" href="index.html#products">Continue Shopping</a>
-        <a class="btn secondary" href="account.html">My Account</a>
-        <a href="return.html?id=${esc(order.id)}" class="return-action-btn">Return / Replace</a>
-        <a href="cancel-order.html?id=${encodeURIComponent(order.id)}"
-           class="btn secondary"
-        >
-           Cancel Order
-        </a>
-    </div>
-    </div>
-  `;
-}
-
-loadOrder();
-
-</script>
-
-</body>
-</html>
+    if(typeof message !== 'undefined') message.innerHTML = `<div class="card error">This order was not found.<
