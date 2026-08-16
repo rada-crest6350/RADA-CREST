@@ -6,64 +6,448 @@
 
 <title>Order Details — RADA CREST</title>
 
-<!-- Supabase CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
 
 <style>
-*{box-sizing:border-box;}
-body{margin:0;background:#f7f5ef;color:#171717;font-family:Arial,Helvetica,sans-serif;}
-.page{max-width:1000px;margin:auto;padding:20px;}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px;}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#171717;font-weight:800;}
-.brand-mark{width:42px;height:42px;border-radius:12px;background:#171717;color:#fff;display:grid;place-items:center;font-weight:900;}
-.back{text-decoration:none;color:#555;font-weight:700;}
-.card{background:#fff;border:1px solid #e5e0d5;border-radius:22px;padding:22px;margin-bottom:18px;box-shadow:0 10px 30px rgba(0,0,0,.05);}
-.order-head{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;}
-.order-id{font-size:24px;font-weight:900;}
-.date{color:#777;margin-top:6px;}
-.total{font-size:25px;font-weight:900;}
-.status{display:inline-block;margin-top:12px;padding:8px 12px;border-radius:999px;background:#eee;font-size:13px;font-weight:800;text-transform:capitalize;}
-.status-delivered{background:#e2f5e8;color:#267144;}
-.status-cancelled{background:#fde4e4;color:#a33a3a;}
-.status-shipped{background:#e5eefc;color:#315b9b;}
-.status-confirmed,.status-processing,.status-packed{background:#fff0cf;color:#8a641c;}
-.tracking{margin-top:28px;}
-.tracking h2,.card h2{margin-top:0;}
-.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:25px;}
-.step{text-align:center;position:relative;}
-.circle{width:42px;height:42px;margin:auto;border-radius:50%;background:#ddd;color:#777;display:grid;place-items:center;font-weight:900;position:relative;z-index:2;}
-.step.active .circle,.step.done .circle{background:#171717;color:#fff;}
-.step-label{margin-top:10px;font-size:12px;font-weight:800;}
-.step-line{position:absolute;top:20px;left:50%;width:100%;height:3px;background:#ddd;z-index:1;}
-.step:last-child .step-line{display:none;}
-.step.done .step-line{background:#171717;}
-.items{display:grid;gap:12px;}
-.item{display:flex;justify-content:space-between;gap:15px;padding:14px 0;border-bottom:1px solid #eee;}
-.item:last-child{border-bottom:0;}
-.item-left{display:flex;gap:12px;align-items:center;}
-.item-image{width:65px;height:65px;border-radius:12px;background:#f2f0ea;object-fit:contain;}
-.item-name{font-weight:800;}
-.item-qty{color:#777;font-size:13px;margin-top:5px;}
-.item-price{font-weight:900;white-space:nowrap;}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
-.info-box{background:#f8f6f0;border-radius:14px;padding:15px;}
-.info-box strong{display:block;margin-bottom:7px;}
-.info-box span{color:#555;line-height:1.6;}
-.actions{display:flex;gap:10px;flex-wrap:wrap;}
-.btn,.return-action-btn{display:inline-block;border:0;border-radius:12px;padding:13px 18px;text-decoration:none;font-weight:800;cursor:pointer;}
-.primary{background:#171717;color:#fff;}
-.secondary{background:#fff;color:#171717;border:1px solid #d8d2c7;}
-.return-action-btn{background:#0f172a;color:#fff !important;}
-.empty{text-align:center;padding:45px 15px;color:#777;}
-.error{color:#a33a3a;background:#fde4e4;padding:15px;border-radius:12px;margin-bottom:15px;}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#f7f5ef;
+  color:#171717;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.page{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:#171717;
+  font-weight:800;
+}
+
+.brand-mark{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:#171717;
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+}
+
+.back{
+  text-decoration:none;
+  color:#555;
+  font-weight:700;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e0d5;
+  border-radius:22px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.order-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
+}
+
+.order-id{
+  font-size:24px;
+  font-weight:900;
+}
+
+.date{
+  color:#777;
+  margin-top:6px;
+}
+
+.total{
+  font-size:25px;
+  font-weight:900;
+}
+
+.status{
+  display:inline-block;
+  margin-top:12px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#eee;
+  font-size:13px;
+  font-weight:800;
+  text-transform:capitalize;
+}
+
+.status-delivered{
+  background:#e2f5e8;
+  color:#267144;
+}
+
+.status-cancelled{
+  background:#fde4e4;
+  color:#a33a3a;
+}
+
+.status-shipped{
+  background:#e5eefc;
+  color:#315b9b;
+}
+
+.status-confirmed,
+.status-processing,
+.status-packed{
+  background:#fff0cf;
+  color:#8a641c;
+}
+
+/* TRACKING */
+
+.tracking{
+  margin-top:28px;
+}
+
+.tracking h2,
+.card h2{
+  margin-top:0;
+}
+
+.steps{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:25px;
+}
+
+.step{
+  text-align:center;
+  position:relative;
+}
+
+.circle{
+  width:42px;
+  height:42px;
+  margin:auto;
+  border-radius:50%;
+  background:#ddd;
+  color:#777;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  position:relative;
+  z-index:2;
+}
+
+.step.active .circle,
+.step.done .circle{
+  background:#171717;
+  color:#fff;
+}
+
+.step-label{
+  margin-top:10px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.step-line{
+  position:absolute;
+  top:20px;
+  left:50%;
+  width:100%;
+  height:3px;
+  background:#ddd;
+  z-index:1;
+}
+
+.step:last-child .step-line{
+  display:none;
+}
+
+.step.done .step-line{
+  background:#171717;
+}
+
+/* ITEMS */
+
+.items{
+  display:grid;
+  gap:12px;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:14px 0;
+  border-bottom:1px solid #eee;
+}
+
+.item:last-child{
+  border-bottom:0;
+}
+
+.item-left{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.item-image{
+  width:65px;
+  height:65px;
+  border-radius:12px;
+  background:#f2f0ea;
+  object-fit:contain;
+}
+
+.item-name{
+  font-weight:800;
+}
+
+.item-qty{
+  color:#777;
+  font-size:13px;
+  margin-top:5px;
+}
+
+.item-price{
+  font-weight:900;
+  white-space:nowrap;
+}
+
+/* INFO */
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.info-box{
+  background:#f8f6f0;
+  border-radius:14px;
+  padding:15px;
+}
+
+.info-box strong{
+  display:block;
+  margin-bottom:7px;
+}
+
+.info-box span{
+  color:#555;
+  line-height:1.6;
+}
+
+/* BUTTONS */
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  display:inline-block;
+  border:0;
+  border-radius:12px;
+  padding:13px 18px;
+  text-decoration:none;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.primary{
+  background:#171717;
+  color:#fff;
+}
+
+.secondary{
+  background:#fff;
+  color:#171717;
+  border:1px solid #d8d2c7;
+}
+
+.empty{
+  text-align:center;
+  padding:45px 15px;
+  color:#777;
+}
+
+.error{
+  color:#a33a3a;
+}
+  .return-action-btn {
+  background: #0f172a;
+  color: #ffffff !important;
+  padding: 14px 22px;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  transition: all 0.2s ease;
+}
+.return-action-btn:hover {
+  background: #1e293b;
+}
+  
+/* PRODUCT REVIEW */
+.review-btn{
+  margin-top:10px;
+  padding:9px 14px;
+  border:0;
+  border-radius:10px;
+  background:#171717;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+  font-size:13px;
+}
+.review-btn:hover{
+  opacity:.9;
+}
+.review-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:9999;
+}
+.review-modal.show{
+  display:flex;
+}
+.review-box{
+  width:min(500px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+.review-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+}
+.review-close{
+  border:0;
+  background:#f2f0ea;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  font-size:20px;
+  cursor:pointer;
+}
+.review-stars{
+  display:flex;
+  gap:6px;
+  margin:15px 0;
+}
+.review-star{
+  border:0;
+  background:none;
+  font-size:34px;
+  color:#ccc;
+  cursor:pointer;
+  padding:0;
+}
+.review-star.selected{
+  color:#f5b400;
+}
+.review-text{
+  width:100%;
+  min-height:110px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:13px;
+  resize:vertical;
+  font:inherit;
+  box-sizing:border-box;
+}
+.review-upload{
+  margin-top:14px;
+}
+.review-upload input{
+  width:100%;
+  padding:12px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  box-sizing:border-box;
+}
+.review-preview{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.review-preview img{
+  width:70px;
+  height:70px;
+  object-fit:cover;
+  border-radius:10px;
+}
+.review-submit{
+  width:100%;
+  margin-top:16px;
+  padding:14px;
+  border:0;
+  border-radius:12px;
+  background:#171717;
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+}
+.review-message{
+  margin-top:10px;
+  font-size:14px;
+}
+  
 @media(max-width:700px){
-  .page{padding:12px;}
-  .order-head{flex-direction:column;}
-  .steps{grid-template-columns:1fr;gap:15px;}
-  .step{display:flex;align-items:center;gap:12px;text-align:left;}
-  .circle{margin:0;flex:none;}
-  .step-line{display:none;}
-  .info-grid{grid-template-columns:1fr;}
+  .page{ padding:12px; }
+  .order-head{ flex-direction:column; }
+  .total{ font-size:22px; }
+  .steps{ grid-template-columns:1fr; gap:15px; }
+  .step{ display:flex; align-items:center; gap:12px; text-align:left; }
+  .circle{ margin:0; flex:none; }
+  .step-line{ display:none; }
+  .step-label{ margin:0; }
+  .info-grid{ grid-template-columns:1fr; }
+  .item{ align-items:flex-start; }
+  .item-price{ font-size:14px; }
 }
 </style>
 </head>
@@ -71,6 +455,7 @@ body{margin:0;background:#f7f5ef;color:#171717;font-family:Arial,Helvetica,sans-
 <body>
 
 <div class="page">
+
   <div class="topbar">
     <a class="brand" href="index.html">
       <span class="brand-mark">RC</span>
@@ -81,192 +466,428 @@ body{margin:0;background:#f7f5ef;color:#171717;font-family:Arial,Helvetica,sans-
 
   <div id="pageMessage"></div>
   <div id="orderContent"></div>
+
 </div>
 
-<!-- Optional config files (if they exist) -->
-<script src="config.js" onerror="console.log('config.js optional load skipped')"></script>
-<script src="supabase-client.js" onerror="console.log('supabase-client.js optional load skipped')"></script>
+<!-- REVIEW MODAL -->
+<div id="reviewModal" class="review-modal">
+  <div class="review-box">
+    <div class="review-head">
+      <div>
+        <h2 style="margin:0;">Rate & Review</h2>
+        <div id="reviewProductName" style="color:#666;margin-top:5px;"></div>
+      </div>
+      <button class="review-close" onclick="closeReview()">×</button>
+    </div>
+    <div style="margin-top:20px;font-weight:800;">Your Rating</div>
+    <div class="review-stars">
+      <button type="button" class="review-star" data-rating="1">★</button>
+      <button type="button" class="review-star" data-rating="2">★</button>
+      <button type="button" class="review-star" data-rating="3">★</button>
+      <button type="button" class="review-star" data-rating="4">★</button>
+      <button type="button" class="review-star" data-rating="5">★</button>
+    </div>
+    <textarea id="reviewText" class="review-text" placeholder="How was your product? Write your review..."></textarea>
+    <div class="review-upload">
+      <strong>Add Product Photos</strong>
+      <div style="color:#777;font-size:13px;margin:5px 0 10px;">You can upload up to 5 photos.</div>
+      <label>Upload Photos:</label>
+      <input id="reviewPhotos" type="file" accept="image/*" multiple accept="image/*">
+      <div id="reviewPreview" class="review-preview"></div>
+    </div>
+    <div id="reviewMessage" class="review-message"></div>
+    <button id="reviewSubmit" class="review-submit" onclick="submitReview()">Submit Review</button>
+  </div>
+</div>
 
 <script>
+
 const box = document.getElementById("orderContent");
-const msgBox = document.getElementById("pageMessage");
+const message = document.getElementById("pageMessage");
 
 function esc(value){
-  return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
+
 function money(value){
   return "₹" + Number(value || 0).toLocaleString("en-IN");
 }
+
 function formatDate(value){
-  try{ return new Date(value).toLocaleString("en-IN", {day:"2-digit", month:"long", year:"numeric", hour:"numeric", minute:"2-digit", hour12:true}); }
-  catch{ return "-"; }
+  try{
+    return new Date(value).toLocaleString(
+      "en-IN",
+      {
+        day:"2-digit",
+        month:"long",
+        year:"numeric",
+        hour:"numeric",
+        minute:"2-digit",
+        hour12:true
+      }
+    );
+  }catch{
+    return "-";
+  }
 }
+
 function cleanImage(value){
   if(!value) return "";
-  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
+  let url = String(value).trim();
+  url = url
+    .replace(/^\[img\]\s*/i,"")
+    .replace(/\s*\[\/img\]$/i,"")
+    .replace(/^["']+|["']+$/g,"")
+    .trim();
+
   return /^https?:\/\/\S+$/i.test(url) ? url : "";
 }
 
-async function initOrderView() {
-  try {
-    // Self-initialize Supabase if window.supabaseClient is not defined yet
-    let client = window.supabaseClient;
-    if (!client && window.supabase && window.supabase.createClient) {
-      // Use values from config.js if available, otherwise use default fallback constants
-      const url = window.SUPABASE_URL || "https://yngankarjheadymarzuj.supabase.co";
-      const key = window.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluZ2Fua2FyamhlYWR5bWFyenVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAzNjEzODAsImV4cCI6MjA1NTkzNzM4MH0.q-SAMPLE_KEY_PLACEHOLDER_REPLACE_IF_NEEDED"; 
-      
-      // Let's create client directly using window.SUPABASE_URL / ANON_KEY if defined globally by config.js
-      if(window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-        client = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-      } else {
-        // Fallback to whatever URL/Key was working in your project
-        client = window.supabase.createClient(url, key);
+function statusClass(status){
+  return String(status || "pending")
+    .toLowerCase()
+    .replace(/[^a-z]/g,"");
+}
+
+/* -----------------------------
+   TRACKING
+----------------------------- */
+
+function getTrackingSteps(status){
+  const current = String(status || "pending").toLowerCase().trim();
+
+  if(current === "cancelled"){
+    return { cancelled: true, index: -1 };
+  }
+
+  const steps = ["pending", "confirmed", "packed", "shipped", "delivered"];
+  let index = steps.indexOf(current);
+
+  if(current === "processing"){
+    index = 2;
+  }
+
+  if(index < 0){
+    index = 0;
+  }
+
+  return { cancelled: false, index: index };
+}
+
+function renderTracking(status){
+  const tracking = getTrackingSteps(status);
+
+  if(tracking.cancelled){
+    return `
+      <div class="tracking">
+        <h2>Order Tracking</h2>
+        <div class="status status-cancelled">Order Cancelled</div>
+      </div>
+    `;
+  }
+
+  const labels = [
+    ["pending","Order Placed"],
+    ["confirmed","Confirmed"],
+    ["packed","Packed"],
+    ["shipped","Shipped"],
+    ["delivered","Delivered"]
+  ];
+
+  return `
+    <div class="tracking">
+      <h2>Order Tracking</h2>
+      <div class="steps">
+        ${labels.map((item, index) => {
+          const done = index < tracking.index;
+          const active = index === tracking.index;
+          return `
+            <div class="step ${done ? "done" : ""} ${active ? "active" : ""}">
+              <div class="circle">
+                ${done || active ? "✓" : index + 1}
+              </div>
+              <div class="step-label">${item[1]}</div>
+              ${index < labels.length - 1 ? `<div class="step-line"></div>` : ""}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+/* =============================
+   PRODUCT REVIEW SYSTEM
+============================= */
+let reviewProductId = null;
+let reviewRating = 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const reviewStars = document.querySelectorAll(".review-star");
+  reviewStars.forEach(star => {
+    star.addEventListener("click", () => {
+      reviewRating = Number(star.dataset.rating);
+      reviewStars.forEach(s => {
+        s.classList.toggle("selected", Number(s.dataset.rating) <= reviewRating);
+      });
+    });
+  });
+
+  const reviewPhotos = document.getElementById("reviewPhotos");
+  if(reviewPhotos){
+    reviewPhotos.addEventListener("change", () => {
+      const reviewPreview = document.getElementById("reviewPreview");
+      const reviewMessage = document.getElementById("reviewMessage");
+      if(reviewPreview) reviewPreview.innerHTML = "";
+      const files = Array.from(reviewPhotos.files || []);
+      if(files.length > 5){
+        reviewPhotos.value = "";
+        if(reviewMessage) reviewMessage.innerHTML = "Maximum 5 photos allowed.";
+        return;
       }
-      window.supabaseClient = client;
+      if(reviewMessage) reviewMessage.innerHTML = "";
+      files.forEach(file => {
+        if(!file.type.startsWith("image/")) return;
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        if(reviewPreview) reviewPreview.appendChild(img);
+      });
+    });
+  }
+
+  const reviewModal = document.getElementById("reviewModal");
+  if(reviewModal){
+    reviewModal.addEventListener("click", event => {
+      if(event.target === reviewModal) closeReview();
+    });
+  }
+});
+
+async function openReview(productId, productName){
+  reviewProductId = Number(productId);
+  reviewRating = 0;
+
+  const reviewProductName = document.getElementById("reviewProductName");
+  const reviewText = document.getElementById("reviewText");
+  const reviewPhotos = document.getElementById("reviewPhotos");
+  const reviewPreview = document.getElementById("reviewPreview");
+  const reviewMessage = document.getElementById("reviewMessage");
+  const reviewSubmitButton = document.getElementById("reviewSubmit");
+  const reviewModal = document.getElementById("reviewModal");
+  const reviewStars = document.querySelectorAll(".review-star");
+
+  if(reviewProductName) reviewProductName.textContent = productName;
+  if(reviewText) reviewText.value = "";
+  if(reviewPhotos) reviewPhotos.value = "";
+  if(reviewPreview) reviewPreview.innerHTML = "";
+  if(reviewMessage) reviewMessage.innerHTML = "";
+  
+  reviewStars.forEach(star => star.classList.remove("selected"));
+
+  const { data: { user } } = await window.supabaseClient.auth.getUser();
+  if(!user){
+    alert("Please login first.");
+    return;
+  }
+
+  const { data: existingReview, error } = await window.supabaseClient
+    .from("product_reviews")
+    .select("*")
+    .eq("product_id", reviewProductId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if(error){
+    console.warn("Review check:", error.message);
+  }
+
+  if(existingReview){
+    reviewRating = Number(existingReview.rating || 0);
+    if(reviewText) reviewText.value = existingReview.review || "";
+    reviewStars.forEach(star => {
+      star.classList.toggle("selected", Number(star.dataset.rating) <= reviewRating);
+    });
+    if(reviewMessage) reviewMessage.innerHTML = "You already reviewed this product. You can update your review.";
+    if(reviewSubmitButton) reviewSubmitButton.textContent = "Update Review";
+  } else {
+    if(reviewSubmitButton) reviewSubmitButton.textContent = "Submit Review";
+  }
+
+  if(reviewModal) reviewModal.classList.add("show");
+}
+
+function closeReview(){
+  const reviewModal = document.getElementById("reviewModal");
+  if(reviewModal) reviewModal.classList.remove("show");
+}
+
+async function submitReview(){
+  const textInput = document.getElementById("reviewText");
+  const fileInput = document.getElementById("reviewPhotos");
+  const messageBox = document.getElementById("reviewMessage");
+
+  if(!textInput){
+    if(messageBox) messageBox.textContent = "Review text box not found.";
+    return;
+  }
+
+  const prodId = typeof reviewProductId !== 'undefined' ? reviewProductId : null;
+
+  if(!prodId){
+    if(messageBox) messageBox.textContent = "Error: Product ID is missing. Please reopen the review popup.";
+    return;
+  }
+
+  const reviewText = textInput.value.trim();
+  const files = fileInput ? fileInput.files : [];
+  let photoUrls = [];
+
+  if(messageBox) messageBox.textContent = "Processing review and photos...";
+
+  try {
+    let ratingValue = typeof reviewRating !== 'undefined' ? reviewRating : 5; 
+    const starBtn = document.querySelector(".review-star.selected, .review-star.active");
+    if(starBtn && starBtn.dataset.rating) {
+      ratingValue = Number(starBtn.dataset.rating) || ratingValue;
     }
 
-    if (!client) {
-      msgBox.innerHTML = '<div class="error">Supabase could not be initialized. Please check your Supabase credentials or script files.</div>';
-      return;
-    }
+    if(files && files.length > 0){
+      const limit = Math.min(files.length, 5);
+      
+      for(let i = 0; i < limit; i++){
+        const file = files[i];
+        const fileName = `review_${Date.now()}_${i}_${file.name}`;
+        
+        const { error: uploadError } = await window.supabaseClient.storage
+          .from("product-review-images")
+          .upload(fileName, file);
 
-    const params = new URLSearchParams(location.search);
-    const orderId = params.get("id");
+        if(uploadError){
+          console.error("Storage upload error:", uploadError);
+          if(messageBox) messageBox.textContent = "Upload Error: " + uploadError.message;
+          return; 
+        }
 
-    if (!orderId) {
-      msgBox.innerHTML = '<div class="error">Order ID is missing in URL.</div>';
-      return;
-    }
-
-    // 1. Fetch Order from order_summary or orders
-    let { data: order, error: orderError } = await client
-      .from("order_summary")
-      .select("*")
-      .eq("id", orderId)
-      .maybeSingle();
-
-    if (orderError || !order) {
-      const resOrders = await client
-        .from("orders")
-        .select("*")
-        .eq("id", orderId)
-        .maybeSingle();
-      order = resOrders.data;
-      orderError = resOrders.error;
-    }
-
-    if (orderError || !order) {
-      msgBox.innerHTML = `<div class="error">Order not found: ${esc(orderError?.message || '')}</div>`;
-      return;
-    }
-
-    // 2. Fetch Order Items & Product Images
-    const { data: items } = await client
-      .from("order_items")
-      .select("*")
-      .eq("order_id", orderId);
-
-    const orderItems = items || [];
-
-    for (let item of orderItems) {
-      if (!item.image_url && !item.image && !item.product_image && item.product_id) {
-        const { data: prod } = await client
-          .from("products")
-          .select("image_url, image, img, photo")
-          .eq("id", item.product_id)
-          .maybeSingle();
-
-        if (prod) {
-          const imgUrl = prod.image_url || prod.image || prod.img || prod.photo || '';
-          item.image_url = imgUrl;
+        const { data: publicUrlData } = window.supabaseClient.storage
+          .from("product-review-images")
+          .getPublicUrl(fileName);
+          
+        if(publicUrlData && publicUrlData.publicUrl){
+          photoUrls.push(publicUrlData.publicUrl);
+        } else {
+          const publicUrl = `${window.supabaseClient.supabaseUrl}/storage/v1/object/public/product-review-images/${fileName}`;
+          photoUrls.push(publicUrl);
         }
       }
     }
 
-    const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0), 0);
-    const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
-    const status = String(order.status || "pending").toLowerCase();
+    const { data: { user } } = await window.supabaseClient.auth.getUser();
+    if(!user){
+      if(messageBox) messageBox.textContent = "Please login first.";
+      return;
+    }
 
-    // 3. Render Items HTML
-    const itemsHtml = orderItems.length ? orderItems.map(item => {
-      const img = cleanImage(item.image_url || item.image || item.product_image || "");
-      const qty = Number(item.quantity || 1);
-      const price = Number(item.unit_price ?? item.price ?? 0);
+    const { error: insertError } = await window.supabaseClient
+      .from("product_reviews")
+      .upsert({
+        product_id: prodId,
+        user_id: user.id,
+        customer_name: user.user_metadata?.full_name || user.email || "Customer",
+        rating: ratingValue,
+        review: reviewText,
+        photo_urls: photoUrls.length > 0 ? photoUrls : null
+      }, { onConflict: 'product_id,user_id' });
 
-      return `
-        <div class="item">
-          <div class="item-left">
-            ${img ? `<img class="item-image" src="${esc(img)}" alt="Product" onerror="this.style.display='none'">` : `<div class="item-image"></div>`}
-            <div>
-              <div class="item-name">${esc(item.product_name || "Product")}</div>
-              <div class="item-qty">Quantity: ${qty} × ${money(price)}</div>
-            </div>
-          </div>
-          <div class="item-price">${money(price * qty)}</div>
-        </div>
-      `;
-    }).join("") : `<div class="empty">No items found for this order.</div>`;
+    if(insertError){
+      console.error("Database error:", insertError);
+      if(messageBox) messageBox.textContent = "Database Error: " + insertError.message;
+      return;
+    }
 
-    // 4. Render Main Page
-    box.innerHTML = `
-      <div class="card">
-        <div class="order-head">
-          <div>
-            <div class="order-id">Order #${esc(order.id)}</div>
-            <div class="date">${esc(formatDate(order.created_at))}</div>
-            <div class="status status-${status}">${esc(status)}</div>
-          </div>
-          <div class="total">${money(total)}</div>
-        </div>
-      </div>
+    if(messageBox) messageBox.textContent = "Review submitted successfully!";
+    setTimeout(() => {
+      const reviewModal = document.getElementById("reviewModal");
+      if(reviewModal) reviewModal.classList.remove("show");
+      location.reload();
+    }, 1500);
 
-      <div class="card">
-        <h2>Order Items</h2>
-        <div class="items">${itemsHtml}</div>
-      </div>
-
-      <div class="card">
-        <h2>Delivery Details</h2>
-        <div class="info-grid">
-          <div class="info-box">
-            <strong>Customer</strong>
-            <span>${esc(order.shipping_name || order.customer_name || "-")}</span>
-          </div>
-          <div class="info-box">
-            <strong>Phone</strong>
-            <span>${esc(order.shipping_phone || order.customer_phone || "-")}</span>
-          </div>
-          <div class="info-box">
-            <strong>Email</strong>
-            <span>${esc(order.customer_email || "-")}</span>
-          </div>
-          <div class="info-box">
-            <strong>Payment</strong>
-            <span>${esc(order.payment_method || "COD")}</span>
-          </div>
-        </div>
-        ${order.shipping_address ? `<div class="info-box" style="margin-top:15px;"><strong>Delivery Address</strong><span>${esc(order.shipping_address)}</span></div>` : ""}
-      </div>
-
-      <div class="card">
-        <h2>Actions</h2>
-        <div class="actions">
-          <a class="btn primary" href="account.html">← My Account</a>
-          <a class="return-action-btn" href="return.html?id=${esc(order.id)}">Return / Replace</a>
-          <a class="btn secondary" href="cancel-order.html?id=${esc(order.id)}">Cancel Order</a>
-        </div>
-      </div>
-    `;
-
-  } catch (err) {
-    console.error("View Error:", err);
-    msgBox.innerHTML = `<div class="error">Error loading page: ${esc(err.message)}</div>`;
+  } catch(err){
+    console.error("Catch error:", err);
+    if(messageBox) messageBox.textContent = "Something went wrong: " + err.message;
   }
 }
+  
+/* -----------------------------
+   LOAD ORDER
+----------------------------- */
 
-initOrderView();
-</script>
+async function loadOrder(){
+  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 
-</body>
-</html>
+  const supabaseClient = window.supabase?.createClient 
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) 
+    : window.supabaseClient;
+
+  window.supabaseClient = supabaseClient;
+  
+  if(!window.supabaseClient){
+    message.innerHTML = `<div class="card error">Supabase is not configured.</div>`;
+    return;
+  }
+
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("id");
+
+  if(!orderId){
+    message.innerHTML = `<div class="card error">Order ID is missing.</div>`;
+    return;
+  }
+
+  let { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) {
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const sessionRes = await supabaseClient.auth.getSession();
+    user = sessionRes?.data?.session?.user;
+  }
+
+  if(!user){
+    location.href = "account.html?redirect=" + encodeURIComponent("order-view.html?id=" + orderId);
+    return;
+  }
+
+  /* ORDER */
+  let { data: order, error: orderError } = await supabaseClient
+    .from("order_summary")
+    .select("*")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if(orderError || !order){
+    const resOrders = await supabaseClient
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
+      .maybeSingle();
+    order = resOrders.data;
+    orderError = resOrders.error;
+  }
+
+  if(orderError || !order){
+    message.innerHTML = `<div class="card error">${esc(orderError?.message || "This order was not found.")}</div>`;
+    return;
+  }
+
+  /* ORDER ITEMS */
+  const { data: items, error: itemError } = await supabaseClient
+    .from("order_items")
+    .select("*")
+    .eq("order_id", order.id);
+
+  if(itemError){
+    console.war
