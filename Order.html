@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Orders — RADA CREST</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  color:#171717;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(0,0,0,.035),transparent 28%),
+    radial-gradient(circle at 90% 10%,rgba(0,0,0,.025),transparent 30%),
+    #f8f7f4;
+}
+
+.glass-header{
+  background:rgba(255,255,255,.84);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(0,0,0,.07);
+}
+
+.page-shell{
+  width:min(920px,calc(100% - 24px));
+  margin:auto;
+}
+
+.order-card{
+  position:relative;
+  background:rgba(255,255,255,.96);
+  border:1px solid rgba(0,0,0,.07);
+  border-radius:26px;
+  overflow:hidden;
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.045),
+    0 2px 8px rgba(0,0,0,.025);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.order-card:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.075),
+    0 3px 10px rgba(0,0,0,.035);
+}
+
+.order-card:active{
+  transform:scale(.995);
+}
+
+.order-top{
+  border-bottom:1px solid #eeeeee;
+}
+
+.product-box{
+  width:64px;
+  height:64px;
+  min-width:64px;
+  border-radius:17px;
+  overflow:hidden;
+  background:#f2f2f2;
+  border:1px solid #eeeeee;
+}
+
+.product-box img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.status-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:currentColor;
+}
+
+.status-delivered{
+  color:#087443;
+  background:#ecfdf3;
+}
+
+.status-cancelled{
+  color:#b42318;
+  background:#fff1f0;
+}
+
+.status-pending{
+  color:#9a6700;
+  background:#fff8df;
+}
+
+.status-processing{
+  color:#175cd3;
+  background:#eff8ff;
+}
+
+.status-default{
+  color:#525252;
+  background:#f4f4f5;
+}
+
+.view-button{
+  background:#111;
+  color:white;
+  transition:.2s ease;
+}
+
+.view-button:hover{
+  background:#292929;
+  transform:translateY(-1px);
+}
+
+.empty-icon{
+  width:82px;
+  height:82px;
+  margin:auto;
+  border-radius:27px;
+  background:#111;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 18px 40px rgba(0,0,0,.14);
+}
+
+.skeleton{
+  animation:pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:.55}
+  50%{opacity:1}
+}
+
+.toast{
+  animation:toastIn .25s ease forwards;
+}
+
+@keyframes toastIn{
+  from{
+    opacity:0;
+    transform:translateY(-10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@media(max-width:640px){
+
+  .page-shell{
+    width:calc(100% - 18px);
+  }
+
+  .order-card{
+    border-radius:22px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="glass-header sticky top-0 z-50">
+
+  <div class="page-shell h-[72px] flex items-center justify-between">
+
+    <div class="flex items-center gap-3">
+
+      <a
+        href="account.html"
+        class="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center hover:bg-neutral-100 transition"
+      >
+        <i class="fa-solid fa-arrow-left text-sm"></i>
+      </a>
+
+      <div>
+
+        <div class="font-extrabold tracking-[.18em] text-[15px]">
+          RADA CREST
+        </div>
+
+        <div class="text-[10px] text-neutral-400 uppercase tracking-wider">
+          Order Centre
+        </div>
+
+      </div>
+
+    </div>
+
+    <a
+      href="cart.html"
+      class="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center hover:bg-neutral-100 transition"
+      aria-label="Cart"
+    >
+      <i class="fa-solid fa-bag-shopping text-sm"></i>
+    </a>
+
+  </div>
+
+</header>
+
+
+<main class="page-shell py-8 sm:py-10">
+
+  <!-- INTRO -->
+  <section class="mb-7">
+
+    <div class="flex items-end justify-between gap-4">
+
+      <div>
+
+        <p class="text-[10px] uppercase tracking-[.23em] font-bold text-neutral-400 mb-2">
+          Your Shopping History
+        </p>
+
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+          My Orders
+        </h1>
+
+        <p class="text-sm text-neutral-500 mt-2 leading-6">
+          Track and manage every order placed from your RADA CREST account.
+        </p>
+
+      </div>
+
+      <div
+        id="orderCount"
+        class="hidden sm:flex px-3 py-2 rounded-full bg-white border border-neutral-200 text-xs font-semibold text-neutral-500"
+      >
+        0 Orders
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ALERT -->
+  <div
+    id="alert"
+    class="hidden mb-5 px-4 py-3 rounded-2xl text-sm"
+  ></div>
+
+
+  <!-- LOADING -->
+  <section id="loadingState" class="space-y-4">
+
+    <div class="order-card p-5 skeleton">
+
+      <div class="flex justify-between gap-4">
+
+        <div class="space-y-3">
+
+          <div class="h-4 bg-neutral-200 rounded w-32"></div>
+
+          <div class="h-3 bg-neutral-200 rounded w-44"></div>
+
+        </div>
+
+        <div class="h-7 bg-neutral-200 rounded-full w-24"></div>
+
+      </div>
+
+      <div class="flex gap-4 mt-6">
+
+        <div class="product-box bg-neutral-200"></div>
+
+        <div class="flex-1 space-y-3">
+
+          <div class="h-4 bg-neutral-200 rounded w-48"></div>
+
+          <div class="h-3 bg-neutral-200 rounded w-28"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="order-card p-5 skeleton">
+
+      <div class="h-4 bg-neutral-200 rounded w-36"></div>
+
+      <div class="h-3 bg-neutral-200 rounded w-44 mt-3"></div>
+
+      <div class="flex gap-4 mt-6">
+
+        <div class="product-box bg-neutral-200"></div>
+
+        <div class="flex-1">
+
+          <div class="h-4 bg-neutral-200 rounded w-44"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ORDERS -->
+  <section
+    id="ordersList"
+    class="hidden space-y-4"
+  ></section>
+
+
+  <!-- EMPTY -->
+  <section
+    id="emptyState"
+    class="hidden order-card text-center px-6 py-16"
+  >
+
+    <div class="empty-icon">
+
+      <i class="fa-solid fa-box-open text-3xl"></i>
+
+    </div>
+
+    <h2 class="font-extrabold text-xl mt-6">
+      No orders yet
+    </h2>
+
+    <p class="text-sm text-neutral-500 max-w-sm mx-auto mt-2 leading-6">
+      Your completed and active orders will appear here once you place your
+      first RADA CREST order.
+    </p>
+
+    <a
+      href="index.html"
+      class="inline-flex items-center justify-center mt-6 px-5 py-3 rounded-xl bg-black text-white text-sm font-semibold"
+    >
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Continue Shopping
+    </a>
+
+  </section>
+
+
+  <div class="text-center mt-8 text-[11px] text-neutral-400">
+    <i class="fa-solid fa-shield-halved mr-1"></i>
+    Your order information is protected by your account.
+  </div>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+
+
+<script>
+
+let currentUser = null;
+let orders = [];
+
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+function showAlert(message){
+
+  const el = document.getElementById('alert');
+
+  el.className =
+    'mb-5 px-4 py-3 rounded-2xl text-sm toast bg-red-50 text-red-700 border border-red-200';
+
+  el.textContent = message;
+
+  el.classList.remove('hidden');
+
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+async function loadAccount(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getUser();
+
+    if(error) throw error;
+
+    if(!data.user){
+
+      window.location.href = 'account.html';
+
+      return;
+    }
+
+    currentUser = data.user;
+
+    await loadOrders();
+
+  }catch(error){
+
+    console.error(error);
+
+    document
+      .getElementById('loadingState')
+      .classList.add('hidden');
+
+    showAlert(
+      error.message || 'Unable to load your account.'
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD ORDERS
+========================================================= */
+
+async function loadOrders(){
+
+  /*
+    First try order_summary because the previous
+    RADA CREST order system already uses it.
+  */
+
+  let result =
+    await supabaseClient
+      .from('order_summary')
+      .select('*')
+      .eq('customer_email', currentUser.email)
+      .order('created_at', {ascending:false});
+
+
+  /*
+    If order_summary is unavailable, use orders table.
+  */
+
+  if(result.error){
+
+    console.warn(
+      'order_summary unavailable, using orders table.',
+      result.error
+    );
+
+    result =
+      await supabaseClient
+        .from('orders')
+        .select('*')
+        .eq('customer_email', currentUser.email)
+        .order('created_at', {ascending:false});
+
+  }
+
+
+  document
+    .getElementById('loadingState')
+    .classList.add('hidden');
+
+
+  if(result.error){
+
+    console.error(result.error);
+
+    showAlert(
+      result.error.message ||
+      'Unable to load orders.'
+    );
+
+    return;
+  }
+
+
+  orders = result.data || [];
+
+  renderOrders();
+
+}
+
+
+/* =========================================================
+   RENDER ORDERS
+========================================================= */
+
+function renderOrders(){
+
+  const list =
+    document.getElementById('ordersList');
+
+  const empty =
+    document.getElementById('emptyState');
+
+  const count =
+    document.getElementById('orderCount');
+
+
+  count.textContent =
+    `${orders.length} ${orders.length === 1 ? 'Order' : 'Orders'}`;
+
+  count.classList.remove('hidden');
+
+
+  if(!orders.length){
+
+    list.classList.add('hidden');
+
+    empty.classList.remove('hidden');
+
+    return;
+  }
+
+
+  empty.classList.add('hidden');
+
+  list.classList.remove('hidden');
+
+
+  list.innerHTML =
+    orders.map(order => {
+
+      const id =
+        order.id || order.order_id;
+
+      const status =
+        order.status || 'Pending';
+
+      const payment =
+        order.payment_status || 'Pending';
+
+      const total =
+        Number(
+          order.total_amount ??
+          order.total ??
+          0
+        );
+
+
+      const date =
+        formatDate(order.created_at);
+
+
+      const statusClass =
+        getStatusClass(status);
+
+
+      const statusIcon =
+        getStatusIcon(status);
+
+
+      const productImage =
+        order.product_image ||
+        order.image_url ||
+        order.image ||
+        '';
+
+
+      const productName =
+        order.product_name ||
+        order.product_title ||
+        'Order Items';
+
+
+      const quantity =
+        order.quantity ||
+        order.item_count ||
+        '';
+
+
+      return `
+
+        <article
+          class="order-card cursor-pointer"
+          onclick="openOrder('${escapeAttr(id)}')"
+        >
+
+          <!-- TOP -->
+          <div class="order-top px-5 sm:px-6 py-5">
+
+            <div class="flex items-start justify-between gap-4">
+
+              <div>
+
+                <p class="text-[10px] uppercase tracking-[.15em] text-neutral-400 font-bold">
+                  Order
+                </p>
+
+                <h2 class="font-extrabold text-sm mt-1 break-all">
+                  #${escapeHtml(String(id))}
+                </h2>
+
+                <p class="text-xs text-neutral-400 mt-1">
+                  ${date}
+                </p>
+
+              </div>
+
+
+              <span class="status ${statusClass}">
+                <span class="status-dot"></span>
+                <i class="${statusIcon} text-[9px]"></i>
+                ${escapeHtml(status)}
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- PRODUCT / SUMMARY -->
+          <div class="px-5 sm:px-6 py-5">
+
+            <div class="flex items-center gap-4">
+
+              <div class="product-box">
+
+                ${
+                  productImage
+                  ?
+                  `
+                    <img
+                      src="${escapeAttr(productImage)}"
+                      alt="Product"
+                      onerror="this.style.display='none'"
+                    >
+                  `
+                  :
+                  `
+                    <div class="w-full h-full flex items-center justify-center text-neutral-400">
+                      <i class="fa-solid fa-box"></i>
+                    </div>
+                  `
+                }
+
+              </div>
+
+
+              <div class="flex-1 min-w-0">
+
+                <h3 class="font-bold text-sm truncate">
+                  ${escapeHtml(productName)}
+                </h3>
+
+                ${
+                  quantity
+                  ?
+                  `
+                    <p class="text-xs text-neutral-400 mt-1">
+                      ${escapeHtml(String(quantity))} item(s)
+                    </p>
+                  `
+                  :
+                  `
+                    <p class="text-xs text-neutral-400 mt-1">
+                      View complete order
+                    </p>
+                  `
+                }
+
+                <p class="text-xs text-neutral-500 mt-2">
+                  Payment:
+                  <span class="font-semibold">
+                    ${escapeHtml(payment)}
+                  </span>
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- BOTTOM -->
+            <div class="flex items-center justify-between gap-4 mt-5 pt-5 border-t border-neutral-100">
+
+              <div>
+
+                <p class="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">
+                  Order Total
+                </p>
+
+                <p class="text-lg font-extrabold mt-1">
+                  ₹${formatMoney(total)}
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                onclick="event.stopPropagation();openOrder('${escapeAttr(id)}')"
+                class="view-button px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-2"
+              >
+                View Order
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }).join('');
+
+}
+
+
+/* =========================================================
+   OPEN ORDER
+========================================================= */
+
+function openOrder(id){
+
+  if(!id) return;
+
+  window.location.href =
+    `order-view.html?id=${encodeURIComponent(id)}`;
+
+}
+
+
+/* =========================================================
+   STATUS STYLE
+========================================================= */
+
+function getStatusClass(status){
+
+  const s =
+    String(status || '').toLowerCase();
+
+
+  if(
+    s.includes('deliver') ||
+    s.includes('complete')
+  ){
+
+    return 'status-delivered';
+
+  }
+
+
+  if(
+    s.includes('cancel') ||
+    s.includes('reject')
+  ){
+
+    return 'status-cancelled';
+
+  }
+
+
+  if(
+    s.includes('pending') ||
+    s.includes('new')
+  ){
+
+    return 'status-pending';
+
+  }
+
+
+  if(
+    s.includes('confirm') ||
+    s.includes('pack') ||
+    s.includes('ship') ||
+    s.includes('process')
+  ){
+
+    return 'status-processing';
+
+  }
+
+
+  return 'status-default';
+
+}
+
+
+/* =========================================================
+   STATUS ICON
+========================================================= */
+
+function getStatusIcon(status){
+
+  const s =
+    String(status || '').toLowerCase();
+
+
+  if(s.includes('deliver'))
+    return 'fa-solid fa-check';
+
+  if(s.includes('cancel'))
+    return 'fa-solid fa-xmark';
+
+  if(s.includes('ship'))
+    return 'fa-solid fa-truck';
+
+  if(s.includes('pack'))
+    return 'fa-solid fa-box';
+
+  if(s.includes('confirm'))
+    return 'fa-solid fa-check';
+
+  return 'fa-solid fa-clock';
+
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+function formatDate(value){
+
+  if(!value) return '';
+
+  const date =
+    new Date(value);
+
+  if(isNaN(date.getTime()))
+    return '';
+
+  return date.toLocaleDateString(
+    'en-IN',
+    {
+      day:'2-digit',
+      month:'short',
+      year:'numeric'
+    }
+  );
+
+}
+
+
+/* =========================================================
+   MONEY
+========================================================= */
+
+function formatMoney(value){
+
+  return Number(value || 0)
+    .toLocaleString('en-IN',{
+      maximumFractionDigits:2
+    });
+
+}
+
+
+/* =========================================================
+   SECURITY
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+function escapeAttr(value){
+
+  return escapeHtml(value);
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  loadAccount
+);
+
+</script>
+
+</body>
+</html>
