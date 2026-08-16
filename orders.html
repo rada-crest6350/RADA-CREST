@@ -469,16 +469,12 @@ async function loadAccount(){
 }
 
 
+  
 /* =========================================================
    LOAD ORDERS
 ========================================================= */
 
 async function loadOrders(){
-
-  /*
-    First try order_summary because the previous
-    RADA CREST order system already uses it.
-  */
 
   let result =
     await supabaseClient
@@ -487,50 +483,58 @@ async function loadOrders(){
       .eq('customer_email', currentUser.email)
       .order('created_at', {ascending:false});
 
-
-  /*
-    If order_summary is unavailable, use orders table.
-  */
-
   if(result.error){
-
-    console.warn(
-      'order_summary unavailable, using orders table.',
-      result.error
-    );
-
     result =
       await supabaseClient
         .from('orders')
         .select('*')
         .eq('customer_email', currentUser.email)
         .order('created_at', {ascending:false});
-
   }
-
 
   document
     .getElementById('loadingState')
     .classList.add('hidden');
 
-
   if(result.error){
-
     console.error(result.error);
-
-    showAlert(
-      result.error.message ||
-      'Unable to load orders.'
-    );
-
+    showAlert(result.error.message || 'Unable to load orders.');
     return;
   }
 
-
   orders = result.data || [];
-  console.log("Fetched Orders Data:", orders);
-  renderOrders();
 
+  // Har order ke liye uske items/products ki image fetch karo agar nahi hai toh
+  for(let ord of orders){
+    if(!ord.product_image && !ord.image_url && !ord.image){
+      // Pehle order_items check karo
+      const { data: items } = await supabaseClient
+        .from('order_items')
+        .select('product_id, product_name, quantity')
+        .eq('order_id', ord.id)
+        .limit(1);
+
+      if(items && items.length > 0){
+        ord.item_count = items.length;
+        if(items[0].product_name) ord.product_name = items[0].product_name;
+        
+        // Agar product_id hai toh products table se image nikalo
+        if(items[0].product_id){
+          const { data: prod } = await supabaseClient
+            .from('products')
+            .select('image_url, image')
+            .eq('id', items[0].product_id)
+            .maybeSingle();
+
+          if(prod){
+            ord.product_image = prod.image_url || prod.image || '';
+          }
+        }
+      }
+    }
+  }
+
+  renderOrders();
 }
 
 
