@@ -892,7 +892,8 @@ async function loadOrder() {
 
   if (items && items.length > 0) {
     for (let item of items) {
-      if (!item.image_url && !item.image && item.product_id) {
+      // Products table se image fetch karo agar available ho
+      if (!item.image_url && !item.image && !item.product_image && item.product_id) {
         const { data: prod } = await supabaseClient
           .from("products")
           .select("image_url, image, img, photo")
@@ -900,22 +901,20 @@ async function loadOrder() {
           .maybeSingle();
 
         if (prod) {
-          item.image_url = prod.image_url || prod.image || prod.img || prod.photo || '';
+          const imgUrl = prod.image_url || prod.image || prod.img || prod.photo || '';
+          item.image_url = imgUrl;
+          item.image = imgUrl;
+          item.product_image = imgUrl;
         }
+      } else {
+        // Agar items table mein hi pehle se koi image field hai toh sabhi ko barabar kar do
+        const existingImg = item.image_url || item.image || item.product_image || '';
+        item.image_url = existingImg;
+        item.image = existingImg;
+        item.product_image = existingImg;
       }
     }
   }
-
-  // Ab original render function call ho jayega jo aapke code mein pehle se hai
-  if (typeof renderOrderDetails === 'function') {
-    renderOrderDetails(order, items);
-  } else if (typeof renderOrder === 'function') {
-    renderOrder(order, items);
-  }
-}
-
-// Function call
-loadOrder();
 
   /* TOTAL */
   const calculatedTotal = orderItems.reduce(
