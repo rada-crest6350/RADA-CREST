@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Mobile - RADA CREST</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>body{font-family:'Plus Jakarta Sans',sans-serif;background:#FBF9F5}</style>
+</head>
+<body class="text-neutral-800 antialiased min-h-screen flex flex-col justify-between">
+<header class="w-full bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between">
+<a href="index.html" class="font-bold tracking-widest text-lg uppercase">RADA CREST</a>
+<a href="account.html" class="text-sm text-neutral-600"><i class="fa-solid fa-arrow-left"></i> Back</a>
+</header>
+<main class="max-w-md w-full mx-auto px-4 py-10 flex-grow">
+<div class="text-center mb-6">
+<div class="w-14 h-14 mx-auto mb-4 rounded-full bg-black text-white flex items-center justify-center"><i class="fa-solid fa-mobile-screen-button"></i></div>
+<h1 class="text-2xl font-bold">Verify Mobile Number</h1>
+<p class="text-sm text-neutral-500 mt-2">Enter the 6-digit OTP sent to your mobile number.</p>
+</div>
+<div id="alert" class="hidden mb-4 p-3 text-sm rounded-lg"></div>
+<div class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
+<form onsubmit="verifySignup(event)" class="space-y-4">
+<label class="block text-xs font-semibold uppercase text-neutral-600">6-Digit OTP</label>
+<input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required placeholder="123456" class="w-full px-3 py-3 bg-neutral-50 border border-neutral-300 rounded-lg text-center tracking-[0.5em] text-lg focus:outline-none focus:border-black">
+<button id="verify-btn" class="w-full py-3 bg-black text-white rounded-xl font-medium">Verify & Continue</button>
+</form>
+<button onclick="resendOtp()" id="resend-btn" class="w-full mt-3 py-3 border border-neutral-300 rounded-xl text-sm font-medium">Resend OTP</button>
+</div>
+</main>
+<footer class="text-center py-4 text-xs text-neutral-400 border-t border-neutral-200 bg-white">&copy; 2026 RADA CREST. All rights reserved.</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+<script>
+function alertBox(msg, error=true){
+ const el=document.getElementById('alert');
+ el.className='mb-4 p-3 text-sm rounded-lg '+(error?'bg-red-50 text-red-700 border border-red-200':'bg-emerald-50 text-emerald-700 border border-emerald-200');
+ el.innerText=msg; el.classList.remove('hidden');
+}
+async function verifySignup(e){
+ e.preventDefault();
+ const phone=sessionStorage.getItem('pending_signup_phone');
+ const email=sessionStorage.getItem('pending_signup_email');
+ const name=sessionStorage.getItem('pending_signup_name');
+ const mobile=sessionStorage.getItem('pending_signup_mobile');
+ const token=document.getElementById('otp').value.trim();
+ if(!phone || !email || !token){ alertBox('Signup session is missing. Please start signup again.'); return; }
+ const btn=document.getElementById('verify-btn'); btn.disabled=true; btn.innerText='Verifying...';
+ try{
+   const {data,error}=await supabaseClient.auth.verifyOtp({phone,token,type:'sms'});
+   if(error) throw error;
+   if(!data.session) throw new Error('Verification succeeded but no session was returned.');
+   const {error: emailError}=await supabaseClient.auth.updateUser({
+      email,
+      data:{full_name:name || '', mobile_number:mobile || ''}
+   });
+   if(emailError) throw emailError;
+   sessionStorage.removeItem('pending_signup_phone');
+   sessionStorage.removeItem('pending_signup_email');
+   sessionStorage.removeItem('pending_signup_name');
+   sessionStorage.removeItem('pending_signup_mobile');
+   alertBox('Mobile verified. Your account is ready. Please check your email to confirm it.',false);
+   setTimeout(()=>window.location.href='account.html',2200);
+ }catch(err){ alertBox(err.message || 'OTP verification failed.'); }
+ finally{ btn.disabled=false; btn.innerText='Verify & Continue'; }
+}
+async function resendOtp(){
+ const phone=sessionStorage.getItem('pending_signup_phone');
+ if(!phone){ alertBox('Signup session is missing. Please start again.'); return; }
+ const btn=document.getElementById('resend-btn'); btn.disabled=true; btn.innerText='Sending...';
+ try{
+   const {error}=await supabaseClient.auth.signInWithOtp({phone,options:{shouldCreateUser:false}});
+   if(error) throw error;
+   alertBox('A new OTP has been sent.',false);
+ }catch(err){ alertBox(err.message || 'Unable to resend OTP.'); }
+ finally{ btn.disabled=false; btn.innerText='Resend OTP'; }
+}
+</script>
+</body>
+</html>
