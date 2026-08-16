@@ -893,7 +893,7 @@ async function loadOrder(){
   if(productIds.length){
     const { data: products } = await supabaseClient
       .from("products")
-      .select("id,image_url,image")
+      .select("id,image_url,image,image_2")
       .in("id", productIds);
 
     (products || []).forEach(product => {
@@ -913,7 +913,14 @@ async function loadOrder(){
   /* ITEMS HTML */
   const itemsHtml = orderItems.length ? orderItems.map(item => {
     const product = productMap.get(String(item.product_id));
-    const image = cleanImage(product?.image_url || product?.image || "");
+    const image = cleanImage(
+      item.image_url || 
+      item.image || 
+      product?.image_url || 
+      product?.image_2 || 
+      product?.image || 
+      ""
+    );
     const quantity = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
 
