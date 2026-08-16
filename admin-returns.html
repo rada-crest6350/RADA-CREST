@@ -1,1 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Return Requests — RADA CREST Admin</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0b0b0b;
+    color: #fff;
+    padding: 30px 20px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+  .back-btn {
+    color: #888;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .back-btn:hover { color: #fff; }
+  h1 { margin: 0; font-size: 24px; }
+  .card {
+    background: #151515;
+    border: 1px solid #292929;
+    border-radius: 16px;
+    padding: 25px;
+  }
+  .filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  input, select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #0d0d0d;
+    color: #fff;
+    outline: none;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #222;
+  }
+  th { color: #888; font-weight: bold; }
+  .badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    background: #222;
+    color: #7dff9b;
+  }
+</style>
+</head>
+<body>
 
+<div class="container">
+  <div class="top-bar">
+    <div>
+      <a href="admin-dashboard.html" class="back-btn">← Back to Dashboard</a>
+      <h1>Return & Replacement Requests</h1>
+    </div>
+    <div id="returnCounts" style="font-size: 13px; color: #888;">Loading...</div>
+  </div>
+
+  <div class="card">
+    <div class="filters">
+      <input type="text" id="returnSearch" placeholder="Search Order ID or Description..." onkeyup="filterReturns()" style="flex: 1; min-width: 220px;">
+      <select id="statusFilter" onchange="filterReturns()">
+        <option value="">All Status</option>
+        <option value="Requested">Requested</option>
+        <option value="Under Review">Under Review</option>
+        <option value="Approved">Approved</option>
+        <option value="Pickup Pending">Pickup Pending</option>
+        <option value="Product Received">Product Received</option>
+        <option value="Refunded">Refunded</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Return ID</th>
+            <th>Order ID</th>
+            <th>Type</th>
+            <th>Description / Reason</th>
+            <th>Media</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="returnsTableBody">
+          <tr><td colspan="7" style="text-align: center; color: #777;">Loading requests...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let allReturns = [];
+
+  async function loadAdminReturns() {
+    const { data, error } = await supabase
+      .from('support_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Error fetching returns:", error);
+      document.getElementById("returnsTableBody").innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ff7777;">Error loading requests.</td></tr>`;
+      return;
+    }
+
+    allReturns = data || [];
+    renderReturns(allReturns);
+    updateCounts(allReturns);
+  }
+
+  function renderReturns(returns) {
+    const tbody = document.getElementById("returnsTableBody");
+    tbody.innerHTML = "";
+
+    if (returns.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #777; padding: 20px;">No return requests found.</td></tr>`;
+      return;
+    }
+
+    returns.forEach(item => {
+      let photosHtml = "No Media";
+      if (item.photo_urls && item.photo_urls.length > 0) {
+        photosHtml = item.photo_urls.map(url => `<a href="${url}" target="_blank"><img src="${url}" style="width: 35px; height: 35px; object-fit: cover; border-radius: 4px; margin-right: 4px;"></a>`).join('');
+      }
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>#RTN-${item.id}</td>
+        <td style="font-weight: bold;">#${item.order_id}</td>
+        <td>${item.issue_type}</td>
+        <td style="max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.description}">${item.description}</td>
+        <td>${photosHtml}</td>
+        <td><span class="badge">${item.status}</span></td>
+        <td>
+          <select onchange="updateStatus(${item.id}, this.value)" style="padding: 6px; background: #1a1a1a; color: #fff; border-radius: 6px; border: 1px solid #444;">
+            <option value="" disabled selected>Update Status</option>
+            <option value="Under Review">Under Review</option>
+            <option value="Approved">Approved</option>
+            <option value="Pickup Pending">Pickup Pending</option>
+            <option value="Product Received">Product Received</option>
+            <option value="Refunded">Refunded</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  window.updateStatus = async function(id, newStatus) {
+    const { error } = await supabase
+      .from('support_requests')
+      .update({ status: newStatus, updated_at: new Date() })
+      .eq('id', id);
+
+    if (error) {
+      alert("Failed to update status: " + error.message);
+    } else {
+      alert(`Return #${id} status updated to ${newStatus}`);
+      loadAdminReturns();
+    }
+  };
+
+  window.filterReturns = function() {
+    const searchTxt = document.getElementById("returnSearch").value.toLowerCase();
+    const statusTxt = document.getElementById("statusFilter").value;
+
+    const filtered = allReturns.filter(item => {
+      const matchSearch = item.order_id.toString().includes(searchTxt) || item.description.toLowerCase().includes(searchTxt);
+      const matchStatus = statusTxt ? item.status === statusTxt : true;
+      return matchSearch && matchStatus;
+    });
+
+    renderReturns(filtered);
+  };
+
+  function updateCounts(returns) {
+    const total = returns.length;
+    const pending = returns.filter(r => r.status === 'Requested' || r.status === 'Under Review').length;
+    document.getElementById("returnCounts").textContent = `Total: ${total} | Pending Review: ${pending}`;
+  }
+
+  loadAdminReturns();
+</script>
+
+</body>
+</html>
