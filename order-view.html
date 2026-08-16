@@ -896,19 +896,27 @@ async function loadOrder(){
 
   const orderItems = items || [];
 
-  /* PRODUCT IMAGES */
-  const productIds = orderItems.map(item => item.product_id).filter(Boolean);
-  let productMap = new Map();
+    /* ORDER ITEMS */
+  const { data: items, error: itemsError } = await supabaseClient
+    .from("order_items")
+    .select("*")
+    .eq("order_id", orderId);
 
-  if(productIds.length){
-    const { data: products } = await supabaseClient
-      .from("products")
-      .select("id,image_url,image")
-      .in("id", productIds);
+  if (items && items.length > 0) {
+    for (let item of items) {
+      // Agar item mein direct image nahi hai, toh products table se laao
+      if (!item.image_url && !item.image && item.product_id) {
+        const { data: prod } = await supabaseClient
+          .from("products")
+          .select("*")
+          .eq("id", item.product_id)
+          .maybeSingle();
 
-    (products || []).forEach(product => {
-      productMap.set(String(product.id), product);
-    });
+        if (prod) {
+          item.image_url = prod.image_url || prod.image || prod.img || prod.photo || '';
+        }
+      }
+    }
   }
 
   /* TOTAL */
