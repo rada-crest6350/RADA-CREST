@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Addresses — RADA CREST</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(0,0,0,.035),transparent 28%),
+    radial-gradient(circle at 90% 15%,rgba(0,0,0,.025),transparent 30%),
+    #f8f7f4;
+  color:#171717;
+}
+
+button,
+input{
+  font-family:inherit;
+}
+
+.glass-header{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(0,0,0,.07);
+}
+
+.page-shell{
+  width:min(920px,calc(100% - 28px));
+  margin:auto;
+}
+
+.address-card{
+  position:relative;
+  background:rgba(255,255,255,.94);
+  border:1px solid rgba(0,0,0,.075);
+  border-radius:26px;
+  overflow:hidden;
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.045),
+    0 2px 8px rgba(0,0,0,.025);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.address-card:hover{
+  transform:translateY(-2px);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.075),
+    0 3px 10px rgba(0,0,0,.035);
+}
+
+.address-card.default-card{
+  border-color:#171717;
+}
+
+.default-line{
+  height:3px;
+  background:#171717;
+}
+
+.icon-box{
+  width:48px;
+  height:48px;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#111;
+  color:white;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+
+.soft-button{
+  border:1px solid #e5e5e5;
+  background:#fff;
+  transition:.2s ease;
+}
+
+.soft-button:hover{
+  background:#f5f5f5;
+  border-color:#d4d4d4;
+}
+
+.primary-button{
+  background:#111;
+  color:#fff;
+  box-shadow:0 10px 25px rgba(0,0,0,.14);
+  transition:.2s ease;
+}
+
+.primary-button:hover{
+  transform:translateY(-1px);
+  background:#222;
+}
+
+.modal-backdrop{
+  background:rgba(10,10,10,.52);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+.modal-card{
+  animation:modalIn .25s ease forwards;
+}
+
+@keyframes modalIn{
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(.97);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+.input{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #dedede;
+  border-radius:14px;
+  background:#fafafa;
+  outline:none;
+  transition:.2s ease;
+  font-size:14px;
+}
+
+.input:focus{
+  background:white;
+  border-color:#111;
+  box-shadow:0 0 0 3px rgba(0,0,0,.06);
+}
+
+.label{
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#737373;
+  margin-bottom:7px;
+}
+
+.empty-orb{
+  width:76px;
+  height:76px;
+  border-radius:25px;
+  background:#111;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  box-shadow:0 15px 35px rgba(0,0,0,.13);
+}
+
+.toast{
+  animation:toastIn .25s ease forwards;
+}
+
+@keyframes toastIn{
+  from{
+    opacity:0;
+    transform:translateY(-10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+@media(max-width:640px){
+
+  .page-shell{
+    width:min(100% - 20px,920px);
+  }
+
+  .address-card{
+    border-radius:22px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="glass-header sticky top-0 z-40">
+
+  <div class="page-shell h-[72px] flex items-center justify-between">
+
+    <div class="flex items-center gap-3">
+
+      <a
+        href="account.html"
+        class="w-10 h-10 rounded-xl flex items-center justify-center border border-neutral-200 bg-white hover:bg-neutral-100 transition"
+        aria-label="Back"
+      >
+        <i class="fa-solid fa-arrow-left text-sm"></i>
+      </a>
+
+      <div>
+        <div class="font-extrabold tracking-[.18em] text-[15px]">
+          RADA CREST
+        </div>
+
+        <div class="text-[10px] text-neutral-400 tracking-wider uppercase mt-0.5">
+          Address Vault
+        </div>
+      </div>
+
+    </div>
+
+    <button
+      onclick="openAddressModal()"
+      class="primary-button px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+    >
+      <i class="fa-solid fa-plus text-xs"></i>
+      <span class="hidden sm:inline">Add Address</span>
+      <span class="sm:hidden">Add</span>
+    </button>
+
+  </div>
+
+</header>
+
+
+<main class="page-shell py-8 sm:py-10">
+
+  <!-- PAGE INTRO -->
+  <section class="mb-7">
+
+    <div class="flex items-end justify-between gap-4">
+
+      <div>
+
+        <p class="text-[10px] uppercase tracking-[.22em] font-bold text-neutral-400 mb-2">
+          Personal Space
+        </p>
+
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+          My Addresses
+        </h1>
+
+        <p class="text-sm text-neutral-500 mt-2 max-w-xl leading-6">
+          Save your frequently used delivery locations and select them
+          instantly during checkout.
+        </p>
+
+      </div>
+
+      <div class="hidden sm:flex items-center gap-2 text-xs text-neutral-400">
+        <i class="fa-solid fa-shield-halved"></i>
+        Secured to your account
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ALERT -->
+  <div
+    id="alert"
+    class="hidden mb-5 px-4 py-3 rounded-2xl text-sm"
+  ></div>
+
+
+  <!-- LOADING -->
+  <div id="loadingState" class="space-y-4">
+
+    <div class="address-card p-6 animate-pulse">
+      <div class="h-5 bg-neutral-200 rounded w-32"></div>
+      <div class="h-3 bg-neutral-200 rounded w-52 mt-4"></div>
+      <div class="h-3 bg-neutral-200 rounded w-40 mt-2"></div>
+      <div class="h-10 bg-neutral-200 rounded-xl w-full mt-6"></div>
+    </div>
+
+    <div class="address-card p-6 animate-pulse">
+      <div class="h-5 bg-neutral-200 rounded w-28"></div>
+      <div class="h-3 bg-neutral-200 rounded w-48 mt-4"></div>
+      <div class="h-3 bg-neutral-200 rounded w-36 mt-2"></div>
+    </div>
+
+  </div>
+
+
+  <!-- ADDRESS LIST -->
+  <section id="addressList" class="hidden space-y-4"></section>
+
+
+  <!-- EMPTY STATE -->
+  <section
+    id="emptyState"
+    class="hidden address-card text-center px-6 py-14"
+  >
+
+    <div class="empty-orb">
+      <i class="fa-solid fa-location-dot text-2xl"></i>
+    </div>
+
+    <h2 class="font-bold text-xl mt-6">
+      No saved addresses
+    </h2>
+
+    <p class="text-sm text-neutral-500 mt-2 max-w-sm mx-auto leading-6">
+      Add your home, work or another delivery address so checkout becomes
+      faster and easier.
+    </p>
+
+    <button
+      onclick="openAddressModal()"
+      class="primary-button mt-6 px-5 py-3 rounded-xl text-sm font-semibold"
+    >
+      <i class="fa-solid fa-plus mr-2"></i>
+      Add Your First Address
+    </button>
+
+  </section>
+
+
+  <!-- FOOT NOTE -->
+  <div class="mt-7 flex items-center justify-center gap-2 text-[11px] text-neutral-400">
+    <i class="fa-solid fa-lock"></i>
+    Your saved addresses are linked to your RADA CREST account.
+  </div>
+
+</main>
+
+
+<!-- ========================================================= -->
+<!-- ADDRESS MODAL -->
+<!-- ========================================================= -->
+
+<div
+  id="addressModal"
+  class="hidden fixed inset-0 z-50 modal-backdrop flex items-end sm:items-center justify-center p-0 sm:p-5"
+>
+
+  <div
+    class="modal-card bg-white w-full sm:max-w-xl rounded-t-[30px] sm:rounded-[28px] max-h-[92vh] overflow-y-auto"
+  >
+
+    <!-- Modal Header -->
+    <div class="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-neutral-100 px-5 sm:px-7 py-5">
+
+      <div class="flex items-center justify-between">
+
+        <div>
+
+          <p class="text-[10px] uppercase tracking-[.18em] text-neutral-400 font-bold">
+            Delivery Profile
+          </p>
+
+          <h2 id="modalTitle" class="text-xl font-extrabold mt-1">
+            Add New Address
+          </h2>
+
+        </div>
+
+        <button
+          onclick="closeAddressModal()"
+          class="w-10 h-10 rounded-xl bg-neutral-100 hover:bg-neutral-200 transition flex items-center justify-center"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- Form -->
+    <form
+      id="addressForm"
+      onsubmit="saveAddress(event)"
+      class="p-5 sm:p-7"
+    >
+
+      <input type="hidden" id="editId">
+
+
+      <!-- LABEL -->
+      <div class="mb-5">
+
+        <label class="label">
+          Address Type
+        </label>
+
+        <div class="grid grid-cols-3 gap-2">
+
+          <button
+            type="button"
+            onclick="selectLabel('Home')"
+            id="labelHome"
+            class="label-choice rounded-xl border border-black bg-black text-white py-3 text-sm font-semibold"
+          >
+            <i class="fa-solid fa-house mr-1"></i>
+            Home
+          </button>
+
+          <button
+            type="button"
+            onclick="selectLabel('Work')"
+            id="labelWork"
+            class="label-choice rounded-xl border border-neutral-200 bg-white py-3 text-sm font-semibold"
+          >
+            <i class="fa-solid fa-briefcase mr-1"></i>
+            Work
+          </button>
+
+          <button
+            type="button"
+            onclick="selectLabel('Other')"
+            id="labelOther"
+            class="label-choice rounded-xl border border-neutral-200 bg-white py-3 text-sm font-semibold"
+          >
+            <i class="fa-solid fa-location-dot mr-1"></i>
+            Other
+          </button>
+
+        </div>
+
+        <input type="hidden" id="label" value="Home">
+
+      </div>
+
+
+      <!-- NAME + MOBILE -->
+      <div class="grid sm:grid-cols-2 gap-4">
+
+        <div>
+          <label class="label">Full Name</label>
+
+          <input
+            id="full_name"
+            class="input"
+            type="text"
+            maxlength="80"
+            autocomplete="name"
+            placeholder="Enter full name"
+            required
+          >
+        </div>
+
+
+        <div>
+          <label class="label">Mobile Number</label>
+
+          <input
+            id="mobile"
+            class="input"
+            type="tel"
+            inputmode="numeric"
+            maxlength="10"
+            pattern="[0-9]{10}"
+            autocomplete="tel"
+            placeholder="10-digit mobile"
+            required
+          >
+        </div>
+
+      </div>
+
+
+      <!-- ADDRESS -->
+      <div class="mt-4">
+
+        <label class="label">
+          Complete Address
+        </label>
+
+        <textarea
+          id="address"
+          class="input resize-none"
+          rows="3"
+          maxlength="300"
+          placeholder="House / Flat / Street / Area"
+          required
+        ></textarea>
+
+      </div>
+
+
+      <!-- CITY / STATE -->
+      <div class="grid sm:grid-cols-2 gap-4 mt-4">
+
+        <div>
+          <label class="label">City</label>
+
+          <input
+            id="city"
+            class="input"
+            type="text"
+            maxlength="80"
+            placeholder="City"
+            required
+          >
+        </div>
+
+        <div>
+          <label class="label">State</label>
+
+          <input
+            id="state"
+            class="input"
+            type="text"
+            maxlength="80"
+            placeholder="State"
+            required
+          >
+        </div>
+
+      </div>
+
+
+      <!-- PINCODE -->
+      <div class="mt-4">
+
+        <label class="label">Pincode</label>
+
+        <input
+          id="pincode"
+          class="input"
+          type="text"
+          inputmode="numeric"
+          maxlength="6"
+          pattern="[0-9]{6}"
+          placeholder="6-digit pincode"
+          required
+        >
+
+      </div>
+
+
+      <!-- DEFAULT -->
+      <div class="mt-5 p-4 rounded-2xl bg-neutral-50 border border-neutral-100">
+
+        <label class="flex items-center gap-3 cursor-pointer">
+
+          <input
+            id="is_default"
+            type="checkbox"
+            class="w-5 h-5 accent-black"
+          >
+
+          <div>
+            <div class="text-sm font-semibold">
+              Make this my default address
+            </div>
+
+            <div class="text-xs text-neutral-400 mt-1">
+              This address can be selected first during checkout.
+            </div>
+          </div>
+
+        </label>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+      <div class="flex gap-3 mt-6">
+
+        <button
+          type="button"
+          onclick="closeAddressModal()"
+          class="soft-button flex-1 py-3.5 rounded-xl text-sm font-semibold"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="saveBtn"
+          type="submit"
+          class="primary-button flex-1 py-3.5 rounded-xl text-sm font-semibold"
+        >
+          Save Address
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+
+
+<script>
+
+let currentUser = null;
+let addresses = [];
+
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+function showAlert(message, type = 'error'){
+
+  const el = document.getElementById('alert');
+
+  el.className =
+    'mb-5 px-4 py-3 rounded-2xl text-sm toast ' +
+    (
+      type === 'success'
+      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+      : 'bg-red-50 text-red-700 border border-red-200'
+    );
+
+  el.textContent = message;
+  el.classList.remove('hidden');
+
+  setTimeout(() => {
+    el.classList.add('hidden');
+  }, 3500);
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+async function loadUser(){
+
+  try{
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.getUser();
+
+    if(error) throw error;
+
+    if(!data.user){
+
+      window.location.href = 'account.html';
+      return;
+    }
+
+    currentUser = data.user;
+
+    await loadAddresses();
+
+  }catch(error){
+
+    console.error(error);
+
+    showAlert(
+      error.message || 'Unable to load your account.'
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD ADDRESSES
+========================================================= */
+
+async function loadAddresses(){
+
+  document
+    .getElementById('loadingState')
+    .classList.remove('hidden');
+
+  document
+    .getElementById('addressList')
+    .classList.add('hidden');
+
+  document
+    .getElementById('emptyState')
+    .classList.add('hidden');
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from('addresses')
+    .select('*')
+    .eq('customer_id', currentUser.id)
+    .order('is_default', {ascending:false})
+    .order('created_at', {ascending:false});
+
+
+  document
+    .getElementById('loadingState')
+    .classList.add('hidden');
+
+
+  if(error){
+
+    console.error(error);
+
+    showAlert(
+      error.message || 'Unable to load addresses.'
+    );
+
+    return;
+  }
+
+
+  addresses = data || [];
+
+  renderAddresses();
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderAddresses(){
+
+  const list =
+    document.getElementById('addressList');
+
+  const empty =
+    document.getElementById('emptyState');
+
+
+  if(!addresses.length){
+
+    list.classList.add('hidden');
+    empty.classList.remove('hidden');
+
+    return;
+  }
+
+
+  empty.classList.add('hidden');
+  list.classList.remove('hidden');
+
+
+  list.innerHTML =
+    addresses.map(address => {
+
+      const safeLabel =
+        escapeHtml(address.label || 'Home');
+
+      const safeName =
+        escapeHtml(address.full_name || '');
+
+      const safeMobile =
+        escapeHtml(address.mobile || '');
+
+      const safeAddress =
+        escapeHtml(address.address || '');
+
+      const safeCity =
+        escapeHtml(address.city || '');
+
+      const safeState =
+        escapeHtml(address.state || '');
+
+      const safePin =
+        escapeHtml(address.pincode || '');
+
+
+      return `
+
+        <article class="address-card ${address.is_default ? 'default-card' : ''}">
+
+          ${
+            address.is_default
+            ? `<div class="default-line"></div>`
+            : ''
+          }
+
+          <div class="p-5 sm:p-6">
+
+            <div class="flex items-start justify-between gap-4">
+
+              <div class="flex items-center gap-3">
+
+                <div class="icon-box">
+
+                  ${
+                    address.label === 'Work'
+                    ? '<i class="fa-solid fa-briefcase"></i>'
+                    : address.label === 'Other'
+                    ? '<i class="fa-solid fa-location-dot"></i>'
+                    : '<i class="fa-solid fa-house"></i>'
+                  }
+
+                </div>
+
+                <div>
+
+                  <div class="flex items-center gap-2 flex-wrap">
+
+                    <h3 class="font-extrabold text-base">
+                      ${safeLabel}
+                    </h3>
+
+                    ${
+                      address.is_default
+                      ? `
+                        <span class="px-2 py-1 rounded-full bg-black text-white text-[9px] font-bold uppercase tracking-wider">
+                          Default
+                        </span>
+                      `
+                      : ''
+                    }
+
+                  </div>
+
+                  <p class="text-xs text-neutral-400 mt-1">
+                    Delivery address
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <button
+                onclick="editAddress('${address.id}')"
+                class="w-9 h-9 rounded-xl bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center transition"
+                aria-label="Edit address"
+              >
+                <i class="fa-solid fa-pen text-xs"></i>
+              </button>
+
+            </div>
+
+
+            <div class="mt-5 pl-0 sm:pl-[60px]">
+
+              <div class="font-semibold text-sm">
+                ${safeName}
+              </div>
+
+              <div class="text-sm text-neutral-500 mt-1">
+                <i class="fa-solid fa-phone text-[10px] mr-1"></i>
+                ${safeMobile}
+              </div>
+
+              <div class="mt-3 text-sm text-neutral-600 leading-6">
+                ${safeAddress}
+                <br>
+                ${safeCity}, ${safeState} — ${safePin}
+              </div>
+
+
+              <div class="flex flex-wrap gap-2 mt-5">
+
+                ${
+                  !address.is_default
+                  ? `
+                    <button
+                      onclick="makeDefault('${address.id}')"
+                      class="soft-button px-3 py-2 rounded-xl text-xs font-semibold"
+                    >
+                      <i class="fa-solid fa-star mr-1"></i>
+                      Make Default
+                    </button>
+                  `
+                  : ''
+                }
+
+
+                <button
+                  onclick="editAddress('${address.id}')"
+                  class="soft-button px-3 py-2 rounded-xl text-xs font-semibold"
+                >
+                  <i class="fa-solid fa-pen mr-1"></i>
+                  Edit
+                </button>
+
+
+                <button
+                  onclick="deleteAddress('${address.id}')"
+                  class="px-3 py-2 rounded-xl text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 transition"
+                >
+                  <i class="fa-solid fa-trash mr-1"></i>
+                  Delete
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }).join('');
+
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+function selectLabel(label){
+
+  document.getElementById('label').value = label;
+
+  document
+    .querySelectorAll('.label-choice')
+    .forEach(button => {
+
+      button.className =
+        'label-choice rounded-xl border border-neutral-200 bg-white py-3 text-sm font-semibold';
+
+    });
+
+
+  const active =
+    document.getElementById(
+      'label' + label
+    );
+
+  active.className =
+    'label-choice rounded-xl border border-black bg-black text-white py-3 text-sm font-semibold';
+
+}
+
+
+/* =========================================================
+   OPEN MODAL
+========================================================= */
+
+function openAddressModal(address = null){
+
+  document
+    .getElementById('addressModal')
+    .classList.remove('hidden');
+
+  document
+    .getElementById('addressForm')
+    .reset();
+
+  document
+    .getElementById('editId')
+    .value = '';
+
+  document
+    .getElementById('label')
+    .value = 'Home';
+
+  document
+    .getElementById('modalTitle')
+    .textContent =
+      address
+      ? 'Edit Address'
+      : 'Add New Address';
+
+  document
+    .getElementById('saveBtn')
+    .textContent =
+      address
+      ? 'Update Address'
+      : 'Save Address';
+
+  selectLabel('Home');
+
+
+  if(address){
+
+    document.getElementById('editId').value =
+      address.id;
+
+    document.getElementById('full_name').value =
+      address.full_name || '';
+
+    document.getElementById('mobile').value =
+      address.mobile || '';
+
+    document.getElementById('address').value =
+      address.address || '';
+
+    document.getElementById('city').value =
+      address.city || '';
+
+    document.getElementById('state').value =
+      address.state || '';
+
+    document.getElementById('pincode').value =
+      address.pincode || '';
+
+    document.getElementById('is_default').checked =
+      !!address.is_default;
+
+    selectLabel(
+      address.label || 'Home'
+    );
+
+  }
+
+  document.body.style.overflow = 'hidden';
+
+}
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+function closeAddressModal(){
+
+  document
+    .getElementById('addressModal')
+    .classList.add('hidden');
+
+  document.body.style.overflow = '';
+
+}
+
+
+/* =========================================================
+   EDIT
+========================================================= */
+
+function editAddress(id){
+
+  const address =
+    addresses.find(item =>
+      String(item.id) === String(id)
+    );
+
+  if(!address) return;
+
+  openAddressModal(address);
+
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+async function saveAddress(event){
+
+  event.preventDefault();
+
+
+  if(!currentUser){
+
+    showAlert('Please login first.');
+    return;
+
+  }
+
+
+  const fullName =
+    document.getElementById('full_name').value.trim();
+
+  const mobile =
+    document.getElementById('mobile').value.trim();
+
+  const address =
+    document.getElementById('address').value.trim();
+
+  const city =
+    document.getElementById('city').value.trim();
+
+  const state =
+    document.getElementById('state').value.trim();
+
+  const pincode =
+    document.getElementById('pincode').value.trim();
+
+  const label =
+    document.getElementById('label').value;
+
+  const isDefault =
+    document.getElementById('is_default').checked;
+
+  const editId =
+    document.getElementById('editId').value;
+
+
+  /* MOBILE */
+  if(!/^[0-9]{10}$/.test(mobile)){
+
+    showAlert(
+      'Please enter a valid 10-digit mobile number.'
+    );
+
+    return;
+  }
+
+
+  /* PINCODE */
+  if(!/^[0-9]{6}$/.test(pincode)){
+
+    showAlert(
+      'Please enter a valid 6-digit pincode.'
+    );
+
+    return;
+  }
+
+
+  if(
+    !fullName ||
+    !address ||
+    !city ||
+    !state
+  ){
+
+    showAlert(
+      'Please complete all address details.'
+    );
+
+    return;
+  }
+
+
+  const payload = {
+
+    customer_id: currentUser.id,
+
+    label,
+
+    full_name: fullName,
+
+    mobile,
+
+    address,
+
+    city,
+
+    state,
+
+    pincode,
+
+    is_default: isDefault
+
+  };
+
+
+  const button =
+    document.getElementById('saveBtn');
+
+  button.disabled = true;
+
+  button.textContent =
+    editId
+    ? 'Updating...'
+    : 'Saving...';
+
+
+  try{
+
+    let error;
+
+
+    if(editId){
+
+      const result =
+        await supabaseClient
+          .from('addresses')
+          .update(payload)
+          .eq('id',editId)
+          .eq('customer_id',currentUser.id);
+
+      error = result.error;
+
+    }else{
+
+      const result =
+        await supabaseClient
+          .from('addresses')
+          .insert(payload);
+
+      error = result.error;
+
+    }
+
+
+    if(error) throw error;
+
+
+    closeAddressModal();
+
+    showAlert(
+      editId
+      ? 'Address updated successfully.'
+      : 'Address saved successfully.',
+      'success'
+    );
+
+
+    await loadAddresses();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showAlert(
+      error.message ||
+      'Unable to save address.'
+    );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      editId
+      ? 'Update Address'
+      : 'Save Address';
+
+  }
+
+}
+
+
+/* =========================================================
+   MAKE DEFAULT
+========================================================= */
+
+async function makeDefault(id){
+
+  try{
+
+    const {
+      error
+    } = await supabaseClient
+      .from('addresses')
+      .update({
+        is_default:true
+      })
+      .eq('id',id)
+      .eq('customer_id',currentUser.id);
+
+
+    if(error) throw error;
+
+
+    showAlert(
+      'Default address updated.',
+      'success'
+    );
+
+
+    await loadAddresses();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showAlert(
+      error.message ||
+      'Unable to update default address.'
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+async function deleteAddress(id){
+
+  const address =
+    addresses.find(item =>
+      String(item.id) === String(id)
+    );
+
+
+  if(!address) return;
+
+
+  const confirmed =
+    confirm(
+      `Delete your ${address.label || 'saved'} address?`
+    );
+
+
+  if(!confirmed) return;
+
+
+  try{
+
+    const {
+      error
+    } = await supabaseClient
+      .from('addresses')
+      .delete()
+      .eq('id',id)
+      .eq('customer_id',currentUser.id);
+
+
+    if(error) throw error;
+
+
+    showAlert(
+      'Address deleted.',
+      'success'
+    );
+
+
+    await loadAddresses();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    showAlert(
+      error.message ||
+      'Unable to delete address.'
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+/* =========================================================
+   MODAL BACKDROP
+========================================================= */
+
+document
+  .getElementById('addressModal')
+  .addEventListener('click',function(event){
+
+    if(event.target === this){
+
+      closeAddressModal();
+
+    }
+
+  });
+
+
+/* =========================================================
+   START
+========================================================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  loadUser
+);
+
+</script>
+
+</body>
+</html>
