@@ -605,9 +605,11 @@ function renderOrders(){
 
       const productImage =
         order.product_image ||
-        order.product?.image_url ||
         order.image_url ||
         order.image ||
+        order.product?.image_url ||
+        order.product?.image ||
+        order.item_image ||
         '';
 
 
