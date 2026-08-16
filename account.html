@@ -1,1860 +1,318 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Account — RADA CREST</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="supabase-client.js"></script>
-
-<style>
-:root{
-  --ink:#171717;
-  --muted:#777;
-  --paper:#f7f5ef;
-  --card:#fffdf8;
-  --line:#ded9ce;
-  --gold:#b08a3c;
-  --danger:#b53b3b;
-  --success:#28734b;
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:linear-gradient(180deg,#f7f5ef,#efede6);
-  color:var(--ink);
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-
-a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.page{
-  width:min(980px,calc(100% - 28px));
-  margin:28px auto 60px;
-}
-
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:15px;
-  margin-bottom:24px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:900;
-  letter-spacing:.12em;
-  font-size:18px;
-}
-
-.brand-mark{
-  width:46px;
-  height:46px;
-  border:2px solid var(--ink);
-  border-radius:13px;
-  display:grid;
-  place-items:center;
-  background:#fff;
-  color:var(--ink);
-  overflow:hidden;
-  font-size:13px;
-  letter-spacing:.04em;
-}
-
-.brand-mark img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
-.back{
-  font-size:14px;
-  color:#555;
-}
-
-.panel{
-  background:rgba(255,253,248,.94);
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:30px;
-  box-shadow:0 20px 55px rgba(45,39,28,.08);
-}
-
-h1{
-  font-size:clamp(36px,7vw,58px);
-  line-height:1;
-  margin:0 0 12px;
-  letter-spacing:-.04em;
-}
-
-h2{
-  font-size:28px;
-  margin:34px 0 16px;
-}
-
-.sub{
-  color:var(--muted);
-  margin:0 0 24px;
-}
-
-.auth-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px;
-}
-
-.auth-card{
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:22px;
-  background:#fff;
-}
-
-.auth-card h2{
-  margin:0 0 6px;
-  font-size:23px;
-}
-
-label{
-  display:block;
-  font-weight:750;
-  margin:15px 0 7px;
-  font-size:14px;
-}
-
-input{
-  width:100%;
-  border:1px solid #d7d2c8;
-  border-radius:13px;
-  padding:14px 15px;
-  font:inherit;
-  background:#fffdf9;
-  outline:none;
-}
-
-input:focus{
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(176,138,60,.12);
-}
-
-button,.button{
-  border:0;
-  border-radius:13px;
-  padding:14px 17px;
-  font:inherit;
-  font-weight:850;
-  cursor:pointer;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-
-.primary{
-  background:#171717;
-  color:#fff;
-  width:100%;
-  margin-top:18px;
-}
-
-.secondary{
-  background:#fff;
-  border:1px solid #171717;
-  color:#171717;
-}
-
-.gold{
-  background:linear-gradient(135deg,#a77d2e,#d4b76e);
-  color:#16120b;
-}
-
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-.message{
-  margin-top:14px;
-  min-height:20px;
-  font-size:14px;
-  font-weight:700;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.account-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:15px;
-  flex-wrap:wrap;
-}
-
-.orders{
-  display:grid;
-  gap:15px;
-}
-
-.order-card{
-  border:1px solid var(--line);
-  border-radius:20px;
-  background:#fff;
-  padding:20px;
-}
-
-.order-top{
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  align-items:flex-start;
-}
-
-.order-id{
-  font-size:20px;
-  font-weight:900;
-}
-
-.order-date{
-  color:#888;
-  font-size:13px;
-  margin-top:5px;
-}
-
-.total{
-  font-size:22px;
-  font-weight:950;
-  white-space:nowrap;
-}
-
-.meta{
-  display:flex;
-  gap:9px;
-  flex-wrap:wrap;
-  margin:16px 0;
-}
-
-.badge{
-  padding:7px 10px;
-  border-radius:999px;
-  background:#f0eee7;
-  font-size:12px;
-  font-weight:850;
-  text-transform:capitalize;
-}
-
-.status-pending{
-  background:#fff2c8;
-  color:#8a6400;
-}
-
-.status-confirmed{
-  background:#e7f0ff;
-  color:#31598d;
-}
-
-.status-processing{
-  background:#eee6ff;
-  color:#62419c;
-}
-
-.status-shipped{
-  background:#e3efff;
-  color:#315b9b;
-}
-
-.status-delivered{
-  background:#e2f5e8;
-  color:#267144;
-}
-
-.status-cancelled{
-  background:#fde4e4;
-  color:#a33a3a;
-}
-
-.items{
-  border-top:1px solid #ece8df;
-  margin-top:14px;
-  padding-top:13px;
-  display:grid;
-  gap:9px;
-}
-
-.item{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  font-size:14px;
-}
-
-.item-name{
-  font-weight:750;
-}
-
-.item-right{
-  white-space:nowrap;
-  color:#444;
-}
-
-.address{
-  margin-top:14px;
-  padding:13px 14px;
-  background:#f8f6f0;
-  border-radius:12px;
-  color:#555;
-  font-size:13px;
-  line-height:1.5;
-}
-
-.empty{
-  text-align:center;
-  padding:35px 15px;
-  color:#777;
-  border:1px dashed #ccc5b7;
-  border-radius:18px;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.error-box{
-  background:#fff0f0;
-  border:1px solid #efcaca;
-  color:#a33a3a;
-  padding:14px;
-  border-radius:14px;
-  line-height:1.5;
-}
-
-@media(max-width:720px){
-  .auth-grid{
-    grid-template-columns:1fr;
-  }
-
-  .panel{
-    padding:22px;
-  }
-
-  .order-top{
-    flex-direction:column;
-  }
-
-  .total{
-    font-size:20px;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - RADA CREST</title>
+    <!-- Google Fonts & Tailwind CSS for Modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FBF9F5; }
+    </style>
 </head>
-
-<body>
-
-<div class="page">
-
-  <div class="topbar">
-    <a class="brand" href="index.html">
-      <span class="brand-mark" id="logo">RC</span>
-      <span>RADA CREST</span>
-    </a>
-
-    <a class="back" href="index.html">← Back to Store</a>
-  </div>
-
-  <main class="panel">
-
-    <!-- LOGIN / SIGNUP -->
-    <section id="authView">
-
-      <h1>My Account</h1>
-
-      <p class="sub">
-        Sign in to view your orders, or create a new customer account.
-      </p>
-
-      <div class="auth-grid">
-
-        <div class="auth-card">
-
-          <h2>Sign In</h2>
-
-          <p class="sub">
-            Access your existing RADA CREST account.
-          </p>
-
-          <label for="loginEmail">Email</label>
-
-          <input
-            id="loginEmail"
-            type="email"
-            autocomplete="email"
-            placeholder="you@example.com"
-          >
-
-          <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your password">
-
-          <a href="forgot-password.html">
-            Forgot password?
-          </a>
-
-          <button class="primary" id="loginBtn" type="button">Sign In</button>
-
-          <div class="message" id="loginMsg"></div>
-
-        </div>
-
-
-        <div class="auth-card">
-
-          <h2>Create Account</h2>
-
-          <p class="sub">
-            Create your customer account for order history.
-          </p>
-
-          <label for="signupEmail">Email</label>
-
-          <input
-            id="signupEmail"
-            type="email"
-            autocomplete="email"
-            placeholder="you@example.com"
-          >
-
-          <label for="signupPassword">Password</label>
-
-          <input
-            id="signupPassword"
-            type="password"
-            autocomplete="new-password"
-            placeholder="At least 6 characters"
-          >
-
-          <button
-            class="primary gold"
-            id="signupBtn"
-            type="button"
-          >
-            Create Account
-          </button>
-
-          <div class="message" id="signupMsg"></div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ACCOUNT -->
-    <section id="accountView" class="hidden">
-
-      <div class="account-head">
-
-        <div>
-
-          <h1>My Account</h1>
-
-          <p class="sub">
-            Welcome, <strong id="userEmail"></strong>
-          </p>
-
-        </div>
-
-        <div class="actions">
-
-          <button
-            class="secondary"
-            id="logoutBtn"
-            type="button"
-          >
-            Logout
-          </button>
-
-        </div>
-
-      </div>
-
-
-      <h2>My Orders</h2>
-
-      <div
-        id="ordersMessage"
-        class="message"
-      ></div>
-
-      <div
-        id="ordersList"
-        class="orders"
-      >
-        <div class="empty">
-          Loading your orders...
-        </div>
-      </div>
-
-    </section>
-
-  </main>
-
-</div>
-
-
-<script>
-
-const SUPABASE_URL =
-  "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
-
-const client =
-  window.supabase?.createClient
-    ? window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      )
-    : supabaseClient;
-
-
-/* -----------------------------
-   BASIC HELPERS
------------------------------ */
-
-const $ = id =>
-  document.getElementById(id);
-
-
-function esc(value){
-
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-function money(value){
-
-  const n = Number(value || 0);
-
-  return "₹" +
-    n.toLocaleString("en-IN");
-
-}
-
-
-function date(value){
-
-  try{
-
-    return new Date(value).toLocaleString(
-      "en-IN",
-      {
-        day:"2-digit",
-        month:"2-digit",
-        year:"numeric",
-        hour:"numeric",
-        minute:"2-digit",
-        hour12:true
-      }
-    );
-
-  }catch{
-
-    return "-";
-
-  }
-
-}
-
-
-function statusClass(status){
-
-  return "status-" +
-    String(status || "pending")
-      .toLowerCase()
-      .replace(/[^a-z]/g,"");
-
-}
-
-
-function showMsg(id,text,type=""){
-
-  const el = $(id);
-
-  if(!el) return;
-
-  el.textContent = text || "";
-
-  el.style.color =
-    type === "error"
-      ? "#b53b3b"
-      : type === "success"
-        ? "#28734b"
-        : "#777";
-
-}
-
-
-/* -----------------------------
-   LOGO
------------------------------ */
-
-async function loadLogo(){
-
-  try{
-
-    const {data,error} =
-      await client
-        .from("site_settings")
-        .select("logo_url,site_name")
-        .limit(1)
-        .maybeSingle();
-
-    if(error){
-
-      console.warn(
-        "site_settings logo load failed:",
-        error
-      );
-
-      return;
-
-    }
-
-    if(data?.logo_url){
-
-      $("logo").innerHTML =
-        '<img src="' +
-        esc(data.logo_url) +
-        '" alt="RADA CREST Logo">';
-
-    }
-
-  }catch(error){
-
-    console.warn(
-      "Logo error:",
-      error
-    );
-
-  }
-
-}
-
-
-/* -----------------------------
-   SIGN IN
------------------------------ */
-
-async function signIn(){
-
-  const email =
-    $("loginEmail").value.trim();
-
-  const password =
-    $("loginPassword").value;
-
-  if(!email || !password){
-
-    showMsg(
-      "loginMsg",
-      "Please enter email and password.",
-      "error"
-    );
-
-    return;
-
-  }
-
-  const btn =
-    $("loginBtn");
-
-  btn.disabled = true;
-
-  btn.textContent =
-    "Signing in...";
-
-  showMsg("loginMsg","");
-
-  const {
-    data,
-    error
-  } =
-    await client.auth.signInWithPassword({
-      email,
-      password
-    });
-
-  btn.disabled = false;
-
-  btn.textContent =
-    "Sign In";
-
-  if(error){
-
-    showMsg(
-      "loginMsg",
-      error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-  if(data?.user){
-
-    await showAccount(
-      data.user
-    );
-
-  }
-
-}
-
-
-/* -----------------------------
-   SIGN UP
------------------------------ */
-
-async function signUp(){
-
-  const email =
-    $("signupEmail").value.trim();
-
-  const password =
-    $("signupPassword").value;
-
-  if(
-    !email ||
-    password.length < 6
-  ){
-
-    showMsg(
-      "signupMsg",
-      "Enter a valid email and a password of at least 6 characters.",
-      "error"
-    );
-
-    return;
-
-  }
-
-  const btn =
-    $("signupBtn");
-
-  btn.disabled = true;
-
-  btn.textContent =
-    "Creating...";
-
-  showMsg("signupMsg","");
-
-  const {
-    data,
-    error
-  } =
-    await client.auth.signUp({
-      email,
-      password
-    });
-
-  btn.disabled = false;
-
-  btn.textContent =
-    "Create Account";
-
-  if(error){
-
-    showMsg(
-      "signupMsg",
-      error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-  if(
-    data?.session &&
-    data?.user
-  ){
-
-    showMsg(
-      "signupMsg",
-      "Account created successfully.",
-      "success"
-    );
-
-    await showAccount(
-      data.user
-    );
-
-    return;
-
-  }
-
-  showMsg(
-    "signupMsg",
-    "Account created. If email confirmation is enabled, check your email, then sign in.",
-    "success"
-  );
-
-}
-
-
-/* -----------------------------
-   NORMALIZE ORDER ITEM
------------------------------ */
-
-function normalizeItem(item){
-
-  const quantity =
-    Number(
-      item?.quantity ??
-      item?.qty ??
-      1
-    ) || 1;
-
-
-  const unitPrice =
-    Number(
-      item?.unit_price ??
-      item?.price ??
-      item?.product_price ??
-      item?.amount ??
-      0
-    ) || 0;
-
-
-  const productName =
-    item?.product_name ??
-    item?.name ??
-    item?.productName ??
-    item?.title ??
-    "Product";
-
-
-  return {
-    quantity,
-    unitPrice,
-    productName
-  };
-
-}
-
-
-/* -----------------------------
-   ORDER TOTAL
------------------------------ */
-
-function getOrderTotal(
-  order,
-  items
-){
-
-  const directTotal =
-    Number(
-      order?.total_amount ??
-      order?.total ??
-      order?.grand_total ??
-      order?.amount ??
-      0
-    );
-
-  if(directTotal > 0){
-
-    return directTotal;
-
-  }
-
-
-  return items.reduce(
-    (sum,item)=>{
-
-      const normalized =
-        normalizeItem(item);
-
-      return sum +
-        (
-          normalized.quantity *
-          normalized.unitPrice
-        );
-
-    },
-    0
-  );
-
-}
-
-
-/* -----------------------------
-   LOAD ORDERS
------------------------------ */
-
-async function loadOrders(user){
-
-  const box =
-    $("ordersList");
-
-  box.innerHTML =
-    '<div class="empty">Loading your orders...</div>';
-
-  showMsg(
-    "ordersMessage",
-    ""
-  );
-
-
-  /*
-    IMPORTANT:
-
-    We read the actual orders table first.
-    We do NOT depend on order_summary
-    for displaying customer orders.
-  */
-
-  const {
-    data:orders,
-    error:ordersError
-  } =
-    await client
-      .from("orders")
-      .select("*")
-      .eq("user_id",user.id)
-      .order(
-        "created_at",
-        {ascending:false}
-      );
-
-
-  if(ordersError){
-
-    console.error(
-      "Orders loading error:",
-      ordersError
-    );
-
-    box.innerHTML =
-      '<div class="error-box">' +
-      'Unable to load your orders right now.<br><br>' +
-      esc(ordersError.message) +
-      '</div>';
-
-    showMsg(
-      "ordersMessage",
-      "Orders could not be loaded.",
-      "error"
-    );
-
-    return;
-
-  }
-
-
-  if(!orders || !orders.length){
-
-    box.innerHTML =
-      '<div class="empty">' +
-      'You have not placed any orders yet.' +
-      '<br><br>' +
-      '<a class="button secondary" href="index.html#products">' +
-      'Start Shopping' +
-      '</a>' +
-      '</div>';
-
-    return;
-
-  }
-
-
-  /*
-    Get all order IDs.
-  */
-
-  const orderIds =
-    orders
-      .map(order=>order.id)
-      .filter(Boolean);
-
-
-  /*
-    Load all order items together.
-  */
-
-  let allItems = [];
-
-
-  if(orderIds.length){
-
-    const {
-      data:itemData,
-      error:itemError
-    } =
-      await client
-        .from("order_items")
-        .select("*")
-        .in(
-          "order_id",
-          orderIds
-        );
-
-
-    if(itemError){
-
-      console.warn(
-        "Order items loading error:",
-        itemError
-      );
-
-      /*
-        We DO NOT delete/hide the order
-        if item loading fails.
-      */
-
-      allItems = [];
-
-    }else{
-
-      allItems =
-        itemData || [];
-
-    }
-
-  }
-
-
-  /*
-    Group items by order ID.
-  */
-
-  const itemsByOrder =
-    new Map();
-
-
-  allItems.forEach(item=>{
-
-    const id =
-      item.order_id;
-
-    if(!itemsByOrder.has(id)){
-
-      itemsByOrder.set(
-        id,
-        []
-      );
-
-    }
-
-    itemsByOrder
-      .get(id)
-      .push(item);
-
-  });
-
-
-  /*
-    Render every order.
-  */
-
-  box.innerHTML =
-    orders
-      .map(order=>{
-
-        const items =
-          itemsByOrder.get(
-            order.id
-          ) || [];
-
-
-        const status =
-          String(
-            order.status ||
-            "pending"
-          ).toLowerCase();
-
-
-        const total =
-          getOrderTotal(
-            order,
-            items
-          );
-
-
-        const payment =
-          order.payment_method ??
-          order.payment_status ??
-          "COD";
-
-
-        const shippingName =
-          order.shipping_name ??
-          order.customer_name ??
-          "";
-
-
-        const shippingPhone =
-          order.shipping_phone ??
-          order.customer_phone ??
-          "";
-
-
-        const shippingAddress =
-          order.shipping_address ??
-          order.address ??
-          "";
-
-
-        const itemsHTML =
-          items.length
-
-            ? items
-                .map(item=>{
-
-                  const x =
-                    normalizeItem(
-                      item
-                    );
-
-
-                  const lineTotal =
-                    x.quantity *
-                    x.unitPrice;
-
-
-                  return `
-                    <div class="item">
-
-                      <div class="item-name">
-                        ${esc(x.productName)}
-                        × ${x.quantity}
-                      </div>
-
-                      <div class="item-right">
-                        ${money(lineTotal)}
-                      </div>
-
-                    </div>
-                  `;
-
-                })
-                .join("")
-
-            : `
-              <div class="item">
-
-                <div class="item-name">
-                  Order details unavailable
-                </div>
-
-              </div>
-            `;
-
-
-        const addressHTML =
-          shippingAddress ||
-          shippingName ||
-          shippingPhone
-
-            ? `
-              <div class="address">
-
-                <strong>
-                  Delivery address
-                </strong>
-
-                ${shippingName
-                  ? `<br>${esc(shippingName)}`
-                  : ""}
-
-                ${shippingPhone
-                  ? `<br>${esc(shippingPhone)}`
-                  : ""}
-
-                ${shippingAddress
-                  ? `<br>${esc(shippingAddress)}`
-                  : ""}
-
-              </div>
-            `
-
-            : "";
-
-
-        return `
-          <article class="order-card">
-
-            <div class="order-top">
-
-              <div>
-
-                <div class="order-id">
-                  Order #${esc(order.id)}
-                </div>
-
-                <div class="order-date">
-                  ${esc(
-                    date(order.created_at)
-                  )}
-                </div>
-
-              </div>
-
-              <div class="total">
-                ${money(total)}
-              </div>
-
-            </div>
-
-
-            <div class="meta">
-
-              <span class="badge ${statusClass(status)}">
-                Order Status:
-                ${esc(status)}
-              </span>
-
-              <span class="badge">
-                Payment:
-                ${esc(payment)}
-              </span>
-
-            </div>
-
-
-            <div class="items">
-
-              ${itemsHTML}
-
-            </div>
-
-
-            ${addressHTML}
-            
-  </article>
-
-        `;
-
-      })
-      .join("");
-
-}
-
-
-/* -----------------------------
-   SHOW ACCOUNT
------------------------------ */
-
-async function showAccount(user){
-
-  $("authView")
-    .classList
-    .add("hidden");
-
-  $("accountView")
-    .classList
-    .remove("hidden");
-
-
-  $("userEmail")
-    .textContent =
-      user.email || "";
-
-
-  await loadOrders(
-    user
-  );
-
-}
-
-
-/* -----------------------------
-   INITIALIZE
------------------------------ */
-
-async function init(){
-
-  await loadLogo();
-
-
-  const {
-    data,
-    error
-  } =
-    await client.auth.getUser();
-
-
-  if(error){
-
-    console.warn(
-      "Auth check:",
-      error
-    );
-
-  }
-
-
-  if(data?.user){
-
-    await showAccount(
-      data.user
-    );
-
-    return;
-
-  }
-
-
-  const redirect =
-    new URLSearchParams(
-      location.search
-    ).get("redirect");
-
-
-  if(redirect){
-
-    sessionStorage.setItem(
-      "rc_after_login",
-      redirect
-    );
-
-  }
-
-}
-
-
-/* -----------------------------
-   BUTTONS
------------------------------ */
-
-$("loginBtn")
-  .addEventListener(
-    "click",
-    signIn
-  );
-
-
-$("signupBtn")
-  .addEventListener(
-    "click",
-    signUp
-  );
-
-
-$("logoutBtn")
-  .addEventListener(
-    "click",
-    async()=>{
-
-      await client.auth.signOut();
-
-      location.href =
-        "index.html";
-
-    }
-  );
-
-
-$("loginPassword")
-  .addEventListener(
-    "keydown",
-    event=>{
-
-      if(event.key === "Enter"){
-
-        signIn();
-
-      }
-
-    }
-  );
-
-
-$("signupPassword")
-  .addEventListener(
-    "keydown",
-    event=>{
-
-      if(event.key === "Enter"){
-
-        signUp();
-
-      }
-
-    }
-  );
-
-
-/* -----------------------------
-   AUTH STATE
------------------------------ */
-
-client.auth.onAuthStateChange(
-  async(event,session)=>{
-
-    if(session?.user){
-
-      const redirect =
-        sessionStorage.getItem(
-          "rc_after_login"
-        );
-
-
-      if(redirect){
-
-        sessionStorage.removeItem(
-          "rc_after_login"
-        );
-
-        location.href =
-          redirect;
-
-        return;
-
-      }
-
-
-      await showAccount(
-        session.user
-      );
-
-    }
-
-  }
-);
-
-
-/* START */
-
-init();
-
-</script>
-<script>
-
-/*
-  RADA CREST
-  Extra account features
-  Existing account/order code untouched.
-*/
-
-
-/* -----------------------------
-   CLICK ORDER → ORDER PAGE
------------------------------ */
-
-const rcOrdersList =
-  document.getElementById("ordersList");
-
-if(rcOrdersList){
-
-  rcOrdersList.addEventListener(
-    "click",
-    function(event){
-
-      const card =
-        event.target.closest(".order-card");
-
-      if(!card) return;
-
-      const orderIdElement =
-        card.querySelector(".order-id");
-
-      if(!orderIdElement) return;
-
-      const text =
-        orderIdElement.textContent.trim();
-
-      const orderId =
-        text.replace(/^Order\s*#/i,"").trim();
-
-      if(!orderId) return;
-
-      window.location.href =
-        "order.html?id=" +
-        encodeURIComponent(orderId);
-
-    }
-  );
-
-}
-
-
-/* -----------------------------
-   MAKE ORDER CARDS LOOK CLICKABLE
------------------------------ */
-
-const rcOrderStyle =
-  document.createElement("style");
-
-rcOrderStyle.textContent = `
-
-#ordersList .order-card{
-  cursor:pointer;
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease,
-    border-color .2s ease;
-}
-
-#ordersList .order-card:hover{
-  transform:translateY(-2px);
-  box-shadow:0 12px 30px rgba(0,0,0,.08);
-  border-color:#c8b27c;
-}
-
-#ordersList .order-card::after{
-  content:"View Order →";
-  display:block;
-  margin-top:14px;
-  color:#8a641c;
-  font-size:13px;
-  font-weight:800;
-}
-
-`;
-
-document.head.appendChild(
-  rcOrderStyle
-);
-
-
-/* -----------------------------
-   WISHLIST SECTION
------------------------------ */
-
-async function rcLoadWishlist(){
-
-  const accountView =
-    document.getElementById("accountView");
-
-  if(!accountView) return;
-
-  /*
-    Prevent duplicate wishlist section.
-  */
-  if(document.getElementById("rcWishlistSection")){
-    return;
-  }
-
-  const section =
-    document.createElement("section");
-
-  section.id =
-    "rcWishlistSection";
-
-  section.style.marginTop =
-    "28px";
-
-  section.innerHTML = `
-
-    <h2>My Wishlist</h2>
-
-    <div
-      id="rcWishlistList"
-      class="orders"
-    >
-      <div class="empty">
-        Loading wishlist...
-      </div>
-    </div>
-
-  `;
-
-  /*
-    Put wishlist below orders.
-  */
-
-  accountView.appendChild(section);
-
-
-  const {
-    data:{
-      user
-    }
-  } =
-    await supabaseClient.auth.getUser();
-
-  if(!user){
-
-    section.remove();
-
-    return;
-  }
-
-
-  const {
-    data:wishlists,
-    error
-  } =
-    await supabaseClient
-      .from("wishlists")
-      .select("*")
-      .eq("user_id",user.id)
-      .order(
-        "created_at",
-        {ascending:false}
-      );
-
-
-  const list =
-    document.getElementById(
-      "rcWishlistList"
-    );
-
-
-  if(error){
-
-    list.innerHTML = `
-      <div class="empty">
-        Wishlist could not be loaded.
-      </div>
-    `;
-
-    console.warn(
-      "Wishlist:",
-      error.message
-    );
-
-    return;
-  }
-
-
-  if(!wishlists || !wishlists.length){
-
-    list.innerHTML = `
-      <div class="empty">
-
-        Your wishlist is empty.
-
-        <br><br>
-
-        <a
-          class="button secondary"
-          href="index.html#products"
-        >
-          Browse Products
+<body class="text-neutral-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="w-full bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <a href="index.html" class="flex items-center gap-2">
+            <span class="font-bold tracking-widest text-lg uppercase">RADA CREST</span>
         </a>
+        <a href="index.html" class="text-sm font-medium text-neutral-600 hover:text-black flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i> Back to Store
+        </a>
+    </header>
 
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const productIds =
-    wishlists
-      .map(item => item.product_id)
-      .filter(Boolean);
-
-
-  if(!productIds.length){
-
-    list.innerHTML = `
-      <div class="empty">
-        Your wishlist is empty.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  const {
-    data:products,
-    error:productError
-  } =
-    await supabaseClient
-      .from("products")
-      .select("*")
-      .in("id",productIds);
-
-
-  if(productError){
-
-    list.innerHTML = `
-      <div class="empty">
-        Wishlist products could not be loaded.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  if(!products || !products.length){
-
-    list.innerHTML = `
-      <div class="empty">
-        Your wishlist is empty.
-      </div>
-    `;
-
-    return;
-  }
-
-
-  list.innerHTML =
-    products.map(product => `
-
-      <article
-        class="order-card rc-wishlist-card"
-        data-product-id="${product.id}"
-      >
-
-        <div
-          class="order-top"
-        >
-
-          <div>
-
-            <div class="order-id">
-              ${rcEsc(product.name)}
+    <!-- Main Container -->
+    <main class="max-w-md w-full mx-auto px-4 py-8 flex-grow">
+        
+        <!-- Not Logged In View -->
+        <div id="auth-container">
+            <div class="mb-6 text-center">
+                <h1 class="text-2xl font-bold tracking-tight">My Account</h1>
+                <p class="text-sm text-neutral-500 mt-1">Sign in to view your orders, or create a new customer account.</p>
             </div>
 
-            <div class="order-date">
-              ${
-                product.category
-                  ? rcEsc(product.category)
-                  : "RADA CREST Product"
-              }
+            <!-- Tab Switcher -->
+            <div class="flex bg-neutral-200 p-1 rounded-xl mb-6">
+                <button id="tab-login-btn" onclick="switchTab('login')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm transition-all">Sign In</button>
+                <button id="tab-signup-btn" onclick="switchTab('signup')" class="flex-1 py-2 text-sm font-semibold text-neutral-500 transition-all">Create Account</button>
             </div>
 
-          </div>
+            <!-- Notification Banner -->
+            <div id="auth-alert" class="hidden mb-4 p-3 text-sm rounded-lg"></div>
 
-          <div class="total">
-            ₹${Number(
-              product.price || 0
-            ).toLocaleString("en-IN")}
-          </div>
+            <!-- Sign In Form -->
+            <div id="login-form-box" class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-bold mb-1">Sign In</h2>
+                <p class="text-xs text-neutral-500 mb-4">Access your existing RADA CREST account.</p>
+                
+                <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Email</label>
+                        <input type="email" id="login-email" required placeholder="you@example.com" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Password</label>
+                        <div class="relative">
+                            <input type="password" id="login-password" required placeholder="Your password" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
+                            <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 text-sm">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-xs">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="remember-me" class="rounded border-neutral-300 text-black focus:ring-black"> Remember me
+                        </label>
+                        <button type="button" onclick="handleForgotPassword()" class="text-neutral-600 hover:underline font-medium">Forgot password?</button>
+                    </div>
+                    <button type="submit" id="login-btn" class="w-full py-3 bg-black text-white rounded-xl font-medium text-sm hover:bg-neutral-800 transition-all shadow-md">
+                        Sign In
+                    </button>
+                </form>
+            </div>
 
+            <!-- Create Account Form (Hidden by default) -->
+            <div id="signup-form-box" class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm hidden">
+                <h2 class="text-lg font-bold mb-1">Create Account</h2>
+                <p class="text-xs text-neutral-500 mb-4">Create your customer account for order history.</p>
+                
+                <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Full Name</label>
+                        <input type="text" id="signup-name" required placeholder="John Doe" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Email</label>
+                        <input type="email" id="signup-email" required placeholder="you@example.com" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Password</label>
+                        <div class="relative">
+                            <input type="password" id="signup-password" required minlength="6" placeholder="At least 6 characters" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
+                            <button type="button" onclick="togglePassword('signup-password', this)" class="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 text-sm">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" id="signup-btn" class="w-full py-3 bg-amber-600 text-white rounded-xl font-medium text-sm hover:bg-amber-700 transition-all shadow-md">
+                        Create Account
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <div
-          class="meta"
-          style="margin-top:12px;"
-        >
+        <!-- Logged In Dashboard View (Hidden initially) -->
+        <div id="dashboard-container" class="hidden">
+            <div class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm mb-4">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-neutral-100">
+                    <div>
+                        <h2 class="text-lg font-bold" id="user-display-name">Welcome</h2>
+                        <p class="text-xs text-neutral-500" id="user-display-email">email@domain.com</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-sm" id="user-initials">
+                        RC
+                    </div>
+                </div>
 
-          <span class="badge">
-            View Product →
-          </span>
+                <div class="space-y-2">
+                    <a href="#" onclick="alert('My Orders feature coming up next!')" class="flex items-center justify-between p-3 rounded-xl hover:bg-neutral-50 transition text-sm font-medium">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-box text-neutral-400 w-5"></i> My Orders</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-neutral-400"></i>
+                    </a>
+                    <a href="#" onclick="alert('Track Orders feature coming up next!')" class="flex items-center justify-between p-3 rounded-xl hover:bg-neutral-50 transition text-sm font-medium">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-truck-fast text-neutral-400 w-5"></i> Track Orders</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-neutral-400"></i>
+                    </a>
+                    <a href="#" onclick="alert('Saved Addresses feature coming up next!')" class="flex items-center justify-between p-3 rounded-xl hover:bg-neutral-50 transition text-sm font-medium">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-location-dot text-neutral-400 w-5"></i> My Addresses</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-neutral-400"></i>
+                    </a>
+                </div>
+            </div>
 
+            <button onclick="handleLogout()" class="w-full py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium text-sm hover:bg-red-100 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
         </div>
 
-      </article>
+    </main>
 
-    `).join("");
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-neutral-400 border-t border-neutral-200 bg-white">
+        &copy; 2026 RADA CREST. All rights reserved.
+    </footer>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ⚙️ APNA SUPABASE CONFIG YAHAN DAALEIN
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-  document
-    .querySelectorAll(".rc-wishlist-card")
-    .forEach(card => {
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      card.addEventListener(
-        "click",
-        function(){
+        // Check active session on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                showDashboard(session.user);
+            }
+        });
 
-          const id =
-            this.dataset.productId;
+        // Toggle Tabs (Login / Signup)
+        function switchTab(tab) {
+            const loginBox = document.getElementById('login-form-box');
+            const signupBox = document.getElementById('signup-form-box');
+            const loginBtn = document.getElementById('tab-login-btn');
+            const signupBtn = document.getElementById('tab-signup-btn');
+            hideAlert();
 
-          window.location.href =
-            "product.html?id=" +
-            encodeURIComponent(id);
-
-        }
-      );
-
-    });
-
-}
-
-
-function rcEsc(value){
-
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-/*
-  Wait for the existing account system
-  to finish showing the account.
-*/
-
-async function rcStartExtraAccountFeatures(){
-
-  const accountView =
-    document.getElementById("accountView");
-
-  if(!accountView) return;
-
-  /*
-    If already logged in and account view
-    is visible, load immediately.
-  */
-
-  if(!accountView.classList.contains("hidden")){
-
-    await rcLoadWishlist();
-
-    return;
-  }
-
-
-  /*
-    Otherwise wait for Supabase auth.
-  */
-
-  if(window.supabaseClient){
-
-    supabaseClient.auth.onAuthStateChange(
-      async function(event,session){
-
-        if(session?.user){
-
-          setTimeout(
-            rcLoadWishlist,
-            300
-          );
-
+            if (tab === 'login') {
+                loginBox.classList.remove('hidden');
+                signupBox.classList.add('hidden');
+                loginBtn.className = "flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm transition-all";
+                signupBtn.className = "flex-1 py-2 text-sm font-semibold text-neutral-500 transition-all";
+            } else {
+                signupBox.classList.remove('hidden');
+                loginBox.classList.add('hidden');
+                signupBtn.className = "flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm transition-all";
+                loginBtn.className = "flex-1 py-2 text-sm font-semibold text-neutral-500 transition-all";
+            }
         }
 
-      }
-    );
+        // Show/Hide Password
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
 
-  }
+        // Alerts utility
+        function showAlert(message, isError = true) {
+            const alertBox = document.getElementById('auth-alert');
+            alertBox.className = `mb-4 p-3 text-sm rounded-lg ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`;
+            alertBox.innerText = message;
+            alertBox.classList.remove('hidden');
+        }
 
-}
+        function hideAlert() {
+            document.getElementById('auth-alert').classList.add('hidden');
+        }
 
+        // Handle Signup
+        async function handleSignup(e) {
+            e.preventDefault();
+            hideAlert();
+            const btn = document.getElementById('signup-btn');
+            btn.disabled = true;
+            btn.innerText = 'Creating Account...';
 
-rcStartExtraAccountFeatures();
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
 
-     </script>
-  
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: { full_name: name }
+                    }
+                });
+
+                if (error) throw error;
+
+                showAlert('Account created successfully! Please check your email for confirmation or log in.', false);
+                setTimeout(() => switchTab('login'), 2000);
+            } catch (err) {
+                showAlert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Create Account';
+            }
+        }
+
+        // Handle Login
+        async function handleLogin(e) {
+            e.preventDefault();
+            hideAlert();
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.innerText = 'Signing In...';
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                showDashboard(data.user);
+                
+                // Redirect back to checkout/previous page if applicable
+                const redirectUrl = sessionStorage.getItem('redirect_after_login');
+                if (redirectUrl) {
+                    sessionStorage.removeItem('redirect_after_login');
+                    window.location.href = redirectUrl;
+                }
+            } catch (err) {
+                showAlert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Sign In';
+            }
+        }
+
+        // Handle Forgot Password
+        async function handleForgotPassword() {
+            const email = document.getElementById('login-email').value;
+            if (!email) {
+                showAlert('Please enter your email address in the field above first.');
+                return;
+            }
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+                if (error) throw error;
+                showAlert('Password reset link sent to your email!', false);
+            } catch (err) {
+                showAlert(err.message);
+            }
+        }
+
+        // Show Dashboard after successful login
+        function showDashboard(user) {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('dashboard-container').classList.remove('hidden');
+
+            const fullName = user.user_metadata?.full_name || 'Valued Customer';
+            document.getElementById('user-display-name').innerText = fullName;
+            document.getElementById('user-display-email').innerText = user.email;
+
+            // Generate initials
+            const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('user-initials').innerText = initials || 'RC';
+        }
+
+        // Handle Logout
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            document.getElementById('dashboard-container').classList.add('hidden');
+            document.getElementById('auth-container').classList.remove('hidden');
+            document.getElementById('loginForm').reset();
+        }
+    </script>
 </body>
 </html>
