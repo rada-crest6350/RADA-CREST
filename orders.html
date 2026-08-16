@@ -503,7 +503,6 @@ async function loadOrders(){
 
   orders = result.data || [];
 
-  // Har order ke liye order_items aur products fetch karo
   for(let ord of orders){
     const { data: items } = await supabaseClient
       .from('order_items')
@@ -514,22 +513,21 @@ async function loadOrders(){
       ord.item_count = items.length;
       if(items[0].product_name) ord.product_name = items[0].product_name;
 
-      // Products table se image fetch karo product_id ke zariye
-      if(items[0].product_id){
+      // Check all possible image fields in order_items first
+      ord.product_image = items[0].image_url || items[0].image || items[0].product_image || '';
+
+      // Agar items mein image nahi mili, toh products table se nikalo
+      if(!ord.product_image && items[0].product_id){
         const { data: prod } = await supabaseClient
           .from('products')
-          .select('image_url, image')
+          .select('*')
           .eq('id', items[0].product_id)
           .maybeSingle();
 
         if(prod){
-          ord.product_image = prod.image_url || prod.image || '';
+          console.log("Found Product Data:", prod); // Yeh console mein dikhayega ki product columns kya hain
+          ord.product_image = prod.image_url || prod.image || prod.img || prod.photo || '';
         }
-      }
-      
-      // Agar items mein hi direct image di ho toh wo le lo
-      if(!ord.product_image && items[0].image_url){
-        ord.product_image = items[0].image_url;
       }
     }
   }
