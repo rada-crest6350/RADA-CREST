@@ -475,48 +475,62 @@ async function loadAccount(){
 
 async function loadOrders(){
 
-  let result =
-    await supabaseClient
-      .from('order_summary')
-      .select('*')
-      .eq('customer_email', currentUser.email)
-      .order('created_at', {ascending:false});
+  let allOrders = [];
 
-  if(result.error){
-    result =
-      await supabaseClient
-        .from('orders')
-        .select('*')
-        .eq('customer_email', currentUser.email)
-        .order('created_at', {ascending:false});
+  // 1. Fetch from order_summary using both email and user_id if possible
+  const { data: summaryData, error: summaryError } = await supabaseClient
+    .from('order_summary')
+    .select('*')
+    .or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`)
+    .order('created_at', {ascending:false});
+
+  if(!summaryError && summaryData){
+    allOrders = [...summaryData];
   }
+
+  // 2. Fetch from orders table as well
+  const { data: ordersData, error: ordersError } = await supabaseClient
+    .from('orders')
+    .select('*')
+    .or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`)
+    .order('created_at', {ascending:false});
+
+  if(!ordersError && ordersData){
+    // Merge both and avoid duplicate IDs
+    const existingIds = new Set(allOrders.map(o => o.id || o.order_id));
+    for(let ord of ordersData){
+      const oid = ord.id || ord.order_id;
+      if(!existingIds.has(oid)){
+        allOrders.push(ord);
+        existingIds.add(oid);
+      }
+    }
+  }
+
+  // Sort by created_at descending
+  allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   document
     .getElementById('loadingState')
     .classList.add('hidden');
 
-  if(result.error){
-    console.error(result.error);
-    showAlert(result.error.message || 'Unable to load orders.');
-    return;
-  }
+  orders = allOrders;
 
-  orders = result.data || [];
-
+  // Har order ke liye order_items aur products fetch karke photo ensure karo
   for(let ord of orders){
     const { data: items } = await supabaseClient
       .from('order_items')
       .select('*')
-      .eq('order_id', ord.id);
+      .eq('order_id', ord.id || ord.order_id);
 
     if(items && items.length > 0){
       ord.item_count = items.length;
-      if(items[0].product_name) ord.product_name = items[0].product_name;
+      if(!ord.product_name && items[0].product_name) {
+        ord.product_name = items[0].product_name;
+      }
 
-      // Check all possible image fields in order_items first
       ord.product_image = items[0].image_url || items[0].image || items[0].product_image || '';
 
-      // Agar items mein image nahi mili, toh products table se nikalo
       if(!ord.product_image && items[0].product_id){
         const { data: prod } = await supabaseClient
           .from('products')
@@ -525,7 +539,6 @@ async function loadOrders(){
           .maybeSingle();
 
         if(prod){
-          console.log("Found Product Data:", prod); // Yeh console mein dikhayega ki product columns kya hain
           ord.product_image = prod.image_url || prod.image || prod.img || prod.photo || '';
         }
       }
