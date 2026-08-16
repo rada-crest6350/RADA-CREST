@@ -67,7 +67,7 @@
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="remember-me" class="rounded border-neutral-300 text-black focus:ring-black"> Remember me
                         </label>
-                        <button type="button" onclick="handleForgotPassword()" class="text-neutral-600 hover:underline font-medium">Forgot password?</button>
+                        <a href="forgot-password.html" class="text-neutral-600 hover:underline font-medium">Forgot password?</a>
                     </div>
                     <button type="submit" id="login-btn" class="w-full py-3 bg-black text-white rounded-xl font-medium text-sm hover:bg-neutral-800 transition-all shadow-md">
                         Sign In
@@ -78,7 +78,7 @@
             <!-- Create Account Form (Hidden by default) -->
             <div id="signup-form-box" class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm hidden">
                 <h2 class="text-lg font-bold mb-1">Create Account</h2>
-                <p class="text-xs text-neutral-500 mb-4">Create your customer account for order history.</p>
+                <p class="text-xs text-neutral-500 mb-4">Create your account with email, mobile number and password.</p>
                 
                 <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-4">
                     <div>
@@ -217,37 +217,79 @@
             document.getElementById('auth-alert').classList.add('hidden');
         }
 
-        // Handle Signup with Mobile Number
+        // Handle Signup — Email + Mobile + Password
         async function handleSignup(e) {
             e.preventDefault();
             hideAlert();
+
+            if (typeof sbReady === 'function' && !sbReady()) {
+                showAlert('Supabase configuration is not ready. Please check config.js.');
+                return;
+            }
+
             const btn = document.getElementById('signup-btn');
             btn.disabled = true;
             btn.innerText = 'Creating Account...';
 
-            const name = document.getElementById('signup-name').value;
-            const mobile = document.getElementById('signup-mobile').value;
-            const email = document.getElementById('signup-email').value;
+            const name = document.getElementById('signup-name').value.trim();
+            const mobile = document.getElementById('signup-mobile').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value;
 
+            if (!/^\d{10}$/.test(mobile)) {
+                showAlert('Please enter a valid 10-digit mobile number.');
+                btn.disabled = false;
+                btn.innerText = 'Create Account';
+                return;
+            }
+
+            const phone = `+91${mobile}`;
+
             try {
+                // Phone is the Auth identifier so Supabase can later send a
+                // password-reset OTP to the same verified number.
                 const { data, error } = await supabaseClient.auth.signUp({
-                    email: email,
-                    password: password,
+                    phone,
+                    password,
                     options: {
-                        data: { 
+                        channel: 'sms',
+                        data: {
                             full_name: name,
-                            mobile_number: mobile
+                            mobile_number: mobile,
+                            signup_email: email
                         }
                     }
                 });
 
                 if (error) throw error;
 
-                showAlert('Account created successfully! Please check your email for confirmation or log in.', false);
-                setTimeout(() => switchTab('login'), 2000);
+                sessionStorage.setItem('pending_signup_phone', phone);
+                sessionStorage.setItem('pending_signup_name', name);
+                sessionStorage.setItem('pending_signup_email', email);
+                sessionStorage.setItem('pending_signup_mobile', mobile);
+
+                if (data.session) {
+                    // If phone confirmation is disabled, attach the email now.
+                    const { error: emailError } = await supabaseClient.auth.updateUser({
+                        email,
+                        data: {
+                            full_name: name,
+                            mobile_number: mobile
+                        }
+                    });
+
+                    if (emailError) throw emailError;
+
+                    showAlert(
+                        'Account created. Please check your email to confirm it. You can also sign in with your mobile number.',
+                        false
+                    );
+                    setTimeout(() => switchTab('login'), 2500);
+                } else {
+                    window.location.href = 'verify-phone.html?mode=signup';
+                }
             } catch (err) {
-                showAlert(err.message);
+                showAlert(err.message || 'Unable to create account.');
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'Create Account';
@@ -276,31 +318,21 @@
                     throw new Error('Please enter your email/mobile number and password.');
                 }
 
-                let loginEmail = identifier;
+                let credentials;
 
-                // Mobile login requires profiles.phone and profiles.email.
                 if (/^\d{10}$/.test(identifier)) {
-                    const { data: profile, error: profileError } = await supabaseClient
-                        .from('profiles')
-                        .select('email')
-                        .eq('phone', identifier)
-                        .maybeSingle();
-
-                    if (profileError) {
-                        throw new Error('Mobile login is not available yet. Please check the profiles table and its RLS policy.');
-                    }
-
-                    if (!profile?.email) {
-                        throw new Error('No account was found for this mobile number.');
-                    }
-
-                    loginEmail = profile.email;
+                    credentials = {
+                        phone: `+91${identifier}`,
+                        password
+                    };
+                } else {
+                    credentials = {
+                        email: identifier,
+                        password
+                    };
                 }
 
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: loginEmail,
-                    password: password
-                });
+                const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
 
                 if (error) throw error;
 
@@ -319,49 +351,7 @@
             }
         }
 
-        // Handle Forgot Password
-        async function handleForgotPassword() {
-            hideAlert();
-
-            if (typeof sbReady === 'function' && !sbReady()) {
-                showAlert('Supabase configuration is not ready. Please check config.js.');
-                return;
-            }
-
-            const identifier = document.getElementById('login-email').value.trim();
-
-            if (!identifier) {
-                showAlert('Please enter your registered email address first.');
-                return;
-            }
-
-            if (/^\d{10}$/.test(identifier)) {
-                showAlert('For password reset, please enter your registered email. Mobile OTP recovery needs Supabase Phone Auth to be configured.');
-                return;
-            }
-
-            if (!identifier.includes('@')) {
-                showAlert('Please enter a valid registered email address for password reset.');
-                return;
-            }
-
-            try {
-                const redirectTo = `${window.location.origin}/reset-password.html`;
-
-                const { error } = await supabaseClient.auth.resetPasswordForEmail(identifier, {
-                    redirectTo
-                });
-
-                if (error) throw error;
-
-                showAlert(
-                    'If an account exists with this email, a password reset link has been sent. Please check your inbox.',
-                    false
-                );
-            } catch (err) {
-                showAlert(err.message || 'Unable to send password reset link.');
-            }
-        }
+        // Forgot password is handled on forgot-password.html.
 
         // Show Dashboard after successful login
         function showDashboard(user) {
