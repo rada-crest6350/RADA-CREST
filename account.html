@@ -134,19 +134,63 @@
                         <span class="flex items-center gap-3"><i class="fa-solid fa-truck-fast text-neutral-400 w-5"></i> Track Orders</span>
                         <i class="fa-solid fa-chevron-right text-xs text-neutral-400"></i>
                     </a>
-                    <a href="addresses.html"
-                       class="account-row"
-                       style="text-decoration:none;color:inherit;">
-    
-                        <div class="account-row-icon">
-                        <i class="fa-solid fa-location-dot"></i>
-                        </div>
+                    <a
+  href="addresses.html"
+  style="
+    display:flex;
+    align-items:center;
+    width:100%;
+    min-height:72px;
+    padding:0 8px;
+    text-decoration:none;
+    color:inherit;
+    cursor:pointer;
+  "
+>
+  <!-- Left Icon -->
+  <div
+    style="
+      width:42px;
+      min-width:42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#a3a3a3;
+      font-size:20px;
+    "
+  >
+    <i class="fa-solid fa-location-dot"></i>
+  </div>
 
-                        <div onclick="window.location.href='addresses.html'">
-                        <span>My Addresses</span>
-                        </div>
-                        
-                        <i class="fa-solid fa-chevron-right account-row-arrow"></i>
+  <!-- Text -->
+  <div
+    style="
+      flex:1;
+      min-width:0;
+      padding-left:10px;
+      font-size:20px;
+      font-weight:500;
+      color:#292929;
+    "
+  >
+    My Addresses
+  </div>
+
+  <!-- Arrow -->
+  <div
+    style="
+      width:40px;
+      min-width:40px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      color:#a3a3a3;
+      font-size:18px;
+    "
+  >
+    <i class="fa-solid fa-chevron-right"></i>
+  </div>
+
                     </a>
                 </div>
             </div>
