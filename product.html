@@ -633,8 +633,7 @@ async function loadReviews(){
   
 async function loadProduct(){
   if(typeof sbReady !== "function" || !sbReady()){
-    productPage.innerHTML =
-      "<p>Supabase is not configured.</p>";
+    productPage.innerHTML = "<p>Supabase is not configured properly or config.js is missing.</p>";
     return;
   }
 
@@ -649,6 +648,7 @@ async function loadProduct(){
   }
 
   try{
+    console.log("Fetching product with ID:", id);
     const {
       data,
       error
@@ -659,15 +659,37 @@ async function loadProduct(){
       .eq("active", true)
       .single();
 
-    if(error || !data){
-      console.error(error);
+    if(error){
+      console.error("Supabase Error:", error);
       productPage.innerHTML = `
-        <h2>Product not found</h2>
+        <h2>Database Error</h2>
+        <p>${esc(error.message)}</p>
         <a class="btn" href="index.html">Back to Shop</a>
       `;
       return;
     }
 
+    if(!data){
+      productPage.innerHTML = `
+        <h2>Product not found in database</h2>
+        <a class="btn" href="index.html">Back to Shop</a>
+      `;
+      return;
+    }
+
+    product = data;
+    renderProduct();
+
+  }catch(err){
+    console.error("Catch Error:", err);
+    productPage.innerHTML = `
+      <h2>Unable to load product</h2>
+      <p>${esc(err.message)}</p>
+      <a class="btn" href="index.html">Back to Shop</a>
+    `;
+  }
+}
+  
     product = data;
     renderProduct();
 
