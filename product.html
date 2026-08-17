@@ -427,7 +427,21 @@ function addToCart(){
     message.textContent = "Added to cart.";
   }
 }
+  
+function buyNow(){
+  const quantity = getQty();
+  if(quantity === null) return;
 
+  // Yaha apna WhatsApp number dalien (91 se shuru karein)
+  const phoneNumber = "91XXXXXXXXXX"; 
+  const message = `Hello, I want to buy: ${product.name} (Quantity: ${quantity})`;
+  
+  const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  
+  // WhatsApp par redirect karein
+  window.open(url, '_blank');
+}
+  
 async function loadReviews(){
   const box = document.getElementById("reviews");
   if(!box) return;
