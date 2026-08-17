@@ -1,0 +1,1360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Buy Control — RADA CREST</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f5f5f3;
+  color:#111;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.bc-wrap{
+  max-width:1180px;
+  margin:auto;
+  padding:25px 16px 70px;
+}
+
+.bc-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:28px;
+}
+
+.bc-back{
+  text-decoration:none;
+  color:#111;
+  background:#fff;
+  border:1px solid #e5e5e5;
+  padding:11px 15px;
+  border-radius:13px;
+  font-weight:850;
+}
+
+.bc-brand{
+  font-weight:950;
+  letter-spacing:.1em;
+}
+
+.bc-title h1{
+  margin:0;
+  font-size:36px;
+  letter-spacing:-.04em;
+}
+
+.bc-title p{
+  color:#777;
+  margin:8px 0 25px;
+}
+
+.bc-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e5e5;
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(0,0,0,.045);
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.card-head h2{
+  margin:0;
+  font-size:20px;
+}
+
+.card-head p{
+  margin:6px 0 0;
+  color:#777;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.switch{
+  position:relative;
+  width:52px;
+  height:29px;
+  flex:none;
+}
+
+.switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+
+.slider{
+  position:absolute;
+  inset:0;
+  background:#ddd;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+.slider:before{
+  content:"";
+  position:absolute;
+  width:21px;
+  height:21px;
+  left:4px;
+  top:4px;
+  background:#fff;
+  border-radius:50%;
+  transition:.2s;
+}
+
+.switch input:checked + .slider{
+  background:#111;
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(23px);
+}
+
+.field{
+  margin-bottom:15px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:7px;
+  font-size:13px;
+  font-weight:850;
+}
+
+.field input,
+.field select{
+  width:100%;
+  min-height:46px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:11px 13px;
+  font-size:14px;
+  background:#fff;
+  outline:none;
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:#111;
+  box-shadow:0 0 0 3px rgba(0,0,0,.05);
+}
+
+.two{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.preview{
+  margin-top:12px;
+  padding:14px;
+  background:#f7f7f5;
+  border:1px solid #e6e6e6;
+  border-radius:14px;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.gift-info{
+  padding:14px;
+  background:#fffaf0;
+  border:1px solid #f1dfb4;
+  border-radius:14px;
+  font-size:13px;
+  line-height:1.6;
+  margin-bottom:15px;
+}
+
+.gift-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.gift-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:12px;
+  border:1px solid #e5e5e5;
+  border-radius:15px;
+  background:#fafaf8;
+}
+
+.gift-product{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.gift-product img{
+  width:58px;
+  height:58px;
+  border-radius:12px;
+  object-fit:contain;
+  background:#fff;
+  border:1px solid #eee;
+}
+
+.gift-name{
+  font-weight:850;
+  font-size:14px;
+}
+
+.gift-price{
+  color:#777;
+  font-size:12px;
+  margin-top:4px;
+}
+
+.remove-gift{
+  border:1px solid #ddd;
+  background:#fff;
+  color:#a00000;
+  border-radius:11px;
+  padding:10px 13px;
+  font-weight:850;
+  cursor:pointer;
+}
+
+.add-gift{
+  width:100%;
+  min-height:47px;
+  margin-top:13px;
+  border:1px dashed #aaa;
+  border-radius:13px;
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.save-area{
+  margin-top:20px;
+  display:flex;
+  justify-content:flex-end;
+}
+
+.save-btn{
+  min-height:53px;
+  padding:0 25px;
+  background:#111;
+  color:#fff;
+  border:0;
+  border-radius:14px;
+  font-weight:950;
+  cursor:pointer;
+}
+
+.save-btn:disabled{
+  opacity:.5;
+}
+
+.status{
+  display:none;
+  margin-top:15px;
+  padding:13px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:850;
+}
+
+.status.success{
+  display:block;
+  color:#08752b;
+  background:#effcf3;
+  border:1px solid #c9efd4;
+}
+
+.status.error{
+  display:block;
+  color:#a00000;
+  background:#fff0f0;
+  border:1px solid #ffd0d0;
+}
+
+.loading{
+  min-height:60vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#666;
+  font-weight:800;
+}
+
+@media(max-width:800px){
+  .bc-grid{
+    grid-template-columns:1fr;
+  }
+
+  .full{
+    grid-column:auto;
+  }
+}
+
+@media(max-width:600px){
+  .bc-wrap{
+    padding:16px 12px 50px;
+  }
+
+  .bc-title h1{
+    font-size:29px;
+  }
+
+  .two{
+    grid-template-columns:1fr;
+  }
+
+  .gift-row{
+    grid-template-columns:1fr;
+  }
+
+  .remove-gift{
+    width:100%;
+  }
+
+  .save-btn{
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bc-wrap">
+
+  <div class="bc-top">
+    <a href="admin.html" class="bc-back">← Admin</a>
+    <div class="bc-brand">RADA CREST</div>
+  </div>
+
+  <div class="bc-title">
+    <h1>Buy Control</h1>
+    <p>Control discounts, free delivery and automatic RADA CREST gifts.</p>
+  </div>
+
+  <div id="loading" class="loading">
+    Loading Buy Control...
+  </div>
+
+  <div id="page" style="display:none">
+
+    <div class="bc-grid">
+
+      <!-- DISCOUNT -->
+
+      <section class="card">
+
+        <div class="card-head">
+          <div>
+            <h2>🏷️ Discount</h2>
+            <p>Automatically apply discount on eligible shopping.</p>
+          </div>
+
+          <label class="switch">
+            <input id="discountEnabled" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="two">
+
+          <div class="field">
+            <label>Discount Type</label>
+
+            <select id="discountType">
+              <option value="percentage">Percentage (%)</option>
+              <option value="fixed">Fixed Amount (₹)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Discount Value</label>
+
+            <input
+              id="discountValue"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="10"
+            >
+          </div>
+
+        </div>
+
+        <div class="two">
+
+          <div class="field">
+            <label>Minimum Shopping</label>
+
+            <input
+              id="minimumDiscountAmount"
+              type="number"
+              min="0"
+              placeholder="999"
+            >
+          </div>
+
+          <div class="field">
+            <label>Maximum Discount</label>
+
+            <input
+              id="maximumDiscountAmount"
+              type="number"
+              min="0"
+              placeholder="500"
+            >
+          </div>
+
+        </div>
+
+        <div id="discountPreview" class="preview">
+          Discount disabled.
+        </div>
+
+      </section>
+
+
+      <!-- FREE DELIVERY -->
+
+      <section class="card">
+
+        <div class="card-head">
+          <div>
+            <h2>🚚 Free Delivery</h2>
+            <p>Automatically remove delivery charge after the selected amount.</p>
+          </div>
+
+          <label class="switch">
+            <input id="freeDeliveryEnabled" type="checkbox">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="field">
+          <label>Free Delivery Above</label>
+
+          <input
+            id="freeDeliveryMinimum"
+            type="number"
+            min="0"
+            placeholder="499"
+          >
+        </div>
+
+        <div id="deliveryPreview" class="preview">
+          Free delivery disabled.
+        </div>
+
+      </section>
+
+
+      <!-- GIFT POOL -->
+
+      <section class="card full">
+
+        <div class="card-head">
+
+          <div>
+            <h2>🎁 Automatic Gift Pool</h2>
+
+            <p>
+              Select 5–6 existing products. When a customer's shopping
+              reaches the minimum amount, the system will automatically
+              choose ONE available gift.
+            </p>
+          </div>
+
+          <label class="switch">
+            <input id="giftEnabled" type="checkbox">
+            <span class="slider"></span>
+          </label>
+
+        </div>
+
+
+        <div class="two">
+
+          <div class="field">
+
+            <label>
+              Minimum Shopping For Gift
+            </label>
+
+            <input
+              id="giftMinimum"
+              type="number"
+              min="0"
+              placeholder="999"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="gift-info">
+
+          🎁 <strong>How it works:</strong><br>
+
+          Customer reaches the minimum shopping amount →
+          system checks gift stock →
+          one available product is randomly selected →
+          that product is automatically added as
+          <strong>“Gift for RADA CREST”</strong> →
+          gift price is ₹0.
+
+        </div>
+
+
+        <div id="giftList" class="gift-list"></div>
+
+
+        <button
+          type="button"
+          class="add-gift"
+          onclick="openGiftSelector()"
+        >
+          + Add Product To Gift Pool
+        </button>
+
+      </section>
+
+    </div>
+
+
+    <div id="status" class="status"></div>
+
+
+    <div class="save-area">
+
+      <button
+        id="saveBtn"
+        class="save-btn"
+        onclick="saveSettings()"
+      >
+        Save Buy Control
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+"use strict";
+
+let products = [];
+let settings = null;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+
+function imageUrl(value){
+  return String(value || "")
+    .split(/[\n,]+/)
+    .map(x => x.trim())
+    .filter(Boolean)[0] || "";
+}
+
+
+function showStatus(text,type){
+
+  const box =
+    document.getElementById("status");
+
+  box.className =
+    "status " + type;
+
+  box.textContent = text;
+}
+
+
+/* =========================
+   LOAD PRODUCTS
+========================= */
+
+async function loadProducts(){
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("products")
+    .select("id,name,price,stock,active,image_url")
+    .eq("active",true)
+    .order("name",{ascending:true});
+
+  if(error) throw error;
+
+  products = data || [];
+}
+
+
+/* =========================
+   GIFT POOL
+========================= */
+
+function renderGiftPool(rules){
+
+  const list =
+    document.getElementById("giftList");
+
+  list.innerHTML = "";
+
+  if(!rules.length){
+
+    list.innerHTML = `
+      <div style="
+        padding:15px;
+        border:1px dashed #ddd;
+        border-radius:14px;
+        color:#777;
+        text-align:center;
+        font-size:13px;
+      ">
+        No gift products selected yet.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  rules.forEach((rule,index)=>{
+
+    const product =
+      products.find(
+        p => String(p.id) === String(rule.product_id)
+      );
+
+    if(!product) return;
+
+    const image =
+      imageUrl(product.image_url);
+
+    const row =
+      document.createElement("div");
+
+    row.className = "gift-row";
+
+    row.dataset.productId =
+      product.id;
+
+    row.innerHTML = `
+
+      <div class="gift-product">
+
+        ${
+          image
+          ? `
+            <img
+              src="${esc(image)}"
+              alt="${esc(product.name)}"
+            >
+          `
+          : `
+            <div style="
+              width:58px;
+              height:58px;
+              display:grid;
+              place-items:center;
+              background:#eee;
+              border-radius:12px;
+            ">
+              🎁
+            </div>
+          `
+        }
+
+        <div>
+
+          <div class="gift-name">
+            ${esc(product.name)}
+          </div>
+
+          <div class="gift-price">
+            Product value ₹${Number(product.price || 0).toLocaleString("en-IN")}
+            · Stock ${Number(product.stock || 0)}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button
+        class="remove-gift"
+        type="button"
+        onclick="removeGift('${esc(product.id)}')"
+      >
+        Remove
+      </button>
+
+    `;
+
+    list.appendChild(row);
+
+  });
+
+}
+
+
+/* =========================
+   GET CURRENT GIFTS
+========================= */
+
+function getCurrentGiftIds(){
+
+  return [
+    ...document.querySelectorAll(
+      ".gift-row"
+    )
+  ].map(row =>
+    String(row.dataset.productId)
+  );
+
+}
+
+
+/* =========================
+   ADD GIFT
+========================= */
+
+function openGiftSelector(){
+
+  const selected =
+    getCurrentGiftIds();
+
+  const available =
+    products.filter(
+      p => !selected.includes(String(p.id))
+    );
+
+
+  if(!available.length){
+
+    showStatus(
+      "All available products are already in the gift pool.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const name =
+    prompt(
+      "Enter the exact product name to search:\n\n" +
+      available.map(p => p.name).join("\n")
+    );
+
+
+  if(!name) return;
+
+
+  const product =
+    available.find(
+      p =>
+        p.name.toLowerCase() ===
+        name.trim().toLowerCase()
+    );
+
+
+  if(!product){
+
+    showStatus(
+      "Product not found. Enter the exact product name.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(Number(product.stock || 0) <= 0){
+
+    showStatus(
+      "This product is out of stock and cannot be added as a gift.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  selected.push(String(product.id));
+
+
+  renderGiftPool(
+    selected.map(id => ({
+      product_id:id
+    }))
+  );
+
+
+  showStatus(
+    "Gift product added. Save Buy Control to apply it.",
+    "success"
+  );
+
+}
+
+
+/* =========================
+   REMOVE
+========================= */
+
+function removeGift(id){
+
+  const rows =
+    document.querySelectorAll(".gift-row");
+
+  const rules = [];
+
+  rows.forEach(row=>{
+
+    const productId =
+      String(row.dataset.productId);
+
+    if(productId !== String(id)){
+
+      rules.push({
+        product_id:productId
+      });
+
+    }
+
+  });
+
+  renderGiftPool(rules);
+}
+
+
+/* =========================
+   LOAD SETTINGS
+========================= */
+
+async function loadSettings(){
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("buy_control")
+    .select("*")
+    .eq("id",1)
+    .maybeSingle();
+
+  if(error) throw error;
+
+
+  if(!data){
+
+    const {
+      data:newData,
+      error:newError
+    } = await supabaseClient
+      .from("buy_control")
+      .insert({id:1})
+      .select("*")
+      .single();
+
+    if(newError) throw newError;
+
+    settings = newData;
+
+  }else{
+
+    settings = data;
+
+  }
+
+
+  applySettings();
+}
+
+
+/* =========================
+   APPLY
+========================= */
+
+function applySettings(){
+
+  document.getElementById(
+    "discountEnabled"
+  ).checked =
+    !!settings.discount_enabled;
+
+
+  document.getElementById(
+    "discountType"
+  ).value =
+    settings.discount_type || "percentage";
+
+
+  document.getElementById(
+    "discountValue"
+  ).value =
+    settings.discount_value || 0;
+
+
+  document.getElementById(
+    "minimumDiscountAmount"
+  ).value =
+    settings.minimum_discount_amount || 0;
+
+
+  document.getElementById(
+    "maximumDiscountAmount"
+  ).value =
+    settings.maximum_discount_amount || 0;
+
+
+  document.getElementById(
+    "freeDeliveryEnabled"
+  ).checked =
+    !!settings.free_delivery_enabled;
+
+
+  document.getElementById(
+    "freeDeliveryMinimum"
+  ).value =
+    settings.free_delivery_minimum || 0;
+
+
+  document.getElementById(
+    "giftEnabled"
+  ).checked =
+    !!settings.gift_enabled;
+
+
+  document.getElementById(
+    "giftMinimum"
+  ).value =
+    settings.gift_minimum || 0;
+
+
+  let rules =
+    settings.gift_rules || [];
+
+
+  if(typeof rules === "string"){
+
+    try{
+      rules = JSON.parse(rules);
+    }catch(e){
+      rules = [];
+    }
+
+  }
+
+
+  if(!Array.isArray(rules)){
+    rules = [];
+  }
+
+
+  renderGiftPool(rules);
+
+  updatePreview();
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
+
+function updatePreview(){
+
+  const discount =
+    document.getElementById(
+      "discountEnabled"
+    ).checked;
+
+  const type =
+    document.getElementById(
+      "discountType"
+    ).value;
+
+  const value =
+    Number(
+      document.getElementById(
+        "discountValue"
+      ).value || 0
+    );
+
+  const minimum =
+    Number(
+      document.getElementById(
+        "minimumDiscountAmount"
+      ).value || 0
+    );
+
+
+  document.getElementById(
+    "discountPreview"
+  ).textContent = discount
+    ? (
+      type === "percentage"
+      ? `${value}% discount on ₹${minimum.toLocaleString("en-IN")}+ shopping.`
+      : `₹${value.toLocaleString("en-IN")} discount on ₹${minimum.toLocaleString("en-IN")}+ shopping.`
+    )
+    : "Discount disabled.";
+
+
+  const delivery =
+    document.getElementById(
+      "freeDeliveryEnabled"
+    ).checked;
+
+  const deliveryMinimum =
+    Number(
+      document.getElementById(
+        "freeDeliveryMinimum"
+      ).value || 0
+    );
+
+
+  document.getElementById(
+    "deliveryPreview"
+  ).textContent = delivery
+    ? `Orders of ₹${deliveryMinimum.toLocaleString("en-IN")}+ will receive FREE delivery.`
+    : "Free delivery disabled.";
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+async function saveSettings(){
+
+  const btn =
+    document.getElementById("saveBtn");
+
+  try{
+
+    const giftRows =
+      document.querySelectorAll(
+        ".gift-row"
+      );
+
+    const giftRules = [];
+
+
+    giftRows.forEach(row=>{
+
+      const productId =
+        row.dataset.productId;
+
+      const product =
+        products.find(
+          p => String(p.id) === String(productId)
+        );
+
+      if(product){
+
+        giftRules.push({
+
+          product_id:product.id,
+
+          product_name:product.name
+
+        });
+
+      }
+
+    });
+
+
+    const giftEnabled =
+      document.getElementById(
+        "giftEnabled"
+      ).checked;
+
+
+    const giftMinimum =
+      Number(
+        document.getElementById(
+          "giftMinimum"
+        ).value || 0
+      );
+
+
+    if(
+      giftEnabled &&
+      (
+        giftMinimum <= 0 ||
+        giftRules.length === 0
+      )
+    ){
+
+      showStatus(
+        "For automatic gifts, set a minimum amount and select at least one gift product.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    const discountType =
+      document.getElementById(
+        "discountType"
+      ).value;
+
+    const discountValue =
+      Number(
+        document.getElementById(
+          "discountValue"
+        ).value || 0
+      );
+
+
+    if(
+      discountType === "percentage" &&
+      discountValue > 100
+    ){
+
+      showStatus(
+        "Discount percentage cannot exceed 100%.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    btn.disabled = true;
+    btn.textContent = "Saving...";
+
+
+    const {
+      error
+    } = await supabaseClient
+      .from("buy_control")
+      .upsert({
+
+        id:1,
+
+        discount_enabled:
+          document.getElementById(
+            "discountEnabled"
+          ).checked,
+
+        discount_type:
+          discountType,
+
+        discount_value:
+          discountValue,
+
+        minimum_discount_amount:
+          Number(
+            document.getElementById(
+              "minimumDiscountAmount"
+            ).value || 0
+          ),
+
+        maximum_discount_amount:
+          Number(
+            document.getElementById(
+              "maximumDiscountAmount"
+            ).value || 0
+          ),
+
+        free_delivery_enabled:
+          document.getElementById(
+            "freeDeliveryEnabled"
+          ).checked,
+
+        free_delivery_minimum:
+          Number(
+            document.getElementById(
+              "freeDeliveryMinimum"
+            ).value || 0
+          ),
+
+        gift_enabled:
+          giftEnabled,
+
+        gift_minimum:
+          giftMinimum,
+
+        gift_rules:
+          giftRules,
+
+        updated_at:
+          new Date().toISOString()
+
+      });
+
+
+    if(error) throw error;
+
+
+    btn.textContent =
+      "Saved ✓";
+
+    showStatus(
+      "Buy Control saved successfully.",
+      "success"
+    );
+
+
+    setTimeout(()=>{
+
+      btn.disabled = false;
+      btn.textContent =
+        "Save Buy Control";
+
+    },1800);
+
+
+  }catch(error){
+
+    console.error(error);
+
+    btn.disabled = false;
+    btn.textContent =
+      "Save Buy Control";
+
+    showStatus(
+      error.message ||
+      "Unable to save settings.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+[
+  "discountEnabled",
+  "discountType",
+  "discountValue",
+  "minimumDiscountAmount",
+  "freeDeliveryEnabled",
+  "freeDeliveryMinimum"
+].forEach(id=>{
+
+  document.getElementById(id)
+    ?.addEventListener(
+      "input",
+      updatePreview
+    );
+
+  document.getElementById(id)
+    ?.addEventListener(
+      "change",
+      updatePreview
+    );
+
+});
+
+
+/* =========================
+   START
+========================= */
+
+async function start(){
+
+  try{
+
+    if(
+      typeof sbReady !== "function" ||
+      !sbReady()
+    ){
+      throw new Error(
+        "Supabase is not configured."
+      );
+    }
+
+
+    await loadProducts();
+
+    await loadSettings();
+
+
+    document.getElementById(
+      "loading"
+    ).style.display = "none";
+
+
+    document.getElementById(
+      "page"
+    ).style.display = "block";
+
+
+  }catch(error){
+
+    console.error(error);
+
+    document.getElementById(
+      "loading"
+    ).innerHTML = `
+      <div>
+        <h3>Unable to load Buy Control</h3>
+        <p>${esc(error.message)}</p>
+      </div>
+    `;
+
+  }
+
+}
+
+start();
+
+</script>
+
+</body>
+</html>
