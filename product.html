@@ -320,10 +320,13 @@ function renderProduct(){
                 Add to Cart
               </button>
 
-              <button type="button" class="rc-buy" onclick="buyNow()">
+              <button
+                type="button"
+                class="rc-buy"
+                onclick="window.location.href='buy.html?id=' + encodeURIComponent(product.id)"
+             >
                 Buy Now
-              </button>
-            </div>
+             </button>
 
             <div id="msg" class="rc-msg"></div>
           `
