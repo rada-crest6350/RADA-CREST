@@ -1,1 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Rules & Offers | RADA CREST</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #FF7A00;
+      --bg: #0b0d14;
+      --card: #12141a;
+      --text: #ffffff;
+      --muted: #9ba1b0;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding-bottom: 50px; }
+    .header { background: var(--card); border-bottom: 2px solid var(--primary); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { color: var(--primary); font-weight: 900; font-size: 1.1rem; }
+    .container { max-width: 700px; margin: 20px auto; padding: 0 16px; }
+    .section-box { background: var(--card); border-radius: 16px; padding: 18px; border: 1px solid var(--border); margin-bottom: 16px; }
+    .section-title { font-size: 1.05rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    .form-control { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 10px; border-radius: 8px; color: #fff; outline: none; }
+    .form-control:focus { border-color: var(--primary); }
+    .btn-save { width: 100%; background: var(--primary); color: #000; border: none; padding: 14px; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+    .gift-list { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .gift-item-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); }
+    .gift-item-row img { width: 40px; height: 40px; border-radius: 6px; object-fit: contain; background: #fff; }
+    .del-btn { color: #ff4444; background: none; border: none; cursor: pointer; font-size: 1rem; }
+  </style>
+</head>
+<body>
 
+  <header class="header">
+    <div class="brand">RADA CREST ADMIN • RULES</div>
+    <a href="admin-dashboard.html" style="color:var(--muted); text-decoration:none; font-size:0.9rem;"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+  </header>
+
+  <div class="container">
+
+    <!-- 1. Free Surprise Gift Settings -->
+    <div class="section-box">
+      <div class="section-title"><i class="fa-solid fa-gift"></i> Free Gift Unlock Rules</div>
+      
+      <div class="switch-row">
+        <span>Enable Min Quantity Trigger</span>
+        <input type="checkbox" id="giftQtyToggle" />
+      </div>
+      <div class="form-group">
+        <label>Minimum Pieces for Free Gift</label>
+        <input type="number" id="giftMinQty" class="form-control" placeholder="e.g. 5" />
+      </div>
+
+      <div class="switch-row" style="margin-top:14px;">
+        <span>Enable Min Amount Trigger</span>
+        <input type="checkbox" id="giftAmtToggle" />
+      </div>
+      <div class="form-group">
+        <label>Minimum Cart Value (₹) for Free Gift</label>
+        <input type="number" id="giftMinAmt" class="form-control" placeholder="e.g. 999" />
+      </div>
+    </div>
+
+    <!-- 2. Manage Gift Items Pool -->
+    <div class="section-box">
+      <div class="section-title"><i class="fa-solid fa-boxes-packing"></i> Add Gift Items to Pool (6-10 Gifts)</div>
+      
+      <div class="form-group">
+        <label>Gift Product Name</label>
+        <input type="text" id="giftName" class="form-control" placeholder="e.g. USB LED Night Light / Key Ring" />
+      </div>
+      <div class="form-group">
+        <label>Gift Image URL</label>
+        <input type="url" id="giftImg" class="form-control" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label>Market Value (₹)</label>
+        <input type="number" id="giftValue" class="form-control" placeholder="e.g. 199" />
+      </div>
+      <div class="form-group">
+        <label>Description (Shows on ? icon tap)</label>
+        <input type="text" id="giftDesc" class="form-control" placeholder="High speed USB portable light" />
+      </div>
+      <button type="button" class="btn-save" style="background:#25D366; color:#fff;" onclick="addNewGift()">+ Add Gift to Pool</button>
+
+      <div class="gift-list" id="giftItemsContainer">
+        <!-- Live gifts will render here -->
+      </div>
+    </div>
+
+    <!-- 3. Delivery Fee Rules -->
+    <div class="section-box">
+      <div class="section-title"><i class="fa-solid fa-truck-fast"></i> Delivery Fee & Free Delivery Rules</div>
+      <div class="form-group">
+        <label>Standard Delivery Fee (₹)</label>
+        <input type="number" id="standardDelivery" class="form-control" placeholder="e.g. 50" />
+      </div>
+      <div class="form-group">
+        <label>Free Delivery Above Order Value (₹)</label>
+        <input type="number" id="freeDeliveryAmt" class="form-control" placeholder="e.g. 499" />
+      </div>
+      <div class="form-group">
+        <label>Free Delivery Above Quantity (Pcs)</label>
+        <input type="number" id="freeDeliveryQty" class="form-control" placeholder="e.g. 3" />
+      </div>
+    </div>
+
+    <!-- 4. Festival Sale Boost -->
+    <div class="section-box">
+      <div class="section-title"><i class="fa-solid fa-bolt-lightning"></i> Festival Sale Boost</div>
+      <div class="switch-row">
+        <span>Enable Festival Discount Boost</span>
+        <input type="checkbox" id="festivalToggle" />
+      </div>
+      <div class="form-group">
+        <label>Extra Discount Percentage (%)</label>
+        <input type="number" id="festivalPercent" class="form-control" placeholder="e.g. 10" />
+      </div>
+    </div>
+
+    <!-- 5. Digital Stamp Card Program -->
+    <div class="section-box">
+      <div class="section-title"><i class="fa-solid fa-stamp"></i> Digital Stamp Loyalty Rules</div>
+      <div class="form-group">
+        <label>Orders needed to get 1 Free Item</label>
+        <input type="number" id="stampTarget" class="form-control" placeholder="e.g. 5" />
+      </div>
+    </div>
+
+    <button type="button" class="btn-save" onclick="saveAllSettings()">Save Rules Configuration</button>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    async function loadData() {
+      if (!supabaseClient) return;
+
+      // 1. Load Settings
+      const { data: config } = await supabaseClient.from('store_settings').select('*').eq('id', 'config').single();
+      if (config) {
+        document.getElementById('giftQtyToggle').checked = config.gift_qty_enabled;
+        document.getElementById('giftMinQty').value = config.gift_min_qty;
+        document.getElementById('giftAmtToggle').checked = config.gift_amount_enabled;
+        document.getElementById('giftMinAmt').value = config.gift_min_amount;
+        document.getElementById('standardDelivery').value = config.delivery_fee;
+        document.getElementById('freeDeliveryAmt').value = config.free_delivery_min_amount;
+        document.getElementById('freeDeliveryQty').value = config.free_delivery_min_qty;
+        document.getElementById('festivalToggle').checked = config.festival_discount_enabled;
+        document.getElementById('festivalPercent').value = config.festival_discount_percent;
+        document.getElementById('stampTarget').value = config.stamp_target;
+      }
+
+      // 2. Load Gift Pool
+      loadGiftsPool();
+    }
+
+    async function loadGiftsPool() {
+      const container = document.getElementById('giftItemsContainer');
+      const { data: gifts } = await supabaseClient.from('gift_items').select('*').order('id', { ascending: false });
+      
+      if (gifts && gifts.length > 0) {
+        container.innerHTML = gifts.map(g => `
+          <div class="gift-item-row">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <img src="${g.image || 'https://via.placeholder.com/40'}" />
+              <div>
+                <b>${g.name}</b>
+                <div style="font-size:0.75rem; color:var(--muted);">Value: ₹${g.market_value} • ${g.description || ''}</div>
+              </div>
+            </div>
+            <button class="del-btn" onclick="deleteGift(${g.id})"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `).join('');
+      } else {
+        container.innerHTML = `<div style="color:var(--muted); font-size:0.8rem; text-align:center;">No gifts added yet. Add at least 6-10 items.</div>`;
+      }
+    }
+
+    async function addNewGift() {
+      const name = document.getElementById('giftName').value.trim();
+      const image = document.getElementById('giftImg').value.trim();
+      const val = document.getElementById('giftValue').value;
+      const desc = document.getElementById('giftDesc').value.trim();
+
+      if (!name) { alert("Gift name is required!"); return; }
+
+      const { error } = await supabaseClient.from('gift_items').insert([{
+        name, image, market_value: Number(val) || 0, description: desc
+      }]);
+
+      if (error) { alert("Error adding gift: " + error.message); return; }
+
+      document.getElementById('giftName').value = '';
+      document.getElementById('giftImg').value = '';
+      document.getElementById('giftValue').value = '';
+      document.getElementById('giftDesc').value = '';
+      loadGiftsPool();
+    }
+
+    async function deleteGift(id) {
+      if (confirm("Delete this gift item?")) {
+        await supabaseClient.from('gift_items').delete().eq('id', id);
+        loadGiftsPool();
+      }
+    }
+
+    async function saveAllSettings() {
+      const payload = {
+        gift_qty_enabled: document.getElementById('giftQtyToggle').checked,
+        gift_min_qty: Number(document.getElementById('giftMinQty').value) || 5,
+        gift_amount_enabled: document.getElementById('giftAmtToggle').checked,
+        gift_min_amount: Number(document.getElementById('giftMinAmt').value) || 999,
+        delivery_fee: Number(document.getElementById('standardDelivery').value) || 50,
+        free_delivery_min_amount: Number(document.getElementById('freeDeliveryAmt').value) || 499,
+        free_delivery_min_qty: Number(document.getElementById('freeDeliveryQty').value) || 3,
+        festival_discount_enabled: document.getElementById('festivalToggle').checked,
+        festival_discount_percent: Number(document.getElementById('festivalPercent').value) || 10,
+        stamp_target: Number(document.getElementById('stampTarget').value) || 5,
+        updated_at: new Date()
+      };
+
+      const { error } = await supabaseClient.from('store_settings').upsert({ id: 'config', ...payload });
+      if (error) {
+        alert("Error saving: " + error.message);
+      } else {
+        alert("Saare Discount, Gift & Delivery Rules Save Ho Gaye!");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>
