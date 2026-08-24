@@ -27,6 +27,7 @@
       font-size: 0.9rem; 
       outline: none; 
       box-sizing: border-box;
+      margin-bottom: 6px;
     }
     .form-control:focus { border-color: var(--primary, #FF7A00); }
     .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -126,17 +127,21 @@
         </div>
       </div>
 
-      <!-- Media: Photos & Video Upload -->
+      <!-- Media: Direct Photo Links (1 to 5) -->
       <div class="form-group">
-        <label>Product Photos (Select up to 5 images)</label>
-        <input type="file" id="pPhotoFiles" class="form-control" accept="image/*" multiple />
-        <small style="color: #9ba1b0; display: block; margin-top: 4px;">Max 5 photos allowed.</small>
+        <label><i class="fa-solid fa-link"></i> Product Image Links (Paste Image URLs)</label>
+        <input type="url" id="pImg1" class="form-control" placeholder="Main Image URL (Required)" required />
+        <input type="url" id="pImg2" class="form-control" placeholder="Image 2 URL (Optional)" />
+        <input type="url" id="pImg3" class="form-control" placeholder="Image 3 URL (Optional)" />
+        <input type="url" id="pImg4" class="form-control" placeholder="Image 4 URL (Optional)" />
+        <input type="url" id="pImg5" class="form-control" placeholder="Image 5 URL (Optional)" />
+        <small style="color: #9ba1b0; display: block;">Direct links only (.jpg, .png, webp, imageshack, etc.)</small>
       </div>
 
+      <!-- Media: Video Link -->
       <div class="form-group">
-        <label>Product Video (Upload Video or Paste URL)</label>
-        <input type="file" id="pVideoFile" class="form-control" accept="video/*" style="margin-bottom: 6px;" />
-        <input type="text" id="pVideoUrl" class="form-control" placeholder="Or paste Video URL (mp4 / embed)" />
+        <label><i class="fa-solid fa-video"></i> Product Video URL (Optional)</label>
+        <input type="url" id="pVideoUrl" class="form-control" placeholder="Video URL (mp4 link or YouTube embed)" />
       </div>
 
       <!-- Warranty Toggle -->
@@ -176,38 +181,18 @@
   </div>
 
   <script>
-    document.getElementById('addProductForm').onsubmit = async (e) => {
+    document.getElementById('addProductForm').onsubmit = (e) => {
       e.preventDefault();
 
-      const photoFiles = Array.from(document.getElementById('pPhotoFiles').files).slice(0, 5);
-      const videoFile = document.getElementById('pVideoFile').files[0];
-      const videoUrlInput = document.getElementById('pVideoUrl').value.trim();
-
-      const fileToBase64 = (file) => new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (event) => resolve(event.target.result);
-        reader.readAsDataURL(file);
-      });
-
-      let imageUrls = [];
-      if (photoFiles.length > 0) {
-        try {
-          imageUrls = await Promise.all(photoFiles.map(f => fileToBase64(f)));
-        } catch (err) {
-          imageUrls = ['assets/placeholder_product.jpg'];
-        }
-      } else {
-        imageUrls.push('assets/placeholder_product.jpg');
-      }
-
-      let finalVideoUrl = videoUrlInput;
-      if (videoFile) {
-        try {
-          finalVideoUrl = await fileToBase64(videoFile);
-        } catch(err) {
-          finalVideoUrl = '';
-        }
-      }
+      // Collect URLs
+      const imageInputs = [
+        document.getElementById('pImg1').value.trim(),
+        document.getElementById('pImg2').value.trim(),
+        document.getElementById('pImg3').value.trim(),
+        document.getElementById('pImg4').value.trim(),
+        document.getElementById('pImg5').value.trim()
+      ];
+      const imageUrls = imageInputs.filter(url => url.length > 0);
 
       // Collect Bulk Tiers
       const bulkTiers = [];
@@ -230,7 +215,7 @@
         bulkPricing: bulkTiers,
         image: imageUrls[0],
         images: imageUrls,
-        video: finalVideoUrl,
+        video: document.getElementById('pVideoUrl').value.trim(),
         hasWarranty: document.getElementById('pWarrantyToggle').checked,
         size: document.getElementById('pSize').value || 'Free Size',
         colors: document.getElementById('pColors').value || '',
@@ -243,12 +228,11 @@
       };
 
       try {
-        // Fetch existing list from both potential keys
         let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || 
                           JSON.parse(localStorage.getItem('products')) || [];
         allProducts.unshift(newProduct);
 
-        // Sync save to BOTH keys so Home Page and Admin Dashboard stay identical
+        // Sync save
         localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
         localStorage.setItem('products', JSON.stringify(allProducts));
 
@@ -261,7 +245,7 @@
         alert('Product added successfully!');
         window.location.href = 'index.html';
       } catch (storageError) {
-        alert('Storage limit reached! Please use smaller photo sizes.');
+        alert('Error: ' + storageError.message);
       }
     };
   </script>
