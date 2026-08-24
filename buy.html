@@ -62,7 +62,7 @@
       padding: 16px;
       margin-bottom: 14px;
     }
-    .stamp-dots { display: flex; gap: 10px; margin-top: 10px; }
+    .stamp-dots { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
     .stamp-dot {
       width: 36px;
       height: 36px;
@@ -74,9 +74,9 @@
       justify-content: center;
       font-size: 0.82rem;
       color: var(--muted);
-      transition: all 0.3s var(--ease-spring);
+      transition: all 0.4s var(--ease-spring);
     }
-    .stamp-dot.earned { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 900; box-shadow: 0 0 12px var(--primary-glow); transform: scale(1.05); }
+    .stamp-dot.earned { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 900; box-shadow: 0 0 14px var(--primary-glow); transform: scale(1.1); }
 
     /* Rule Banners */
     .rule-banner {
@@ -147,7 +147,7 @@
     .text-discount { color: #25D366; font-weight: 700; }
     .text-primary { color: var(--primary); font-weight: 900; }
 
-    /* Terms & Conditions / Policy Section */
+    /* Policies Box */
     .policies-box {
       background: rgba(255,255,255,0.02);
       border: 1px solid var(--border);
@@ -196,7 +196,7 @@
     }
     .btn-place-order:active { transform: scale(0.96); }
 
-    /* Congratulations Success Modal */
+    /* Congratulations Success Modal with Live Stamp Animation */
     .success-modal {
       position: fixed;
       inset: 0;
@@ -213,7 +213,7 @@
       background: var(--card);
       border: 2px solid var(--primary);
       border-radius: 24px;
-      padding: 30px 20px;
+      padding: 26px 20px;
       max-width: 400px;
       width: 100%;
       text-align: center;
@@ -224,20 +224,27 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .success-icon-box {
-      width: 70px;
-      height: 70px;
+      width: 60px;
+      height: 60px;
       background: rgba(37,211,102,0.15);
       border: 2px solid #25D366;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 16px;
+      margin: 0 auto 12px;
       color: #25D366;
-      font-size: 2rem;
-      animation: bounceSuccess 1.5s infinite ease-in-out;
+      font-size: 1.6rem;
     }
-    @keyframes bounceSuccess { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    /* Modal Stamp Progress Animation Container */
+    .modal-stamp-container {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin: 14px 0;
+    }
 
     /* Info Modal */
     .info-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
@@ -261,15 +268,22 @@
     </div>
   </div>
 
-  <!-- Congratulations Success Modal -->
+  <!-- Congratulations Success Modal with Live Stamp Animation -->
   <div class="success-modal" id="successModal">
     <div class="success-card">
       <div class="success-icon-box">
         <i class="fa-solid fa-check"></i>
       </div>
-      <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 8px;">Order Placed Successfully!</h2>
-      <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 20px;">Your digital stamp has been added. Redirecting to WhatsApp receipt...</p>
-      <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary);" id="countdownTimer">3s</div>
+      <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 4px;">Order Placed Successfully!</h2>
+      <p style="color: var(--muted); font-size: 0.82rem; margin-bottom: 10px;">Your loyalty stamp has been successfully earned!</p>
+      
+      <!-- Animated Stamp Progress inside Modal -->
+      <div class="modal-stamp-container">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--primary); margin-bottom:6px;" id="modalStampText">Updating Stamps...</div>
+        <div class="stamp-dots" id="modalStampDots"></div>
+      </div>
+
+      <p style="color: var(--muted); font-size: 0.78rem;">Redirecting to WhatsApp receipt in <span id="countdownTimer" style="color:var(--primary); font-weight:800;">3s</span></p>
     </div>
   </div>
 
@@ -442,148 +456,4 @@
               <i class="fa-solid fa-truck-ramp-box" style="display:block; font-size:1.2rem; margin-bottom:4px;"></i>
               Cash on Delivery
             </div>
-            <div class="pay-opt ${checkoutState.paymentMode === 'online' ? 'active' : ''}" onclick="setPaymentMode('online')">
-              <i class="fa-solid fa-credit-card" style="display:block; font-size:1.2rem; margin-bottom:4px;"></i>
-              Online Payment (UPI/Card)
-            </div>
-          </div>
-        </div>
-
-        <!-- Price Breakdown -->
-        <div class="order-card">
-          <b style="font-size:0.95rem; display:block; margin-bottom:10px;">Price Details</b>
-          <div class="bill-row">
-            <span>Total MRP (${checkoutState.qty} items)</span>
-            <span>₹${totalMrp}</span>
-          </div>
-          <div class="bill-row">
-            <span>Discount on MRP</span>
-            <span class="text-discount">- ₹${totalDiscount}</span>
-          </div>
-          <div class="bill-row">
-            <span>Free Gift</span>
-            <span style="color:#25D366;">${giftUnlocked && checkoutState.selectedGift ? checkoutState.selectedGift.name + ' (FREE)' : 'None'}</span>
-          </div>
-          <div class="bill-row">
-            <span>Delivery Fee</span>
-            <span>${deliveryFee === 0 ? '<b style="color:#25D366;">FREE</b>' : '₹' + deliveryFee}</span>
-          </div>
-          <div class="bill-row total-row">
-            <span>Total Payable</span>
-            <span class="text-primary">₹${finalAmount}</span>
-          </div>
-
-          <!-- Terms, Policies & Conditions Box -->
-          <div class="policies-box">
-            <h4><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Secure & Verified Store</h4>
-            <p>By placing this order, you agree to RADA CREST's policy terms. All orders are verified via WhatsApp.</p>
-            <div class="policies-links">
-              <a href="terms.html" target="_blank">Terms & Conditions</a>
-              <a href="terms.html" target="_blank">Privacy Policy</a>
-              <a href="return.html" target="_blank">Return & Refund Policy</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom Bar -->
-        <div class="bottom-bar">
-          <div>
-            <small style="color:var(--muted); font-size:0.75rem;">Total Amount</small>
-            <b style="color:var(--primary); font-size:1.25rem;">₹${finalAmount}</b>
-          </div>
-          <button class="btn-place-order" onclick="processOrder(${finalAmount}, ${giftUnlocked})">
-            <i class="fa-solid fa-lock"></i> Place Order
-          </button>
-        </div>
-      `;
-    }
-
-    function selectGift(id) {
-      checkoutState.selectedGift = checkoutState.giftList.find(g => g.id === id);
-      renderCheckout();
-    }
-
-    function setPaymentMode(mode) {
-      checkoutState.paymentMode = mode;
-      renderCheckout();
-    }
-
-    function openInfoModal(title, desc) {
-      document.getElementById('infoModalTitle').innerText = title;
-      document.getElementById('infoModalDesc').innerText = desc;
-      document.getElementById('infoModal').classList.add('active');
-    }
-
-    function closeInfoModal() {
-      document.getElementById('infoModal').classList.remove('active');
-    }
-
-    function processOrder(finalAmount, giftUnlocked) {
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const addr = document.getElementById('custAddr').value.trim();
-      const pin = document.getElementById('custPin').value.trim();
-
-      if (!name || !phone || !addr || !pin) {
-        alert("Kripya saari delivery details bharein!");
-        return;
-      }
-
-      if (checkoutState.paymentMode === 'online') {
-        alert("Online payment gateway simulated successfully. Proceeding to confirmation...");
-      }
-
-      const stampTarget = checkoutState.settings.stamp_target || 5;
-      let newStamps = checkoutState.userStamps + 1;
-      if (newStamps > stampTarget) newStamps = 0;
-      localStorage.setItem('rc_user_stamps', newStamps);
-
-      const modal = document.getElementById('successModal');
-      modal.classList.add('active');
-
-      let timer = 3;
-      const timerEl = document.getElementById('countdownTimer');
-      const interval = setInterval(() => {
-        timer--;
-        timerEl.innerText = timer + 's';
-        if (timer <= 0) {
-          clearInterval(interval);
-          sendWhatsAppOrder(finalAmount, giftUnlocked, name, phone, addr, pin);
-        }
-      }, 1000);
-    }
-
-    function sendWhatsAppOrder(finalAmount, giftUnlocked, name, phone, addr, pin) {
-      const p = checkoutState.product;
-      const giftStr = (giftUnlocked && checkoutState.selectedGift) ? `%0A*Free Gift:* ${checkoutState.selectedGift.name}` : '';
-      const payStr = checkoutState.paymentMode === 'online' ? 'Online Paid' : 'Cash on Delivery';
-
-      const msg = `*NEW ORDER - RADA CREST*%0A` +
-                  `----------------------------%0A` +
-                  `*Product:* ${p.name}%0A` +
-                  `*Quantity:* ${checkoutState.qty} Pcs%0A` +
-                  `*Payment:* ${payStr}%0A` +
-                  `*Total Price:* ₹${finalAmount}${giftStr}%0A` +
-                  `----------------------------%0A` +
-                  `*Customer Details:*%0A` +
-                  `Name: ${name}%0A` +
-                  `Phone: ${phone}%0A` +
-                  `Address: ${addr} - ${pin}`;
-
-      window.location.href = `https://wa.me/?text=${msg}`;
-    }
-
-    function showError(msg) {
-      document.getElementById('checkoutRoot').innerHTML = `
-        <div style="text-align:center; padding: 90px 20px; color:#fff;">
-          <h2>${msg}</h2>
-          <p style="color:var(--muted); margin: 10px 0 20px;">Could not load checkout details.</p>
-          <a href="index.html" style="color:var(--primary); text-decoration:none; font-weight:700;">← Return to Shop</a>
-        </div>
-      `;
-    }
-
-    document.addEventListener('DOMContentLoaded', initCheckout);
-  </script>
-</body>
-</html>
+            <div class="pay-opt ${checkoutState.paymentMode === 'online
