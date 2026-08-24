@@ -1,1176 +1,192 @@
-<!doctype html>
-<html lang="en">
-
+<!DOCTYPE html>
+<html lang="hi">
 <head>
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>RADA CREST — Premium Electrical</title>
-
-<link rel="stylesheet" href="style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js"></script>
-<script src="supabase-client.js"></script>
-
-<style>
-
-.product{
-  cursor:pointer;
-  transition:.25s;
-}
-
-.product:hover{
-  transform:translateY(-4px);
-}
-
-.product .pimg{
-  overflow:hidden;
-  min-height:220px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.product .pimg img{
-  width:100%;
-  height:220px;
-  object-fit:contain;
-  display:block;
-}
-
-.product .pimg .no-image{
-  font-size:70px;
-}
-
-#homepageBannerImage{
-  display:none;
-  width:100%;
-  max-height:420px;
-  object-fit:cover;
-  border-radius:inherit;
-}
-.hero.has-banner{
-  overflow:hidden;
-}
-.hero-banner-wrap{
-  display:none;
-  width:100%;
-  margin-top:24px;
-}
-@media (max-width:800px){
-  #homepageBannerImage{max-height:280px;}
-}
-.product-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.product-actions button{
-  cursor:pointer;
-}
-
-.buy{
-  cursor:pointer;
-}
-
-.badge{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:6px;
-  font-size:11px;
-  font-weight:800;
-}
-
-
-/* Premium banner-first hero. Existing product/order/cart logic is unchanged. */
-.hero{
-  position:relative;
-  display:block !important;
-  padding:22px !important;
-  background:linear-gradient(135deg,#111,#1b1b1b) !important;
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 24px 60px rgba(0,0,0,.18);
-}
-.hero-copy{
-  display:none !important;
-}
-.hero-banner-wrap{
-  display:none;
-  width:100%;
-  margin:0 !important;
-}
-.hero.has-banner .hero-banner-wrap{
-  display:block !important;
-}
-#homepageBannerImage {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;        
-    min-height: 100% !important;    
-    object-fit: cover !important;   
-    border-radius: 18px;
-}
-.hero:not(.has-banner) .hero-banner-wrap{
-  display:block !important;
-}
-.hero:not(.has-banner) .hero-banner-wrap::before{
-  content:'RADA CREST  •  PREMIUM ELECTRICAL';
-  display:flex;
-  min-height:250px;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  border-radius:18px;
-  background:linear-gradient(135deg,#101010,#242424);
-  color:#f5f5f5;
-  font-size:clamp(24px,4vw,48px);
-  font-weight:800;
-  letter-spacing:.04em;
-  padding:30px;
-}
-.hero:not(.has-banner) #homepageBannerImage{display:none !important;}
-@media(max-width:800px){
-  .hero{padding:10px !important;}
-  #homepageBannerImage{max-height:420px;border-radius:12px;}
-}
-
-/* Product Filters Styling */
-.product-filters{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:0 0 22px;
-  padding:14px;
-  background:#fff;
-  border:1px solid #e5e0d5;
-  border-radius:16px;
-}
-
-.product-filters select,
-.filter-reset{
-  border:1px solid #d8d2c7;
-  background:#fffdf8;
-  color:#171717;
-  border-radius:10px;
-  padding:11px 13px;
-  font:inherit;
-  font-size:14px;
-  cursor:pointer;
-}
-
-.product-filters select:focus{
-  outline:none;
-  border-color:#b08a3c;
-  box-shadow:0 0 3px rgba(176,138,60,.10);
-}
-
-.filter-reset{
-  background:#171717;
-  color:#fff;
-  border-color:#171717;
-}
-
-@media(max-width:600px){
-  .product-filters{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-  }
-
-  .product-filters select,
-  .filter-reset{
-    width:100%;
-  }
-
-  .filter-reset{
-    grid-column:1 / -1;
-  }
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RADA CREST | Smart LED & Modern Tech Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
-
-
 <body>
 
-
-<header class="header">
-
-  <a
-    class="brand"
-    href="index.html"
-  >
-
-    <span class="brand-mark">
-      RC
-    </span>
-
-    <span>
-      RADA <b>CREST</b>
-    </span>
-
-  </a>
-
-
-  <div class="search">
-
-    <input
-      id="search"
-      type="search"
-      placeholder="Search products..."
-      autocomplete="off"
-      oninput="loadProducts()"
-    >
-
-    <button
-      type="button"
-      onclick="loadProducts()"
-    >
-      ⌕
-    </button>
-
-  </div>
-
-
-  <nav>
-
-    <a href="#products">
-      Shop
-    </a>
-
-    <a href="#why">
-      Why Us
-    </a>
-
-    <a href="account.html">
-      Account
-    </a>
-
-    <a href="cart.html">
-      🛒
-      <span id="cartCount">0</span>
-    </a>
-
-  </nav>
-
-</header>
-
-
-
-<section class="hero">
-
-  <div class="hero-copy">
-    <p class="eyebrow">RADA CREST • SMART ELECTRICAL</p>
-    <h1>Premium electrical essentials for everyday living.</h1>
-    <p>Reliable products, practical design and trusted support from RADA CREST.</p>
-    <a class="btn" href="#products">Explore Products →</a>
-  </div>
-
-  <div class="hero-banner-wrap">
-    <a id="homepageBannerLink" href="javascript:void(0)" style="display:block; text-decoration:none;">
-      <img
-        id="homepageBannerImage"
-        src=""
-        alt="RADA CREST homepage banner"
-        onerror="this.style.display='none';this.closest('.hero').classList.remove('has-banner');"
-      >
-    </a>
-  </div>
-
-</section>
-
-
-
-<section
-  id="products"
-  class="section"
->
-
-  <!-- Filter Section Added Here -->
-  <div class="product-filters">
-    <select id="categoryFilter" onchange="loadProducts()">
-      <option value="">All Categories</option>
-    </select>
-
-    <select id="priceFilter" onchange="loadProducts()">
-      <option value="">Sort by Price</option>
-      <option value="low">Price: Low to High</option>
-      <option value="high">Price: High to Low</option>
-    </select>
-
-    <select id="stockFilter" onchange="loadProducts()">
-      <option value="">All Products</option>
-      <option value="in">In Stock</option>
-      <option value="out">Out of Stock</option>
-    </select>
-
-    <button
-      type="button"
-      class="filter-reset"
-      onclick="resetFilters()"
-    >
-      Reset
-    </button>
-  </div>
-
-  <div class="section-head">
-
-    <div>
-
-      <p class="eyebrow">
-        RADA CREST COLLECTION
-      </p>
-
-      <h2>
-        Featured Products
-      </h2>
-
-    </div>
-
-  </div>
-
-
-  <div
-    id="grid"
-    class="grid"
-  >
-
-    <p>
-      Loading products...
-    </p>
-
-  </div>
-
-</section>
-
-
-
-<section
-  id="why"
-  class="why"
->
-
-  <div>
-
-    <p class="eyebrow">
-      WHY RADA CREST
-    </p>
-
-    <h2>
-      Built for everyday trust.
-    </h2>
-
-  </div>
-
-
-  <div class="benefits">
-
-    <div>
-      ✓
-      <b>Quality Products</b>
-      <small>
-        Made for daily use
-      </small>
-    </div>
-
-
-    <div>
-      ✓
-      <b>Warranty Support</b>
-      <small>
-        Clear product warranty
-      </small>
-    </div>
-
-
-    <div>
-      ✓
-      <b>Secure Packaging</b>
-      <small>
-        Carefully packed
-      </small>
-    </div>
-
-
-    <div>
-      ✓
-      <b>Customer Support</b>
-      <small>
-        Help when you need it
-      </small>
-    </div>
-
-  </div>
-
-</section>
-
-
-
-<footer>
-
-  <div class="brand">
-
-    <span class="brand-mark">
-      RC
-    </span>
-
-    <span>
-      RADA <b>CREST</b>
-    </span>
-
-  </div>
-
-
-  <div>
-
-    <a href="admin.html">
-      Admin
-    </a>
-
-    ·
-
-    <a href="account.html">
-      Account
-    </a>
-
-    ·
-
-    <a href="cart.html">
-      Cart
-    </a>
-
-  </div>
-
-</footer>
-
-
-
-<script>
-
-let products = [];
-
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-function cleanImageUrl(value){
-  if(!value) return "";
-  let u = String(value).trim();
-
-  u = u.replace(/^\[img\]\s*/i,"")
-       .replace(/\s*\[\/img\]$/i,"")
-       .replace(/^["']+|["']+$/g,"")
-       .trim();
-
-  return /^https?:\/\/\S+$/i.test(u) ? u : "";
-}
-
-function getImages(url){
-  if(!url) return [];
-
-  return String(url)
-    .split(/[\n,]+/)
-    .map(x => cleanImageUrl(x))
-    .filter(Boolean);
-}
-
-async function loadStoreSettings(){
-  try{
-    if(!sbReady()) return;
-
-    const { data, error } = await supabaseClient
-      .from("site_settings")
-      .select("*")
-      .limit(1)
-      .maybeSingle();
-
-    if(error){
-      console.warn("Store settings error:", error.message);
-      return;
-    }
-
-    if(!data) return;
-
-    const siteName =
-      data.site_name ||
-      data.name ||
-      "";
-
-    if(siteName){
-      document.title = siteName + " — Premium Electrical";
-      document.querySelectorAll(".brand > span:last-child").forEach(el=>{
-        el.textContent = siteName;
-      });
-    }
-
-    const logoUrl = cleanImageUrl(
-      data.logo_url ||
-      data.logo ||
-      data.logoUrl ||
-      ""
-    );
-
-    if(logoUrl){
-      document.querySelectorAll(".brand-mark").forEach(el=>{
-        el.innerHTML =
-          '<img src="' + escapeHtml(logoUrl) +
-          '" alt="RADA CREST Logo" ' +
-          'style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" ' +
-          'onerror="this.remove();">';
-        el.style.overflow = "hidden";
-      });
-    }
-
-    const bannerUrl = cleanImageUrl(
-      data.banner_url ||
-      data.homepage_banner_url ||
-      data.homepageBannerUrl ||
-      data.banner ||
-      data.site_banner ||
-      ""
-    );
-
-    const bannerProductId =
-      data.banner_product_id ||
-      data.banner_product ||
-      data.bannerProductId ||
-      "";
-
-    const bannerLinkUrl =
-      data.banner_link ||
-      data.homepage_banner_link ||
-      data.bannerLink ||
-      "";
-
-    if(bannerUrl){
-      const hero = document.querySelector(".hero");
-      const bannerImg = document.getElementById("homepageBannerImage");
-      const bannerLink = document.getElementById("homepageBannerLink");
-
-      if(hero && bannerImg){
-        bannerImg.src = bannerUrl;
-        bannerImg.style.display = "block";
-        bannerImg.closest(".hero-banner-wrap").style.display = "block";
-        hero.classList.add("has-banner");
-
-        if(bannerLink){
-          if(bannerProductId){
-            bannerLink.href = "product.html?id=" + encodeURIComponent(bannerProductId);
-            bannerLink.style.cursor = "pointer";
-          } else if(bannerLinkUrl){
-            bannerLink.href = bannerLinkUrl;
-            bannerLink.style.cursor = "pointer";
-          } else {
-            bannerLink.removeAttribute("href");
-            bannerLink.style.cursor = "default";
-          }
-        }
-
-      }
-    }
-
-    const offer = data.offer_text || data.offer || "";
-    if(offer){
-      const eyebrow = document.querySelector(".hero .eyebrow");
-      if(eyebrow) eyebrow.textContent = offer;
-    }
-
-    const description =
-      data.store_description ||
-      data.description ||
-      "";
-
-    if(description){
-      const paragraphs =
-        document.querySelectorAll(".hero > div:first-child > p");
-
-      if(paragraphs.length > 1){
-        paragraphs[1].textContent = description;
-      }
-    }
-
-  }catch(err){
-    console.warn("Store settings could not be loaded:", err);
-  }
-}
-
-async function loadProducts(){
-
-  const grid =
-    document.getElementById("grid");
-
-
-  if(!sbReady()){
-
-    grid.innerHTML =
-      "<p>Supabase configuration is missing.</p>";
-
-    return;
-
-  }
-
-
-  const searchInput =
-    document.getElementById("search");
-
-
-  const q =
-    searchInput.value.trim();
-
-  const category =
-    document.getElementById("categoryFilter")?.value || "";
-
-  const priceSort =
-    document.getElementById("priceFilter")?.value || "";
-
-  const stockFilter =
-    document.getElementById("stockFilter")?.value || "";
-
-
-  let query =
-    supabaseClient
-      .from("products")
-      .select("*")
-      .eq("active",true);
-
-
-  if(q){
-
-    query =
-      query.ilike(
-        "name",
-        "%" + q + "%"
-      );
-
-  }
-
-
-  if(category){
-    query = query.eq("category", category);
-  }
-
-
-  if(stockFilter === "in"){
-    query = query.gt("stock", 0);
-  }
-
-  if(stockFilter === "out"){
-    query = query.lte("stock", 0);
-  }
-
-
-  if(priceSort === "low"){
-    query = query.order("price", {ascending: true});
-  }else if(priceSort === "high"){
-    query = query.order("price", {ascending: false});
-  }else{
-    query = query.order("created_at", {ascending: false});
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await query;
-
-
-  if(error){
-
-    grid.innerHTML =
-      `<p>${escapeHtml(error.message)}</p>`;
-
-    return;
-
-  }
-
-
-  products =
-    data || [];
-
-
-  if(!products.length){
-
-    grid.innerHTML =
-      "<p>No products found.</p>";
-
-    return;
-
-  }
-
-
-  grid.innerHTML =
-    products.map(
-      p => renderProductCard(p)
-    ).join("");
-
-
-}
-
-
-async function loadFilterCategories(){
-
-  const select =
-    document.getElementById("categoryFilter");
-
-  if(!select || !sbReady()) return;
-
-  const {data,error} =
-    await supabaseClient
-      .from("products")
-      .select("category")
-      .eq("active",true);
-
-  if(error){
-    console.warn("Category filter error:", error.message);
-    return;
-  }
-
-  const categories =
-    [...new Set(
-      (data || [])
-        .map(p => String(p.category || "").trim())
-        .filter(Boolean)
-    )].sort();
-
-  select.innerHTML =
-    '<option value="">All Categories</option>' +
-    categories.map(category =>
-      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
-    ).join("");
-
-}
-
-
-function resetFilters(){
-
-  const category =
-    document.getElementById("categoryFilter");
-
-  const price =
-    document.getElementById("priceFilter");
-
-  const stock =
-    document.getElementById("stockFilter");
-
-  if(category) category.value = "";
-  if(price) price.value = "";
-  if(stock) stock.value = "";
-
-  loadProducts();
-
-}
-
-
-function renderProductCard(p){
-
-  const price =
-    Number(p.price || 0);
-
-
-  const oldPrice =
-    Number(p.old_price || 0);
-
-
-  const discount =
-    Number(p.discount_percent || 0);
-
-
-  const stock =
-    Number(p.stock || 0);
-
-
-  const images =
-    getImages(
-      p.image_url ||
-      p.image ||
-      p.image_url_1 ||
-      p.image_urls ||
-      ""
-    );
-
-
-  const image =
-    images.length
-      ? images[0]
-      : "";
-
-
-  return `
-
-    <article
-      class="product"
-      onclick="openProduct(${p.id})"
-    >
-
-
-      <div class="pimg">
-
-        ${
-          image
-
-          ?
-
-          `<img
-            src="${escapeHtml(image)}"
-            alt="${escapeHtml(p.name)}"
-            loading="lazy"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
-          >
-          <span
-            class="no-image"
-            style="display:none"
-          >
-            💡
-          </span>`
-
-          :
-
-          `<span class="no-image">
-            💡
-          </span>`
-        }
-
+  <!-- BACKGROUND AMBIENT GLOW -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand-block" id="brandBlock">
+        <img id="storeLogo" src="assets/logo.png" alt="Rada Crest" class="brand-logo" onerror="this.style.display='none'">
+        <span id="storeName" class="brand-name">RADA CREST</span>
       </div>
 
+      <nav class="quick-nav">
+        <a href="help.html" class="nav-chip" title="Help">
+          <i class="fa-regular fa-circle-question"></i>
+          <span>Help</span>
+        </a>
+        <a href="referral.html" class="nav-chip" title="Refer & Earn">
+          <i class="fa-solid fa-gift text-accent"></i>
+          <span>Refer</span>
+        </a>
+        <a href="cart.html" class="nav-icon-btn cart-btn" title="Cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="badge" id="cartCountBadge">0</span>
+        </a>
+        <a href="account.html" class="nav-icon-btn account-btn" title="Account">
+          <i class="fa-regular fa-user"></i>
+        </a>
+      </nav>
+    </div>
+  </header>
 
-      <div class="pbody">
+  <main class="main-content container">
+    <!-- DELIVERY ADDRESS CHIP -->
+    <section class="address-strip" onclick="location.href='address.html'">
+      <div class="address-meta">
+        <i class="fa-solid fa-location-dot accent-icon"></i>
+        <div class="address-text">
+          <div class="caption">Deliver to: <strong id="userFullName">User</strong></div>
+          <div class="loc-summary" id="userAddressLine">Loading delivery address...</div>
+        </div>
+      </div>
+      <button type="button" class="btn-edit-addr">Edit <i class="fa-solid fa-chevron-right"></i></button>
+    </section>
 
+    <!-- SMART SEARCH ENGINE -->
+    <section class="search-panel">
+      <div class="search-bar-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-leading-icon"></i>
+        <input type="search" id="smartSearchInput" placeholder="Search 'fast charger', '9W LED', 'board'..." autocomplete="off">
+        
+        <div class="search-actions">
+          <button type="button" id="voiceSearchBtn" class="search-tool-btn" title="Voice Search">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button type="button" id="photoSearchBtn" class="search-tool-btn" title="Photo Search">
+            <i class="fa-solid fa-camera"></i>
+          </button>
+        </div>
+      </div>
+      <!-- Hidden file input for photo search -->
+      <input type="file" id="photoInput" accept="image/*" style="display: none;">
+      <div id="searchSuggestions" class="search-dropdown hidden"></div>
+    </section>
 
-        ${
-          p.category
+    <!-- 4K MAIN BANNER CAROUSEL (Up to 10 Banners) -->
+    <section class="slider-module">
+      <div class="carousel-track-container" id="bannerContainer">
+        <div class="carousel-track" id="bannerTrack">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+      <div class="slider-dots" id="bannerDots"></div>
+    </section>
 
-          ?
+    <!-- FESTIVAL SALE OR DYNAMIC FALLBACK -->
+    <section id="festivalSection" class="promo-module hidden">
+      <!-- Dynamically filled with Festival Banner or Fallback -->
+    </section>
 
-          `<small>
-            ${escapeHtml(p.category)}
-          </small>`
+    <!-- CATEGORIES -->
+    <section class="section-block">
+      <div class="section-head">
+        <h2>Shop by Category</h2>
+      </div>
+      <div class="categories-grid" id="categoriesContainer">
+        <!-- Dynamic Category Cards -->
+      </div>
+    </section>
 
-          :
+    <!-- SUGGESTED PRODUCTS -->
+    <section class="section-block">
+      <div class="section-head">
+        <h2>Suggested for You</h2>
+        <span class="badge-accent">Smart Pick</span>
+      </div>
+      <div class="products-horizontal-scroll" id="suggestedProductsContainer">
+        <!-- Dynamic Cards -->
+      </div>
+    </section>
 
-          ""
-        }
+    <!-- TRENDING PRODUCTS -->
+    <section class="section-block">
+      <div class="section-head">
+        <h2>Trending Now</h2>
+        <span class="badge-fire"><i class="fa-solid fa-fire"></i> Hot</span>
+      </div>
+      <div class="products-horizontal-scroll" id="trendingProductsContainer">
+        <!-- Dynamic Cards -->
+      </div>
+    </section>
 
-
-        <h3>
-          ${escapeHtml(p.name)}
-        </h3>
-
-
+    <!-- MAIN PRODUCT EXPLORER & FILTERS -->
+    <section class="section-block">
+      <div class="section-head column-mobile">
         <div>
-
-          <b>
-            ₹${price.toLocaleString("en-IN")}
-          </b>
-
-
-          ${
-            oldPrice > price
-
-            ?
-
-            `<del>
-              ₹${oldPrice.toLocaleString("en-IN")}
-            </del>`
-
-            :
-
-            ""
-          }
-
-
-          ${
-            discount > 0
-
-            ?
-
-            `<span class="badge">
-              ${discount}% OFF
-            </span>`
-
-            :
-
-            ""
-          }
-
+          <h2>Explore All Products</h2>
+          <p class="section-sub">High-efficiency tech & lighting curated for you</p>
         </div>
-
-
-        ${
-          p.warranty
-
-          ?
-
-          `<small>
-            🛡️ ${escapeHtml(p.warranty)}
-          </small>`
-
-          :
-
-          ""
-        }
-
-
-        ${
-          stock > 0
-
-          ?
-
-          `<small>
-            📦 In Stock
-          </small>`
-
-          :
-
-          `<small>
-            Out of Stock
-          </small>`
-        }
-
-
-        <div
-          class="product-actions"
-          onclick="event.stopPropagation()"
-        >
-
-          ${
-            stock > 0
-
-            ?
-
-            `
-
-            <button
-              class="btn small"
-              type="button"
-              onclick="addToCart(${p.id})"
-            >
-              Add to Cart
-            </button>
-
-
-            <button
-              class="buy"
-              type="button"
-              onclick="buyNow(${p.id})"
-            >
-              Buy Now
-            </button>
-
-            `
-
-            :
-
-            `<button
-              class="btn small"
-              disabled
-            >
-              Out of Stock
-            </button>`
-          }
-
+        
+        <!-- Filter Controls -->
+        <div class="filter-toolbar">
+          <select id="categoryFilter" class="custom-select">
+            <option value="all">All Categories</option>
+          </select>
+          <select id="priceFilter" class="custom-select">
+            <option value="default">Sort: Featured</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+          </select>
+          <select id="qualityFilter" class="custom-select">
+            <option value="all">Rating: All</option>
+            <option value="4">4★ & above</option>
+            <option value="5">Top 5★ Rated</option>
+          </select>
         </div>
-
-
       </div>
 
-    </article>
-
-  `;
-
-}
-
-
-function openProduct(id){
-
-  window.location.href =
-    "product.html?id=" +
-    encodeURIComponent(id);
-
-}
-
-
-function getCart(){
-
-  try{
-
-    return JSON.parse(
-      localStorage.getItem("rc_cart") ||
-      "[]"
-    );
-
-  }catch{
-
-    return [];
-
-  }
-
-}
-
-
-function saveCart(cart){
-
-  localStorage.setItem(
-    "rc_cart",
-    JSON.stringify(cart)
-  );
-
-
-  updateCartCount();
-
-}
-
-
-function updateCartCount(){
-
-  const cart =
-    getCart();
-
-
-  const count =
-    cart.reduce(
-      (sum,item) =>
-        sum + Number(item.qty || 0),
-      0
-    );
-
-
-  const element =
-    document.getElementById(
-      "cartCount"
-    );
-
-
-  if(element){
-
-    element.textContent =
-      count;
-
-  }
-
-}
-
-
-function addToCart(id){
-
-  const product =
-    products.find(
-      p =>
-        Number(p.id) ===
-        Number(id)
-    );
-
-
-  if(!product) return;
-
-
-  const cart =
-    getCart();
-
-
-  const existing =
-    cart.find(
-      item =>
-        Number(item.id) ===
-        Number(id)
-    );
-
-
-  if(existing){
-
-    existing.qty =
-      Number(existing.qty) + 1;
-
-  }else{
-
-    cart.push({
-
-      id: Number(id),
-
-      qty: 1
-
-    });
-
-  }
-
-
-  saveCart(cart);
-
-
-  alert(
-    product.name +
-    " added to cart."
-  );
-
-}
-
-
-async function buyNow(id){
-
-  const product =
-    products.find(
-      p =>
-        Number(p.id) ===
-        Number(id)
-    );
-
-
-  if(!product) return;
-
-
-  const {
-    data: {
-      user
-    }
-  } =
-    await supabaseClient
-      .auth
-      .getUser();
-
-
-  if(!user){
-
-    window.location.href =
-      "account.html?redirect=" +
-      encodeURIComponent(
-        "index.html#products"
-      );
-
-    return;
-
-  }
-
-
-  window.location.href =
-    "product.html?id=" +
-    encodeURIComponent(
-      product.id
-    );
-
-}
-
-
-updateCartCount();
-
-loadStoreSettings();
-loadFilterCategories();
-loadProducts();
-
-</script>
-
-
+      <div class="products-grid" id="mainProductsGrid">
+        <!-- Dynamic Grid Cards -->
+      </div>
+    </section>
+
+    <!-- LEGAL & INFO ACCORDION -->
+    <section class="policy-card">
+      <div class="policy-content">
+        <i class="fa-solid fa-shield-halved text-accent policy-icon"></i>
+        <div>
+          <h4>100% Genuine & Certified Products</h4>
+          <p>Read our warranty guidelines, shipping policies, and service terms.</p>
+        </div>
+      </div>
+      <a href="terms.html" class="btn-terms">Terms & Rules <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <div class="brand-name">RADA CREST</div>
+        <p>Premium LED lighting and high-speed electrical accessories engineered for durability.</p>
+      </div>
+      <div class="footer-links">
+        <a href="terms.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <a href="help.html">Customer Support</a>
+        <a href="account.html">My Orders</a>
+      </div>
+      <div class="footer-copy">
+        &copy; 2026 RADA CREST. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
