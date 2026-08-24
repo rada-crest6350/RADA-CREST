@@ -1,514 +1,164 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>RADA CREST | Smart LED & Modern Tech Store</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary-bg: #05070A;
-      --surface-1: rgba(18, 22, 30, 0.75);
-      --surface-2: rgba(26, 32, 44, 0.75);
-      --surface-border: rgba(255, 122, 0, 0.25);
-      --accent: #FF7A00;
-      --accent-glow: rgba(255, 122, 0, 0.45);
-      --cyber-blue: #00E5FF;
-      --text-main: #F4F6F8;
-      --text-muted: #8E9BAE;
-      --radius-sm: 10px;
-      --radius-md: 16px;
-      --radius-lg: 24px;
-      --radius-full: 9999px;
-      --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    body {
-      background-color: var(--primary-bg);
-      background-image: 
-        radial-gradient(circle at 15% 10%, rgba(255, 122, 0, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 60%, rgba(0, 229, 255, 0.08) 0%, transparent 40%),
-        linear-gradient(rgba(255, 122, 0, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 122, 0, 0.03) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 16px;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* HEADER */
-    .app-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(5, 7, 10, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--surface-border);
-    }
-
-    .header-inner {
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-block {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-
-    .brand-logo {
-      height: 32px;
-      object-fit: contain;
-    }
-
-    .brand-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.3rem;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      background: linear-gradient(135deg, #FFFFFF 30%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 15px rgba(255, 122, 0, 0.4);
-    }
-
-    .quick-nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .nav-chip {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface-1);
-      border: 1px solid var(--surface-border);
-      padding: 7px 12px;
-      border-radius: var(--radius-full);
-      color: var(--text-main);
-      text-decoration: none;
-      font-size: 0.8rem;
-      font-weight: 600;
-      transition: var(--transition);
-    }
-
-    .nav-chip:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 12px var(--accent-glow);
-    }
-
-    .nav-icon-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--radius-full);
-      background: var(--surface-1);
-      border: 1px solid var(--surface-border);
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      position: relative;
-    }
-
-    .badge {
-      position: absolute;
-      top: -3px;
-      right: -3px;
-      background: var(--accent);
-      color: #000;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: var(--radius-full);
-      animation: pulseGlow 2s infinite ease-in-out;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 4px var(--accent); }
-      50% { transform: scale(1.15); box-shadow: 0 0 14px var(--accent); }
-    }
-
-    .text-accent { color: var(--accent); }
-
-    /* ADDRESS BAR */
-    .address-strip {
-      margin-top: 14px;
-      background: linear-gradient(135deg, rgba(26, 32, 44, 0.8) 0%, rgba(255, 122, 0, 0.12) 100%);
-      border: 1px solid var(--surface-border);
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      backdrop-filter: blur(16px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .address-strip::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -150%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 122, 0, 0.2), transparent);
-      animation: sweep 4s infinite linear;
-    }
-
-    @keyframes sweep {
-      0% { left: -150%; }
-      100% { left: 150%; }
-    }
-
-    .address-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .address-text .caption {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-
-    .address-text .loc-summary {
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-
-    .btn-edit-addr {
-      background: transparent;
-      border: none;
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    /* SMART SEARCH BAR */
-    .search-panel {
-      position: relative;
-      margin-top: 14px;
-    }
-
-    .search-bar-wrapper {
-      display: flex;
-      align-items: center;
-      background: var(--surface-1);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-lg);
-      padding: 6px 10px 6px 16px;
-      transition: var(--transition);
-      backdrop-filter: blur(20px);
-    }
-
-    .search-bar-wrapper:focus-within {
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    #smartSearchInput {
-      flex: 1;
-      background: transparent;
-      border: none;
-      padding: 10px 12px;
-      color: var(--text-main);
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    .search-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .search-tool-btn {
-      background: var(--surface-2);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: var(--text-muted);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    /* BANNER SLIDER */
-    .slider-module {
-      margin-top: 18px;
-      position: relative;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 1px solid var(--surface-border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    }
-
-    .banner-slide {
-      width: 100%;
-      aspect-ratio: 16 / 7;
-      background: var(--surface-2);
-      cursor: pointer;
-    }
-
-    .banner-slide img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* SECTIONS */
-    .section-block { margin-top: 28px; }
-    .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .section-head h2 {
-      font-size: 1.15rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent);
-      animation: livePulse 1.5s infinite;
-    }
-
-    @keyframes livePulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.4; }
-    }
-
-    /* CATEGORIES GRID */
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .category-card {
-      background: var(--surface-1);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius-md);
-      padding: 14px 8px;
-      text-align: center;
-      cursor: pointer;
-      backdrop-filter: blur(14px);
-      transition: var(--transition);
-    }
-
-    .category-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-4px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.8), 0 0 15px var(--accent-glow);
-    }
-
-    .cat-icon-wrap {
-      color: var(--accent);
-      font-size: 1.3rem;
-      margin-bottom: 8px;
-    }
-
-    .category-card span { font-size: 0.75rem; font-weight: 700; }
-
-    /* EMPTY / STATUS STATE BOX */
-    .status-card {
-      text-align: center;
-      padding: 28px 16px;
-      border: 1px dashed var(--surface-border);
-      border-radius: var(--radius-md);
-      background: var(--surface-1);
-      backdrop-filter: blur(14px);
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    .status-card i {
-      font-size: 1.8rem;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    /* FOOTER */
-    .app-footer {
-      margin-top: 48px;
-      background: #030406;
-      border-top: 1px solid var(--surface-border);
-      padding: 30px 0;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      position: relative;
-      z-index: 2;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RADA CREST | Smart & Premium Lighting</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="home.css" />
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="header-inner container">
-      <div class="brand-block" onclick="location.href='index.html'">
-        <img id="storeLogo" src="assets/logo.png" alt="Rada Crest" class="brand-logo" onerror="this.style.display='none'">
-        <span class="brand-name">RADA CREST</span>
-      </div>
-      <nav class="quick-nav">
-        <a href="help.html" class="nav-chip"><i class="fa-regular fa-circle-question"></i> Help</a>
-        <a href="referral.html" class="nav-chip"><i class="fa-solid fa-gift text-accent"></i> Refer</a>
-        <a href="cart.html" class="nav-icon-btn"><i class="fa-solid fa-bag-shopping"></i><span class="badge" id="cartCountBadge">0</span></a>
-        <a href="account.html" class="nav-icon-btn"><i class="fa-regular fa-user"></i></a>
+  <!-- Futuristic Cyber Grid Glow Background -->
+  <div class="bg-glow"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <a href="index.html" class="brand-container" id="brandContainer">
+        <img id="brandLogo" src="assets/logo.png" alt="Rada Crest" class="brand-logo" onerror="this.style.display='none'" />
+        <span id="brandName" class="brand-title">RADA CREST</span>
+      </a>
+      <nav class="nav-actions">
+        <a href="help.html" class="nav-btn" title="Help & Support"><i class="fa-solid fa-headset"></i><span>Help</span></a>
+        <a href="referral.html" class="nav-btn highlight" title="Refer & Earn"><i class="fa-solid fa-gift"></i><span>Refer</span></a>
+        <a href="cart.html" class="nav-btn cart-btn" title="Cart">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="cart-badge" id="cartCount">0</span>
+        </a>
+        <a href="account.html" class="nav-btn" title="Account"><i class="fa-solid fa-user-astronaut"></i></a>
       </nav>
+    </div>
+
+    <!-- Delivery Address Bar -->
+    <div class="delivery-bar" id="deliveryBar">
+      <div class="delivery-info">
+        <i class="fa-solid fa-location-crosshairs text-accent"></i>
+        <div class="delivery-text">
+          <small>Deliver to</small>
+          <p id="currentAddress">Add delivery address</p>
+        </div>
+      </div>
+      <a href="address.html" class="edit-addr-btn">Edit</a>
+    </div>
+
+    <!-- Smart Search Bar -->
+    <div class="search-container">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon" id="searchBtn"></i>
+        <input type="text" id="searchInput" placeholder="Search '9W LED Bulb', 'sasta charger'..." autocomplete="off" />
+        <div class="search-media-actions">
+          <button type="button" id="voiceSearchBtn" title="Voice Search"><i class="fa-solid fa-microphone"></i></button>
+          <button type="button" id="photoSearchBtn" title="Photo Search"><i class="fa-solid fa-camera"></i></button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="main-content container">
-    <!-- ADDRESS -->
-    <section class="address-strip" onclick="location.href='address.html'">
-      <div class="address-meta">
-        <i class="fa-solid fa-location-dot text-accent" style="font-size: 1.1rem;"></i>
-        <div class="address-text">
-          <div class="caption">Deliver to: <strong>Customer</strong></div>
-          <div class="loc-summary">Add delivery address</div>
-        </div>
-      </div>
-      <button class="btn-edit-addr">Edit &gt;</button>
-    </section>
-
-    <!-- SEARCH -->
-    <section class="search-panel">
-      <div class="search-bar-wrapper">
-        <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
-        <input type="search" id="smartSearchInput" placeholder="Search smart LED, inverter bulb, charger..." autocomplete="off">
-        <div class="search-actions">
-          <button type="button" class="search-tool-btn" id="voiceSearchBtn"><i class="fa-solid fa-microphone"></i></button>
-          <button type="button" class="search-tool-btn" id="photoSearchBtn"><i class="fa-solid fa-camera"></i></button>
-        </div>
-      </div>
-      <input type="file" id="photoInput" accept="image/*" style="display: none;">
-    </section>
-
-    <!-- BANNER -->
-    <section class="slider-module">
-      <div class="banner-slide" onclick="location.href='category.html?id=led'">
-        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80" alt="Tech Banner">
+  <main class="main-content">
+    <!-- Main Banner Slider -->
+    <section class="banner-section">
+      <div class="slider-wrapper" id="bannerSlider">
+        <div class="slides-track" id="slidesTrack"></div>
+        <button class="slider-arrow prev" id="sliderPrev"><i class="fa-solid fa-angle-left"></i></button>
+        <button class="slider-arrow next" id="sliderNext"><i class="fa-solid fa-angle-right"></i></button>
+        <div class="slider-dots" id="sliderDots"></div>
       </div>
     </section>
 
-    <!-- CATEGORIES -->
-    <section class="section-block">
-      <div class="section-head">
-        <h2><div class="live-dot"></div> Shop Categories</h2>
+    <!-- Festival Sale Section (Dynamic / Fallback Switch) -->
+    <section class="festival-section" id="festivalSection" style="display: none;">
+      <div class="section-header festival-header">
+        <div class="title-wrap">
+          <i class="fa-solid fa-bolt-lightning text-accent"></i>
+          <h2 id="festivalTitle">Festival Super Sale</h2>
+        </div>
+        <a id="festivalViewAll" href="festival.html" class="view-all">Explore All <i class="fa-solid fa-chevron-right"></i></a>
       </div>
-      <div class="categories-grid">
-        <div class="category-card" onclick="location.href='category.html?id=led'">
-          <div class="cat-icon-wrap"><i class="fa-solid fa-lightbulb"></i></div>
-          <span>LED Lights</span>
-        </div>
-        <div class="category-card" onclick="location.href='category.html?id=chargers'">
-          <div class="cat-icon-wrap"><i class="fa-solid fa-bolt"></i></div>
-          <span>Chargers</span>
-        </div>
-        <div class="category-card" onclick="location.href='category.html?id=boards'">
-          <div class="cat-icon-wrap"><i class="fa-solid fa-plug"></i></div>
-          <span>Ext Boards</span>
-        </div>
-        <div class="category-card" onclick="location.href='category.html?id=cables'">
-          <div class="cat-icon-wrap"><i class="fa-solid fa-network-wired"></i></div>
-          <span>Cables</span>
-        </div>
-      </div>
+      <div class="festival-banner-wrap" id="festivalBannerWrap"></div>
+      <div class="product-scroller" id="festivalProductsList"></div>
     </section>
 
-    <!-- INVENTORY STATUS -->
-    <section class="section-block">
-      <div class="section-head">
-        <h2><div class="live-dot"></div> Live Inventory</h2>
+    <!-- Categories Section -->
+    <section class="categories-section">
+      <div class="section-header">
+        <h2>Explore Categories</h2>
       </div>
-      <div class="status-card">
-        <i class="fa-solid fa-microchip"></i><br>
-        <strong style="color: var(--text-main);">Inventory Updating</strong><br>
-        Store products are being synchronized with the backend.
+      <div class="categories-grid" id="categoriesGrid"></div>
+    </section>
+
+    <!-- Suggested Products -->
+    <section class="product-section" id="suggestedSection">
+      <div class="section-header">
+        <div class="title-wrap">
+          <span class="badge-accent">Smart Pick</span>
+          <h2>Suggested For You</h2>
+        </div>
       </div>
+      <div class="product-scroller" id="suggestedProductsList"></div>
+    </section>
+
+    <!-- Trending Products -->
+    <section class="product-section" id="trendingSection">
+      <div class="section-header">
+        <div class="title-wrap">
+          <span class="badge-accent pulse"><i class="fa-solid fa-fire"></i> Hot</span>
+          <h2>Trending Now</h2>
+        </div>
+      </div>
+      <div class="product-scroller" id="trendingProductsList"></div>
+    </section>
+
+    <!-- Dynamic Custom Sections (New Arrivals, Best Sellers, etc.) -->
+    <div id="dynamicSectionsContainer"></div>
+
+    <!-- Product Listing & Filter Section -->
+    <section class="product-listing-section">
+      <div class="section-header">
+        <h2>All Products</h2>
+        <div class="filter-controls">
+          <select id="categoryFilter" class="filter-select">
+            <option value="all">All Categories</option>
+          </select>
+          <select id="sortFilter" class="filter-select">
+            <option value="default">Sort: Default</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+            <option value="rating">Customer Rating</option>
+          </select>
+        </div>
+      </div>
+      <div class="product-grid" id="allProductsGrid"></div>
     </section>
   </main>
 
-  <footer class="app-footer container">
-    <div style="margin-bottom: 12px;">
-      <a href="terms.html" style="color: var(--accent); text-decoration: none; margin-right: 14px;">Terms & Conditions</a>
-      <a href="help.html" style="color: var(--text-muted); text-decoration: none;">Help Support</a>
+  <!-- Photo Search Permission & Selection Modal -->
+  <div class="custom-modal" id="photoModal">
+    <div class="modal-card">
+      <h3>Visual Search</h3>
+      <p>Search using your camera or gallery image.</p>
+      <div class="modal-buttons">
+        <label class="modal-action-btn"><i class="fa-solid fa-camera"></i> Take Photo
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden />
+        </label>
+        <label class="modal-action-btn"><i class="fa-solid fa-image"></i> Upload Image
+          <input type="file" id="galleryInput" accept="image/*" hidden />
+        </label>
+      </div>
+      <button type="button" class="modal-close-btn" id="closePhotoModal">Cancel</button>
     </div>
-    <div>&copy; 2026 RADA CREST. All rights reserved.</div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="legal-links">
+      <a href="terms.html">Terms & Conditions</a> • 
+      <a href="privacy.html">Privacy Policy</a> • 
+      <a href="help.html">24/7 Support</a>
+    </div>
+    <p class="copyright">© 2026 RADA CREST Innovations. All rights reserved.</p>
   </footer>
 
-  <script>
-    // Safe Cart Badge Sync
-    try {
-      const cart = JSON.parse(localStorage.getItem("rc_cart") || "[]");
-      document.getElementById("cartCountBadge").textContent = cart.reduce((t, i) => t + (i.qty || 1), 0);
-    } catch(e) {}
-
-    // Safe Voice Search
-    document.getElementById("voiceSearchBtn").addEventListener("click", () => {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return alert("Voice Search is not supported on this browser.");
-      const rec = new SR();
-      rec.onresult = (e) => { document.getElementById("smartSearchInput").value = e.results[0][0].transcript; };
-      rec.start();
-    });
-
-    // Safe Photo Search
-    document.getElementById("photoSearchBtn").addEventListener("click", async () => {
-      try {
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const s = await navigator.mediaDevices.getUserMedia({ video: true });
-          s.getTracks().forEach(t => t.stop());
-        }
-        document.getElementById("photoInput").click();
-      } catch (e) {
-        alert("Camera permission denied.");
-      }
-    });
-  </script>
+  <script src="home.js"></script>
 </body>
 </html>
