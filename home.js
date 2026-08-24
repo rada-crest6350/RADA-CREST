@@ -440,3 +440,12 @@ function initPhotoSearch() {
   cameraInput.onchange = (e) => handleImage(e.target.files[0]);
   galleryInput.onchange = (e) => handleImage(e.target.files[0]);
 }
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initSmartPickAndTrending();
+    initAllProductsListing();
+  });
+} else {
+  initSmartPickAndTrending();
+  initAllProductsListing();
+}
