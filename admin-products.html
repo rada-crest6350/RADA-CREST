@@ -6,6 +6,8 @@
   <title>Admin | Add Product - RADA CREST</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="home.css">
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     .admin-container { 
       max-width: 700px; 
@@ -176,13 +178,20 @@
         </div>
       </div>
 
-      <button type="submit" class="btn-submit">Save & Publish Product</button>
+      <button type="submit" class="btn-submit" id="submitBtn">Save & Publish Product</button>
     </form>
   </div>
 
   <script>
-    document.getElementById('addProductForm').onsubmit = (e) => {
+    const SUPABASE_URL = 'https://tfrdoxfopqcvszfwwyvd.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_De-FPqeLF8L5g-7_nu_mvQ_VihQGfJL';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    document.getElementById('addProductForm').onsubmit = async (e) => {
       e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Saving...';
 
       // Collect URLs
       const imageInputs = [
@@ -205,15 +214,14 @@
       if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
 
       const newProduct = {
-        id: 'prod_' + Date.now(),
-        type: document.getElementById('productType').value,
         name: document.getElementById('pName').value,
+        type: document.getElementById('productType').value,
         category: document.getElementById('pCategory').value,
         status: document.getElementById('pStatus').value,
         oldPrice: Number(document.getElementById('pOldPrice').value) || 0,
         price: Number(document.getElementById('pPrice').value),
         bulkPricing: bulkTiers,
-        image: imageUrls[0],
+        image: imageUrls[0] || '',
         images: imageUrls,
         video: document.getElementById('pVideoUrl').value.trim(),
         hasWarranty: document.getElementById('pWarrantyToggle').checked,
@@ -227,26 +235,24 @@
         isTrending: true
       };
 
-      try {
-        let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || 
-                          JSON.parse(localStorage.getItem('products')) || [];
-        allProducts.unshift(newProduct);
-
-        // Sync save
-        localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
-        localStorage.setItem('products', JSON.stringify(allProducts));
-
-        if (newProduct.type === 'festival') {
-          let festivalData = JSON.parse(localStorage.getItem('rc_festival_sale')) || { active: true, products: [] };
-          festivalData.products.push(newProduct);
-          localStorage.setItem('rc_festival_sale', JSON.stringify(festivalData));
+      // 1. Supabase Cloud Sync
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('products').insert([newProduct]);
+        } catch (err) {
+          console.warn('Supabase insert skipped:', err.message);
         }
-
-        alert('Product added successfully!');
-        window.location.href = 'index.html';
-      } catch (storageError) {
-        alert('Error: ' + storageError.message);
       }
+
+      // 2. Local Fallback Sync
+      let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || 
+                        JSON.parse(localStorage.getItem('products')) || [];
+      allProducts.unshift({ ...newProduct, id: 'prod_' + Date.now() });
+      localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
+      localStorage.setItem('products', JSON.stringify(allProducts));
+
+      alert('Product saved successfully!');
+      window.location.href = 'index.html';
     };
   </script>
 </body>
