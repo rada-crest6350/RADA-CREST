@@ -7,14 +7,42 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="home.css">
   <style>
-    .admin-container { max-width: 700px; margin: 20px auto; padding: 20px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--border-glass); }
+    .admin-container { 
+      max-width: 700px; 
+      margin: 20px auto; 
+      padding: 20px; 
+      background: var(--card-bg, #12141a); 
+      border-radius: var(--radius-lg, 16px); 
+      border: 1px solid var(--border-glass, rgba(255,255,255,0.08)); 
+    }
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; }
-    .form-control { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); padding: 10px; border-radius: var(--radius-sm); color: #fff; font-size: 0.9rem; outline: none; }
-    .form-control:focus { border-color: var(--primary); }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted, #9ba1b0); margin-bottom: 5px; }
+    .form-control { 
+      width: 100%; 
+      background: rgba(255,255,255,0.05); 
+      border: 1px solid var(--border-glass, rgba(255,255,255,0.08)); 
+      padding: 10px; 
+      border-radius: var(--radius-sm, 8px); 
+      color: #fff; 
+      font-size: 0.9rem; 
+      outline: none; 
+      box-sizing: border-box;
+    }
+    .form-control:focus { border-color: var(--primary, #FF7A00); }
     .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: #fff; font-size: 0.85rem; }
-    .btn-submit { width: 100%; background: var(--primary); color: #000; font-weight: 700; padding: 12px; border: none; border-radius: var(--radius-sm); cursor: pointer; margin-top: 10px; font-size: 1rem; }
+    .btn-submit { 
+      width: 100%; 
+      background: var(--primary, #FF7A00); 
+      color: #000; 
+      font-weight: 700; 
+      padding: 14px; 
+      border: none; 
+      border-radius: var(--radius-sm, 8px); 
+      cursor: pointer; 
+      margin-top: 15px; 
+      font-size: 1rem; 
+    }
   </style>
 </head>
 <body>
@@ -22,12 +50,12 @@
   <header class="header">
     <div class="header-top">
       <a href="index.html" class="brand-container"><span class="brand-title">RADA CREST ADMIN</span></a>
-      <a href="admin.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+      <a href="admin-dashboard.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
     </div>
   </header>
 
   <div class="admin-container">
-    <h2>Add New Product</h2>
+    <h2 style="margin-bottom: 15px;">Add New Product</h2>
     <form id="addProductForm">
       
       <!-- Product Type Selection -->
@@ -71,47 +99,45 @@
           <input type="number" id="pOldPrice" class="form-control" placeholder="e.g. 499">
         </div>
         <div class="form-group">
-          <label>Selling Price (Auto Discount)</label>
+          <label>Selling Price</label>
           <input type="number" id="pPrice" class="form-control" placeholder="e.g. 199" required>
         </div>
       </div>
 
-      <!-- Bulk Pricing Tiers (Structured for 50pcs, 100pcs etc.) -->
-<div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
-  <label style="color: var(--primary); font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Bulk / Wholesale Tier Pricing</label>
-  
-  <div class="row-grid" style="margin-bottom: 8px;">
-    <div>
-      <small style="color: var(--text-muted);">Tier 1 (e.g. 50 Pcs)</small>
-      <div style="display: flex; gap: 6px; margin-top: 2px;">
-        <input type="number" id="bulkQty1" class="form-control" placeholder="Qty (e.g. 50)" />
-        <input type="number" id="bulkPrice1" class="form-control" placeholder="Price/pc" />
+      <!-- Bulk Pricing Tiers -->
+      <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+        <label style="color: var(--primary, #FF7A00); font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Bulk / Wholesale Tier Pricing</label>
+        
+        <div class="row-grid" style="margin-bottom: 8px;">
+          <div>
+            <small style="color: #9ba1b0;">Tier 1 (e.g. 50 Pcs)</small>
+            <div style="display: flex; gap: 6px; margin-top: 2px;">
+              <input type="number" id="bulkQty1" class="form-control" placeholder="Min Qty (50)" />
+              <input type="number" id="bulkPrice1" class="form-control" placeholder="Price/pc" />
+            </div>
+          </div>
+          <div>
+            <small style="color: #9ba1b0;">Tier 2 (e.g. 100 Pcs)</small>
+            <div style="display: flex; gap: 6px; margin-top: 2px;">
+              <input type="number" id="bulkQty2" class="form-control" placeholder="Min Qty (100)" />
+              <input type="number" id="bulkPrice2" class="form-control" placeholder="Price/pc" />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div>
-      <small style="color: var(--text-muted);">Tier 2 (e.g. 100 Pcs)</small>
-      <div style="display: flex; gap: 6px; margin-top: 2px;">
-        <input type="number" id="bulkQty2" class="form-control" placeholder="Qty (e.g. 100)" />
-        <input type="number" id="bulkPrice2" class="form-control" placeholder="Price/pc" />
-      </div>
-    </div>
-  </div>
-</div>
-      
 
       <!-- Media: Photos & Video Upload -->
-<div class="form-group">
-  <label>Product Photos (Select up to 5 images)</label>
-  <input type="file" id="pPhotoFiles" class="form-control" accept="image/*" multiple />
-  <small style="color: var(--text-muted); display: block; margin-top: 4px;">Max 5 photos allowed.</small>
-</div>
+      <div class="form-group">
+        <label>Product Photos (Select up to 5 images)</label>
+        <input type="file" id="pPhotoFiles" class="form-control" accept="image/*" multiple />
+        <small style="color: #9ba1b0; display: block; margin-top: 4px;">Max 5 photos allowed.</small>
+      </div>
 
-<div class="form-group">
-  <label>Product Video (Upload 1 Video or Paste URL)</label>
-  <input type="file" id="pVideoFile" class="form-control" accept="video/*" style="margin-bottom: 6px;" />
-  <input type="text" id="pVideoUrl" class="form-control" placeholder="Or paste Video URL (mp4 / YouTube embed)" />
-</div>
-      
+      <div class="form-group">
+        <label>Product Video (Upload Video or Paste URL)</label>
+        <input type="file" id="pVideoFile" class="form-control" accept="video/*" style="margin-bottom: 6px;" />
+        <input type="text" id="pVideoUrl" class="form-control" placeholder="Or paste Video URL (mp4 / embed)" />
+      </div>
 
       <!-- Warranty Toggle -->
       <div class="form-group">
@@ -150,87 +176,94 @@
   </div>
 
   <script>
-  document.getElementById('addProductForm').onsubmit = async (e) => {
-  e.preventDefault();
+    document.getElementById('addProductForm').onsubmit = async (e) => {
+      e.preventDefault();
 
-  const photoFiles = Array.from(document.getElementById('pPhotoFiles').files).slice(0, 5);
-  const videoFile = document.getElementById('pVideoFile').files[0];
-  const videoUrlInput = document.getElementById('pVideoUrl').value.trim();
+      const photoFiles = Array.from(document.getElementById('pPhotoFiles').files).slice(0, 5);
+      const videoFile = document.getElementById('pVideoFile').files[0];
+      const videoUrlInput = document.getElementById('pVideoUrl').value.trim();
 
-  const fileToBase64 = (file) => new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.readAsDataURL(file);
-  });
+      const fileToBase64 = (file) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(event.target.result);
+        reader.readAsDataURL(file);
+      });
 
-  let imageUrls = [];
-  try {
-    if (photoFiles.length > 0) {
-      imageUrls = await Promise.all(photoFiles.map(f => fileToBase64(f)));
-    } else {
-      imageUrls.push('assets/placeholder_product.jpg');
-    }
-  } catch (err) {
-    imageUrls = ['assets/placeholder_product.jpg'];
-  }
+      let imageUrls = [];
+      if (photoFiles.length > 0) {
+        try {
+          imageUrls = await Promise.all(photoFiles.map(f => fileToBase64(f)));
+        } catch (err) {
+          imageUrls = ['assets/placeholder_product.jpg'];
+        }
+      } else {
+        imageUrls.push('assets/placeholder_product.jpg');
+      }
 
-  let finalVideoUrl = videoUrlInput;
-  if (videoFile) {
-    try {
-      finalVideoUrl = await fileToBase64(videoFile);
-    } catch(err) {
-      finalVideoUrl = '';
-    }
-  }
+      let finalVideoUrl = videoUrlInput;
+      if (videoFile) {
+        try {
+          finalVideoUrl = await fileToBase64(videoFile);
+        } catch(err) {
+          finalVideoUrl = '';
+        }
+      }
 
-  // Collect Bulk Tiers
-  const bulkTiers = [];
-  const q1 = document.getElementById('bulkQty1').value;
-  const p1 = document.getElementById('bulkPrice1').value;
-  if (q1 && p1) bulkTiers.push({ minQty: Number(q1), pricePerPiece: Number(p1) });
+      // Collect Bulk Tiers
+      const bulkTiers = [];
+      const q1 = document.getElementById('bulkQty1').value;
+      const p1 = document.getElementById('bulkPrice1').value;
+      if (q1 && p1) bulkTiers.push({ minQty: Number(q1), pricePerPiece: Number(p1) });
 
-  const q2 = document.getElementById('bulkQty2').value;
-  const p2 = document.getElementById('bulkPrice2').value;
-  if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
+      const q2 = document.getElementById('bulkQty2').value;
+      const p2 = document.getElementById('bulkPrice2').value;
+      if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
 
-  const newProduct = {
-    id: 'prod_' + Date.now(),
-    type: document.getElementById('productType').value,
-    name: document.getElementById('pName').value,
-    category: document.getElementById('pCategory').value,
-    status: document.getElementById('pStatus').value,
-    oldPrice: Number(document.getElementById('pOldPrice').value) || 0,
-    price: Number(document.getElementById('pPrice').value),
-    bulkPricing: bulkTiers,
-    image: imageUrls[0],
-    images: imageUrls,
-    video: finalVideoUrl,
-    hasWarranty: document.getElementById('pWarrantyToggle').checked,
-    size: document.getElementById('pSize').value || 'Free Size',
-    colors: document.getElementById('pColors').value,
-    stock: Number(document.getElementById('pStock').value) || 0,
-    moq: Number(document.getElementById('pMoq').value) || 1,
-    rating: 5.0,
-    salesCount: 0,
-    isSuggested: true, // Homepage par turant show karne ke liye
-    isTrending: true
-  };
+      const newProduct = {
+        id: 'prod_' + Date.now(),
+        type: document.getElementById('productType').value,
+        name: document.getElementById('pName').value,
+        category: document.getElementById('pCategory').value,
+        status: document.getElementById('pStatus').value,
+        oldPrice: Number(document.getElementById('pOldPrice').value) || 0,
+        price: Number(document.getElementById('pPrice').value),
+        bulkPricing: bulkTiers,
+        image: imageUrls[0],
+        images: imageUrls,
+        video: finalVideoUrl,
+        hasWarranty: document.getElementById('pWarrantyToggle').checked,
+        size: document.getElementById('pSize').value || 'Free Size',
+        colors: document.getElementById('pColors').value || '',
+        stock: Number(document.getElementById('pStock').value) || 0,
+        moq: Number(document.getElementById('pMoq').value) || 1,
+        rating: 5.0,
+        salesCount: 0,
+        isSuggested: true,
+        isTrending: true
+      };
 
-  try {
-    let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || [];
-    allProducts.unshift(newProduct);
-    localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
+      try {
+        // Fetch existing list from both potential keys
+        let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || 
+                          JSON.parse(localStorage.getItem('products')) || [];
+        allProducts.unshift(newProduct);
 
-    if (newProduct.type === 'festival') {
-      let festivalData = JSON.parse(localStorage.getItem('rc_festival_sale')) || { active: true, products: [] };
-      festivalData.products.push(newProduct);
-      localStorage.setItem('rc_festival_sale', JSON.stringify(festivalData));
-    }
+        // Sync save to BOTH keys so Home Page and Admin Dashboard stay identical
+        localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
+        localStorage.setItem('products', JSON.stringify(allProducts));
 
-    alert('Product successfully added! Now displaying on Home Page.');
-    window.location.href = 'index.html';
-  } catch (storageError) {
-    alert('Storage limit reached! Please upload smaller images or fewer photos.');
-  }
-};
-    
+        if (newProduct.type === 'festival') {
+          let festivalData = JSON.parse(localStorage.getItem('rc_festival_sale')) || { active: true, products: [] };
+          festivalData.products.push(newProduct);
+          localStorage.setItem('rc_festival_sale', JSON.stringify(festivalData));
+        }
+
+        alert('Product added successfully!');
+        window.location.href = 'index.html';
+      } catch (storageError) {
+        alert('Storage limit reached! Please use smaller photo sizes.');
+      }
+    };
+  </script>
+</body>
+</html>
