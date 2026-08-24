@@ -16,11 +16,41 @@ document.addEventListener('DOMContentLoaded', () => {
   initPhotoSearch();
 });
 
-/* 1. Global Product Fetch Helper (Sabhi keys check karega) */
+/* Sabhi possible localStorage keys ko scan karke products laane ka foolproof function */
 function getStoredProducts() {
-  return JSON.parse(localStorage.getItem('products')) || 
-         JSON.parse(localStorage.getItem('rc_all_products')) || 
-         JSON.parse(localStorage.getItem('rc_products')) || [];
+  let products = [];
+  
+  // Possible keys jahan admin data save kar sakta hai
+  const possibleKeys = ['products', 'rc_all_products', 'rc_products', 'admin_products', 'allProducts'];
+  
+  for (let key of possibleKeys) {
+    const data = localStorage.getItem(key);
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          products = parsed;
+          break;
+        }
+      } catch (e) {}
+    }
+  }
+
+  // Agar phir bhi na mile, toh localStorage ki saari keys check karo jisme product data ho sakta hai
+  if (products.length === 0) {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      try {
+        const val = JSON.parse(localStorage.getItem(key));
+        if (Array.isArray(val) && val.length > 0 && (val[0].name || val[0].price)) {
+          products = val;
+          break;
+        }
+      } catch (e) {}
+    }
+  }
+
+  return products;
 }
 
 /* 2. Suggested & Trending Sync Fix */
