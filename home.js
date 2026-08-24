@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initPhotoSearch();
 });
 
+// High quality built-in Vector Image (Kabhi fail nahi hogi)
+const DEFAULT_PRODUCT_IMG = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='%2312141a'/%3E%3Cpath d='M150 60 C120 60 95 85 95 120 C95 145 110 165 125 180 L125 210 L175 210 L175 180 C190 165 205 145 205 120 C205 85 180 60 150 60 Z' fill='%23FF7A00' opacity='0.85'/%3E%3Crect x='130' y='215' width='40' height='8' rx='3' fill='%23ffffff' opacity='0.4'/%3E%3Crect x='135' y='226' width='30' height='6' rx='3' fill='%23ffffff' opacity='0.3'/%3E%3Ctext x='150' y='265' fill='%23ffffff' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle'%3ERADA CREST%3C/text%3E%3C/svg%3E";
+
+const DEFAULT_CAT_IMG = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%231a1d26' stroke='%23FF7A00' stroke-width='2'/%3E%3Cpath d='M50 25 C40 25 32 33 32 44 C32 52 37 58 42 63 L42 72 L58 72 L58 63 C63 58 68 52 68 44 C68 33 60 25 50 25 Z' fill='%23FF7A00'/%3E%3C/svg%3E";
+
 /* 1. Global Product Fetcher with Live Fallback */
 function getStoredProducts() {
   let products = [];
@@ -43,7 +48,7 @@ function getStoredProducts() {
         price: 50,
         oldPrice: 500,
         rating: 5,
-        image: 'assets/placeholder_product.jpg',
+        image: DEFAULT_PRODUCT_IMG,
         category: 'led',
         isSuggested: true,
         isTrending: true
@@ -70,9 +75,11 @@ function createProductCard(product) {
     ? `<span style="position: absolute; top: 10px; left: 10px; background: #FF7A00; color:#000; font-size: 0.65rem; font-weight: 800; padding: 2px 5px; border-radius: 4px;">${Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF</span>` 
     : '';
 
+  const imgSrc = (product.image && product.image.trim() !== '') ? product.image : DEFAULT_PRODUCT_IMG;
+
   card.innerHTML = `
     ${discountBadge}
-    <img src="${product.image || 'assets/placeholder_product.jpg'}" alt="${product.name}" onerror="this.src='https://placehold.co/400x400/12141a/FF7A00?text=RADA+CREST'" />
+    <img src="${imgSrc}" alt="${product.name}" onerror="this.src='${DEFAULT_PRODUCT_IMG}'" />
     <div class="product-title" title="${product.name}">${product.name}</div>
     <div class="rating-badge"><i class="fa-solid fa-star"></i> ${product.rating || '5'}</div>
     <div class="price-row">
@@ -144,7 +151,7 @@ function initAllProductsListing() {
 function initBrandSettings() {
   const storeSettings = JSON.parse(localStorage.getItem('rc_store_settings')) || {
     name: 'RADA CREST',
-    logoUrl: 'assets/logo.png',
+    logoUrl: DEFAULT_PRODUCT_IMG,
     showLogo: true
   };
   
@@ -188,8 +195,7 @@ function initCartCounter() {
 /* 9. Banner Slider */
 function initBannerSlider() {
   const defaultBanners = [
-    { image: 'assets/banner1.jpg', link: 'category.html?cat=led' },
-    { image: 'assets/banner2.jpg', link: 'festival.html' }
+    { image: DEFAULT_PRODUCT_IMG, link: 'category.html?cat=led' }
   ];
   
   const banners = (JSON.parse(localStorage.getItem('rc_admin_banners')) || defaultBanners)
@@ -206,7 +212,7 @@ function initBannerSlider() {
   banners.forEach((b, index) => {
     const slide = document.createElement('div');
     slide.className = 'slide';
-    slide.innerHTML = `<img src="${b.image}" alt="Deal" onerror="this.src='https://placehold.co/800x350/12141a/FF7A00?text=RADA+CREST+OFFERS'" />`;
+    slide.innerHTML = `<img src="${b.image}" alt="Deal" onerror="this.src='${DEFAULT_PRODUCT_IMG}'" />`;
     slide.onclick = () => { if (b.link) window.location.href = b.link; };
     track.appendChild(slide);
 
@@ -253,10 +259,10 @@ function initFestivalAndFallback() {
 /* 11. Categories */
 function initCategories() {
   const defaultCats = [
-    { name: 'LED Bulbs', slug: 'led', icon: 'assets/cat_led.png' },
-    { name: 'Extension', slug: 'extension', icon: 'assets/cat_ext.png' },
-    { name: 'T-Bulbs', slug: 't-bulb', icon: 'assets/cat_tbulb.png' },
-    { name: 'Accessories', slug: 'accessories', icon: 'assets/cat_acc.png' }
+    { name: 'LED Bulbs', slug: 'led', icon: DEFAULT_CAT_IMG },
+    { name: 'Extension', slug: 'extension', icon: DEFAULT_CAT_IMG },
+    { name: 'T-Bulbs', slug: 't-bulb', icon: DEFAULT_CAT_IMG },
+    { name: 'Accessories', slug: 'accessories', icon: DEFAULT_CAT_IMG }
   ];
   const categories = JSON.parse(localStorage.getItem('rc_categories')) || defaultCats;
   const grid = document.getElementById('categoriesGrid');
@@ -270,7 +276,7 @@ function initCategories() {
       card.href = `category.html?cat=${encodeURIComponent(cat.slug || cat.name.toLowerCase())}`;
       card.innerHTML = `
         <div class="cat-img-box">
-          <img src="${cat.icon || 'assets/cat_default.png'}" alt="${cat.name}" onerror="this.src='https://placehold.co/100x100/12141a/FF7A00?text=RC'" />
+          <img src="${cat.icon || DEFAULT_CAT_IMG}" alt="${cat.name}" onerror="this.src='${DEFAULT_CAT_IMG}'" />
         </div>
         <span>${cat.name}</span>
       `;
