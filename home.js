@@ -16,12 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initPhotoSearch();
 });
 
-/* Sabhi possible localStorage keys ko scan karke products laane ka foolproof function */
+/* 1. Global Product Fetcher with Live Fallback */
 function getStoredProducts() {
   let products = [];
-  
-  // Possible keys jahan admin data save kar sakta hai
-  const possibleKeys = ['products', 'rc_all_products', 'rc_products', 'admin_products', 'allProducts'];
+  const possibleKeys = ['rc_all_products', 'products', 'rc_products', 'admin_products'];
   
   for (let key of possibleKeys) {
     const data = localStorage.getItem(key);
@@ -36,42 +34,71 @@ function getStoredProducts() {
     }
   }
 
-  // Agar phir bhi na mile, toh localStorage ki saari keys check karo jisme product data ho sakta hai
-  if (products.length === 0) {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      try {
-        const val = JSON.parse(localStorage.getItem(key));
-        if (Array.isArray(val) && val.length > 0 && (val[0].name || val[0].price)) {
-          products = val;
-          break;
-        }
-      } catch (e) {}
-    }
+  // Fallback Product agar storage empty ho
+  if (!products || products.length === 0) {
+    return [
+      {
+        id: 'prod_default_1',
+        name: '9W Inverter LED Bulb',
+        price: 50,
+        oldPrice: 500,
+        rating: 5,
+        image: 'assets/placeholder_product.jpg',
+        category: 'led',
+        isSuggested: true,
+        isTrending: true
+      }
+    ];
   }
 
   return products;
 }
 
-/* 2. Suggested & Trending Sync Fix */
+/* 2. Global Safe Route */
+function navigateToProduct(productId) {
+  if (!productId) return;
+  window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
+}
+
+/* 3. Product Card Component Builder */
+function createProductCard(product) {
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.onclick = () => navigateToProduct(product.id);
+
+  const discountBadge = product.oldPrice && product.oldPrice > product.price 
+    ? `<span style="position: absolute; top: 10px; left: 10px; background: #FF7A00; color:#000; font-size: 0.65rem; font-weight: 800; padding: 2px 5px; border-radius: 4px;">${Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF</span>` 
+    : '';
+
+  card.innerHTML = `
+    ${discountBadge}
+    <img src="${product.image || 'assets/placeholder_product.jpg'}" alt="${product.name}" onerror="this.src='https://placehold.co/400x400/12141a/FF7A00?text=RADA+CREST'" />
+    <div class="product-title" title="${product.name}">${product.name}</div>
+    <div class="rating-badge"><i class="fa-solid fa-star"></i> ${product.rating || '5'}</div>
+    <div class="price-row">
+      <span class="current-price">₹${product.price}</span>
+      ${product.oldPrice ? `<span class="old-price">₹${product.oldPrice}</span>` : ''}
+    </div>
+  `;
+  return card;
+}
+
+/* 4. Suggested & Trending Lists */
 function initSmartPickAndTrending() {
   const allProducts = getStoredProducts();
   const suggestedList = document.getElementById('suggestedProductsList');
   const trendingList = document.getElementById('trendingProductsList');
 
-  suggestedList.innerHTML = '';
-  trendingList.innerHTML = '';
+  if (suggestedList) suggestedList.innerHTML = '';
+  if (trendingList) trendingList.innerHTML = '';
 
-  if (!allProducts.length) return;
-
-  // Agar products hain toh pehle 8 products ko suggested aur trending me dikhao
   allProducts.slice(0, 8).forEach(p => {
-    suggestedList.appendChild(createProductCard(p));
-    trendingList.appendChild(createProductCard(p));
+    if (suggestedList) suggestedList.appendChild(createProductCard(p));
+    if (trendingList) trendingList.appendChild(createProductCard(p));
   });
 }
 
-/* 3. All Products Grid Listing Fix */
+/* 5. All Products Grid Listing & Filtering */
 function initAllProductsListing() {
   const allProducts = getStoredProducts();
   const grid = document.getElementById('allProductsGrid');
@@ -79,6 +106,7 @@ function initAllProductsListing() {
   const sortFilter = document.getElementById('sortFilter');
 
   function render(items) {
+    if (!grid) return;
     grid.innerHTML = '';
     if (!items || !items.length) {
       grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 20px;">No products found.</p>`;
@@ -89,8 +117,8 @@ function initAllProductsListing() {
 
   function applyFilters() {
     let filtered = [...allProducts];
-    const cat = (catFilter.value || '').toLowerCase().trim();
-    const sort = sortFilter.value;
+    const cat = catFilter ? catFilter.value.toLowerCase().trim() : 'all';
+    const sort = sortFilter ? sortFilter.value : 'default';
 
     if (cat !== 'all') {
       filtered = filtered.filter(p => {
@@ -101,7 +129,7 @@ function initAllProductsListing() {
 
     if (sort === 'low-high') filtered.sort((a, b) => Number(a.price) - Number(b.price));
     else if (sort === 'high-low') filtered.sort((a, b) => Number(b.price) - Number(a.price));
-    else if (sort === 'rating') filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    else if (sort === 'rating') filtered.sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0));
 
     render(filtered);
   }
@@ -112,55 +140,52 @@ function initAllProductsListing() {
   render(allProducts);
 }
 
-/* 2. Admin Logo & Brand Dynamics (Real-time Sync) */
+/* 6. Admin Brand Settings */
 function initBrandSettings() {
-  const defaultSettings = {
+  const storeSettings = JSON.parse(localStorage.getItem('rc_store_settings')) || {
     name: 'RADA CREST',
     logoUrl: 'assets/logo.png',
     showLogo: true
   };
   
-  const storeSettings = JSON.parse(localStorage.getItem('rc_store_settings')) || defaultSettings;
-  
   const brandName = document.getElementById('brandName');
   const brandLogo = document.getElementById('brandLogo');
 
-  if (storeSettings.name) {
-    brandName.innerText = storeSettings.name;
-  }
-
-  if (storeSettings.showLogo !== false && storeSettings.logoUrl) {
-    brandLogo.src = storeSettings.logoUrl;
-    brandLogo.style.display = 'block';
-    
-    // Fallback agar image load na ho toh text initials ya hide karne ke liye
-    brandLogo.onerror = () => {
+  if (brandName && storeSettings.name) brandName.innerText = storeSettings.name;
+  if (brandLogo) {
+    if (storeSettings.showLogo !== false && storeSettings.logoUrl) {
+      brandLogo.src = storeSettings.logoUrl;
+      brandLogo.style.display = 'block';
+      brandLogo.onerror = () => { brandLogo.style.display = 'none'; };
+    } else {
       brandLogo.style.display = 'none';
-    };
-  } else {
-    brandLogo.style.display = 'none';
+    }
   }
 }
 
-/* 3. Delivery Address State Sync */
+/* 7. Delivery Address Sync */
 function initDeliveryAddress() {
   const activeAddr = JSON.parse(localStorage.getItem('rc_selected_address'));
   const currentAddressEl = document.getElementById('currentAddress');
-  if (activeAddr && activeAddr.addressLine) {
-    currentAddressEl.innerText = `${activeAddr.name ? activeAddr.name + ' - ' : ''}${activeAddr.addressLine}, ${activeAddr.city || ''}`;
-  } else {
-    currentAddressEl.innerText = 'Add delivery address';
+  if (currentAddressEl) {
+    if (activeAddr && activeAddr.addressLine) {
+      currentAddressEl.innerText = `${activeAddr.name ? activeAddr.name + ' - ' : ''}${activeAddr.addressLine}`;
+    } else {
+      currentAddressEl.innerText = 'Add delivery address';
+    }
   }
 }
 
-/* 4. Cart Count */
+/* 8. Cart Count */
 function initCartCounter() {
   const cartItems = JSON.parse(localStorage.getItem('rc_cart_items')) || [];
   const cartCountEl = document.getElementById('cartCount');
-  cartCountEl.innerText = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  if (cartCountEl) {
+    cartCountEl.innerText = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+  }
 }
 
-/* 5. Main Banner Slider (Max 10) */
+/* 9. Banner Slider */
 function initBannerSlider() {
   const defaultBanners = [
     { image: 'assets/banner1.jpg', link: 'category.html?cat=led' },
@@ -173,18 +198,15 @@ function initBannerSlider() {
 
   const track = document.getElementById('slidesTrack');
   const dots = document.getElementById('sliderDots');
+  if (!track || !dots) return;
+
   track.innerHTML = '';
   dots.innerHTML = '';
-
-  if (!banners.length) {
-    document.querySelector('.banner-section').style.display = 'none';
-    return;
-  }
 
   banners.forEach((b, index) => {
     const slide = document.createElement('div');
     slide.className = 'slide';
-    slide.innerHTML = `<img src="${b.image}" alt="Special Deal" onerror="this.src='assets/placeholder_banner.jpg'" />`;
+    slide.innerHTML = `<img src="${b.image}" alt="Deal" onerror="this.src='https://placehold.co/800x350/12141a/FF7A00?text=RADA+CREST+OFFERS'" />`;
     slide.onclick = () => { if (b.link) window.location.href = b.link; };
     track.appendChild(slide);
 
@@ -195,59 +217,40 @@ function initBannerSlider() {
 
   let currentIndex = 0;
   const updateSlide = (idx) => {
+    if (!banners.length) return;
     currentIndex = (idx + banners.length) % banners.length;
     track.style.transform = `translateX(-${currentIndex * 100}%)`;
     dots.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === currentIndex));
   };
 
-  document.getElementById('sliderNext').onclick = () => updateSlide(currentIndex + 1);
-  document.getElementById('sliderPrev').onclick = () => updateSlide(currentIndex - 1);
+  const nextBtn = document.getElementById('sliderNext');
+  const prevBtn = document.getElementById('sliderPrev');
+  if (nextBtn) nextBtn.onclick = () => updateSlide(currentIndex + 1);
+  if (prevBtn) prevBtn.onclick = () => updateSlide(currentIndex - 1);
   setInterval(() => updateSlide(currentIndex + 1), 4500);
 }
 
-/* 6. Product Card Component Builder */
-function createProductCard(product) {
-  const card = document.createElement('div');
-  card.className = 'product-card';
-  card.onclick = () => navigateToProduct(product.id);
-
-  const discountBadge = product.oldPrice && product.oldPrice > product.price 
-    ? `<span style="position: absolute; top: 12px; left: 12px; background: #FF7A00; color:#000; font-size: 0.65rem; font-weight: 800; padding: 2px 4px; border-radius: 4px;">${Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF</span>` 
-    : '';
-
-  card.innerHTML = `
-    ${discountBadge}
-    <img src="${product.image || 'assets/placeholder_product.jpg'}" alt="${product.name}" onerror="this.src='assets/placeholder_product.jpg'" />
-    <div class="product-title" title="${product.name}">${product.name}</div>
-    <div class="rating-badge"><i class="fa-solid fa-star"></i> ${product.rating || '4.5'}</div>
-    <div class="price-row">
-      <span class="current-price">₹${product.price}</span>
-      ${product.oldPrice ? `<span class="old-price">₹${product.oldPrice}</span>` : ''}
-    </div>
-  `;
-  return card;
-}
-
-/* 7. Festival Sale Banner / Fallback Section */
+/* 10. Festival Sale Section */
 function initFestivalAndFallback() {
   const festivalData = JSON.parse(localStorage.getItem('rc_festival_sale')) || { active: false };
   const festivalSection = document.getElementById('festivalSection');
 
-  if (festivalData.active) {
-    festivalSection.style.display = 'block';
-    if (festivalData.title) document.getElementById('festivalTitle').innerText = festivalData.title;
-    if (festivalData.pageLink) document.getElementById('festivalViewAll').href = festivalData.pageLink;
-
-    const list = document.getElementById('festivalProductsList');
-    list.innerHTML = '';
-    (festivalData.products || []).forEach(p => list.appendChild(createProductCard(p)));
-  } else {
-    // Fallback: Ensure Suggested/Trending is visibly prioritized if Festival is inactive
-    festivalSection.style.display = 'none';
+  if (festivalSection) {
+    if (festivalData.active) {
+      festivalSection.style.display = 'block';
+      if (festivalData.title) document.getElementById('festivalTitle').innerText = festivalData.title;
+      const list = document.getElementById('festivalProductsList');
+      if (list) {
+        list.innerHTML = '';
+        (festivalData.products || []).forEach(p => list.appendChild(createProductCard(p)));
+      }
+    } else {
+      festivalSection.style.display = 'none';
+    }
   }
 }
 
-/* 8. Dynamic Categories */
+/* 11. Categories */
 function initCategories() {
   const defaultCats = [
     { name: 'LED Bulbs', slug: 'led', icon: 'assets/cat_led.png' },
@@ -259,45 +262,37 @@ function initCategories() {
   const grid = document.getElementById('categoriesGrid');
   const catFilter = document.getElementById('categoryFilter');
   
-  grid.innerHTML = '';
-  categories.forEach(cat => {
-    const card = document.createElement('a');
-    card.className = 'category-card';
-    card.href = `category.html?cat=${encodeURIComponent(cat.slug || cat.name.toLowerCase())}`;
-    card.innerHTML = `
-      <div class="cat-img-box">
-        <img src="${cat.icon || 'assets/cat_default.png'}" alt="${cat.name}" onerror="this.src='assets/cat_default.png'" />
-      </div>
-      <span>${cat.name}</span>
-    `;
-    grid.appendChild(card);
+  if (grid) {
+    grid.innerHTML = '';
+    categories.forEach(cat => {
+      const card = document.createElement('a');
+      card.className = 'category-card';
+      card.href = `category.html?cat=${encodeURIComponent(cat.slug || cat.name.toLowerCase())}`;
+      card.innerHTML = `
+        <div class="cat-img-box">
+          <img src="${cat.icon || 'assets/cat_default.png'}" alt="${cat.name}" onerror="this.src='https://placehold.co/100x100/12141a/FF7A00?text=RC'" />
+        </div>
+        <span>${cat.name}</span>
+      `;
+      grid.appendChild(card);
+    });
+  }
 
-    // Populate Filter dropdown
-    const opt = document.createElement('option');
-    opt.value = cat.slug || cat.name.toLowerCase();
-    opt.innerText = cat.name;
-    catFilter.appendChild(opt);
-  });
+  if (catFilter && catFilter.options.length <= 1) {
+    categories.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat.slug || cat.name.toLowerCase();
+      opt.innerText = cat.name;
+      catFilter.appendChild(opt);
+    });
+  }
 }
 
-/* 9. Suggested & Trending Lists */
-function initSmartPickAndTrending() {
-  const allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || [];
-  
-  const suggestedList = document.getElementById('suggestedProductsList');
-  const trendingList = document.getElementById('trendingProductsList');
-
-  const suggested = allProducts.filter(p => p.isSuggested || p.rating >= 4.5).slice(0, 8);
-  const trending = allProducts.filter(p => p.isTrending || p.salesCount > 10).slice(0, 8);
-
-  suggested.forEach(p => suggestedList.appendChild(createProductCard(p)));
-  trending.forEach(p => trendingList.appendChild(createProductCard(p)));
-}
-
-/* 10. Dynamic Product Sections (Admin Controlled) */
+/* 12. Dynamic Product Sections */
 function initDynamicProductSections() {
   const sections = JSON.parse(localStorage.getItem('rc_custom_sections')) || [];
   const container = document.getElementById('dynamicSectionsContainer');
+  if (!container) return;
   container.innerHTML = '';
 
   sections.forEach(sec => {
@@ -307,7 +302,6 @@ function initDynamicProductSections() {
     secEl.innerHTML = `
       <div class="section-header">
         <h2>${sec.title}</h2>
-        ${sec.viewAllLink ? `<a href="${sec.viewAllLink}" class="view-all">View All <i class="fa-solid fa-chevron-right"></i></a>` : ''}
       </div>
       <div class="product-scroller" id="sec_${sec.id}"></div>
     `;
@@ -318,44 +312,7 @@ function initDynamicProductSections() {
   });
 }
 
-/* 11. Listing, Sorting & Filtering */
-function initAllProductsListing() {
-  const allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || [];
-  const grid = document.getElementById('allProductsGrid');
-  const catFilter = document.getElementById('categoryFilter');
-  const sortFilter = document.getElementById('sortFilter');
-
-  function render(items) {
-    grid.innerHTML = '';
-    if (!items.length) {
-      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 20px;">No products found.</p>`;
-      return;
-    }
-    items.forEach(p => grid.appendChild(createProductCard(p)));
-  }
-
-  function applyFilters() {
-    let filtered = [...allProducts];
-    const cat = catFilter.value;
-    const sort = sortFilter.value;
-
-    if (cat !== 'all') {
-      filtered = filtered.filter(p => (p.category || '').toLowerCase() === cat.toLowerCase());
-    }
-
-    if (sort === 'low-high') filtered.sort((a, b) => a.price - b.price);
-    else if (sort === 'high-low') filtered.sort((a, b) => b.price - a.price);
-    else if (sort === 'rating') filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-
-    render(filtered);
-  }
-
-  catFilter.onchange = applyFilters;
-  sortFilter.onchange = applyFilters;
-  render(allProducts);
-}
-
-/* 12. Smart Intent Search Router */
+/* 13. Search Systems */
 function executeSearch(query) {
   if (!query || !query.trim()) return;
   window.location.href = `search.html?q=${encodeURIComponent(query.trim())}`;
@@ -365,30 +322,28 @@ function initSmartSearch() {
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
 
-  searchBtn.onclick = () => executeSearch(searchInput.value);
-  searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') executeSearch(searchInput.value);
-  });
+  if (searchBtn && searchInput) {
+    searchBtn.onclick = () => executeSearch(searchInput.value);
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') executeSearch(searchInput.value);
+    });
+  }
 }
 
-/* 13. Voice Search Integration with Permission Handling */
 function initVoiceSearch() {
   const voiceBtn = document.getElementById('voiceSearchBtn');
   const searchInput = document.getElementById('searchInput');
+  if (!voiceBtn || !searchInput) return;
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    voiceBtn.onclick = () => alert('Voice search is not supported on this browser.');
-    return;
-  }
+  if (!SpeechRecognition) return;
 
   const recognition = new SpeechRecognition();
   recognition.lang = 'hi-IN';
-  recognition.interimResults = false;
 
   recognition.onstart = () => {
-    voiceBtn.style.color = 'var(--primary)';
-    searchInput.placeholder = 'Listening... Speak now';
+    voiceBtn.style.color = '#FF7A00';
+    searchInput.placeholder = 'Listening...';
   };
 
   recognition.onresult = (event) => {
@@ -397,29 +352,16 @@ function initVoiceSearch() {
     executeSearch(transcript);
   };
 
-  recognition.onerror = (event) => {
-    voiceBtn.style.color = '';
-    searchInput.placeholder = "Search '9W LED Bulb'...";
-    if (event.error === 'not-allowed') {
-      alert('Microphone permission was denied. Please allow microphone access in settings.');
-    }
-  };
-
   recognition.onend = () => {
     voiceBtn.style.color = '';
-    searchInput.placeholder = "Search '9W LED Bulb'...";
+    searchInput.placeholder = 'Search';
   };
 
   voiceBtn.onclick = () => {
-    try {
-      recognition.start();
-    } catch (e) {
-      recognition.stop();
-    }
+    try { recognition.start(); } catch (e) { recognition.stop(); }
   };
 }
 
-/* 14. Photo Search Modal & Device Permission Handling */
 function initPhotoSearch() {
   const photoBtn = document.getElementById('photoSearchBtn');
   const modal = document.getElementById('photoModal');
@@ -427,25 +369,17 @@ function initPhotoSearch() {
   const cameraInput = document.getElementById('cameraInput');
   const galleryInput = document.getElementById('galleryInput');
 
+  if (!photoBtn || !modal) return;
+
   photoBtn.onclick = () => modal.classList.add('active');
-  closeBtn.onclick = () => modal.classList.remove('active');
+  if (closeBtn) closeBtn.onclick = () => modal.classList.remove('active');
 
   const handleImage = (file) => {
     if (!file) return;
     modal.classList.remove('active');
-    // Directing to Visual Search Processor
     window.location.href = `search.html?visualSearch=true&name=${encodeURIComponent(file.name)}`;
   };
 
-  cameraInput.onchange = (e) => handleImage(e.target.files[0]);
-  galleryInput.onchange = (e) => handleImage(e.target.files[0]);
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    initSmartPickAndTrending();
-    initAllProductsListing();
-  });
-} else {
-  initSmartPickAndTrending();
-  initAllProductsListing();
+  if (cameraInput) cameraInput.onchange = (e) => handleImage(e.target.files[0]);
+  if (galleryInput) galleryInput.onchange = (e) => handleImage(e.target.files[0]);
 }
