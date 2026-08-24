@@ -67,14 +67,28 @@ body {
 .brand-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   text-decoration: none;
 }
 
 .brand-logo {
-  height: 32px;
-  width: auto;
-  filter: drop-shadow(0 0 8px var(--primary-glow));
+  height: 36px;
+  width: 36px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1px solid var(--border-active);
+}
+
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px 6px;
+  font-size: 0.85rem;
+  outline: none;
+  width: 100%;
 }
 
 .brand-title {
