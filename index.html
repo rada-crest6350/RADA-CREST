@@ -8,186 +8,583 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --primary-bg: #090B0E;
+      --surface-1: #12161C;
+      --surface-2: #1A2029;
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --accent: #FF7A00;
+      --accent-glow: rgba(255, 122, 0, 0.35);
+      --accent-soft: rgba(255, 122, 0, 0.12);
+      --text-main: #F4F6F8;
+      --text-muted: #8E9BAE;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --transition: cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--primary-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-1 {
+      top: -100px;
+      left: 20%;
+      width: 350px;
+      height: 350px;
+      background: var(--accent-glow);
+      opacity: 0.25;
+    }
+
+    /* HEADER */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 11, 14, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .header-inner {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .brand-logo {
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #FFFFFF 40%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .quick-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .nav-icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-full);
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: var(--accent);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+    }
+
+    .text-accent { color: var(--accent); }
+
+    /* ADDRESS STRIP */
+    .address-strip {
+      margin-top: 14px;
+      background: linear-gradient(90deg, rgba(26, 32, 41, 0.6) 0%, rgba(255, 122, 0, 0.08) 100%);
+      border: 1px solid var(--surface-border);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .address-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .address-text .caption {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .address-text .loc-summary {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .btn-edit-addr {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* SEARCH */
+    .search-panel {
+      position: relative;
+      margin-top: 14px;
+    }
+
+    .search-bar-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--surface-1);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-lg);
+      padding: 4px 8px 4px 14px;
+      transition: var(--transition);
+    }
+
+    .search-bar-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    #smartSearchInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 10px 12px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .search-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .search-tool-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* SLIDER */
+    .slider-module {
+      margin-top: 16px;
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+
+    .banner-slide {
+      min-width: 100%;
+      aspect-ratio: 16 / 7;
+      background: var(--surface-2);
+      cursor: pointer;
+    }
+
+    .banner-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .slider-dots {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .dot.active {
+      width: 18px;
+      border-radius: var(--radius-full);
+      background: var(--accent);
+    }
+
+    /* CATEGORIES & CARDS */
+    .section-block { margin-top: 24px; }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .category-card {
+      background: var(--surface-1);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 12px 6px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .cat-icon-wrap {
+      color: var(--accent);
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+    }
+
+    .category-card span { font-size: 0.75rem; font-weight: 600; }
+
+    .products-horizontal-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 6px;
+    }
+    .products-horizontal-scroll::-webkit-scrollbar { display: none; }
+
+    .product-card {
+      background: var(--surface-1);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      min-width: 150px;
+      max-width: 170px;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .products-grid .product-card { min-width: 0; max-width: none; }
+
+    .product-img-box {
+      aspect-ratio: 1/1;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .product-img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+    .product-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 2.2em;
+      margin-bottom: 6px;
+    }
+
+    .current-price {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .old-price {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      margin-left: 4px;
+    }
+
+    .filter-toolbar select {
+      background: var(--surface-1);
+      border: 1px solid var(--surface-border);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      outline: none;
+    }
+
+    .hidden { display: none !important; }
+
+    /* FOOTER */
+    .app-footer {
+      margin-top: 40px;
+      background: #050608;
+      border-top: 1px solid var(--surface-border);
+      padding: 24px 0;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+  </style>
 </head>
 <body>
 
-  <!-- BACKGROUND AMBIENT GLOW -->
   <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
 
-  <!-- HEADER -->
   <header class="app-header">
     <div class="header-inner container">
-      <div class="brand-block" id="brandBlock">
-        <img id="storeLogo" src="assets/logo.png" alt="Rada Crest" class="brand-logo" onerror="this.style.display='none'">
-        <span id="storeName" class="brand-name">RADA CREST</span>
+      <div class="brand-block">
+        <span class="brand-name">RADA CREST</span>
       </div>
-
       <nav class="quick-nav">
-        <a href="help.html" class="nav-chip" title="Help">
-          <i class="fa-regular fa-circle-question"></i>
-          <span>Help</span>
-        </a>
-        <a href="referral.html" class="nav-chip" title="Refer & Earn">
-          <i class="fa-solid fa-gift text-accent"></i>
-          <span>Refer</span>
-        </a>
-        <a href="cart.html" class="nav-icon-btn cart-btn" title="Cart">
-          <i class="fa-solid fa-bag-shopping"></i>
-          <span class="badge" id="cartCountBadge">0</span>
-        </a>
-        <a href="account.html" class="nav-icon-btn account-btn" title="Account">
-          <i class="fa-regular fa-user"></i>
-        </a>
+        <a href="help.html" class="nav-chip"><i class="fa-regular fa-circle-question"></i> Help</a>
+        <a href="referral.html" class="nav-chip"><i class="fa-solid fa-gift text-accent"></i> Refer</a>
+        <a href="cart.html" class="nav-icon-btn"><i class="fa-solid fa-bag-shopping"></i><span class="badge" id="cartCountBadge">0</span></a>
+        <a href="account.html" class="nav-icon-btn"><i class="fa-regular fa-user"></i></a>
       </nav>
     </div>
   </header>
 
   <main class="main-content container">
-    <!-- DELIVERY ADDRESS CHIP -->
     <section class="address-strip" onclick="location.href='address.html'">
       <div class="address-meta">
-        <i class="fa-solid fa-location-dot accent-icon"></i>
+        <i class="fa-solid fa-location-dot text-accent"></i>
         <div class="address-text">
           <div class="caption">Deliver to: <strong id="userFullName">User</strong></div>
-          <div class="loc-summary" id="userAddressLine">Loading delivery address...</div>
+          <div class="loc-summary" id="userAddressLine">Add delivery address</div>
         </div>
       </div>
-      <button type="button" class="btn-edit-addr">Edit <i class="fa-solid fa-chevron-right"></i></button>
+      <button class="btn-edit-addr">Edit &gt;</button>
     </section>
 
-    <!-- SMART SEARCH ENGINE -->
     <section class="search-panel">
       <div class="search-bar-wrapper">
-        <i class="fa-solid fa-magnifying-glass search-leading-icon"></i>
-        <input type="search" id="smartSearchInput" placeholder="Search 'fast charger', '9W LED', 'board'..." autocomplete="off">
-        
+        <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+        <input type="search" id="smartSearchInput" placeholder="Search LED bulb, fast charger..." autocomplete="off">
         <div class="search-actions">
-          <button type="button" id="voiceSearchBtn" class="search-tool-btn" title="Voice Search">
-            <i class="fa-solid fa-microphone"></i>
-          </button>
-          <button type="button" id="photoSearchBtn" class="search-tool-btn" title="Photo Search">
-            <i class="fa-solid fa-camera"></i>
-          </button>
+          <button type="button" class="search-tool-btn" id="voiceSearchBtn"><i class="fa-solid fa-microphone"></i></button>
+          <button type="button" class="search-tool-btn" id="photoSearchBtn"><i class="fa-solid fa-camera"></i></button>
         </div>
       </div>
-      <!-- Hidden file input for photo search -->
       <input type="file" id="photoInput" accept="image/*" style="display: none;">
-      <div id="searchSuggestions" class="search-dropdown hidden"></div>
     </section>
 
-    <!-- 4K MAIN BANNER CAROUSEL (Up to 10 Banners) -->
     <section class="slider-module">
-      <div class="carousel-track-container" id="bannerContainer">
-        <div class="carousel-track" id="bannerTrack">
-          <!-- Dynamically populated -->
-        </div>
-      </div>
+      <div class="carousel-track" id="bannerTrack"></div>
       <div class="slider-dots" id="bannerDots"></div>
     </section>
 
-    <!-- FESTIVAL SALE OR DYNAMIC FALLBACK -->
-    <section id="festivalSection" class="promo-module hidden">
-      <!-- Dynamically filled with Festival Banner or Fallback -->
+    <section class="section-block">
+      <div class="section-head"><h2>Shop by Category</h2></div>
+      <div class="categories-grid" id="categoriesContainer"></div>
     </section>
 
-    <!-- CATEGORIES -->
     <section class="section-block">
-      <div class="section-head">
-        <h2>Shop by Category</h2>
-      </div>
-      <div class="categories-grid" id="categoriesContainer">
-        <!-- Dynamic Category Cards -->
-      </div>
+      <div class="section-head"><h2>Suggested for You</h2></div>
+      <div class="products-horizontal-scroll" id="suggestedContainer"></div>
     </section>
 
-    <!-- SUGGESTED PRODUCTS -->
     <section class="section-block">
-      <div class="section-head">
-        <h2>Suggested for You</h2>
-        <span class="badge-accent">Smart Pick</span>
-      </div>
-      <div class="products-horizontal-scroll" id="suggestedProductsContainer">
-        <!-- Dynamic Cards -->
-      </div>
+      <div class="section-head"><h2>Trending Now</h2></div>
+      <div class="products-horizontal-scroll" id="trendingContainer"></div>
     </section>
 
-    <!-- TRENDING PRODUCTS -->
     <section class="section-block">
-      <div class="section-head">
-        <h2>Trending Now</h2>
-        <span class="badge-fire"><i class="fa-solid fa-fire"></i> Hot</span>
-      </div>
-      <div class="products-horizontal-scroll" id="trendingProductsContainer">
-        <!-- Dynamic Cards -->
-      </div>
-    </section>
-
-    <!-- MAIN PRODUCT EXPLORER & FILTERS -->
-    <section class="section-block">
-      <div class="section-head column-mobile">
-        <div>
-          <h2>Explore All Products</h2>
-          <p class="section-sub">High-efficiency tech & lighting curated for you</p>
-        </div>
-        
-        <!-- Filter Controls -->
+      <div class="section-head" style="flex-wrap: wrap; gap: 8px;">
+        <h2>All Products</h2>
         <div class="filter-toolbar">
-          <select id="categoryFilter" class="custom-select">
-            <option value="all">All Categories</option>
-          </select>
-          <select id="priceFilter" class="custom-select">
-            <option value="default">Sort: Featured</option>
+          <select id="priceFilter">
+            <option value="default">Sort: Default</option>
             <option value="low-high">Price: Low to High</option>
             <option value="high-low">Price: High to Low</option>
           </select>
-          <select id="qualityFilter" class="custom-select">
-            <option value="all">Rating: All</option>
-            <option value="4">4★ & above</option>
-            <option value="5">Top 5★ Rated</option>
-          </select>
         </div>
       </div>
-
-      <div class="products-grid" id="mainProductsGrid">
-        <!-- Dynamic Grid Cards -->
-      </div>
-    </section>
-
-    <!-- LEGAL & INFO ACCORDION -->
-    <section class="policy-card">
-      <div class="policy-content">
-        <i class="fa-solid fa-shield-halved text-accent policy-icon"></i>
-        <div>
-          <h4>100% Genuine & Certified Products</h4>
-          <p>Read our warranty guidelines, shipping policies, and service terms.</p>
-        </div>
-      </div>
-      <a href="terms.html" class="btn-terms">Terms & Rules <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      <div class="products-grid" id="allProductsGrid"></div>
     </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="app-footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <div class="brand-name">RADA CREST</div>
-        <p>Premium LED lighting and high-speed electrical accessories engineered for durability.</p>
-      </div>
-      <div class="footer-links">
-        <a href="terms.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-        <a href="help.html">Customer Support</a>
-        <a href="account.html">My Orders</a>
-      </div>
-      <div class="footer-copy">
-        &copy; 2026 RADA CREST. All rights reserved.
-      </div>
+  <footer class="app-footer container">
+    <div style="margin-bottom: 10px;">
+      <a href="terms.html" style="color: var(--accent); text-decoration: none; margin-right: 12px;">Terms & Conditions</a>
+      <a href="help.html" style="color: var(--text-muted); text-decoration: none;">Help Support</a>
     </div>
+    <div>&copy; 2026 RADA CREST. All rights reserved.</div>
   </footer>
-  
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+
+  <!-- CONFIG FILE INCLUDED SAFELY -->
+  <script src="config.js" onerror="console.log('config.js optional')"></script>
+
+  <script>
+    // CORE STORE DATA & STATE
+    const storeData = {
+      banners: [
+        { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1000&q=80", link: "category.html?id=led" },
+        { img: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=1000&q=80", link: "category.html?id=accessories" }
+      ],
+      categories: [
+        { id: "led", name: "LED", icon: "fa-lightbulb" },
+        { id: "chargers", name: "Chargers", icon: "fa-bolt" },
+        { id: "boards", name: "Boards", icon: "fa-plug" },
+        { id: "cables", name: "Cables", icon: "fa-network-wired" }
+      ],
+      products: [
+        { id: "rc-01", name: "RADA High-Glow 9W Inverter LED Bulb", price: 249, oldPrice: 499, image: "https://images.unsplash.com/photo-1550985616-10810253b84d?w=500&q=80", isSuggested: true, isTrending: true },
+        { id: "rc-02", name: "TurboCharge 65W GaN Fast Charger", price: 899, oldPrice: 1499, image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500&q=80", isSuggested: true, isTrending: false },
+        { id: "rc-03", name: "Heavy Duty 4-Socket Surge Protected Board", price: 499, oldPrice: 799, image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80", isSuggested: false, isTrending: true }
+      ]
+    };
+
+    let activeBanner = 0;
+
+    function renderUI() {
+      // 1. Render Banners
+      const track = document.getElementById("bannerTrack");
+      const dots = document.getElementById("bannerDots");
+      track.innerHTML = storeData.banners.map(b => `
+        <div class="banner-slide" onclick="location.href='${b.link}'"><img src="${b.img}" alt="Banner"></div>
+      `).join("");
+      dots.innerHTML = storeData.banners.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join("");
+      
+      setInterval(() => {
+        activeBanner = (activeBanner + 1) % storeData.banners.length;
+        track.style.transform = `translateX(-${activeBanner * 100}%)`;
+        document.querySelectorAll(".dot").forEach((d, i) => d.classList.toggle("active", i === activeBanner));
+      }, 4000);
+
+      // 2. Render Categories
+      document.getElementById("categoriesContainer").innerHTML = storeData.categories.map(c => `
+        <div class="category-card" onclick="location.href='category.html?id=${c.id}'">
+          <div class="cat-icon-wrap"><i class="fa-solid ${c.icon}"></i></div>
+          <span>${c.name}</span>
+        </div>
+      `).join("");
+
+      // 3. Render Product Card Helper
+      const makeCard = (p) => `
+        <div class="product-card" onclick="location.href='product.html?id=${encodeURIComponent(p.id)}'">
+          <div class="product-img-box"><img src="${p.image}" alt="${p.name}"></div>
+          <div class="product-title">${p.name}</div>
+          <div><span class="current-price">₹${p.price}</span><span class="old-price">₹${p.oldPrice}</span></div>
+        </div>
+      `;
+
+      document.getElementById("suggestedContainer").innerHTML = storeData.products.filter(p => p.isSuggested).map(makeCard).join("");
+      document.getElementById("trendingContainer").innerHTML = storeData.products.filter(p => p.isTrending).map(makeCard).join("");
+      document.getElementById("allProductsGrid").innerHTML = storeData.products.map(makeCard).join("");
+
+      // Sync Cart Count
+      const cart = JSON.parse(localStorage.getItem("rc_cart") || "[]");
+      document.getElementById("cartCountBadge").textContent = cart.reduce((t, i) => t + (i.qty || 1), 0);
+    }
+
+    // Voice & Photo Actions
+    document.getElementById("voiceSearchBtn").addEventListener("click", () => {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Voice Search not supported on this browser.");
+      const rec = new SR();
+      rec.onresult = (e) => {
+        document.getElementById("smartSearchInput").value = e.results[0][0].transcript;
+      };
+      rec.start();
+    });
+
+    document.getElementById("photoSearchBtn").addEventListener("click", async () => {
+      try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const s = await navigator.mediaDevices.getUserMedia({ video: true });
+          s.getTracks().forEach(t => t.stop());
+        }
+        document.getElementById("photoInput").click();
+      } catch (e) {
+        alert("Camera permission denied.");
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", renderUI);
+  </script>
 </body>
 </html>
