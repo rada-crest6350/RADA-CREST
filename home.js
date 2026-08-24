@@ -16,10 +16,70 @@ document.addEventListener('DOMContentLoaded', () => {
   initPhotoSearch();
 });
 
-/* 1. Global Navigation Safe Guard */
-function navigateToProduct(productId) {
-  if (!productId) return;
-  window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
+/* 1. Global Product Fetch Helper (Sabhi keys check karega) */
+function getStoredProducts() {
+  return JSON.parse(localStorage.getItem('products')) || 
+         JSON.parse(localStorage.getItem('rc_all_products')) || 
+         JSON.parse(localStorage.getItem('rc_products')) || [];
+}
+
+/* 2. Suggested & Trending Sync Fix */
+function initSmartPickAndTrending() {
+  const allProducts = getStoredProducts();
+  const suggestedList = document.getElementById('suggestedProductsList');
+  const trendingList = document.getElementById('trendingProductsList');
+
+  suggestedList.innerHTML = '';
+  trendingList.innerHTML = '';
+
+  if (!allProducts.length) return;
+
+  // Agar products hain toh pehle 8 products ko suggested aur trending me dikhao
+  allProducts.slice(0, 8).forEach(p => {
+    suggestedList.appendChild(createProductCard(p));
+    trendingList.appendChild(createProductCard(p));
+  });
+}
+
+/* 3. All Products Grid Listing Fix */
+function initAllProductsListing() {
+  const allProducts = getStoredProducts();
+  const grid = document.getElementById('allProductsGrid');
+  const catFilter = document.getElementById('categoryFilter');
+  const sortFilter = document.getElementById('sortFilter');
+
+  function render(items) {
+    grid.innerHTML = '';
+    if (!items || !items.length) {
+      grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 20px;">No products found.</p>`;
+      return;
+    }
+    items.forEach(p => grid.appendChild(createProductCard(p)));
+  }
+
+  function applyFilters() {
+    let filtered = [...allProducts];
+    const cat = (catFilter.value || '').toLowerCase().trim();
+    const sort = sortFilter.value;
+
+    if (cat !== 'all') {
+      filtered = filtered.filter(p => {
+        const pCat = (p.category || '').toLowerCase().trim();
+        return pCat.includes(cat) || cat.includes(pCat);
+      });
+    }
+
+    if (sort === 'low-high') filtered.sort((a, b) => Number(a.price) - Number(b.price));
+    else if (sort === 'high-low') filtered.sort((a, b) => Number(b.price) - Number(a.price));
+    else if (sort === 'rating') filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+    render(filtered);
+  }
+
+  if (catFilter) catFilter.onchange = applyFilters;
+  if (sortFilter) sortFilter.onchange = applyFilters;
+
+  render(allProducts);
 }
 
 /* 2. Admin Logo & Brand Dynamics (Real-time Sync) */
