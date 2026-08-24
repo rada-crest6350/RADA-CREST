@@ -183,7 +183,7 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://tfrdoxfopqcvszfwwyvd.supabase.co';
+    const SUPABASE_URL = 'https://ynpsnkvrj.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_De-FPqeLF8L5g-7_nu_mvQ_VihQGfJL';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -213,46 +213,42 @@
       const p2 = document.getElementById('bulkPrice2').value;
       if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
 
-      const newProduct = {
+      // Supabase SQL Columns Matching Object
+      const supabaseProduct = {
         name: document.getElementById('pName').value,
         type: document.getElementById('productType').value,
         category: document.getElementById('pCategory').value,
         status: document.getElementById('pStatus').value,
-        oldPrice: Number(document.getElementById('pOldPrice').value) || 0,
+        old_price: Number(document.getElementById('pOldPrice').value) || 0,
         price: Number(document.getElementById('pPrice').value),
-        bulkPricing: bulkTiers,
+        bulk_pricing: bulkTiers,
         image: imageUrls[0] || '',
         images: imageUrls,
         video: document.getElementById('pVideoUrl').value.trim(),
-        hasWarranty: document.getElementById('pWarrantyToggle').checked,
+        has_warranty: document.getElementById('pWarrantyToggle').checked,
         size: document.getElementById('pSize').value || 'Free Size',
         colors: document.getElementById('pColors').value || '',
         stock: Number(document.getElementById('pStock').value) || 0,
         moq: Number(document.getElementById('pMoq').value) || 1,
         rating: 5.0,
-        salesCount: 0,
-        isSuggested: true,
-        isTrending: true
+        sales_count: 0,
+        is_suggested: true,
+        is_trending: true
       };
 
-      // 1. Supabase Cloud Sync
-      if (supabaseClient) {
-        try {
-          await supabaseClient.from('products').insert([newProduct]);
-        } catch (err) {
-          console.warn('Supabase insert skipped:', err.message);
+      try {
+        if (supabaseClient) {
+          const { error } = await supabaseClient.from('products').insert([supabaseProduct]);
+          if (error) throw error;
         }
+
+        alert('Product Live Save Ho Gaya (Supabase Connected)!');
+        window.location.href = 'index.html';
+      } catch (err) {
+        alert('Supabase Error: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Save & Publish Product';
       }
-
-      // 2. Local Fallback Sync
-      let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || 
-                        JSON.parse(localStorage.getItem('products')) || [];
-      allProducts.unshift({ ...newProduct, id: 'prod_' + Date.now() });
-      localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
-      localStorage.setItem('products', JSON.stringify(allProducts));
-
-      alert('Product saved successfully!');
-      window.location.href = 'index.html';
     };
   </script>
 </body>
