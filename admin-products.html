@@ -61,7 +61,6 @@
     <h2 style="margin-bottom: 15px;">Add New Product</h2>
     <form id="addProductForm">
       
-      <!-- Product Type Selection -->
       <div class="form-group">
         <label>Product Type</label>
         <select id="productType" class="form-control" required>
@@ -70,7 +69,6 @@
         </select>
       </div>
 
-      <!-- Basic Info -->
       <div class="form-group">
         <label>Product Name</label>
         <input type="text" id="pName" class="form-control" placeholder="e.g. 9W LED Bulb / Fast Charger" required>
@@ -95,7 +93,6 @@
         </div>
       </div>
 
-      <!-- Pricing & Discount -->
       <div class="row-grid">
         <div class="form-group">
           <label>Full Price (MRP)</label>
@@ -107,7 +104,6 @@
         </div>
       </div>
 
-      <!-- Bulk Pricing Tiers -->
       <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
         <label style="color: var(--primary, #FF7A00); font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Bulk / Wholesale Tier Pricing</label>
         
@@ -129,7 +125,6 @@
         </div>
       </div>
 
-      <!-- Media: Direct Photo Links (1 to 5) -->
       <div class="form-group">
         <label><i class="fa-solid fa-link"></i> Product Image Links (Paste Image URLs)</label>
         <input type="url" id="pImg1" class="form-control" placeholder="Main Image URL (Required)" required />
@@ -140,13 +135,11 @@
         <small style="color: #9ba1b0; display: block;">Direct links only (.jpg, .png, webp, imageshack, etc.)</small>
       </div>
 
-      <!-- Media: Video Link -->
       <div class="form-group">
         <label><i class="fa-solid fa-video"></i> Product Video URL (Optional)</label>
         <input type="url" id="pVideoUrl" class="form-control" placeholder="Video URL (mp4 link or YouTube embed)" />
       </div>
 
-      <!-- Warranty Toggle -->
       <div class="form-group">
         <label>Warranty Option</label>
         <div class="checkbox-group">
@@ -154,7 +147,6 @@
         </div>
       </div>
 
-      <!-- Size Option -->
       <div class="row-grid">
         <div class="form-group">
           <label>Size Variant</label>
@@ -166,7 +158,6 @@
         </div>
       </div>
 
-      <!-- Stock & Quantity Set -->
       <div class="row-grid">
         <div class="form-group">
           <label>Stock Quantity Available</label>
@@ -184,17 +175,15 @@
 
   <script>
     const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTg';
-    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) :
-    
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     document.getElementById('addProductForm').onsubmit = async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerText = 'Saving...';
+      submitBtn.innerText = 'Publishing...';
 
-      // Collect URLs
       const imageInputs = [
         document.getElementById('pImg1').value.trim(),
         document.getElementById('pImg2').value.trim(),
@@ -204,7 +193,6 @@
       ];
       const imageUrls = imageInputs.filter(url => url.length > 0);
 
-      // Collect Bulk Tiers
       const bulkTiers = [];
       const q1 = document.getElementById('bulkQty1').value;
       const p1 = document.getElementById('bulkPrice1').value;
@@ -214,7 +202,6 @@
       const p2 = document.getElementById('bulkPrice2').value;
       if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
 
-      // Supabase SQL Columns Matching Object
       const supabaseProduct = {
         name: document.getElementById('pName').value,
         type: document.getElementById('productType').value,
@@ -238,12 +225,11 @@
       };
 
       try {
-        if (supabaseClient) {
-          const { error } = await supabaseClient.from('products').insert([supabaseProduct]);
-          if (error) throw error;
-        }
+        if (!supabaseClient) throw new Error("Database connection nahi bana.");
+        const { error } = await supabaseClient.from('products').insert([supabaseProduct]);
+        if (error) throw error;
 
-        alert('Product Live Save Ho Gaya (Supabase Connected)!');
+        alert('Product Live Publish Ho Gaya!');
         window.location.href = 'index.html';
       } catch (err) {
         alert('Supabase Error: ' + err.message);
