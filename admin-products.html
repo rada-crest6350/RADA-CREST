@@ -76,11 +76,28 @@
         </div>
       </div>
 
-      <!-- Bulk Pricing Tiers -->
-      <div class="form-group">
-        <label>Bulk Pricing (Optional for Wholesale)</label>
-        <input type="text" id="pBulkPrice" class="form-control" placeholder="e.g. 5+ pcs: ₹180 each, 10+ pcs: ₹160 each">
+      <!-- Bulk Pricing Tiers (Structured for 50pcs, 100pcs etc.) -->
+<div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+  <label style="color: var(--primary); font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Bulk / Wholesale Tier Pricing</label>
+  
+  <div class="row-grid" style="margin-bottom: 8px;">
+    <div>
+      <small style="color: var(--text-muted);">Tier 1 (e.g. 50 Pcs)</small>
+      <div style="display: flex; gap: 6px; margin-top: 2px;">
+        <input type="number" id="bulkQty1" class="form-control" placeholder="Qty (e.g. 50)" />
+        <input type="number" id="bulkPrice1" class="form-control" placeholder="Price/pc" />
       </div>
+    </div>
+    <div>
+      <small style="color: var(--text-muted);">Tier 2 (e.g. 100 Pcs)</small>
+      <div style="display: flex; gap: 6px; margin-top: 2px;">
+        <input type="number" id="bulkQty2" class="form-control" placeholder="Qty (e.g. 100)" />
+        <input type="number" id="bulkPrice2" class="form-control" placeholder="Price/pc" />
+      </div>
+    </div>
+  </div>
+</div>
+      
 
       <!-- Media: Photos & Video Upload -->
 <div class="form-group">
@@ -133,44 +150,87 @@
   </div>
 
   <script>
-    document.getElementById('addProductForm').onsubmit = (e) => {
-      e.preventDefault();
+  document.getElementById('addProductForm').onsubmit = async (e) => {
+  e.preventDefault();
 
-      const newProduct = {
-        id: 'prod_' + Date.now(),
-        type: document.getElementById('productType').value,
-        name: document.getElementById('pName').value,
-        category: document.getElementById('pCategory').value,
-        status: document.getElementById('pStatus').value,
-        oldPrice: Number(document.getElementById('pOldPrice').value) || 0,
-        price: Number(document.getElementById('pPrice').value),
-        bulkPrice: document.getElementById('pBulkPrice').value,
-        image: document.getElementById('pImages').value.split(',')[0]?.trim() || 'assets/placeholder_product.jpg',
-        images: document.getElementById('pImages').value.split(',').map(s => s.trim()).filter(Boolean),
-        hasWarranty: document.getElementById('pWarrantyToggle').checked,
-        size: document.getElementById('pSize').value || 'Free Size',
-        colors: document.getElementById('pColors').value,
-        stock: Number(document.getElementById('pStock').value) || 0,
-        moq: Number(document.getElementById('pMoq').value) || 1,
-        rating: 5.0,
-        salesCount: 0
-      };
+  const photoFiles = Array.from(document.getElementById('pPhotoFiles').files).slice(0, 5);
+  const videoFile = document.getElementById('pVideoFile').files[0];
+  const videoUrlInput = document.getElementById('pVideoUrl').value.trim();
 
-      // Save to LocalStorage / Database Sync
-      let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || [];
-      allProducts.unshift(newProduct);
-      localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
+  const fileToBase64 = (file) => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
 
-      // If Festival Sale Product, push to festival data as well
-      if (newProduct.type === 'festival') {
-        let festivalData = JSON.parse(localStorage.getItem('rc_festival_sale')) || { active: true, products: [] };
-        festivalData.products.push(newProduct);
-        localStorage.setItem('rc_festival_sale', JSON.stringify(festivalData));
-      }
+  let imageUrls = [];
+  try {
+    if (photoFiles.length > 0) {
+      imageUrls = await Promise.all(photoFiles.map(f => fileToBase64(f)));
+    } else {
+      imageUrls.push('assets/placeholder_product.jpg');
+    }
+  } catch (err) {
+    imageUrls = ['assets/placeholder_product.jpg'];
+  }
 
-      alert('Product successfully added and updated on Home Page!');
-      window.location.href = 'index.html';
-    };
-  </script>
-</body>
-</html>
+  let finalVideoUrl = videoUrlInput;
+  if (videoFile) {
+    try {
+      finalVideoUrl = await fileToBase64(videoFile);
+    } catch(err) {
+      finalVideoUrl = '';
+    }
+  }
+
+  // Collect Bulk Tiers
+  const bulkTiers = [];
+  const q1 = document.getElementById('bulkQty1').value;
+  const p1 = document.getElementById('bulkPrice1').value;
+  if (q1 && p1) bulkTiers.push({ minQty: Number(q1), pricePerPiece: Number(p1) });
+
+  const q2 = document.getElementById('bulkQty2').value;
+  const p2 = document.getElementById('bulkPrice2').value;
+  if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
+
+  const newProduct = {
+    id: 'prod_' + Date.now(),
+    type: document.getElementById('productType').value,
+    name: document.getElementById('pName').value,
+    category: document.getElementById('pCategory').value,
+    status: document.getElementById('pStatus').value,
+    oldPrice: Number(document.getElementById('pOldPrice').value) || 0,
+    price: Number(document.getElementById('pPrice').value),
+    bulkPricing: bulkTiers,
+    image: imageUrls[0],
+    images: imageUrls,
+    video: finalVideoUrl,
+    hasWarranty: document.getElementById('pWarrantyToggle').checked,
+    size: document.getElementById('pSize').value || 'Free Size',
+    colors: document.getElementById('pColors').value,
+    stock: Number(document.getElementById('pStock').value) || 0,
+    moq: Number(document.getElementById('pMoq').value) || 1,
+    rating: 5.0,
+    salesCount: 0,
+    isSuggested: true, // Homepage par turant show karne ke liye
+    isTrending: true
+  };
+
+  try {
+    let allProducts = JSON.parse(localStorage.getItem('rc_all_products')) || [];
+    allProducts.unshift(newProduct);
+    localStorage.setItem('rc_all_products', JSON.stringify(allProducts));
+
+    if (newProduct.type === 'festival') {
+      let festivalData = JSON.parse(localStorage.getItem('rc_festival_sale')) || { active: true, products: [] };
+      festivalData.products.push(newProduct);
+      localStorage.setItem('rc_festival_sale', JSON.stringify(festivalData));
+    }
+
+    alert('Product successfully added! Now displaying on Home Page.');
+    window.location.href = 'index.html';
+  } catch (storageError) {
+    alert('Storage limit reached! Please upload smaller images or fewer photos.');
+  }
+};
+    
