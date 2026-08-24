@@ -11,9 +11,9 @@
   <style>
     :root {
       --primary-bg: #05070A;
-      --surface-1: rgba(15, 19, 26, 0.7);
-      --surface-2: rgba(26, 32, 44, 0.7);
-      --surface-border: rgba(255, 122, 0, 0.18);
+      --surface-1: rgba(15, 19, 26, 0.75);
+      --surface-2: rgba(26, 32, 44, 0.75);
+      --surface-border: rgba(255, 122, 0, 0.22);
       --accent: #FF7A00;
       --accent-glow: rgba(255, 122, 0, 0.45);
       --accent-soft: rgba(255, 122, 0, 0.12);
@@ -43,7 +43,7 @@
       position: relative;
     }
 
-    /* REAL-TIME MATRIX / PARTICLE CANVAS */
+    /* REAL-TIME MATRIX CANVAS */
     #techCanvas {
       position: fixed;
       top: 0;
@@ -52,10 +52,9 @@
       height: 100vh;
       z-index: 0;
       pointer-events: none;
-      opacity: 0.65;
+      opacity: 0.7;
     }
 
-    /* REAL-TIME PULSING ORBS */
     .orb-light {
       position: fixed;
       border-radius: 50%;
@@ -101,7 +100,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(5, 7, 10, 0.82);
+      background: rgba(5, 7, 10, 0.85);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--surface-border);
@@ -181,12 +180,6 @@
       transition: var(--transition);
     }
 
-    .nav-icon-btn:hover {
-      border-color: var(--accent);
-      transform: scale(1.08);
-      box-shadow: 0 0 15px var(--accent-glow);
-    }
-
     .badge {
       position: absolute;
       top: -3px;
@@ -230,7 +223,7 @@
       left: -150%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 122, 0, 0.18), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 122, 0, 0.22), transparent);
       animation: lightSweep 4s infinite linear;
     }
 
@@ -264,12 +257,9 @@
       font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
 
-    /* SMART SEARCH BAR */
+    /* SEARCH BAR */
     .search-panel {
       position: relative;
       margin-top: 14px;
@@ -289,7 +279,6 @@
     .search-bar-wrapper:focus-within {
       border-color: var(--accent);
       box-shadow: 0 0 24px var(--accent-glow);
-      transform: translateY(-1px);
     }
 
     #smartSearchInput {
@@ -322,13 +311,7 @@
       transition: var(--transition);
     }
 
-    .search-tool-btn:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-
-    /* SLIDER MODULE WITH NEON SCAN BARS */
+    /* SLIDER */
     .slider-module {
       margin-top: 18px;
       position: relative;
@@ -348,7 +331,6 @@
       aspect-ratio: 16 / 7;
       background: var(--surface-2);
       cursor: pointer;
-      position: relative;
     }
 
     .banner-slide img {
@@ -382,7 +364,7 @@
       box-shadow: 0 0 10px var(--accent);
     }
 
-    /* SECTIONS & CYBER HEADERS */
+    /* SECTIONS */
     .section-block { margin-top: 28px; }
     .section-head {
       display: flex;
@@ -414,7 +396,7 @@
       50% { transform: scale(1.4); opacity: 0.4; }
     }
 
-    /* CATEGORIES WITH HUD GLOW */
+    /* CATEGORIES */
     .categories-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -430,8 +412,6 @@
       cursor: pointer;
       backdrop-filter: blur(14px);
       transition: var(--transition);
-      position: relative;
-      overflow: hidden;
     }
 
     .category-card:hover {
@@ -444,16 +424,11 @@
       color: var(--accent);
       font-size: 1.3rem;
       margin-bottom: 8px;
-      transition: transform 0.3s ease;
-    }
-
-    .category-card:hover .cat-icon-wrap {
-      transform: scale(1.2);
     }
 
     .category-card span { font-size: 0.75rem; font-weight: 700; }
 
-    /* PRODUCT CARDS (HIGH-TECH 3D HOVER) */
+    /* PRODUCT CARDS */
     .products-horizontal-scroll {
       display: flex;
       gap: 14px;
@@ -476,8 +451,6 @@
       flex-direction: column;
       backdrop-filter: blur(16px);
       transition: var(--transition);
-      position: relative;
-      overflow: hidden;
     }
 
     .products-grid {
@@ -492,30 +465,18 @@
 
     .products-grid .product-card { min-width: 0; max-width: none; }
 
-    .product-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-6px);
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
-    }
-
     .product-img-box {
       aspect-ratio: 1/1;
       background: var(--surface-2);
       border-radius: var(--radius-sm);
       overflow: hidden;
       margin-bottom: 10px;
-      position: relative;
     }
 
     .product-img-box img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .product-card:hover .product-img-box img {
-      transform: scale(1.08);
     }
 
     .product-title {
@@ -543,6 +504,18 @@
       margin-left: 6px;
     }
 
+    .empty-state-box {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 30px 16px;
+      border: 1px dashed var(--surface-border);
+      border-radius: var(--radius-md);
+      background: var(--surface-1);
+      backdrop-filter: blur(10px);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
     .filter-toolbar select {
       background: var(--surface-1);
       border: 1px solid var(--surface-border);
@@ -551,10 +524,8 @@
       border-radius: var(--radius-full);
       font-size: 0.75rem;
       outline: none;
-      backdrop-filter: blur(10px);
     }
 
-    /* FOOTER */
     .app-footer {
       margin-top: 48px;
       background: #030406;
@@ -570,7 +541,7 @@
 </head>
 <body>
 
-  <!-- BACKGROUND REAL-TIME PARTICLES & CYBER GLOW -->
+  <!-- BACKGROUND ANIMATION CANVAS -->
   <canvas id="techCanvas"></canvas>
   <div class="orb-light orb-1"></div>
   <div class="orb-light orb-2"></div>
@@ -592,7 +563,7 @@
   </header>
 
   <main class="main-content container">
-    <!-- SCANNER ADDRESS BAR -->
+    <!-- ADDRESS BAR -->
     <section class="address-strip" onclick="location.href='address.html'">
       <div class="address-meta">
         <i class="fa-solid fa-location-dot text-accent" style="font-size: 1.1rem;"></i>
@@ -604,7 +575,7 @@
       <button class="btn-edit-addr">Edit <i class="fa-solid fa-chevron-right"></i></button>
     </section>
 
-    <!-- SMART SEARCH -->
+    <!-- SEARCH BAR -->
     <section class="search-panel">
       <div class="search-bar-wrapper">
         <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
@@ -617,7 +588,7 @@
       <input type="file" id="photoInput" accept="image/*" style="display: none;">
     </section>
 
-    <!-- BANNER CAROUSEL -->
+    <!-- BANNER SLIDER -->
     <section class="slider-module" id="bannerModule">
       <div class="carousel-track" id="bannerTrack"></div>
       <div class="slider-dots" id="bannerDots"></div>
@@ -639,7 +610,7 @@
       <div class="products-horizontal-scroll" id="suggestedContainer"></div>
     </section>
 
-    <!-- TRENDING PRODUCTS -->
+    <!-- TRENDING TECH -->
     <section class="section-block" id="trendingSection">
       <div class="section-head">
         <h2><div class="live-dot"></div> Trending Tech</h2>
@@ -647,7 +618,7 @@
       <div class="products-horizontal-scroll" id="trendingContainer"></div>
     </section>
 
-    <!-- ALL PRODUCTS -->
+    <!-- ALL INVENTORY -->
     <section class="section-block">
       <div class="section-head" style="flex-wrap: wrap; gap: 8px;">
         <h2><div class="live-dot"></div> All Inventory</h2>
@@ -671,32 +642,23 @@
     <div>&copy; 2026 RADA CREST. All rights reserved.</div>
   </footer>
 
-  <!-- CONFIG FILE INCLUDED SAFELY -->
-  <script src="config.js" onerror="console.log('config.js optional')"></script>
-
   <script>
-    // ==========================================
-    // 1. DATA CONFIGURATION (KHALI / EDITABLE)
-    // ==========================================
+    // STORE CONFIGURATION
     const storeData = {
-      // Banners: Agar nahi ho to array [] khali rahega
       banners: [
         { img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80", link: "category.html?id=led" }
       ],
       categories: [
-        { id: "led", name: "LED", icon: "fa-lightbulb" },
+        { id: "led", name: "LED Lights", icon: "fa-lightbulb" },
         { id: "chargers", name: "Chargers", icon: "fa-bolt" },
         { id: "boards", name: "Boards", icon: "fa-plug" },
         { id: "cables", name: "Cables", icon: "fa-network-wired" }
       ],
-      // Products: Real product add karne ke liye yahan update karein
-      products: []
+      products: [] // Products add hone par yahan aayenge
     };
 
-    // ==========================================
-    // 2. REAL-TIME CYBER BACKGROUND ANIMATION ENGINE
-    // ==========================================
-    function initMatrixCanvas() {
+    // REAL-TIME ELECTRICAL CANVAS
+    function initTechCanvas() {
       const canvas = document.getElementById("techCanvas");
       const ctx = canvas.getContext("2d");
       let w = canvas.width = window.innerWidth;
@@ -707,12 +669,51 @@
         h = canvas.height = window.innerHeight;
       });
 
-      const particles = Array.from({ length: 35 }, () => ({
+      const particles = Array.from({ length: 30 }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
         size: Math.random() * 2 + 1
       }));
 
-     
+      function animate() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "rgba(255, 122, 0, 0.5)";
+        ctx.strokeStyle = "rgba(255, 122, 0, 0.12)";
+        
+        particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > w) p.vx *= -1;
+          if (p.y < 0 || p.y > h) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          for (let j = idx + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 120) {
+              ctx.lineWidth = 1 - dist / 120;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    // DIRECT UI RENDER FUNCTION
+    function executeRender() {
+      // 1. Categories
+      const catBox = document.getElementById("categoriesContainer");
+      if (catBox) {
+        catBox.innerHTML = storeData.categories.map(c => `
+          <div class="category-card" onclick="location.href='category.html?id=${c.id}'">
+            <div class="cat-icon-wrap"><i class="fa-solid ${c.i
