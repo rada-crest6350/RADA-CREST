@@ -22,21 +22,31 @@ function navigateToProduct(productId) {
   window.location.href = `product.html?id=${encodeURIComponent(productId)}`;
 }
 
-/* 2. Admin Logo & Brand Dynamics */
+/* 2. Admin Logo & Brand Dynamics (Real-time Sync) */
 function initBrandSettings() {
-  const storeSettings = JSON.parse(localStorage.getItem('rc_store_settings')) || {
+  const defaultSettings = {
     name: 'RADA CREST',
     logoUrl: 'assets/logo.png',
     showLogo: true
   };
   
+  const storeSettings = JSON.parse(localStorage.getItem('rc_store_settings')) || defaultSettings;
+  
   const brandName = document.getElementById('brandName');
   const brandLogo = document.getElementById('brandLogo');
 
-  if (storeSettings.name) brandName.innerText = storeSettings.name;
-  if (storeSettings.showLogo && storeSettings.logoUrl) {
+  if (storeSettings.name) {
+    brandName.innerText = storeSettings.name;
+  }
+
+  if (storeSettings.showLogo !== false && storeSettings.logoUrl) {
     brandLogo.src = storeSettings.logoUrl;
     brandLogo.style.display = 'block';
+    
+    // Fallback agar image load na ho toh text initials ya hide karne ke liye
+    brandLogo.onerror = () => {
+      brandLogo.style.display = 'none';
+    };
   } else {
     brandLogo.style.display = 'none';
   }
