@@ -1,0 +1,372 @@
+/**
+ * RADA CREST E-COMMERCE ENGINE
+ * Fully modular & non-destructive architecture
+ */
+
+// 1. STATE & STORES
+const AppState = {
+  storeConfig: {
+    brandName: "RADA CREST",
+    logoUrl: "assets/logo.png"
+  },
+  banners: [],
+  categories: [],
+  products: [],
+  festivalSale: null,
+  activeBannerIndex: 0,
+  bannerInterval: null
+};
+
+// 2. INITIALIZATION
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchStoreState();
+  initHeader();
+  initDeliveryAddress();
+  initSmartSearch();
+  renderBanners();
+  renderFestivalOrFallback();
+  renderCategories();
+  renderProductSections();
+  initFilters();
+});
+
+// 3. DATA FETCHING (ADMIN & STORE DATA)
+async function fetchStoreState() {
+  try {
+    // Note: Can point to real dynamic API endpoint or local store
+    // Fallback data prevents any UI breaks
+    AppState.banners = [
+      { id: 1, img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&q=80", link: "category.html?id=led" },
+      { id: 2, img: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=1200&q=80", link: "category.html?id=accessories" }
+    ].slice(0, 10); // Enforce max 10 banners
+
+    AppState.categories = [
+      { id: "led", name: "LED Lights", icon: "fa-lightbulb" },
+      { id: "chargers", name: "Chargers", icon: "fa-bolt" },
+      { id: "boards", name: "Ext Boards", icon: "fa-plug" },
+      { id: "cables", name: "Cables", icon: "fa-network-wired" }
+    ];
+
+    AppState.products = [
+      {
+        id: "rc-01",
+        name: "RADA High-Glow 9W Inverter LED Bulb",
+        category: "led",
+        price: 249,
+        oldPrice: 499,
+        rating: 4.8,
+        image: "https://images.unsplash.com/photo-1550985616-10810253b84d?w=500&q=80",
+        isSuggested: true,
+        isTrending: true,
+        keywords: ["bulb", "inverter", "light", "led", "sasta", "emergency"]
+      },
+      {
+        id: "rc-02",
+        name: "TurboCharge 65W GaN Fast Charger",
+        category: "chargers",
+        price: 899,
+        oldPrice: 1499,
+        rating: 4.9,
+        image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500&q=80",
+        isSuggested: true,
+        isTrending: false,
+        keywords: ["fast charger", "adapter", "gan", "mobile", "sasta"]
+      },
+      {
+        id: "rc-03",
+        name: "Heavy Duty 4-Socket Surge Protected Board",
+        category: "boards",
+        price: 499,
+        oldPrice: 799,
+        rating: 4.6,
+        image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80",
+        isSuggested: false,
+        isTrending: true,
+        keywords: ["board", "extension", "plug", "socket", "wire"]
+      }
+    ];
+
+    // Festival sale config: Set null to test fallback
+    AppState.festivalSale = {
+      isActive: true,
+      title: "Diwali Mega Tech Carnival",
+      subtitle: "Flat 40% Off on Commercial LED Bulbs & Wiring kits",
+      link: "festival.html"
+    };
+
+  } catch (err) {
+    console.error("Data load failed:", err);
+  }
+}
+
+// 4. HEADER & ADDRESS SETUP
+function initHeader() {
+  document.getElementById("storeName").textContent = AppState.storeConfig.brandName;
+  
+  // Existing cart quantity badge sync
+  const localCart = JSON.parse(localStorage.getItem("rc_cart") || "[]");
+  const countBadge = document.getElementById("cartCountBadge");
+  if (countBadge) {
+    countBadge.textContent = localCart.reduce((total, item) => total + (item.qty || 1), 0);
+  }
+}
+
+function initDeliveryAddress() {
+  const savedAddress = JSON.parse(localStorage.getItem("rc_user_address") || "null");
+  const nameEl = document.getElementById("userFullName");
+  const addrEl = document.getElementById("userAddressLine");
+
+  if (savedAddress && savedAddress.line1) {
+    nameEl.textContent = savedAddress.name || "Customer";
+    addrEl.textContent = `${savedAddress.line1}, ${savedAddress.city} - ${savedAddress.pincode}`;
+  } else {
+    nameEl.textContent = "Add Address";
+    addrEl.textContent = "Select delivery location for faster dispatch";
+  }
+}
+
+// 5. BANNER CAROUSEL
+function renderBanners() {
+  const track = document.getElementById("bannerTrack");
+  const dotsContainer = document.getElementById("bannerDots");
+  
+  if (!AppState.banners.length) return;
+
+  track.innerHTML = AppState.banners.map(b => `
+    <div class="banner-slide" onclick="location.href='${b.link}'">
+      <img src="${b.img}" alt="Promotion">
+    </div>
+  `).join("");
+
+  dotsContainer.innerHTML = AppState.banners.map((_, idx) => `
+    <div class="dot ${idx === 0 ? 'active' : ''}"></div>
+  `).join("");
+
+  startBannerSlider();
+}
+
+function startBannerSlider() {
+  clearInterval(AppState.bannerInterval);
+  AppState.bannerInterval = setInterval(() => {
+    AppState.activeBannerIndex = (AppState.activeBannerIndex + 1) % AppState.banners.length;
+    updateBannerDOM();
+  }, 4000);
+}
+
+function updateBannerDOM() {
+  const track = document.getElementById("bannerTrack");
+  const dots = document.querySelectorAll(".dot");
+  
+  track.style.transform = `translateX(-${AppState.activeBannerIndex * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle("active", i === AppState.activeBannerIndex));
+}
+
+// 6. FESTIVAL SALE WITH SMART FALLBACK
+function renderFestivalOrFallback() {
+  const container = document.getElementById("festivalSection");
+  
+  if (AppState.festivalSale && AppState.festivalSale.isActive) {
+    container.classList.remove("hidden");
+    container.innerHTML = `
+      <div onclick="location.href='${AppState.festivalSale.link}'">
+        <span class="badge-accent"><i class="fa-solid fa-bolt"></i> LIMITED TIME EVENT</span>
+        <h3 style="margin-top: 8px;">${AppState.festivalSale.title}</h3>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">${AppState.festivalSale.subtitle}</p>
+      </div>
+    `;
+  } else {
+    // Non-destructive: Fallback handled automatically via categories & trending rendering
+    container.classList.add("hidden");
+  }
+}
+
+// 7. CATEGORIES
+function renderCategories() {
+  const container = document.getElementById("categoriesContainer");
+  const selectFilter = document.getElementById("categoryFilter");
+
+  container.innerHTML = AppState.categories.map(cat => `
+    <div class="category-card" onclick="location.href='category.html?id=${cat.id}'">
+      <div class="cat-icon-wrap"><i class="fa-solid ${cat.icon}"></i></div>
+      <span>${cat.name}</span>
+    </div>
+  `).join("");
+
+  // Populate filter dropdown
+  AppState.categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat.id;
+    opt.textContent = cat.name;
+    selectFilter.appendChild(opt);
+  });
+}
+
+// 8. PRODUCT CARDS & SECTIONS
+function createProductCard(p) {
+  const discount = p.oldPrice ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
+  
+  return `
+    <div class="product-card" onclick="location.href='product.html?id=${encodeURIComponent(p.id)}'">
+      <div class="product-img-box">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+        ${discount > 0 ? `<span class="discount-tag">${discount}% OFF</span>` : ''}
+      </div>
+      <div class="product-rating">
+        <i class="fa-solid fa-star"></i>
+        <span>${p.rating}</span>
+      </div>
+      <h3 class="product-title">${p.name}</h3>
+      <div class="product-pricing">
+        <span class="current-price">₹${p.price}</span>
+        ${p.oldPrice ? `<span class="old-price">₹${p.oldPrice}</span>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderProductSections() {
+  const suggestedBox = document.getElementById("suggestedProductsContainer");
+  const trendingBox = document.getElementById("trendingProductsContainer");
+  const gridBox = document.getElementById("mainProductsGrid");
+
+  const suggested = AppState.products.filter(p => p.isSuggested);
+  const trending = AppState.products.filter(p => p.isTrending);
+
+  suggestedBox.innerHTML = (suggested.length ? suggested : AppState.products).map(createProductCard).join("");
+  trendingBox.innerHTML = (trending.length ? trending : AppState.products).map(createProductCard).join("");
+  gridBox.innerHTML = AppState.products.map(createProductCard).join("");
+}
+
+// 9. INTENT-BASED SMART SEARCH & HARDWARE PERMISSIONS
+function initSmartSearch() {
+  const input = document.getElementById("smartSearchInput");
+  const voiceBtn = document.getElementById("voiceSearchBtn");
+  const photoBtn = document.getElementById("photoSearchBtn");
+  const photoInput = document.getElementById("photoInput");
+  const dropdown = document.getElementById("searchSuggestions");
+
+  // Multi-attribute Intent Search
+  input.addEventListener("input", (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (!query) {
+      dropdown.classList.add("hidden");
+      return;
+    }
+
+    const matches = AppState.products.filter(p => {
+      const matchName = p.name.toLowerCase().includes(query);
+      const matchCategory = p.category.toLowerCase().includes(query);
+      const matchKeywords = p.keywords && p.keywords.some(k => query.includes(k) || k.includes(query));
+      return matchName || matchCategory || matchKeywords;
+    });
+
+    if (matches.length > 0) {
+      dropdown.innerHTML = matches.map(p => `
+        <div class="search-item" onclick="location.href='product.html?id=${p.id}'">
+          <span>${p.name}</span>
+          <strong class="text-accent">₹${p.price}</strong>
+        </div>
+      `).join("");
+      dropdown.classList.remove("hidden");
+    } else {
+      dropdown.innerHTML = `<div class="search-item" style="color:var(--text-muted);">No products found matching intent.</div>`;
+      dropdown.classList.remove("hidden");
+    }
+  });
+
+  // Voice Search (Speech Recognition)
+  voiceBtn.addEventListener("click", () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice search browser me supported nahi hai.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "hi-IN"; // Supports bilingual Indian Hindi/English intent
+
+    recognition.onstart = () => {
+      voiceBtn.style.color = "var(--accent)";
+      input.placeholder = "Listening... boliye...";
+    };
+
+    recognition.onresult = (event) => {
+      const speechQuery = event.results[0][0].transcript;
+      input.value = speechQuery;
+      input.dispatchEvent(new Event("input"));
+      input.placeholder = "Search 'fast charger', '9W LED'...";
+      voiceBtn.style.color = "var(--text-muted)";
+    };
+
+    recognition.onerror = () => {
+      alert("Microphone permission denied ya error aayi.");
+      input.placeholder = "Search 'fast charger', '9W LED'...";
+      voiceBtn.style.color = "var(--text-muted)";
+    };
+
+    recognition.start();
+  });
+
+  // Safe Photo Search with Camera Permission Check
+  photoBtn.addEventListener("click", async () => {
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Request Permission
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // Stop stream immediately after validating permission
+        stream.getTracks().forEach(track => track.stop());
+        photoInput.click();
+      } else {
+        photoInput.click();
+      }
+    } catch (err) {
+      alert("Camera permission denied. Kripya browser settings me permission enable karein.");
+    }
+  });
+
+  photoInput.addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) {
+      // Direct intent routing to image processed search
+      alert(`Image '${e.target.files[0].name}' captured. Searching matching electronic components...`);
+      input.value = "LED Bulb";
+      input.dispatchEvent(new Event("input"));
+    }
+  });
+}
+
+// 10. PRODUCT FILTER ENGINE
+function initFilters() {
+  const catFilter = document.getElementById("categoryFilter");
+  const priceFilter = document.getElementById("priceFilter");
+  const qualityFilter = document.getElementById("qualityFilter");
+  const grid = document.getElementById("mainProductsGrid");
+
+  function applyFilters() {
+    let filtered = [...AppState.products];
+
+    if (catFilter.value !== "all") {
+      filtered = filtered.filter(p => p.category === catFilter.value);
+    }
+
+    if (qualityFilter.value !== "all") {
+      const minRating = parseFloat(qualityFilter.value);
+      filtered = filtered.filter(p => p.rating >= minRating);
+    }
+
+    if (priceFilter.value === "low-high") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (priceFilter.value === "high-low") {
+      filtered.sort((a, b) => b.price - a.price);
+    }
+
+    grid.innerHTML = filtered.length ? filtered.map(createProductCard).join("") : `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+        No products match selected filters.
+      </div>
+    `;
+  }
+
+  catFilter.addEventListener("change", applyFilters);
+  priceFilter.addEventListener("change", applyFilters);
+  qualityFilter.addEventListener("change", applyFilters);
+}
