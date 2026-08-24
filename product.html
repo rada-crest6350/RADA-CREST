@@ -1,84 +1,150 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Product — RADA CREST</title>
 
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Core Backend Scripts -->
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="supabase-client.js"></script>
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              DEFAULT: '#FF7A00',
+              light: '#FF9433',
+              dark: '#D96800',
+              glow: 'rgba(255, 122, 0, 0.35)'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          keyframes: {
+            shimmer: {
+              '100%': { transform: 'translateX(100%)' }
+            },
+            jiggle: {
+              '0%, 100%': { transform: 'scale(1)' },
+              '25%': { transform: 'scale(1.25) rotate(-6deg)' },
+              '75%': { transform: 'scale(1.25) rotate(6deg)' }
+            }
+          },
+          animation: {
+            shimmer: 'shimmer 2.2s infinite',
+            jiggle: 'jiggle 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    .rc-wrap{max-width:1180px;margin:auto;padding:24px 16px 70px}
-    .rc-back{display:inline-block;margin-bottom:24px;font-weight:800;text-decoration:none}
-    .rc-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:48px}
-    .rc-media{position:sticky;top:18px;align-self:start}
-    .rc-main{height:520px;border:1px solid #e7e7e7;border-radius:26px;background:#fafaf8;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .rc-main img,.rc-main video{width:100%;height:100%;object-fit:contain;padding:20px;box-sizing:border-box}
-    .rc-main iframe{width:100%;height:100%;border:0}
-    .rc-empty{color:#777;text-align:center;font-weight:700;line-height:1.7;padding:20px}
-    .rc-nav{display:flex;gap:10px;overflow-x:auto;padding:13px 2px 5px;scrollbar-width:thin}
-    .rc-thumb{width:78px;height:78px;min-width:78px;border:1px solid #ddd;border-radius:13px;background:#fff;padding:3px;overflow:hidden;cursor:pointer}
-    .rc-thumb.active{border:2px solid #111}
-    .rc-thumb img{width:100%;height:100%;object-fit:contain}
-    .rc-video-thumb{width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff;font-size:25px}
-    .rc-info small{color:#777;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-    .rc-info h1{font-size:clamp(32px,5vw,54px);line-height:1.05;margin:10px 0 18px;letter-spacing:-.04em}
-    .rc-price-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .rc-price{font-size:34px;font-weight:900}
-    .rc-mrp{text-decoration:line-through;color:#888}
-    .rc-off{background:#111;color:#fff;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:900}
-    .rc-trust{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
-    .rc-trust div{border:1px solid #e7e7e7;border-radius:15px;padding:13px}
-    .rc-trust b{display:block;font-size:13px}
-    .rc-trust span{font-size:12px;color:#777}
-    .rc-desc{white-space:pre-line;line-height:1.75;color:#444;margin:20px 0}
-    .rc-qty{display:flex;align-items:center;gap:9px;margin:20px 0}
-    .rc-qty button{width:42px;height:42px;border:1px solid #ddd;background:#fff;border-radius:11px;font-size:22px;cursor:pointer}
-    .rc-qty input{width:62px;height:42px;text-align:center;border:1px solid #ddd;border-radius:11px;font-weight:800}
-    .rc-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .rc-actions button{min-height:52px;border-radius:14px;font-weight:900;cursor:pointer}
-    .rc-cart{background:#111;color:#fff;border:0}
-    .rc-buy{background:#fff;color:#111;border:1px solid #111}
-    .rc-msg{min-height:24px;margin-top:10px;font-weight:700}
-    .rc-section{margin-top:60px}
-    .rc-review{border:1px solid #e7e7e7;border-radius:17px;padding:17px;margin:12px 0}
-    .rc-stars{letter-spacing:2px}
-    @media(max-width:850px){
-      .rc-grid{grid-template-columns:1fr}
-      .rc-media{position:static}
-      .rc-main{height:420px}
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
     }
-    @media(max-width:560px){
-      .rc-main{height:340px}
-      .rc-actions{grid-template-columns:1fr}
-      .rc-info h1{font-size:34px}
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid #eaeaea;
     }
-    .rc-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;justify-content:center;align-items:center;cursor:pointer}
-    .rc-modal img{max-width:90%;max-height:90%;border-radius:10px}
+    .fly-item {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      transition: all 0.75s cubic-bezier(0.19, 1, 0.22, 1);
+      border-radius: 50%;
+    }
+    .zoom-container {
+      overflow: hidden;
+      cursor: crosshair;
+    }
+    .zoom-container img {
+      transition: transform 0.15s ease-out;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
-  
-<div id="rcModal" class="rc-modal" onclick="this.style.display='none'">
-  <img id="modalImg" src="">
-</div>
-  
-<body>
-<main class="section rc-wrap">
-  <a class="rc-back" href="index.html">← Continue Shopping</a>
-  <div id="productPage"><p>Loading product...</p></div>
-</main>
+
+<body class="text-slate-800 antialiased overflow-x-hidden selection:bg-brand selection:text-white">
+
+  <!-- Sticky Top Navbar -->
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Back Link -->
+      <a href="index.html" class="flex items-center gap-2 group text-slate-900 font-extrabold text-sm tracking-wide hover:text-brand transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4 transition-transform group-hover:-translate-x-1"></i>
+        <span>Back to Store</span>
+      </a>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center gap-3">
+        <a href="admin.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-brand bg-brand/10 hover:bg-brand hover:text-white transition-all border border-brand/20">
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+          <span>admin.html</span>
+        </a>
+
+        <div id="cartIconBox" class="relative p-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+          <span id="cartCountBadge" class="absolute -top-1.5 -right-1.5 bg-brand text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white">
+            0
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+    <div id="productPage">
+      <div class="min-h-[400px] flex items-center justify-center text-slate-400 font-bold text-sm">
+        <i data-lucide="loader-2" class="w-5 h-5 animate-spin mr-2"></i> Loading product details...
+      </div>
+    </div>
+  </main>
+
+  <!-- Fullscreen Photo Modal -->
+  <div id="rcModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center cursor-pointer" onclick="this.classList.add('hidden')">
+    <img id="modalImg" src="" class="max-w-[90vw] max-h-[90vh] object-contain rounded-2xl shadow-2xl border border-white/20">
+  </div>
+
+  <!-- Dynamic Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-950 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMsg">Action completed</span>
+  </div>
 
 <script>
 "use strict";
 
 const productPage = document.getElementById("productPage");
-
 let product = null;
 let media = [];
 let activeMedia = 0;
+let isWishlisted = false;
 
 function esc(value){
   return String(value ?? "")
@@ -108,30 +174,19 @@ function youtubeId(url){
     if(host === "youtu.be" || host.endsWith(".youtu.be")){
       return u.pathname.split("/").filter(Boolean)[0] || null;
     }
-
     if(host.includes("youtube.com")){
-      if(u.pathname === "/watch"){
-        return u.searchParams.get("v");
-      }
-
-      if(u.pathname.startsWith("/shorts/")){
-        return u.pathname.split("/").filter(Boolean)[1] || null;
-      }
-
-      if(u.pathname.startsWith("/embed/")){
-        return u.pathname.split("/").filter(Boolean)[1] || null;
-      }
+      if(u.pathname === "/watch") return u.searchParams.get("v");
+      if(u.pathname.startsWith("/shorts/")) return u.pathname.split("/").filter(Boolean)[1] || null;
+      if(u.pathname.startsWith("/embed/")) return u.pathname.split("/").filter(Boolean)[1] || null;
     }
   }catch(e){
     return null;
   }
-
   return null;
 }
 
 function buildMedia(){
   media = [];
-
   getUrls(product.image_url).forEach(url => {
     media.push({type:"image", url});
   });
@@ -146,7 +201,6 @@ function buildMedia(){
   if(!media.length){
     media.push({type:"empty", url:""});
   }
-
   activeMedia = 0;
 }
 
@@ -157,26 +211,29 @@ function renderMedia(){
   const item = media[activeMedia];
 
   if(!item || item.type === "empty"){
-    box.innerHTML = '<div class="rc-empty">💡<br>Product image unavailable</div>';
+    box.innerHTML = '<div class="text-slate-400 text-center font-bold text-sm py-10">💡<br>Product image unavailable</div>';
     return;
   }
 
   if(item.type === "image"){
     box.innerHTML = `
       <img
+        id="zoomImg"
         src="${esc(item.url)}"
         alt="${esc(product.name)}"
-        onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;rc-empty&quot;>🖼️<br>Image unavailable</div>'"
+        class="w-full h-full object-contain drop-shadow-xl"
+        onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;text-slate-400 text-center font-bold text-sm py-10&quot;>🖼️<br>Image unavailable</div>'"
       >
     `;
+    setupZoom();
   }else{
     const id = youtubeId(item.url);
-
     if(id){
       box.innerHTML = `
         <iframe
           src="https://www.youtube.com/embed/${encodeURIComponent(id)}"
-          title="RADA CREST Product Video"
+          title="Product Video"
+          class="w-full h-full rounded-2xl border-0"
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowfullscreen>
@@ -189,14 +246,19 @@ function renderMedia(){
           controls
           playsinline
           preload="metadata"
-          onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;rc-empty&quot;>🎬<br>Video unavailable</div>'">
+          class="w-full h-full object-contain rounded-2xl"
+          onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;text-slate-400 text-center font-bold text-sm py-10&quot;>🎬<br>Video unavailable</div>'">
         </video>
       `;
     }
   }
 
-  document.querySelectorAll(".rc-thumb").forEach((thumb,index)=>{
-    thumb.classList.toggle("active", index === activeMedia);
+  document.querySelectorAll(".rc-thumb").forEach((thumb, index)=>{
+    if(index === activeMedia){
+      thumb.className = "rc-thumb flex-shrink-0 w-20 h-20 bg-white rounded-2xl border-2 border-brand p-1.5 shadow-sm transition-all";
+    } else {
+      thumb.className = "rc-thumb flex-shrink-0 w-20 h-20 bg-white rounded-2xl border border-slate-200 hover:border-slate-400 p-1.5 shadow-sm transition-all";
+    }
   });
 }
 
@@ -210,43 +272,58 @@ function renderThumbs(){
   const nav = document.getElementById("rcNav");
   if(!nav) return;
 
-  nav.innerHTML = media.map((item,index)=>{
+  nav.innerHTML = media.map((item, index)=>{
     if(item.type === "image"){
       return `
         <button
           type="button"
-          class="rc-thumb ${index === 0 ? "active" : ""}"
+          class="rc-thumb ${index === 0 ? 'flex-shrink-0 w-20 h-20 bg-white rounded-2xl border-2 border-brand p-1.5 shadow-sm' : 'flex-shrink-0 w-20 h-20 bg-white rounded-2xl border border-slate-200 p-1.5 shadow-sm'}"
           onclick="selectMedia(${index})"
-          aria-label="Product image ${index + 1}">
-          <img src="${esc(item.url)}" alt="">
+          aria-label="Image ${index + 1}">
+          <img src="${esc(item.url)}" class="w-full h-full object-contain rounded-lg" alt="">
         </button>
       `;
     }
-
     if(item.type === "video"){
       return `
         <button
           type="button"
-          class="rc-thumb"
+          class="rc-thumb flex-shrink-0 w-20 h-20 bg-slate-900 text-white rounded-2xl border border-slate-700 flex items-center justify-center p-1.5 shadow-sm"
           onclick="selectMedia(${index})"
-          aria-label="Product video">
-          <span class="rc-video-thumb">▶</span>
+          aria-label="Video">
+          <span class="text-xl">▶</span>
         </button>
       `;
     }
-
     return "";
   }).join("");
+}
+
+function setupZoom(){
+  const viewer = document.getElementById("rcMain");
+  const img = document.getElementById("zoomImg");
+  if(!viewer || !img) return;
+
+  viewer.onmousemove = (e) => {
+    const rect = viewer.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    img.style.transformOrigin = `${x}% ${y}%`;
+    img.style.transform = 'scale(1.75)';
+  };
+
+  viewer.onmouseleave = () => {
+    img.style.transformOrigin = 'center center';
+    img.style.transform = 'scale(1)';
+  };
 }
 
 function getDiscount(){
   const mrp = Number(product.old_price || 0);
   const price = Number(product.price || 0);
-
   if(mrp > 0 && price >= 0 && price < mrp){
     return Math.round(((mrp - price) / mrp) * 100);
   }
-
   return 0;
 }
 
@@ -259,308 +336,174 @@ function renderProduct(){
   buildMedia();
 
   productPage.innerHTML = `
-    <div class="rc-grid">
+    <!-- Top Showcase Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-      <div class="rc-media">
-        <div id="rcMain" class="rc-main"></div>
-        <div id="rcNav" class="rc-nav"></div>
+      <!-- Media Viewer (7 cols) -->
+      <div class="lg:col-span-7 flex flex-col gap-4">
+        <div id="rcMain" class="relative bg-white rounded-3xl border border-slate-200/90 p-6 flex items-center justify-center shadow-xl shadow-slate-200/40 zoom-container min-h-[380px] sm:min-h-[480px]">
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="bg-slate-900/80 backdrop-blur text-white text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+            <i data-lucide="move-horizontal" class="w-3 h-3"></i> Side scroll
+          </span>
+          <span class="bg-brand text-white text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+            <i data-lucide="zoom-in" class="w-3 h-3"></i> Tap to zoom
+          </span>
+        </div>
+
+        <!-- Thumbnails -->
+        <div id="rcNav" class="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none"></div>
       </div>
 
-      <div class="rc-info">
-        <small>${esc(product.category || "RADA CREST")}</small>
+      <!-- Details & Config Panel (5 cols) -->
+      <div class="lg:col-span-5 flex flex-col space-y-6">
+        
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-brand/10 text-brand font-bold text-xs uppercase tracking-wider">
+              ${esc(product.category || "RADA CREST")}
+            </span>
+            ${product.warranty ? `
+              <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-semibold text-xs flex items-center gap-1 border border-emerald-200">
+                <i data-lucide="shield-check" class="w-3 h-3"></i> ${esc(product.warranty)}
+              </span>
+            ` : ''}
+          </div>
 
-        <h1>${esc(product.name || "RADA CREST Product")}</h1>
+          <h1 class="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight leading-tight">
+            ${esc(product.name || "RADA CREST Product")}
+          </h1>
+        </div>
 
-        <div class="rc-price-row">
-          <span class="rc-price">
+        <!-- Price Area -->
+        <div class="flex items-baseline gap-3 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+          <span class="text-3xl font-black text-slate-900">
             ₹${price.toLocaleString("en-IN")}
           </span>
-
           ${mrp > price ? `
-            <span class="rc-mrp">
+            <span class="text-base text-slate-400 line-through font-medium">
               ₹${mrp.toLocaleString("en-IN")}
             </span>
           ` : ""}
-
           ${off ? `
-            <span class="rc-off">${off}% OFF</span>
+            <span class="ml-auto inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold bg-orange-50 text-brand border border-brand/30 animate-pulse">
+              ${off}% OFF
+            </span>
           ` : ""}
         </div>
 
-        <div class="rc-trust">
-          <div>
-            <b>🛡 Warranty</b>
-            <span>${esc(product.warranty || "As specified")}</span>
+        <!-- Dynamic Specs Highlight -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-3.5 bg-white rounded-2xl border border-slate-200">
+            <b class="text-xs text-slate-400 uppercase font-bold block">Warranty</b>
+            <span class="text-sm font-extrabold text-slate-800">${esc(product.warranty || "Standard Warranty")}</span>
           </div>
-
-          <div>
-            <b>📦 Stock</b>
-            <span>${stock > 0 ? stock + " available" : "Out of stock"}</span>
+          <div class="p-3.5 bg-white rounded-2xl border border-slate-200">
+            <b class="text-xs text-slate-400 uppercase font-bold block">Stock Status</b>
+            <span class="text-sm font-extrabold ${stock > 0 ? 'text-emerald-600' : 'text-rose-600'}">
+              ${stock > 0 ? stock + " Units Available" : "Out of Stock"}
+            </span>
           </div>
         </div>
 
-        <div class="rc-desc">
-          ${product.description
-            ? esc(product.description)
-            : "Premium RADA CREST product designed for everyday use."}
-        </div>
+        <!-- Actions / Quantity Area -->
+        ${stock > 0 ? `
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-bold uppercase text-slate-400">Quantity:</span>
+              <div class="flex items-center border border-slate-200 rounded-xl bg-white p-1">
+                <button type="button" onclick="changeQty(-1)" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-slate-600 hover:bg-slate-100">−</button>
+                <input id="qty" type="number" min="1" max="${stock}" value="1" class="w-12 text-center text-sm font-black border-0 focus:outline-none">
+                <button type="button" onclick="changeQty(1)" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-slate-600 hover:bg-slate-100">+</button>
+              </div>
 
-        ${
-          stock > 0
-          ? `
-            <div class="rc-qty">
-              <b>Quantity</b>
-              <button type="button" onclick="changeQty(-1)">−</button>
-              <input id="qty" type="number" min="1" max="${stock}" value="1">
-              <button type="button" onclick="changeQty(1)">+</button>
+              <!-- Wishlist & Share -->
+              <button onclick="toggleWishlist(this)" class="p-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-rose-500 transition-colors ml-auto shadow-sm">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+              <button onclick="copyShareLink()" class="p-3 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-brand transition-colors shadow-sm">
+                <i data-lucide="share-2" class="w-4 h-4"></i>
+              </button>
             </div>
 
-            <div class="rc-actions">
-              <button type="button" class="rc-cart" onclick="addToCart()">
-                Add to Cart
+            <div class="space-y-2.5 pt-2">
+              <button id="addToCartAction" type="button" onclick="addToCart()" class="relative w-full overflow-hidden rounded-2xl bg-brand py-4 px-6 text-white font-extrabold text-base shadow-xl shadow-brand/30 hover:bg-brand-light active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shimmer"></div>
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span>Add to Cart</span>
               </button>
 
               <button
                 type="button"
-                class="rc-buy"
                 onclick="window.location.href='buy.html?id=' + encodeURIComponent(product.id)"
-             >
-                Buy Now
-             </button>
-
-            <div id="msg" class="rc-msg"></div>
-          `
-          : `
-            <button class="btn" type="button" disabled>
-              Out of Stock
-            </button>
-          `
-        }
+                class="block w-full text-center py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-black text-white font-bold text-sm shadow-md transition-all">
+                Buy Now with 1-Click
+              </button>
+            </div>
+          </div>
+        ` : `
+          <button class="w-full py-4 rounded-2xl bg-slate-200 text-slate-500 font-extrabold cursor-not-allowed" disabled>
+            Out of Stock
+          </button>
+        `}
       </div>
     </div>
 
-    <section class="rc-section">
-      <h2>Customer Reviews</h2>
-      <div id="reviews">Loading reviews...</div>
-    </section>
-  `;
-
-  renderMedia();
-  renderThumbs();
-  loadReviews();
-}
-
-function changeQty(delta){
-  const input = document.getElementById("qty");
-  if(!input) return;
-
-  const stock = Number(product.stock || 0);
-  const current = Number(input.value || 1);
-
-  input.value = Math.max(
-    1,
-    Math.min(stock, current + delta)
-  );
-}
-
-function getQty(){
-  const input = document.getElementById("qty");
-  const message = document.getElementById("msg");
-
-  const quantity = Number(input?.value || 0);
-  const stock = Number(product.stock || 0);
-
-  if(
-    !Number.isInteger(quantity) ||
-    quantity < 1 ||
-    quantity > stock
-  ){
-    if(message){
-      message.textContent = "Please select a valid quantity.";
-    }
-    return null;
-  }
-
-  return quantity;
-}
-
-function getCart(){
-  try{
-    return JSON.parse(
-      localStorage.getItem("rc_cart") || "[]"
-    );
-  }catch(e){
-    return [];
-  }
-}
-
-function saveCart(cart){
-  localStorage.setItem(
-    "rc_cart",
-    JSON.stringify(cart)
-  );
-}
-
-function addToCart(){
-  const quantity = getQty();
-  if(quantity === null) return;
-
-  const cart = getCart();
-
-  const existing = cart.find(
-    item => Number(item.id) === Number(product.id)
-  );
-
-  if(existing){
-    existing.qty = Math.min(
-      Number(product.stock),
-      Number(existing.qty || 0) + quantity
-    );
-  }else{
-    cart.push({
-      id: product.id,
-      qty: quantity
-    });
-  }
-
-  saveCart(cart);
-
-  const message = document.getElementById("msg");
-  if(message){
-    message.textContent = "Added to cart.";
-  }
-}
-
-async function loadReviews(){
-  const box = document.getElementById("reviews");
-  if(!box) return;
-
-  try{
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .from("product_reviews")
-      .select("*")
-      .eq("product_id", product.id)
-      .order("created_at", {ascending:false});
-
-    if(error){
-      console.error(error);
-      box.innerHTML = "<p>Reviews will appear here.</p>";
-      return;
-    }
-
-    if(!data || !data.length){
-      box.innerHTML = "<p>No reviews yet.</p>";
-      return;
-    }
-
-        box.innerHTML = data.map(review=>{
-      const rating = Math.min(
-        5,
-        Math.max(1, Number(review.rating) || 1)
-      );
-
-      let photosHtml = '';
-      let urls = review.photo_urls;
-      
-      if (typeof urls === 'string') {
-        try { urls = JSON.parse(urls); } catch(e) { urls = [urls]; }
-      }
-
-      if (Array.isArray(urls)) {
-        photosHtml = urls.map(url => `
-          <img src="${esc(url)}" 
-               style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px; margin-right: 8px; border: 1px solid #ddd; cursor: pointer; flex-shrink: 0;" 
-               onclick="document.getElementById('modalImg').src='${esc(url)}'; document.getElementById('rcModal').style.display='flex';" />
-        `).join('');
-      }
-
-      return `
-        <div class="rc-review">
-          <div class="rc-stars">
-            ${"★".repeat(rating)}${"☆".repeat(5 - rating)}
-          </div>
-
-          <p>${esc(review.review || "")}</p>
-
-          ${photosHtml ? `
-            <div style="display: flex; overflow-x: auto; margin: 12px 0; padding-bottom: 5px;">
-              ${photosHtml}
-            </div>
-          ` : ''}
-          
-          <small>
-            ${esc(review.customer_name || "Customer")}
-          </small>
+    <!-- Tabbed Information Hub -->
+    <section class="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-6 overflow-x-auto gap-4">
+        <div class="flex gap-6 sm:gap-8 min-w-max">
+          <button onclick="switchTab('details', this)" class="tab-link pb-3 text-sm font-bold text-brand border-b-2 border-brand transition-all">
+            Product Full Details
+          </button>
+          <button onclick="switchTab('selling', this)" class="tab-link pb-3 text-sm font-bold text-slate-400 hover:text-slate-700 border-b-2 border-transparent transition-all">
+            Selling Counts
+          </button>
+          <button onclick="switchTab('rating', this)" class="tab-link pb-3 text-sm font-bold text-slate-400 hover:text-slate-700 border-b-2 border-transparent transition-all">
+            Product Rating & Reviews
+          </button>
         </div>
-      `;
-    }).join("");
+        <a href="admin.html" class="text-xs text-brand hover:underline font-semibold flex items-center gap-1">
+          <i data-lucide="external-link" class="w-3 h-3"></i> admin.html
+        </a>
+      </div>
 
+      <!-- Tab Content Area -->
+      <div id="tabContent">
+        <div id="detailsTab" class="space-y-4 text-sm text-slate-600 leading-relaxed">
+          <div class="whitespace-pre-line text-slate-700">
+            ${product.description ? esc(product.description) : "Premium RADA CREST product designed for everyday durability and efficiency."}
+          </div>
+        </div>
 
-  }catch(error){
-    console.error(error);
-    box.innerHTML = "<p>Reviews will appear here.</p>";
-  }
-}
-  
-async function loadProduct(){
-  if(typeof sbReady !== "function" || !sbReady()){
-    productPage.innerHTML =
-      "<p>Supabase is not configured.</p>";
-    return;
-  }
+        <div id="sellingTab" class="hidden space-y-3">
+          <div class="flex items-center justify-between p-4 bg-orange-50/60 rounded-2xl border border-orange-100">
+            <div>
+              <h4 class="font-bold text-slate-900">Total Orders Processed</h4>
+              <p class="text-xs text-slate-500">Verified platform dispatches for this item</p>
+            </div>
+            <span class="text-2xl font-black text-brand">500+ Units</span>
+          </div>
+        </div>
 
-  const id = getProductId();
+        <div id="ratingTab" class="hidden space-y-4">
+          <div id="reviews" class="space-y-4">
+            <p class="text-xs text-slate-400 font-semibold">Loading reviews...</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  if(!id){
-    productPage.innerHTML = `
-      <h2>Product not found</h2>
-      <a class="btn" href="index.html">Back to Shop</a>
-    `;
-    return;
-  }
+    <!-- Categories Discovery Section -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">Categories You Might Like</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Explore curated collections designed for your lifestyle</p>
+        </div>
+      </div>
 
-  try{
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .from("products")
-      .select("*")
-      .eq("id", id)
-      .eq("active", true)
-      .single();
-
-    if(error || !data){
-      console.error(error);
-      productPage.innerHTML = `
-        <h2>Product not found</h2>
-        <a class="btn" href="index.html">Back to Shop</a>
-      `;
-      return;
-    }
-
-    product = data;
-    renderProduct();
-
-  }catch(error){
-    console.error(error);
-    productPage.innerHTML = `
-      <h2>Unable to load product</h2>
-      <p>Please try again.</p>
-      <a class="btn" href="index.html">Back to Shop</a>
-    `;
-  }
-}
-
-loadProduct();
-</script>
-  
-  <div id="rcModal" class="rc-modal" onclick="this.style.display='none'">
-    <img id="modalImg" src="">
-  </div>
-
-</body>
-</html>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="group relative rounded-3xl overflow-hidden bg-slate-900 min-h-[220
