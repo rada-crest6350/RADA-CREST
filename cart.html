@@ -738,21 +738,37 @@
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
-    function loadSavedAddress() {
-        let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
-        
-        if (savedAddress && savedAddress.name && savedAddress.address && savedAddress.address.trim() !== '') {
-            document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name}, ${savedAddress.pincode || ''}`;
-            document.getElementById('displayUserName').style.color = 'var(--text-main)';
-            document.getElementById('displayAddress').innerText = savedAddress.address;
-            document.getElementById('addrActionBtn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Change / Edit`;
-        } else {
-            document.getElementById('displayUserName').innerText = `Add Delivery Address`;
-            document.getElementById('displayUserName').style.color = 'var(--warning)';
-            document.getElementById('displayAddress').innerText = `No address added yet. Click to choose or add address.`;
-            document.getElementById('addrActionBtn').innerHTML = `<i class="fa-solid fa-plus"></i> Add Address`;
-        }
+    function getActiveUserSuffix() {
+    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+    if (user) {
+        const uid = user.email || user.phone || user.id;
+        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
     }
+    return 'guest_user';
+}
+
+function loadSavedAddress() {
+    const userSuffix = getActiveUserSuffix();
+    // Sirf is specific user ka address load karega
+    let savedAddress = JSON.parse(localStorage.getItem(`rc_address_${userSuffix}`)) || 
+                       JSON.parse(localStorage.getItem(`rc_selected_address_${userSuffix}`));
+    
+    const nameEl = document.getElementById('displayUserName');
+    const addrEl = document.getElementById('displayAddress');
+    const btnEl = document.getElementById('addrActionBtn');
+
+    if (savedAddress && savedAddress.name && savedAddress.address && savedAddress.address.trim() !== '') {
+        nameEl.innerText = `Deliver to: ${savedAddress.name}, ${savedAddress.pincode || ''}`;
+        nameEl.style.color = 'var(--text-main)';
+        addrEl.innerText = `${savedAddress.address}, ${savedAddress.city || ''} ${savedAddress.state || ''}`;
+        btnEl.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Change / Edit`;
+    } else {
+        nameEl.innerText = `Add Delivery Address`;
+        nameEl.style.color = 'var(--warning)';
+        addrEl.innerText = `No address added yet for this account. Tap to add.`;
+        btnEl.innerHTML = `<i class="fa-solid fa-plus"></i> Add Address`;
+    }
+}
 
     function showToast(msg) {
         const toast = document.getElementById('toastNotify');
