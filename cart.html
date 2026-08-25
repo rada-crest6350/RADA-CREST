@@ -6,6 +6,7 @@
     <title>My Cart | Rada Crest</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         :root {
@@ -172,10 +173,6 @@
             transition: all 0.3s;
             white-space: nowrap;
             box-shadow: 0 4px 15px var(--primary-glow);
-        }
-
-        .addr-edit-btn:hover {
-            transform: scale(1.03);
         }
 
         /* Layout */
@@ -524,7 +521,7 @@
             color: #64748b;
         }
 
-        /* --- In-Page Address Modal --- */
+        /* Modal */
         .address-modal-overlay {
             position: fixed;
             inset: 0;
@@ -535,7 +532,6 @@
             justify-content: center;
             z-index: 1000;
             padding: 16px;
-            animation: fadeIn 0.3s ease;
         }
 
         .address-modal-overlay.active {
@@ -552,7 +548,6 @@
             overflow-y: auto;
             padding: 20px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            animation: slideUp 0.3s ease;
         }
 
         .modal-header {
@@ -579,30 +574,6 @@
             color: var(--text-muted);
             font-size: 1.2rem;
             cursor: pointer;
-        }
-
-        .saved-addr-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .saved-addr-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .saved-addr-item.selected {
-            border-color: var(--primary);
-            background: rgba(255, 122, 0, 0.08);
         }
 
         .form-group {
@@ -686,9 +657,6 @@
             transform: translateY(0);
             opacity: 1;
         }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -709,17 +677,17 @@
         </label>
     </div>
 
-    <!-- Address Card (In-Page Trigger) -->
+    <!-- Address Card -->
     <div class="address-card" onclick="openAddressModal()">
         <div class="address-info">
             <i class="fa-solid fa-location-dot addr-icon"></i>
             <div class="addr-text">
-                <h4 id="displayUserName">Deliver to: Kishan, 508213</h4>
-                <p id="displayAddress">Shop No. 4, Main Road Market, Suryapet, Telangana</p>
+                <h4 id="displayUserName" style="color: var(--warning);">Add Delivery Address</h4>
+                <p id="displayAddress">No address added yet. Click to add your address.</p>
             </div>
         </div>
-        <button class="addr-edit-btn" onclick="event.stopPropagation(); openAddressModal();">
-            <i class="fa-solid fa-pen-to-square"></i> Change / Edit
+        <button class="addr-edit-btn" id="addrActionBtn" onclick="event.stopPropagation(); openAddressModal();">
+            <i class="fa-solid fa-plus"></i> Add Address
         </button>
     </div>
 
@@ -772,11 +740,11 @@
     </footer>
 </div>
 
-<!-- In-Page Address Selection & Edit Modal -->
+<!-- Modal -->
 <div class="address-modal-overlay" id="addressModal">
     <div class="address-modal">
         <div class="modal-header">
-            <h3><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Select or Edit Address</h3>
+            <h3 id="modalTitleText"><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Add Delivery Address</h3>
             <button class="close-modal-btn" onclick="closeAddressModal()"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
@@ -798,7 +766,7 @@
         </div>
 
         <div class="modal-action-btns">
-            <button class="btn-modal-save" onclick="saveAddressFromModal()">Apply to Cart</button>
+            <button class="btn-modal-save" onclick="saveAddressFromModal()">Save Address</button>
             <a href="adresses.html" class="btn-modal-manage">Manage on adresses.html <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
         </div>
     </div>
@@ -807,39 +775,67 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
     const CART_STORAGE_KEY = 'rc_cart_items';
     const WISHLIST_KEY = 'rc_wishlist';
     const ADDRESS_KEY = 'rc_user_address';
-    const MULTI_ADDRESS_KEY = 'rc_all_addresses';
 
-    function getStoredCart() {
-        let data = localStorage.getItem(CART_STORAGE_KEY);
-        try {
-            let parsed = JSON.parse(data);
-            if (Array.isArray(parsed)) return parsed;
-        } catch(e) {}
-        return [];
+    let cartItems = [];
+
+    // Load Cart & Sync with live Supabase Database for Exact Price/MRP
+    async function syncAndLoadCart() {
+        let rawCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
+        
+        if (rawCart.length === 0) {
+            cartItems = [];
+            renderCartItems();
+            return;
+        }
+
+        // Fetch exact latest product details (MRP & Selling Price) from Supabase
+        let productIds = rawCart.map(item => Number(item.id)).filter(id => !isNaN(id));
+        let dbProducts = {};
+
+        if (supabaseClient && productIds.length > 0) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('id, name, price, old_price, stock, image')
+                    .in('id', productIds);
+                if (!error && data) {
+                    data.forEach(p => dbProducts[p.id] = p);
+                }
+            } catch(e) {
+                console.warn("Supabase fetch fallback:", e);
+            }
+        }
+
+        cartItems = rawCart.map((item, index) => {
+            const dbItem = dbProducts[item.id] || {};
+            let price = Number(dbItem.price !== undefined ? dbItem.price : item.price || 0);
+            let oldPrice = Number(dbItem.old_price !== undefined ? dbItem.old_price : (item.old_price || item.oldPrice || price));
+            let stock = dbItem.stock !== undefined ? dbItem.stock : (item.stock || 5);
+            let img = (dbItem.image) || item.image || 'assets/placeholder.jpg';
+
+            return {
+                id: item.id !== undefined ? item.id : `prod_${index}`,
+                title: dbItem.name || item.name || "Rada Crest Product",
+                variant: item.variant || "Standard Edition",
+                currentPrice: price,
+                oldPrice: oldPrice,
+                stockLeft: stock,
+                quantity: Number(item.quantity || 1),
+                selected: item.selected !== undefined ? item.selected : true,
+                image: img
+            };
+        });
+
+        saveCartState();
+        renderCartItems();
     }
-
-    let rawCart = getStoredCart();
-
-    let cartItems = rawCart.map((item, index) => {
-        let price = Number(item.price || 0);
-        let oldPrice = Number(item.old_price || item.oldPrice || (price > 0 ? Math.round(price * 1.5) : 0));
-        let qty = Number(item.quantity || item.qty || 1);
-
-        return {
-            id: item.id !== undefined ? item.id : `prod_${index}`,
-            title: item.name || "Rada Crest Product",
-            variant: item.variant || "Standard Edition",
-            currentPrice: price,
-            oldPrice: oldPrice,
-            stockLeft: item.stock || 3,
-            quantity: qty,
-            selected: item.selected !== undefined ? item.selected : true,
-            image: item.image || 'assets/placeholder.jpg'
-        };
-    });
 
     function saveCartState() {
         let toSave = cartItems.map(item => ({
@@ -854,28 +850,33 @@
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
-    /* Address Management with adresses.html sync */
+    /* Strict Delivery Address: Shows empty state unless user explicitly saves */
     function loadSavedAddress() {
         let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
-        if (savedAddress && (savedAddress.name || savedAddress.address)) {
-            document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name || 'Customer'}, ${savedAddress.pincode || ''}`;
-            document.getElementById('displayAddress').innerText = savedAddress.address || 'Address details saved';
+        
+        if (savedAddress && savedAddress.name && savedAddress.address && savedAddress.address.trim() !== '') {
+            document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name}, ${savedAddress.pincode || ''}`;
+            document.getElementById('displayUserName').style.color = 'var(--text-main)';
+            document.getElementById('displayAddress').innerText = savedAddress.address;
+            document.getElementById('addrActionBtn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Change / Edit`;
             
             document.getElementById('modalName').value = savedAddress.name || '';
             document.getElementById('modalPhone').value = savedAddress.phone || '';
             document.getElementById('modalPincode').value = savedAddress.pincode || '';
             document.getElementById('modalAddress').value = savedAddress.address || '';
+            document.getElementById('modalTitleText').innerHTML = `<i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Edit Delivery Address`;
         } else {
-            // Default Initial
-            const defaultAddr = {
-                name: "Kishan",
-                phone: "9876543210",
-                pincode: "508213",
-                address: "Shop No. 4, Main Road Market, Suryapet, Telangana"
-            };
-            localStorage.setItem(ADDRESS_KEY, JSON.stringify(defaultAddr));
-            localStorage.setItem('user_address', JSON.stringify(defaultAddr));
-            loadSavedAddress();
+            // Absolutely NO prefilled address
+            document.getElementById('displayUserName').innerText = `Add Delivery Address`;
+            document.getElementById('displayUserName').style.color = 'var(--warning)';
+            document.getElementById('displayAddress').innerText = `No address added yet. Click to add your address.`;
+            document.getElementById('addrActionBtn').innerHTML = `<i class="fa-solid fa-plus"></i> Add Address`;
+            
+            document.getElementById('modalName').value = '';
+            document.getElementById('modalPhone').value = '';
+            document.getElementById('modalPincode').value = '';
+            document.getElementById('modalAddress').value = '';
+            document.getElementById('modalTitleText').innerHTML = `<i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Add Delivery Address`;
         }
     }
 
@@ -899,14 +900,12 @@
         }
 
         const newAddr = { name, phone, pincode, address };
-
-        // Save to universal keys so adresses.html and other pages stay in sync
         localStorage.setItem(ADDRESS_KEY, JSON.stringify(newAddr));
         localStorage.setItem('user_address', JSON.stringify(newAddr));
 
         loadSavedAddress();
         closeAddressModal();
-        showToast("Address Successfully Apply Ho Gaya!");
+        showToast("Address Successfully Save Ho Gaya!");
     }
 
     function showToast(msg) {
@@ -941,7 +940,8 @@
                 ? `<span class="stock-badge"><i class="fa-solid fa-bolt"></i> Only ${item.stockLeft} left!</span>`
                 : `<span style="font-size:0.75rem; color:var(--success);"><i class="fa-solid fa-circle-check"></i> In Stock</span>`;
 
-            const discountPercent = item.oldPrice > item.currentPrice 
+            const hasDiscount = item.oldPrice > item.currentPrice;
+            const discountPercent = hasDiscount 
                 ? Math.round(((item.oldPrice - item.currentPrice) / item.oldPrice) * 100)
                 : 0;
 
@@ -961,7 +961,7 @@
 
                     <div class="price-section">
                         <span class="current-price">₹${item.currentPrice}</span>
-                        ${discountPercent > 0 ? `<span class="old-price">₹${item.oldPrice}</span><span class="discount-tag">${discountPercent}% OFF</span>` : ''}
+                        ${hasDiscount ? `<span class="old-price">₹${item.oldPrice}</span><span class="discount-tag">${discountPercent}% OFF</span>` : ''}
                     </div>
 
                     <div class="prod-bottom-row">
@@ -1044,20 +1044,21 @@
         }
     }
 
+    // Accurate Calculation: MRP vs Selling Price
     function calculateCart() {
         const selectedItems = cartItems.filter(i => i.selected);
         const totalItemsCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
         const selectedItemsCount = selectedItems.reduce((sum, i) => sum + i.quantity, 0);
 
-        const subtotal = selectedItems.reduce((sum, i) => sum + (i.currentPrice * i.quantity), 0);
+        const subtotalSelling = selectedItems.reduce((sum, i) => sum + (i.currentPrice * i.quantity), 0);
         const totalMRP = selectedItems.reduce((sum, i) => sum + (i.oldPrice * i.quantity), 0);
-        const totalDiscount = totalMRP > subtotal ? totalMRP - subtotal : 0;
+        const totalDiscount = totalMRP > subtotalSelling ? totalMRP - subtotalSelling : 0;
 
         document.getElementById('headerCount').innerText = `${totalItemsCount} Items`;
         document.getElementById('selectedCountText').innerText = selectedItemsCount;
-        document.getElementById('subtotalVal').innerText = `₹${subtotal.toLocaleString('en-IN')}`;
+        document.getElementById('subtotalVal').innerText = `₹${subtotalSelling.toLocaleString('en-IN')}`;
         document.getElementById('discountVal').innerText = `-₹${totalDiscount.toLocaleString('en-IN')}`;
-        document.getElementById('grandTotalVal').innerText = `₹${subtotal.toLocaleString('en-IN')}`;
+        document.getElementById('grandTotalVal').innerText = `₹${subtotalSelling.toLocaleString('en-IN')}`;
     }
 
     function proceedToBuy() {
@@ -1068,6 +1069,11 @@
         }
 
         const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY));
+        if (!currentAddress || !currentAddress.name || !currentAddress.address) {
+            showToast("Kripya pehle delivery address add karein!");
+            openAddressModal();
+            return;
+        }
 
         const orderData = {
             items: selected,
@@ -1079,9 +1085,9 @@
         window.location.href = "buy.html";
     }
 
-    // Initialize
+    // Start
     loadSavedAddress();
-    renderCartItems();
+    syncAndLoadCart();
 </script>
 </body>
 </html>
