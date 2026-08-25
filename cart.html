@@ -917,62 +917,40 @@
     }
 
     // Complete Buy Bridge -> buy.html
-    function proceedToBuy() {
-        const selected = cartItems.filter(i => i.selected);
-        if (selected.length === 0) {
-            showToast("Kripya kam se kam ek product select karein!");
-            return;
-        }
-
-        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
-        if (!currentAddress || !currentAddress.name || !currentAddress.address) {
-            showToast("Kripya pehle delivery address add karein!");
-            setTimeout(() => {
-                window.location.href = "addresses.html";
-            }, 800);
-            return;
-        }
-
-        const subtotalSelling = selected.reduce((sum, i) => sum + (i.currentPrice * i.quantity), 0);
-        const totalMRP = selected.reduce((sum, i) => sum + (i.oldPrice * i.quantity), 0);
-        const totalDiscount = totalMRP > subtotalSelling ? totalMRP - subtotalSelling : 0;
-        
-        let calculatedShipping = 0;
-        let itemLevelShipping = selected.reduce((sum, i) => sum + ((i.shippingFee || 0) * i.quantity), 0);
-        calculatedShipping = itemLevelShipping > 0 ? itemLevelShipping : adminDeliveryRules.baseShippingFee;
-        if (adminDeliveryRules.freeAboveThreshold > 0 && subtotalSelling >= adminDeliveryRules.freeAboveThreshold) {
-            calculatedShipping = 0;
-        }
-
-        const grandFinal = subtotalSelling + calculatedShipping;
-
-        const orderData = {
-            items: selected.map(item => ({
-                id: item.id,
-                name: item.title,
-                price: item.currentPrice,
-                old_price: item.oldPrice,
-                quantity: item.quantity,
-                image: item.image,
-                variant: item.variant,
-                shipping_fee: item.shippingFee
-            })),
-            pricing: {
-                subtotal: subtotalSelling,
-                discount: totalDiscount,
-                deliveryCharge: calculatedShipping,
-                finalPayable: grandFinal
-            },
-            deliveryAddress: currentAddress,
-            orderDate: new Date().toISOString()
-        };
-
-        // Standardized storage keys for buy.html / checkout.html
-        localStorage.setItem('checkout_order_data', JSON.stringify(orderData));
-        localStorage.setItem('rc_checkout_data', JSON.stringify(orderData));
-
-        window.location.href = "buy.html";
+function proceedToBuy() {
+    const selected = cartItems.filter(i => i.selected);
+    if (selected.length === 0) {
+        showToast("Kripya kam se kam ek product select karein!");
+        return;
     }
+
+    const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
+    if (!currentAddress || !currentAddress.name || !currentAddress.address) {
+        showToast("Kripya pehle delivery address add karein!");
+        setTimeout(() => {
+            window.location.href = "addresses.html";
+        }, 800);
+        return;
+    }
+
+    // Checkout payload save
+    const orderData = {
+        items: selected,
+        deliveryAddress: currentAddress,
+        payableAmount: document.getElementById('grandTotalVal').innerText
+    };
+    localStorage.setItem('checkout_order_data', JSON.stringify(orderData));
+    localStorage.setItem('rc_checkout_data', JSON.stringify(orderData));
+
+    // Buy URL redirection with ID & Quantity
+    if (selected.length === 1) {
+        window.location.href = `buy.html?id=${encodeURIComponent(selected[0].id)}&qty=${selected[0].quantity}`;
+    } else {
+        const firstId = selected[0].id;
+        const totalQty = selected.reduce((sum, i) => sum + i.quantity, 0);
+        window.location.href = `buy.html?id=${encodeURIComponent(firstId)}&qty=${totalQty}&cart=true`;
+    }
+}
 
     loadSavedAddress();
     syncAndLoadCart();
