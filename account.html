@@ -4,265 +4,423 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account - RADA CREST</title>
-    <!-- Google Fonts & Tailwind CSS for Modern UI -->
+    <!-- Tailwind CSS & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FBF9F5; }
+        :root {
+            --brand-orange: #FF7A00;
+            --brand-orange-glow: rgba(255, 122, 0, 0.35);
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #090b0e 0%, #12161f 50%, #07090c 100%);
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(18, 22, 31, 0.85);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        /* Brand Glowing Background Spheres */
+        .ambient-glow {
+            position: fixed;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 122, 0, 0.18) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(70px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Menu Item Hover Animations */
+        .menu-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3.5px;
+            background: var(--brand-orange);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scaleY(0.4);
+        }
+        .menu-btn:hover {
+            transform: translateX(4px);
+            background: rgba(255, 122, 0, 0.05);
+        }
+        .menu-btn:hover::before {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+        .menu-btn:hover .icon-box {
+            transform: scale(1.1) rotate(3deg);
+            color: var(--brand-orange);
+            background: rgba(255, 122, 0, 0.15);
+            border-color: rgba(255, 122, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 122, 0, 0.25);
+        }
+        .menu-btn:hover .arrow-icon {
+            transform: translateX(4px);
+            color: var(--brand-orange);
+        }
+
+        .icon-box {
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .arrow-icon {
+            transition: transform 0.25s ease, color 0.25s ease;
+        }
+
+        /* Pulsing Dot Animation */
+        .pulse-dot {
+            position: relative;
+            display: inline-flex;
+        }
+        .pulse-dot::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 9px;
+            height: 9px;
+            background-color: var(--brand-orange);
+            border-radius: 50%;
+            animation: pulse-ring 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            right: -1px;
+            width: 7px;
+            height: 7px;
+            background-color: var(--brand-orange);
+            border: 1.5px solid #12161f;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.9; }
+            50% { transform: scale(2.2); opacity: 0; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Form Inputs */
+        .custom-input {
+            background: rgba(10, 13, 18, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.25s ease;
+        }
+        .custom-input:focus {
+            border-color: var(--brand-orange);
+            box-shadow: 0 0 0 2.5px rgba(255, 122, 0, 0.25);
+            background: rgba(10, 13, 18, 0.95);
+        }
+
+        /* Primary Button */
+        .btn-brand-orange {
+            background: linear-gradient(135deg, #FF7A00 0%, #E06000 100%);
+            box-shadow: 0 6px 20px -4px var(--brand-orange-glow);
+            transition: all 0.3s ease;
+        }
+        .btn-brand-orange:hover {
+            background: linear-gradient(135deg, #FF8A1C 0%, #FF7A00 100%);
+            box-shadow: 0 8px 25px 0px rgba(255, 122, 0, 0.5);
+        }
+
+        .tab-active {
+            background: var(--brand-orange);
+            color: #000000;
+            font-weight: 700;
+            box-shadow: 0 4px 15px var(--brand-orange-glow);
+        }
     </style>
 </head>
-<body class="text-neutral-800 antialiased min-h-screen flex flex-col justify-between">
+<body class="antialiased min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+
+    <!-- Ambient Lights -->
+    <div class="ambient-glow top-0 left-1/2 -translate-x-1/2"></div>
+    <div class="ambient-glow bottom-10 right-[-100px]"></div>
 
     <!-- Header -->
-    <header class="w-full bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-        <a href="index.html" class="flex items-center gap-2">
-            <span class="font-bold tracking-widest text-lg uppercase">RADA CREST</span>
+    <header class="w-full bg-[#090c10]/80 backdrop-blur-md border-b border-neutral-800/80 px-5 py-3.5 flex items-center justify-between sticky top-0 z-50">
+        <a href="index.html" class="flex items-center gap-2 group">
+            <div class="w-8 h-8 rounded-lg bg-[#FF7A00] flex items-center justify-center text-black font-black text-sm shadow-lg shadow-[#FF7A00]/25 group-hover:scale-105 transition">RC</div>
+            <span class="font-bold tracking-widest text-base uppercase text-white group-hover:text-[#FF7A00] transition">RADA CREST</span>
         </a>
-        <a href="index.html" class="text-sm font-medium text-neutral-600 hover:text-black flex items-center gap-1">
-            <i class="fa-solid fa-arrow-left"></i> Back to Store
+        <a href="index.html" class="text-xs font-semibold tracking-wide uppercase px-3.5 py-1.5 rounded-full border border-neutral-700 text-neutral-300 hover:text-white hover:border-[#FF7A00] hover:bg-neutral-800/80 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i> Store
         </a>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-md w-full mx-auto px-4 py-8 flex-grow">
+    <!-- Main Content Container -->
+    <main class="max-w-md w-full mx-auto px-4 py-7 flex-grow relative z-10">
         
-        <!-- Not Logged In View -->
+        <!-- Authentication View -->
         <div id="auth-container">
             <div class="mb-6 text-center">
-                <h1 class="text-2xl font-bold tracking-tight">My Account</h1>
-                <p class="text-sm text-neutral-500 mt-1">Sign in to view your orders, or create a new customer account.</p>
+                <h1 class="text-2xl font-bold tracking-tight text-white">My Account</h1>
+                <p class="text-xs text-neutral-400 mt-1">Sign in to manage your orders, address & wishlist.</p>
             </div>
 
-            <!-- Tab Switcher -->
-            <div class="flex bg-neutral-200 p-1 rounded-xl mb-6">
-                <button id="tab-login-btn" onclick="switchTab('login')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm transition-all">Sign In</button>
-                <button id="tab-signup-btn" onclick="switchTab('signup')" class="flex-1 py-2 text-sm font-semibold text-neutral-500 transition-all">Create Account</button>
+            <!-- Tab Buttons -->
+            <div class="flex bg-neutral-900/90 border border-neutral-800 p-1 rounded-xl mb-5 shadow-inner">
+                <button id="tab-login-btn" onclick="switchTab('login')" class="flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all">Sign In</button>
+                <button id="tab-signup-btn" onclick="switchTab('signup')" class="flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all">Create Account</button>
             </div>
 
-            <!-- Notification Banner -->
-            <div id="auth-alert" class="hidden mb-4 p-3 text-sm rounded-lg"></div>
+            <!-- Alert Notification -->
+            <div id="auth-alert" class="hidden mb-4 p-3.5 text-xs font-medium rounded-xl"></div>
 
             <!-- Sign In Form -->
-            <div id="login-form-box" class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
-                <h2 class="text-lg font-bold mb-1">Sign In</h2>
-                <p class="text-xs text-neutral-500 mb-4">Sign in using your registered email or 10-digit mobile number.</p>
+            <div id="login-form-box" class="glass-panel rounded-2xl p-6 shadow-xl">
+                <div class="mb-4">
+                    <h2 class="text-base font-bold text-white">Sign In</h2>
+                    <p class="text-[11px] text-neutral-400">Enter your registered email or 10-digit mobile number.</p>
+                </div>
                 
                 <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Email or Mobile Number</label>
-                        <input type="text" id="login-email" required inputmode="email" autocomplete="username" placeholder="you@example.com or 9876543210" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
-                        <span class="text-[10px] text-neutral-400 mt-1 block">Email or 10-digit mobile number</span>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Email or Mobile Number</label>
+                        <input type="text" id="login-email" required inputmode="email" autocomplete="username" placeholder="name@example.com or 9876543210" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Password</label>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Password</label>
                         <div class="relative">
-                            <input type="password" id="login-password" required minlength="8" maxlength="16" placeholder="8–16 characters" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
-                            <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 text-sm">
+                            <input type="password" id="login-password" required minlength="8" maxlength="16" placeholder="8–16 characters" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none pr-10">
+                            <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-3.5 top-2.5 text-neutral-400 hover:text-white text-xs">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between text-xs">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="remember-me" class="rounded border-neutral-300 text-black focus:ring-black"> Remember me
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer text-neutral-400 hover:text-neutral-200">
+                            <input type="checkbox" id="remember-me" class="rounded bg-neutral-800 border-neutral-700 text-[#FF7A00] focus:ring-0"> Remember me
                         </label>
-                        <a href="forgot-password.html" class="text-neutral-600 hover:underline font-medium">Forgot password?</a>
+                        <a href="forgot-password.html" class="text-[#FF7A00] hover:underline font-medium transition">Forgot password?</a>
                     </div>
-                    <button type="submit" id="login-btn" class="w-full py-3 bg-black text-white rounded-xl font-medium text-sm hover:bg-neutral-800 transition-all shadow-md">
+                    <button type="submit" id="login-btn" class="w-full py-3.5 btn-brand-orange text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition transform active:scale-[0.98]">
                         Sign In
                     </button>
                 </form>
             </div>
 
-            <!-- Create Account Form (Hidden by default) -->
-            <div id="signup-form-box" class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm hidden">
-                <h2 class="text-lg font-bold mb-1">Create Account</h2>
-                <p class="text-xs text-neutral-500 mb-4">Create your account with email, mobile number and password.</p>
+            <!-- Create Account Form -->
+            <div id="signup-form-box" class="glass-panel rounded-2xl p-6 shadow-xl hidden">
+                <div class="mb-4">
+                    <h2 class="text-base font-bold text-white">Create Account</h2>
+                    <p class="text-[11px] text-neutral-400">Enter your details to create your customer account.</p>
+                </div>
                 
-                <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-4">
+                <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-3.5">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Full Name</label>
-                        <input type="text" id="signup-name" required placeholder="John Doe" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Full Name</label>
+                        <input type="text" id="signup-name" required placeholder="John Doe" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Mobile Number</label>
-                        <input type="tel" id="signup-mobile" required pattern="[0-9]{10}" placeholder="9876543210" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
-                        <span class="text-[10px] text-neutral-400 mt-1 block">Enter 10-digit mobile number without country code</span>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Mobile Number</label>
+                        <input type="tel" id="signup-mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile number" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Email</label>
-                        <input type="email" id="signup-email" required placeholder="you@example.com" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Email</label>
+                        <input type="email" id="signup-email" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-neutral-600 mb-1">Password</label>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Password</label>
                         <div class="relative">
-                            <input type="password" id="signup-password" required minlength="8" maxlength="16" placeholder="8–16 characters" class="w-full px-3 py-2.5 bg-neutral-50 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:border-black pr-10">
-                        <span class="text-[10px] text-neutral-400 mt-1 block">Password must be 8–16 characters.</span>
-                            <button type="button" onclick="togglePassword('signup-password', this)" class="absolute right-3 top-3 text-neutral-400 hover:text-neutral-600 text-sm">
+                            <input type="password" id="signup-password" required minlength="8" maxlength="16" placeholder="8–16 characters" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none pr-10">
+                            <button type="button" onclick="togglePassword('signup-password', this)" class="absolute right-3.5 top-2.5 text-neutral-400 hover:text-white text-xs">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
                         </div>
                     </div>
-                    <button type="submit" id="signup-btn" class="w-full py-3 bg-amber-600 text-white rounded-xl font-medium text-sm hover:bg-amber-700 transition-all shadow-md">
+                    <button type="submit" id="signup-btn" class="w-full py-3.5 btn-brand-orange text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition transform active:scale-[0.98]">
                         Create Account
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Logged In Dashboard View (Hidden initially) -->
-        <div id="dashboard-container" class="hidden">
-            <div class="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm mb-4">
-                <div class="flex items-center justify-between mb-4 pb-4 border-b border-neutral-100">
-                    <div>
-                        <h2 class="text-lg font-bold" id="user-display-name">Welcome</h2>
-                        <p class="text-xs text-neutral-500" id="user-display-email">email@domain.com</p>
-                        <p class="text-xs text-neutral-500 mt-0.5" id="user-display-mobile">Mobile: --</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-sm" id="user-initials">
+        <!-- Logged In Dashboard View -->
+        <div id="dashboard-container" class="hidden space-y-4">
+            
+            <!-- User Info Card -->
+            <div class="glass-panel rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-[#FF7A00] text-black flex items-center justify-center font-black text-base shadow-lg shadow-[#FF7A00]/30" id="user-initials">
                         RC
                     </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <h2 class="text-base font-bold text-white leading-tight" id="user-display-name">Customer Name</h2>
+                            <i class="fa-solid fa-circle-check text-[#FF7A00] text-xs" title="Verified Customer"></i>
+                        </div>
+                        <p class="text-xs text-neutral-400" id="user-display-email">customer@domain.com</p>
+                        <p class="text-[11px] text-[#FF7A00] font-medium mt-0.5" id="user-display-mobile">Mobile: --</p>
+                    </div>
                 </div>
-
-                <div class="space-y-2">
-                    <a
-  href="orders.html"
-  style="
-    display:flex;
-    align-items:center;
-    width:100%;
-    min-height:72px;
-    padding:0 8px;
-    text-decoration:none;
-    color:inherit;
-    cursor:pointer;
-  "
->
-  <!-- Left Icon -->
-  <div
-    style="
-      width:42px;
-      min-width:42px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#a3a3a3;
-      font-size:20px;
-    "
-  >
-    <i class="fa-solid fa-box"></i>
-  </div>
-
-  <!-- Text -->
-  <div
-    style="
-      flex:1;
-      min-width:0;
-      padding-left:10px;
-      font-size:20px;
-      font-weight:500;
-      color:#292929;
-    "
-  >
-    My Orders
-  </div>
-
-  <!-- Arrow -->
-  <div
-    style="
-      width:40px;
-      min-width:40px;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      color:#a3a3a3;
-      font-size:18px;
-    "
-  >
-    <i class="fa-solid fa-chevron-right"></i>
-  </div>
-
-                    <a
-  href="addresses.html"
-  style="
-    display:flex;
-    align-items:center;
-    width:100%;
-    min-height:72px;
-    padding:0 8px;
-    text-decoration:none;
-    color:inherit;
-    cursor:pointer;
-  "
->
-  <!-- Left Icon -->
-  <div
-    style="
-      width:42px;
-      min-width:42px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#a3a3a3;
-      font-size:20px;
-    "
-  >
-    <i class="fa-solid fa-location-dot"></i>
-  </div>
-
-  <!-- Text -->
-  <div
-    style="
-      flex:1;
-      min-width:0;
-      padding-left:10px;
-      font-size:20px;
-      font-weight:500;
-      color:#292929;
-    "
-  >
-    My Addresses
-  </div>
-
-  <!-- Arrow -->
-  <div
-    style="
-      width:40px;
-      min-width:40px;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      color:#a3a3a3;
-      font-size:18px;
-    "
-  >
-    <i class="fa-solid fa-chevron-right"></i>
-  </div>
-
-                    </a>
-                </div>
+                <a href="profile.html" class="p-2.5 text-neutral-400 hover:text-[#FF7A00] rounded-xl hover:bg-neutral-800/60 transition" title="Edit Profile">
+                    <i class="fa-solid fa-pen-to-square text-sm"></i>
+                </a>
             </div>
 
-            <button onclick="handleLogout()" class="w-full py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-medium text-sm hover:bg-red-100 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            <!-- Navigation Links List with Live Dots and Badges -->
+            <div class="glass-panel rounded-2xl overflow-hidden divide-y divide-neutral-800/60 shadow-lg">
+                
+                <!-- 1. Profile -->
+                <a href="profile.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-neutral-200">Profile</span>
+                            <p class="text-[10px] text-neutral-500">Edit info & security</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                </a>
+
+                <!-- 2. Cart -->
+                <a href="cart.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span class="pulse-dot absolute -top-1 -right-1"></span>
+                        </div>
+                        <span class="text-sm font-semibold text-neutral-200">Cart</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FF7A00]/20 text-[#FF7A00] border border-[#FF7A00]/30" id="cart-counter">View Cart</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 3. Orders -->
+                <a href="orders.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span class="pulse-dot absolute -top-1 -right-1"></span>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-neutral-200">Orders</span>
+                            <p class="text-[10px] text-neutral-500">Track & previous orders</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-semibold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/50">Track</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 4. Wishlist -->
+                <a href="wishlist.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-neutral-200">Wishlist</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-medium text-neutral-400">Saved items</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 5. My Address -->
+                <a href="addresses.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-neutral-200">My Address</span>
+                            <p class="text-[10px] text-neutral-500">Delivery locations</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                </a>
+
+                <!-- 6. Notifications -->
+                <a href="notifications.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="pulse-dot absolute -top-1 -right-1"></span>
+                        </div>
+                        <span class="text-sm font-semibold text-neutral-200">Notifications</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-bold text-[#FF7A00] bg-[#FF7A00]/10 px-2 py-0.5 rounded-full border border-[#FF7A00]/30">New updates</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 7. Language -->
+                <a href="language.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <span class="text-sm font-semibold text-neutral-200">Language</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-[#FF7A00] font-semibold">हिन्दी / EN</span>
+                        <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                    </div>
+                </a>
+
+                <!-- 8. नियम और शर्तें -->
+                <a href="terms.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
+                    <div class="flex items-center gap-3.5">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50">
+                            <i class="fa-solid fa-file-contract"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-neutral-200">नियम और शर्तें</span>
+                            <p class="text-[10px] text-neutral-500">Terms & Policy</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon text-neutral-500 text-xs"></i>
+                </a>
+            </div>
+
+            <!-- 9. Logout Button -->
+            <button onclick="handleLogout()" class="w-full py-3.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/40 rounded-2xl font-semibold text-xs tracking-wider uppercase transition duration-300 flex items-center justify-center gap-2 shadow-lg shadow-red-950/20 active:scale-[0.98]">
+                <i class="fa-solid fa-power-off"></i> Log Out
             </button>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="text-center py-4 text-xs text-neutral-400 border-t border-neutral-200 bg-white">
+    <footer class="text-center py-4 text-xs text-neutral-500 border-t border-neutral-800/60 bg-[#090c10]/80 backdrop-blur-md relative z-10">
         &copy; 2026 RADA CREST. All rights reserved.
     </footer>
 
-    <!-- Supabase -->
+    <!-- Supabase Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="supabase-client.js"></script>
     <script>
-
-        // Check active session on load
         document.addEventListener('DOMContentLoaded', async () => {
             if (typeof sbReady === 'function' && !sbReady()) {
                 showAlert('Supabase configuration is missing. Please check config.js.', true);
@@ -275,7 +433,6 @@
             }
         });
 
-        // Toggle Tabs (Login / Signup)
         function switchTab(tab) {
             const loginBox = document.getElementById('login-form-box');
             const signupBox = document.getElementById('signup-form-box');
@@ -286,24 +443,22 @@
             if (tab === 'login') {
                 loginBox.classList.remove('hidden');
                 signupBox.classList.add('hidden');
-                loginBtn.className = "flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm transition-all";
-                signupBtn.className = "flex-1 py-2 text-sm font-semibold text-neutral-500 transition-all";
+                loginBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all";
+                signupBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all";
             } else {
                 signupBox.classList.remove('hidden');
                 loginBox.classList.add('hidden');
-                signupBtn.className = "flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow-sm transition-all";
-                loginBtn.className = "flex-1 py-2 text-sm font-semibold text-neutral-500 transition-all";
+                signupBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all";
+                loginBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all";
             }
         }
 
-        // Password hard limit: never allow more than 16 characters.
         document.addEventListener('input', (event) => {
             if (event.target.matches('#login-password, #signup-password') && event.target.value.length > 16) {
                 event.target.value = event.target.value.slice(0, 16);
             }
         });
 
-        // Show/Hide Password
         function togglePassword(fieldId, btn) {
             const input = document.getElementById(fieldId);
             const icon = btn.querySelector('i');
@@ -316,10 +471,9 @@
             }
         }
 
-        // Alerts utility
         function showAlert(message, isError = true) {
             const alertBox = document.getElementById('auth-alert');
-            alertBox.className = `mb-4 p-3 text-sm rounded-lg ${isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`;
+            alertBox.className = `mb-4 p-3.5 text-xs font-medium rounded-xl ${isError ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60'}`;
             alertBox.innerText = message;
             alertBox.classList.remove('hidden');
         }
@@ -328,7 +482,6 @@
             document.getElementById('auth-alert').classList.add('hidden');
         }
 
-        // Handle Signup — Email + Mobile + Password
         async function handleSignup(e) {
             e.preventDefault();
             hideAlert();
@@ -348,7 +501,10 @@
             const password = document.getElementById('signup-password').value;
 
             if (password.length < 8 || password.length > 16) {
-                throw new Error('Password must be 8–16 characters.');
+                showAlert('Password must be 8–16 characters.');
+                btn.disabled = false;
+                btn.innerText = 'Create Account';
+                return;
             }
 
             if (!/^\d{10}$/.test(mobile)) {
@@ -361,8 +517,6 @@
             const phone = `+91${mobile}`;
 
             try {
-                // Phone is the Auth identifier so Supabase can later send a
-                // password-reset OTP to the same verified number.
                 const { data, error } = await supabaseClient.auth.signUp({
                     phone,
                     password,
@@ -384,7 +538,6 @@
                 sessionStorage.setItem('pending_signup_mobile', mobile);
 
                 if (data.session) {
-                    // If phone confirmation is disabled, attach the email now.
                     const { error: emailError } = await supabaseClient.auth.updateUser({
                         email,
                         data: {
@@ -395,11 +548,8 @@
 
                     if (emailError) throw emailError;
 
-                    showAlert(
-                        'Account created. Please check your email to confirm it. You can also sign in with your mobile number.',
-                        false
-                    );
-                    setTimeout(() => switchTab('login'), 2500);
+                    showAlert('Account created successfully! Switching to sign in...', false);
+                    setTimeout(() => switchTab('login'), 2000);
                 } else {
                     window.location.href = 'verify-phone.html?mode=signup';
                 }
@@ -411,7 +561,6 @@
             }
         }
 
-        // Handle Login — Email OR Mobile Number
         async function handleLogin(e) {
             e.preventDefault();
             hideAlert();
@@ -437,21 +586,13 @@
                 }
 
                 let credentials;
-
                 if (/^\d{10}$/.test(identifier)) {
-                    credentials = {
-                        phone: `+91${identifier}`,
-                        password
-                    };
+                    credentials = { phone: `+91${identifier}`, password };
                 } else {
-                    credentials = {
-                        email: identifier,
-                        password
-                    };
+                    credentials = { email: identifier, password };
                 }
 
                 const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
-
                 if (error) throw error;
 
                 showDashboard(data.user);
@@ -469,9 +610,6 @@
             }
         }
 
-        // Forgot password is handled on forgot-password.html.
-
-        // Show Dashboard after successful login
         function showDashboard(user) {
             document.getElementById('auth-container').classList.add('hidden');
             document.getElementById('dashboard-container').classList.remove('hidden');
@@ -480,15 +618,13 @@
             const mobileNumber = user.user_metadata?.mobile_number || 'Not provided';
             
             document.getElementById('user-display-name').innerText = fullName;
-            document.getElementById('user-display-email').innerText = user.email;
+            document.getElementById('user-display-email').innerText = user.email || 'No email provided';
             document.getElementById('user-display-mobile').innerText = `Mobile: ${mobileNumber}`;
 
-            // Generate initials
             const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
             document.getElementById('user-initials').innerText = initials || 'RC';
         }
 
-        // Handle Logout
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             document.getElementById('dashboard-container').classList.add('hidden');
