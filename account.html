@@ -364,7 +364,7 @@
                 <!-- 6. Notifications -->
                 <a href="notifications.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
                     <div class="flex items-center gap-3.5">
-                                                <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
+                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
                             <i class="fa-solid fa-bell"></i>
                             <span class="pulse-dot absolute -top-1 -right-1"></span>
                         </div>
@@ -431,7 +431,14 @@
 
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (session) {
+                localStorage.setItem('rc_user', JSON.stringify({
+                    id: session.user.id,
+                    email: session.user.email,
+                    phone: session.user.phone
+                }));
                 showDashboard(session.user);
+            } else {
+                localStorage.removeItem('rc_user');
             }
         });
 
@@ -597,6 +604,12 @@
                 const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
                 if (error) throw error;
 
+                localStorage.setItem('rc_user', JSON.stringify({
+                    id: data.user.id,
+                    email: data.user.email,
+                    phone: data.user.phone
+                }));
+
                 showDashboard(data.user);
 
                 const redirectUrl = sessionStorage.getItem('redirect_after_login');
@@ -653,6 +666,7 @@
 
         async function handleLogout() {
             await supabaseClient.auth.signOut();
+            localStorage.removeItem('rc_user');
             document.getElementById('dashboard-container').classList.add('hidden');
             document.getElementById('auth-container').classList.remove('hidden');
             document.getElementById('loginForm').reset();
