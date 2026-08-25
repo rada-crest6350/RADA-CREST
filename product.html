@@ -672,8 +672,11 @@
     
     function getActiveUserKey() {
   const user = JSON.parse(localStorage.getItem('rc_user')) || null;
-  if (user && user.email) {
-    return `rc_cart_items_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  if (user) {
+    const uniqueId = user.email || user.phone || user.id;
+    if (uniqueId) {
+      return `rc_cart_items_${String(uniqueId).replace(/[^a-zA-Z0-9]/g, '_')}`;
+    }
   }
   return 'rc_cart_items_guest_user';
 }
@@ -685,19 +688,33 @@ function addToCart() {
   let cart = JSON.parse(localStorage.getItem(targetKey)) || [];
   const existingIndex = cart.findIndex(item => String(item.id) === String(currentProduct.id));
 
-  const prodImg = (currentProduct.images && currentProduct.images.length > 0) 
-                  ? currentProduct.images[0] 
-                  : (currentProduct.image || 'assets/placeholder.jpg');
+  // Handle both array images and single image link
+  let prodImg = 'assets/placeholder.jpg';
+  if (currentProduct.images && Array.isArray(currentProduct.images) && currentProduct.images.length > 0) {
+    prodImg = currentProduct.images[0];
+  } else if (currentProduct.image) {
+    prodImg = currentProduct.image;
+  }
+
+  const itemPrice = Number(currentProduct.price || 0);
+  const itemOldPrice = Number(currentProduct.old_price || currentProduct.price || itemPrice);
+  const variantInfo = currentProduct.size ? `Size: ${currentProduct.size}` : (currentProduct.colors ? `Color: ${currentProduct.colors}` : 'Standard Edition');
 
   if (existingIndex > -1) {
     cart[existingIndex].quantity = Number(cart[existingIndex].quantity || 0) + Number(currentQty);
   } else {
     cart.push({
       id: currentProduct.id,
+      title: currentProduct.name,
       name: currentProduct.name,
-      price: Number(currentProduct.price || 0),
-      old_price: Number(currentProduct.old_price || currentProduct.price || 0),
+      price: itemPrice,
+      currentPrice: itemPrice,
+      oldPrice: itemOldPrice,
+      old_price: itemOldPrice,
       image: prodImg,
+      variant: variantInfo,
+      stockLeft: Number(currentProduct.stock || 55),
+      shippingFee: Number(currentProduct.shipping_fee || 0),
       quantity: Number(currentQty),
       selected: true
     });
