@@ -140,11 +140,23 @@ function initDeliveryAddress() {
   }
 }
 
+function getActiveUserIdentifier() {
+  const storedUser = JSON.parse(localStorage.getItem('rc_user')) || 
+                     JSON.parse(localStorage.getItem('supabase_user')) || 
+                     JSON.parse(localStorage.getItem('user_session')) || null;
+
+  if (storedUser && (storedUser.email || storedUser.id)) {
+    return String(storedUser.email || storedUser.id).replace(/[^a-zA-Z0-9]/g, '_');
+  }
+  return 'guest_user';
+}
+
 function initCartCounter() {
-  const cartItems = JSON.parse(localStorage.getItem('rc_cart_items')) || [];
+  const userKey = `rc_cart_items_${getActiveUserIdentifier()}`;
+  const cartItems = JSON.parse(localStorage.getItem(userKey)) || [];
   const cartCountEl = document.getElementById('cartCount');
   if (cartCountEl) {
-    cartCountEl.innerText = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
+    cartCountEl.innerText = cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0);
   }
 }
 
