@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Cart | Rada Crest</title>
-    <!-- Google Fonts & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -48,7 +47,7 @@
             padding: 16px;
         }
 
-        /* 1. Header Navigation */
+        /* Header */
         .header-nav {
             display: flex;
             align-items: center;
@@ -76,7 +75,7 @@
             justify-content: center;
             cursor: pointer;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .back-btn:hover {
@@ -113,7 +112,7 @@
             cursor: pointer;
         }
 
-        /* 2. Delivery Address Card */
+        /* Delivery Address Card */
         .address-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -125,7 +124,7 @@
             justify-content: space-between;
             margin-bottom: 22px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-            animation: fadeInDown 0.6s ease;
+            text-decoration: none;
         }
 
         .address-info {
@@ -157,12 +156,17 @@
             background: transparent;
             border: 1px solid var(--primary);
             color: var(--primary);
-            padding: 7px 15px;
+            padding: 8px 16px;
             border-radius: 10px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
 
         .addr-edit-btn:hover {
@@ -171,7 +175,7 @@
             box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        /* Grid Layout */
+        /* Cart Grid */
         .cart-layout {
             display: grid;
             grid-template-columns: 1.85fr 1.15fr;
@@ -185,7 +189,7 @@
             }
         }
 
-        /* 3. Products List */
+        /* Product Cards */
         .product-list {
             display: flex;
             flex-direction: column;
@@ -204,7 +208,6 @@
             align-items: center;
             position: relative;
             transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: fadeInUp 0.5s ease;
         }
 
         .cart-item-card:hover {
@@ -218,7 +221,6 @@
             opacity: 0;
         }
 
-        /* Custom Checkbox */
         .custom-checkbox {
             appearance: none;
             width: 22px;
@@ -248,7 +250,6 @@
         }
 
         .prod-img-wrap {
-            position: relative;
             width: 90px;
             height: 90px;
             border-radius: 14px;
@@ -273,9 +274,6 @@
             font-size: 1rem;
             font-weight: 700;
             color: var(--text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .prod-spec {
@@ -283,7 +281,6 @@
             color: var(--text-muted);
         }
 
-        /* Stock Automation Badge */
         .stock-badge {
             display: inline-flex;
             align-items: center;
@@ -295,7 +292,6 @@
             padding: 3px 8px;
             border-radius: 6px;
             width: fit-content;
-            animation: pulseWarning 2s infinite ease-in-out;
         }
 
         .price-section {
@@ -394,7 +390,7 @@
             color: var(--danger);
         }
 
-        /* 4. Total Board (Summary) */
+        /* Total Board */
         .total-board {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -430,7 +426,6 @@
             font-weight: 600;
         }
 
-        /* Grand Total */
         .grand-total-row {
             margin-top: 18px;
             padding-top: 16px;
@@ -452,7 +447,6 @@
             text-shadow: 0 0 15px var(--primary-glow);
         }
 
-        /* Buy Now & Checkout Buttons */
         .buy-now-btn {
             width: 100%;
             background: linear-gradient(135deg, #d4af37 0%, #a4821d 100%);
@@ -470,7 +464,6 @@
             gap: 10px;
             transition: all 0.3s;
             box-shadow: 0 6px 25px var(--primary-glow);
-            text-decoration: none;
         }
 
         .buy-now-btn:hover {
@@ -478,7 +471,6 @@
             box-shadow: 0 10px 35px rgba(212, 175, 55, 0.45);
         }
 
-        /* Suggestion Badge */
         .order-suggest {
             margin-top: 14px;
             font-size: 0.82rem;
@@ -493,7 +485,7 @@
             gap: 6px;
         }
 
-        /* 5. Policy Footer Section */
+        /* Policy Footer */
         .policy-footer {
             margin-top: 45px;
             padding-top: 20px;
@@ -526,89 +518,6 @@
             color: #64748b;
         }
 
-        /* Address Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            padding: 16px;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .modal-box {
-            background: #0f1624;
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 24px;
-            width: 100%;
-            max-width: 480px;
-            transform: scale(0.9);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .modal-overlay.active .modal-box {
-            transform: scale(1);
-        }
-
-        .modal-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-
-        .input-group {
-            margin-bottom: 14px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .input-group input, .input-group textarea {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 10px 14px;
-            color: #fff;
-            outline: none;
-            font-size: 0.9rem;
-        }
-
-        .input-group input:focus, .input-group textarea:focus {
-            border-color: var(--primary);
-        }
-
-        .save-addr-btn {
-            width: 100%;
-            background: var(--primary);
-            color: #080b11;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* Toast Notification */
         .toast-notify {
             position: fixed;
             bottom: 24px;
@@ -630,36 +539,19 @@
             transform: translateY(0);
             opacity: 1;
         }
-
-        /* Animations */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulseWarning {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
-            100% { opacity: 0.8; }
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Top Header -->
+    <!-- Header -->
     <div class="header-nav">
         <div class="header-left">
             <a href="index.html" class="back-btn" title="Go Back">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div class="header-title">
-                My Cart <span class="cart-badge" id="headerCount">3 Items</span>
+                My Cart <span class="cart-badge" id="headerCount">0 Items</span>
             </div>
         </div>
         <label class="select-all-box">
@@ -668,25 +560,25 @@
         </label>
     </div>
 
-    <!-- Delivery Address Card -->
+    <!-- Delivery Address Card (Direct link to address.html) -->
     <div class="address-card">
         <div class="address-info">
             <i class="fa-solid fa-location-dot addr-icon"></i>
             <div class="addr-text">
-                <h4 id="displayUserName">Deliver to: Kishan, 508213</h4>
-                <p id="displayAddress">Shop No. 4, Main Road Market, Suryapet, Telangana</p>
+                <h4 id="displayUserName">Deliver to: Set Address</h4>
+                <p id="displayAddress">Click Change / Edit to add your address</p>
             </div>
         </div>
-        <button class="addr-edit-btn" onclick="openAddressModal()">
+        <a href="address.html" class="addr-edit-btn">
             <i class="fa-solid fa-pen-to-square"></i> Change / Edit
-        </button>
+        </a>
     </div>
 
-    <!-- Main Grid -->
+    <!-- Main Layout -->
     <div class="cart-layout">
         <!-- Products Column -->
         <div class="product-list" id="productListContainer">
-            <!-- Dynamic items rendered by JS -->
+            <!-- Dynamic Cart Items -->
         </div>
 
         <!-- Total Board -->
@@ -696,7 +588,7 @@
             </div>
 
             <div class="summary-line">
-                <span>Total (<span id="selectedCountText">3</span> items selected)</span>
+                <span>Total (<span id="selectedCountText">0</span> items selected)</span>
                 <span id="subtotalVal">₹0</span>
             </div>
 
@@ -710,7 +602,6 @@
                 <span id="deliveryVal" style="color: var(--success);">FREE</span>
             </div>
 
-            <!-- Final Grand Total -->
             <div class="grand-total-row">
                 <span class="lbl">Final Payment</span>
                 <span class="val" id="grandTotalVal">₹0</span>
@@ -720,14 +611,13 @@
                 <i class="fa-solid fa-shield-check"></i> 100% Genuine Quality Guaranteed
             </div>
 
-            <!-- Buy Now Button linking to buy.html -->
             <button class="buy-now-btn" onclick="proceedToBuy()">
                 Buy Now / Place Order <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
     </div>
 
-    <!-- Terms & Policies Footer -->
+    <!-- Policy Footer -->
     <footer class="policy-footer">
         <div class="policy-links">
             <a href="terms.html">Terms & Conditions</a>
@@ -739,37 +629,11 @@
     </footer>
 </div>
 
-<!-- Address Edit Modal -->
-<div class="modal-overlay" id="addressModal">
-    <div class="modal-box">
-        <div class="modal-head">
-            <h3>Edit Delivery Address</h3>
-            <button onclick="closeAddressModal()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="input-group">
-            <label>Receiver Full Name</label>
-            <input type="text" id="inputName" value="Kishan">
-        </div>
-        <div class="input-group">
-            <label>Pincode</label>
-            <input type="text" id="inputPin" value="508213">
-        </div>
-        <div class="input-group">
-            <label>Full Delivery Address</label>
-            <textarea id="inputAddress" rows="3">Shop No. 4, Main Road Market, Suryapet, Telangana</textarea>
-        </div>
-        <button class="save-addr-btn" onclick="saveAddress()">Save & Apply Address</button>
-    </div>
-</div>
-
-<!-- Toast Popup -->
-<div class="toast-notify" id="toastNotify">Notification text</div>
+<div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Product Data with Stock Automation & Specifications
-    let cartItems = [
+    // Initial Default items if storage is empty
+    const defaultProducts = [
         {
             id: "RC-001",
             title: "Rada Crest 9W LED Bulb",
@@ -805,7 +669,31 @@
         }
     ];
 
-    // Notification Helper
+    // Load Cart from LocalStorage (Permanent storage)
+    let cartItems = JSON.parse(localStorage.getItem('cart_items'));
+    if (!cartItems) {
+        cartItems = defaultProducts;
+        localStorage.setItem('cart_items', JSON.stringify(cartItems));
+    }
+
+    // Save Cart to LocalStorage
+    function saveCartState() {
+        localStorage.setItem('cart_items', JSON.stringify(cartItems));
+    }
+
+    // Load Saved Address from LocalStorage
+    function loadSavedAddress() {
+        const savedAddress = JSON.parse(localStorage.getItem('user_address'));
+        if (savedAddress && savedAddress.name) {
+            document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name}, ${savedAddress.pincode || ''}`;
+            document.getElementById('displayAddress').innerText = savedAddress.address || 'Address details saved';
+        } else {
+            // Default Fallback
+            document.getElementById('displayUserName').innerText = `Deliver to: Kishan, 508213`;
+            document.getElementById('displayAddress').innerText = `Shop No. 4, Main Road Market, Suryapet, Telangana`;
+        }
+    }
+
     function showToast(msg) {
         const toast = document.getElementById('toastNotify');
         toast.innerText = msg;
@@ -823,9 +711,10 @@
                 <div style="text-align:center; padding:50px 20px; background:var(--card-bg); border-radius:18px; border:1px solid var(--border-color);">
                     <i class="fa-solid fa-box-open" style="font-size:3rem; color:var(--primary); margin-bottom:12px;"></i>
                     <h3>Aapka Cart Khali Hai!</h3>
-                    <p style="color:var(--text-muted); margin-top:6px;">Store se naye products select karein.</p>
+                    <p style="color:var(--text-muted); margin-top:6px;">Store se naye products add karein.</p>
                 </div>
             `;
+            calculateCart();
             return;
         }
 
@@ -841,7 +730,7 @@
             const discountPercent = Math.round(((item.oldPrice - item.currentPrice) / item.oldPrice) * 100);
 
             card.innerHTML = `
-                <input type="checkbox" class="custom-checkbox item-select-check" 
+                <input type="checkbox" class="custom-checkbox" 
                     ${item.selected ? 'checked' : ''} 
                     onchange="toggleItemSelect('${item.id}', this.checked)">
 
@@ -850,9 +739,7 @@
                 </div>
 
                 <div class="prod-details">
-                    <div class="prod-title">
-                        <span>${item.title}</span>
-                    </div>
+                    <div class="prod-title">${item.title}</div>
                     <div class="prod-spec">${item.variant}</div>
                     ${stockHtml}
 
@@ -883,28 +770,26 @@
             container.appendChild(card);
         });
 
-        trackAbandonedCart();
+        calculateCart();
     }
 
-    // Item Selection Logic
     function toggleItemSelect(id, isSelected) {
         const item = cartItems.find(i => i.id === id);
         if (item) {
             item.selected = isSelected;
-            const allSelected = cartItems.every(i => i.selected);
-            document.getElementById('selectAll').checked = allSelected;
+            saveCartState();
+            document.getElementById('selectAll').checked = cartItems.every(i => i.selected);
             calculateCart();
         }
     }
 
     function toggleSelectAll() {
-        const selectAllStatus = document.getElementById('selectAll').checked;
-        cartItems.forEach(i => i.selected = selectAllStatus);
+        const isChecked = document.getElementById('selectAll').checked;
+        cartItems.forEach(i => i.selected = isChecked);
+        saveCartState();
         renderCartItems();
-        calculateCart();
     }
 
-    // Quantity Controls
     function updateItemQty(id, change) {
         const item = cartItems.find(i => i.id === id);
         if (!item) return;
@@ -914,25 +799,23 @@
             deleteItem(id);
             return;
         }
+        saveCartState();
         renderCartItems();
-        calculateCart();
     }
 
-    // Delete Item with Animation
     function deleteItem(id) {
         const card = document.getElementById(`item-card-${id}`);
         if (card) {
             card.classList.add('removing');
             setTimeout(() => {
                 cartItems = cartItems.filter(i => i.id !== id);
+                saveCartState();
                 renderCartItems();
-                calculateCart();
                 showToast("Product Cart se hata diya gaya!");
             }, 300);
         }
     }
 
-    // Move to Wishlist
     function moveToWishlist(id) {
         const item = cartItems.find(i => i.id === id);
         if (item) {
@@ -944,7 +827,6 @@
         }
     }
 
-    // Total Calculation
     function calculateCart() {
         const selectedItems = cartItems.filter(i => i.selected);
         const totalItemsCount = cartItems.reduce((sum, i) => sum + i.qty, 0);
@@ -959,50 +841,8 @@
         document.getElementById('subtotalVal').innerText = `₹${subtotal.toLocaleString('en-IN')}`;
         document.getElementById('discountVal').innerText = `-₹${totalDiscount.toLocaleString('en-IN')}`;
         document.getElementById('grandTotalVal').innerText = `₹${subtotal.toLocaleString('en-IN')}`;
-
-        trackAbandonedCart();
     }
 
-    // Abandoned Cart Tracker
-    function trackAbandonedCart() {
-        const cartPayload = {
-            customer: document.getElementById('inputName').value,
-            address: document.getElementById('inputAddress').value,
-            totalItems: cartItems.length,
-            totalValue: cartItems.reduce((sum, i) => sum + (i.currentPrice * i.qty), 0),
-            items: cartItems,
-            updatedAt: new Date().toISOString()
-        };
-        localStorage.setItem('abandoned_cart_data', JSON.stringify(cartPayload));
-    }
-
-    // Address Modal Controls
-    function openAddressModal() {
-        document.getElementById('addressModal').classList.add('active');
-    }
-
-    function closeAddressModal() {
-        document.getElementById('addressModal').classList.remove('active');
-    }
-
-    function saveAddress() {
-        const name = document.getElementById('inputName').value.trim();
-        const pin = document.getElementById('inputPin').value.trim();
-        const addr = document.getElementById('inputAddress').value.trim();
-
-        if (!name || !addr) {
-            showToast("Kripya poora address bharein!");
-            return;
-        }
-
-        document.getElementById('displayUserName').innerText = `Deliver to: ${name}, ${pin}`;
-        document.getElementById('displayAddress').innerText = addr;
-        closeAddressModal();
-        showToast("Address Safaltapoorvak Update Hua!");
-        trackAbandonedCart();
-    }
-
-    // Proceed to buy.html
     function proceedToBuy() {
         const selected = cartItems.filter(i => i.selected);
         if (selected.length === 0) {
@@ -1012,11 +852,6 @@
 
         const orderData = {
             items: selected,
-            deliveryAddress: {
-                name: document.getElementById('inputName').value,
-                pincode: document.getElementById('inputPin').value,
-                address: document.getElementById('inputAddress').value
-            },
             payableAmount: document.getElementById('grandTotalVal').innerText
         };
 
@@ -1024,9 +859,9 @@
         window.location.href = "buy.html";
     }
 
-    // Initial Execution
+    // Initialize on page load
+    loadSavedAddress();
     renderCartItems();
-    calculateCart();
 </script>
 </body>
 </html>
