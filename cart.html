@@ -636,7 +636,6 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    // 1. Same exact User Identifier
     function getActiveUserIdentifier() {
         const storedUser = JSON.parse(localStorage.getItem('rc_user')) || 
                            JSON.parse(localStorage.getItem('supabase_user')) || 
@@ -670,10 +669,14 @@
     async function syncAndLoadCart() {
         loadAdminShippingSettings();
         
-        // Load user specific cart (Fallback to generic if migrating)
-        let rawCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || 
-                      JSON.parse(localStorage.getItem('rc_cart_items')) || [];
+        let rawCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
         
+        // Check legacy global carts if user cart is empty
+        if (rawCart.length === 0) {
+            rawCart = JSON.parse(localStorage.getItem('rc_cart_items')) || 
+                      JSON.parse(localStorage.getItem('cart')) || [];
+        }
+
         if (rawCart.length === 0) {
             cartItems = [];
             renderCartItems();
@@ -687,7 +690,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('products')
-                    .select('id, name, price, old_price, stock, image, shipping_fee')
+                    .select('id, name, price, old_price, stock, image, images, shipping_fee, size, colors')
                     .in('id', productIds);
                 if (!error && data) {
                     data.forEach(p => dbProducts[p.id] = p);
@@ -699,21 +702,35 @@
 
         cartItems = rawCart.map((item, index) => {
             const dbItem = dbProducts[item.id] || {};
-            let price = Number(dbItem.price !== undefined ? dbItem.price : item.price || 0);
-            let oldPrice = Number(dbItem.old_price !== undefined ? dbItem.old_price : (item.old_price || item.oldPrice || price));
-            let stock = dbItem.stock !== undefined ? dbItem.stock : (item.stock || 10);
+            
+            // Priority: Database -> Saved Item in Cart
+            let title = dbItem.name || item.name || item.title || "Rada Crest Bulb";
+            let price = Number(dbItem.price !== undefined && dbItem.price !== null ? dbItem.price : (item.price || 0));
+            let oldPrice = Number(dbItem.old_price !== undefined && dbItem.old_price !== null ? dbItem.old_price : (item.old_price || item.oldPrice || price));
+            let stock = dbItem.stock !== undefined ? dbItem.stock : (item.stock || 55);
             let shippingFee = Number(dbItem.shipping_fee ?? item.shipping_fee ?? item.delivery_charge ?? 0);
-            let img = dbItem.image || item.image || 'assets/placeholder.jpg';
+            
+            // Image handling (supports both array and single string)
+            let img = 'assets/placeholder.jpg';
+            if (dbItem.images && Array.isArray(dbItem.images) && dbItem.images.length > 0) {
+                img = dbItem.images[0];
+            } else if (dbItem.image) {
+                img = dbItem.image;
+            } else if (item.image) {
+                img = item.image;
+            }
+
+            let variant = item.variant || (dbItem.size ? `Size: ${dbItem.size}` : "Standard Edition");
 
             return {
                 id: item.id !== undefined ? item.id : `prod_${index}`,
-                title: dbItem.name || item.name || "Rada Crest Product",
-                variant: item.variant || "Standard Edition",
+                title: title,
+                variant: variant,
                 currentPrice: price,
                 oldPrice: oldPrice,
                 shippingFee: shippingFee,
                 stockLeft: stock,
-                quantity: Number(item.quantity || 1),
+                quantity: Number(item.quantity || item.qty || 1),
                 selected: item.selected !== undefined ? item.selected : true,
                 image: img
             };
@@ -732,7 +749,8 @@
             image: item.image,
             quantity: item.quantity,
             selected: item.selected,
-            shipping_fee: item.shippingFee
+            shipping_fee: item.shippingFee,
+            variant: item.variant
         }));
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
@@ -798,7 +816,7 @@
                     onchange="toggleItemSelect('${item.id}', this.checked)">
 
                 <div class="prod-img-wrap">
-                    <img src="${item.image}" alt="${item.title}" class="prod-img">
+                    <img src="${item.image}" alt="${item.title}" class="prod-img" onerror="this.onerror=null; this.src='https://placehold.co/100x100/12141a/FF7A00?text=Product';">
                 </div>
 
                 <div class="prod-details">
@@ -967,6 +985,6 @@
 
     loadSavedAddress();
     syncAndLoadCart();
-</script>         
+</script>  
 </body>
 </html>
