@@ -567,18 +567,18 @@
     </div>
 
     <!-- Address Card -->
-<a href="addresses.html" class="address-card">
-    <div class="address-info">
-        <i class="fa-solid fa-location-dot addr-icon"></i>
-        <div class="addr-text">
-            <h4 id="displayUserName" style="color: var(--warning);">Add Delivery Address</h4>
-            <p id="displayAddress">No address added yet. Click to add your address.</p>
+    <a href="addresses.html" class="address-card">
+        <div class="address-info">
+            <i class="fa-solid fa-location-dot addr-icon"></i>
+            <div class="addr-text">
+                <h4 id="displayUserName" style="color: var(--warning);">Add Delivery Address</h4>
+                <p id="displayAddress">No address added yet. Click to add your address.</p>
+            </div>
         </div>
-    </div>
-    <span class="addr-edit-btn" id="addrActionBtn">
-        <i class="fa-solid fa-plus"></i> Add Address
-    </span>
-</a>
+        <span class="addr-edit-btn" id="addrActionBtn">
+            <i class="fa-solid fa-plus"></i> Add Address
+        </span>
+    </a>
 
     <div class="cart-layout">
         <div class="product-list" id="productListContainer"></div>
@@ -641,9 +641,23 @@
     const ADDRESS_KEY = 'rc_user_address';
 
     let cartItems = [];
+    let adminDeliveryRules = {
+        baseShippingFee: 0,
+        freeAboveThreshold: 0
+    };
 
-    // Sync latest prices from Supabase products table
+    // Load dynamic delivery configuration from admin settings if present
+    function loadAdminShippingSettings() {
+        try {
+            const adminConfig = JSON.parse(localStorage.getItem('rc_admin_settings')) || {};
+            adminDeliveryRules.baseShippingFee = Number(adminConfig.shipping_charge ?? adminConfig.deliveryCharge ?? 0);
+            adminDeliveryRules.freeAboveThreshold = Number(adminConfig.free_delivery_above ?? adminConfig.freeAbove ?? 0);
+        } catch(e) {}
+    }
+
+    // Sync latest prices and shipping from Supabase products table
     async function syncAndLoadCart() {
+        loadAdminShippingSettings();
         let rawCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
         
         if (rawCart.length === 0) {
@@ -659,7 +673,7 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('products')
-                    .select('id, name, price, old_price, stock, image')
+                    .select('id, name, price, old_price, stock, image, shipping_fee')
                     .in('id', productIds);
                 if (!error && data) {
                     data.forEach(p => dbProducts[p.id] = p);
@@ -674,6 +688,7 @@
             let price = Number(dbItem.price !== undefined ? dbItem.price : item.price || 0);
             let oldPrice = Number(dbItem.old_price !== undefined ? dbItem.old_price : (item.old_price || item.oldPrice || price));
             let stock = dbItem.stock !== undefined ? dbItem.stock : (item.stock || 5);
+            let shippingFee = Number(dbItem.shipping_fee ?? item.shipping_fee ?? item.delivery_charge ?? 0);
             let img = (dbItem.image) || item.image || 'assets/placeholder.jpg';
 
             return {
@@ -682,6 +697,7 @@
                 variant: item.variant || "Standard Edition",
                 currentPrice: price,
                 oldPrice: oldPrice,
+                shippingFee: shippingFee,
                 stockLeft: stock,
                 quantity: Number(item.quantity || 1),
                 selected: item.selected !== undefined ? item.selected : true,
@@ -701,12 +717,13 @@
             old_price: item.oldPrice,
             image: item.image,
             quantity: item.quantity,
-            selected: item.selected
+            selected: item.selected,
+            shipping_fee: item.shippingFee
         }));
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
-    // Strictly reads saved address from adresses.html without dummy default
+    // Strictly reads saved address from addresses.html without dummy defaults
     function loadSavedAddress() {
         let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
         
@@ -718,7 +735,7 @@
         } else {
             document.getElementById('displayUserName').innerText = `Add Delivery Address`;
             document.getElementById('displayUserName').style.color = 'var(--warning)';
-            document.getElementById('displayAddress').innerText = `No address added yet. Click to choose or add address.`;
+            document.getElementById('displayAddress').innerText = `No address added yet. Click to add your address.`;
             document.getElementById('addrActionBtn').innerHTML = `<i class="fa-solid fa-plus"></i> Add Address`;
         }
     }
@@ -859,6 +876,7 @@
         }
     }
 
+    // Full Dynamic Calculation
     function calculateCart() {
         const selectedItems = cartItems.filter(i => i.selected);
         const totalItemsCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
@@ -868,13 +886,37 @@
         const totalMRP = selectedItems.reduce((sum, i) => sum + (i.oldPrice * i.quantity), 0);
         const totalDiscount = totalMRP > subtotalSelling ? totalMRP - subtotalSelling : 0;
 
+        // Dynamic Delivery Calculation
+        let calculatedShipping = 0;
+        if (selectedItems.length > 0) {
+            let itemLevelShipping = selectedItems.reduce((sum, i) => sum + ((i.shippingFee || 0) * i.quantity), 0);
+            calculatedShipping = itemLevelShipping > 0 ? itemLevelShipping : adminDeliveryRules.baseShippingFee;
+
+            if (adminDeliveryRules.freeAboveThreshold > 0 && subtotalSelling >= adminDeliveryRules.freeAboveThreshold) {
+                calculatedShipping = 0;
+            }
+        }
+
+        const grandFinal = subtotalSelling + calculatedShipping;
+
         document.getElementById('headerCount').innerText = `${totalItemsCount} Items`;
         document.getElementById('selectedCountText').innerText = selectedItemsCount;
         document.getElementById('subtotalVal').innerText = `₹${subtotalSelling.toLocaleString('en-IN')}`;
         document.getElementById('discountVal').innerText = `-₹${totalDiscount.toLocaleString('en-IN')}`;
-        document.getElementById('grandTotalVal').innerText = `₹${subtotalSelling.toLocaleString('en-IN')}`;
+        
+        const deliveryEl = document.getElementById('deliveryVal');
+        if (selectedItems.length === 0 || calculatedShipping === 0) {
+            deliveryEl.innerText = "FREE";
+            deliveryEl.style.color = "var(--success)";
+        } else {
+            deliveryEl.innerText = `₹${calculatedShipping.toLocaleString('en-IN')}`;
+            deliveryEl.style.color = "var(--text-main)";
+        }
+
+        document.getElementById('grandTotalVal').innerText = `₹${grandFinal.toLocaleString('en-IN')}`;
     }
 
+    // Complete Buy Bridge -> buy.html
     function proceedToBuy() {
         const selected = cartItems.filter(i => i.selected);
         if (selected.length === 0) {
@@ -882,22 +924,53 @@
             return;
         }
 
-        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY));
+        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
         if (!currentAddress || !currentAddress.name || !currentAddress.address) {
-            showToast("Kripya pehle delivery address select ya add karein!");
+            showToast("Kripya pehle delivery address add karein!");
             setTimeout(() => {
-                window.location.href = "adresses.html";
+                window.location.href = "addresses.html";
             }, 800);
             return;
         }
 
+        const subtotalSelling = selected.reduce((sum, i) => sum + (i.currentPrice * i.quantity), 0);
+        const totalMRP = selected.reduce((sum, i) => sum + (i.oldPrice * i.quantity), 0);
+        const totalDiscount = totalMRP > subtotalSelling ? totalMRP - subtotalSelling : 0;
+        
+        let calculatedShipping = 0;
+        let itemLevelShipping = selected.reduce((sum, i) => sum + ((i.shippingFee || 0) * i.quantity), 0);
+        calculatedShipping = itemLevelShipping > 0 ? itemLevelShipping : adminDeliveryRules.baseShippingFee;
+        if (adminDeliveryRules.freeAboveThreshold > 0 && subtotalSelling >= adminDeliveryRules.freeAboveThreshold) {
+            calculatedShipping = 0;
+        }
+
+        const grandFinal = subtotalSelling + calculatedShipping;
+
         const orderData = {
-            items: selected,
+            items: selected.map(item => ({
+                id: item.id,
+                name: item.title,
+                price: item.currentPrice,
+                old_price: item.oldPrice,
+                quantity: item.quantity,
+                image: item.image,
+                variant: item.variant,
+                shipping_fee: item.shippingFee
+            })),
+            pricing: {
+                subtotal: subtotalSelling,
+                discount: totalDiscount,
+                deliveryCharge: calculatedShipping,
+                finalPayable: grandFinal
+            },
             deliveryAddress: currentAddress,
-            payableAmount: document.getElementById('grandTotalVal').innerText
+            orderDate: new Date().toISOString()
         };
 
+        // Standardized storage keys for buy.html / checkout.html
         localStorage.setItem('checkout_order_data', JSON.stringify(orderData));
+        localStorage.setItem('rc_checkout_data', JSON.stringify(orderData));
+
         window.location.href = "buy.html";
     }
 
