@@ -112,7 +112,7 @@
             font-weight: 600;
         }
 
-        /* Delivery Address */
+        /* Delivery Address Card */
         .address-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -124,7 +124,12 @@
             justify-content: space-between;
             margin-bottom: 22px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .address-card:hover {
+            border-color: var(--primary);
         }
 
         .address-info {
@@ -135,7 +140,7 @@
 
         .addr-icon {
             color: var(--primary);
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             margin-top: 2px;
         }
 
@@ -153,29 +158,27 @@
         }
 
         .addr-edit-btn {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            background: var(--primary);
+            border: none;
+            color: #000;
             padding: 8px 16px;
             border-radius: 10px;
             font-size: 0.85rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: all 0.3s;
             white-space: nowrap;
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .addr-edit-btn:hover {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 12px var(--primary-glow);
+            transform: scale(1.03);
         }
 
-        /* Grid */
+        /* Layout */
         .cart-layout {
             display: grid;
             grid-template-columns: 1.85fr 1.15fr;
@@ -521,6 +524,146 @@
             color: #64748b;
         }
 
+        /* --- In-Page Address Modal --- */
+        .address-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .address-modal-overlay.active {
+            display: flex;
+        }
+
+        .address-modal {
+            background: #12141a;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .saved-addr-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .saved-addr-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .saved-addr-item.selected {
+            border-color: var(--primary);
+            background: rgba(255, 122, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px;
+            color: #fff;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-action-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-modal-save {
+            flex: 1;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-modal-manage {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border: 1px solid var(--border-color);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .toast-notify {
             position: fixed;
             bottom: 24px;
@@ -534,7 +677,7 @@
             transform: translateY(120px);
             opacity: 0;
             transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 1000;
+            z-index: 2000;
             font-size: 0.9rem;
             font-weight: 700;
         }
@@ -543,12 +686,14 @@
             transform: translateY(0);
             opacity: 1;
         }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="header-nav">
         <div class="header-left">
             <a href="index.html" class="back-btn" title="Go Back">
@@ -564,21 +709,20 @@
         </label>
     </div>
 
-    <!-- Address Link -->
-    <div class="address-card">
+    <!-- Address Card (In-Page Trigger) -->
+    <div class="address-card" onclick="openAddressModal()">
         <div class="address-info">
             <i class="fa-solid fa-location-dot addr-icon"></i>
             <div class="addr-text">
-                <h4 id="displayUserName"/h4>
-                <p id="displayAddress"/p>
+                <h4 id="displayUserName">Deliver to: Kishan, 508213</h4>
+                <p id="displayAddress">Shop No. 4, Main Road Market, Suryapet, Telangana</p>
             </div>
         </div>
-        <a href="addresses.html" class="addr-edit-btn">
+        <button class="addr-edit-btn" onclick="event.stopPropagation(); openAddressModal();">
             <i class="fa-solid fa-pen-to-square"></i> Change / Edit
-        </a>
+        </button>
     </div>
 
-    <!-- Main Layout -->
     <div class="cart-layout">
         <div class="product-list" id="productListContainer"></div>
 
@@ -617,7 +761,6 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="policy-footer">
         <div class="policy-links">
             <a href="terms.html">Terms & Conditions</a>
@@ -629,14 +772,46 @@
     </footer>
 </div>
 
+<!-- In-Page Address Selection & Edit Modal -->
+<div class="address-modal-overlay" id="addressModal">
+    <div class="address-modal">
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> Select or Edit Address</h3>
+            <button class="close-modal-btn" onclick="closeAddressModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="form-group">
+            <label>Receiver Name</label>
+            <input type="text" id="modalName" placeholder="Full Name">
+        </div>
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="modalPhone" placeholder="Mobile Number">
+        </div>
+        <div class="form-group">
+            <label>Pincode</label>
+            <input type="text" id="modalPincode" placeholder="6-digit Pincode">
+        </div>
+        <div class="form-group">
+            <label>Complete Address (House/Shop No, Street, City)</label>
+            <textarea id="modalAddress" rows="3" placeholder="Enter complete address"></textarea>
+        </div>
+
+        <div class="modal-action-btns">
+            <button class="btn-modal-save" onclick="saveAddressFromModal()">Apply to Cart</button>
+            <a href="adresses.html" class="btn-modal-manage">Manage on adresses.html <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </div>
+    </div>
+</div>
+
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Exact localStorage Key used in product.html
     const CART_STORAGE_KEY = 'rc_cart_items';
     const WISHLIST_KEY = 'rc_wishlist';
+    const ADDRESS_KEY = 'rc_user_address';
+    const MULTI_ADDRESS_KEY = 'rc_all_addresses';
 
-    // Load Cart from rc_cart_items
     function getStoredCart() {
         let data = localStorage.getItem(CART_STORAGE_KEY);
         try {
@@ -648,7 +823,6 @@
 
     let rawCart = getStoredCart();
 
-    // Map according to exact product.html payload (id, name, price, image, quantity)
     let cartItems = rawCart.map((item, index) => {
         let price = Number(item.price || 0);
         let oldPrice = Number(item.old_price || item.oldPrice || (price > 0 ? Math.round(price * 1.5) : 0));
@@ -668,7 +842,6 @@
     });
 
     function saveCartState() {
-        // Save back exact structure to rc_cart_items
         let toSave = cartItems.map(item => ({
             id: item.id,
             name: item.title,
@@ -681,12 +854,59 @@
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
+    /* Address Management with adresses.html sync */
     function loadSavedAddress() {
-        const savedAddress = JSON.parse(localStorage.getItem('user_address'));
+        let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
         if (savedAddress && (savedAddress.name || savedAddress.address)) {
             document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name || 'Customer'}, ${savedAddress.pincode || ''}`;
             document.getElementById('displayAddress').innerText = savedAddress.address || 'Address details saved';
+            
+            document.getElementById('modalName').value = savedAddress.name || '';
+            document.getElementById('modalPhone').value = savedAddress.phone || '';
+            document.getElementById('modalPincode').value = savedAddress.pincode || '';
+            document.getElementById('modalAddress').value = savedAddress.address || '';
+        } else {
+            // Default Initial
+            const defaultAddr = {
+                name: "Kishan",
+                phone: "9876543210",
+                pincode: "508213",
+                address: "Shop No. 4, Main Road Market, Suryapet, Telangana"
+            };
+            localStorage.setItem(ADDRESS_KEY, JSON.stringify(defaultAddr));
+            localStorage.setItem('user_address', JSON.stringify(defaultAddr));
+            loadSavedAddress();
         }
+    }
+
+    function openAddressModal() {
+        document.getElementById('addressModal').classList.add('active');
+    }
+
+    function closeAddressModal() {
+        document.getElementById('addressModal').classList.remove('active');
+    }
+
+    function saveAddressFromModal() {
+        const name = document.getElementById('modalName').value.trim();
+        const phone = document.getElementById('modalPhone').value.trim();
+        const pincode = document.getElementById('modalPincode').value.trim();
+        const address = document.getElementById('modalAddress').value.trim();
+
+        if (!name || !address) {
+            showToast("Kripya name aur complete address likhein!");
+            return;
+        }
+
+        const newAddr = { name, phone, pincode, address };
+
+        // Save to universal keys so adresses.html and other pages stay in sync
+        localStorage.setItem(ADDRESS_KEY, JSON.stringify(newAddr));
+        localStorage.setItem('user_address', JSON.stringify(newAddr));
+
+        loadSavedAddress();
+        closeAddressModal();
+        showToast("Address Successfully Apply Ho Gaya!");
     }
 
     function showToast(msg) {
@@ -847,8 +1067,11 @@
             return;
         }
 
+        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY));
+
         const orderData = {
             items: selected,
+            deliveryAddress: currentAddress,
             payableAmount: document.getElementById('grandTotalVal').innerText
         };
 
