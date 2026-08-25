@@ -232,7 +232,7 @@
                 <form id="signupForm" onsubmit="handleSignup(event)" class="space-y-3.5">
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Full Name</label>
-                        <input type="text" id="signup-name" required placeholder="John Doe" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
+                        <input type="text" id="signup-name" required placeholder="Your Name" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Mobile Number</label>
@@ -264,15 +264,17 @@
             <!-- User Info Card -->
             <div class="glass-panel rounded-2xl p-4 flex items-center justify-between">
                 <div class="flex items-center gap-3.5">
-                    <div class="w-12 h-12 rounded-2xl bg-[#FF7A00] text-black flex items-center justify-center font-black text-base shadow-lg shadow-[#FF7A00]/30" id="user-initials">
-                        RC
+                    <!-- Avatar Photo / First Letter -->
+                    <div class="relative w-12 h-12 rounded-2xl overflow-hidden bg-[#FF7A00] flex items-center justify-center shadow-lg shadow-[#FF7A00]/30 border border-[#FF7A00]/40">
+                        <img id="user-avatar-img" src="" alt="Profile" class="w-full h-full object-cover hidden">
+                        <span id="user-initials" class="text-black font-black text-lg select-none">U</span>
                     </div>
                     <div>
                         <div class="flex items-center gap-1.5">
-                            <h2 class="text-base font-bold text-white leading-tight" id="user-display-name">Customer Name</h2>
+                            <h2 class="text-base font-bold text-white leading-tight capitalize" id="user-display-name">Profile</h2>
                             <i class="fa-solid fa-circle-check text-[#FF7A00] text-xs" title="Verified Customer"></i>
                         </div>
-                        <p class="text-xs text-neutral-400" id="user-display-email">customer@domain.com</p>
+                        <p class="text-xs text-neutral-400" id="user-display-email">user@domain.com</p>
                         <p class="text-[11px] text-[#FF7A00] font-medium mt-0.5" id="user-display-mobile">Mobile: --</p>
                     </div>
                 </div>
@@ -362,7 +364,7 @@
                 <!-- 6. Notifications -->
                 <a href="notifications.html" class="menu-btn flex items-center justify-between px-4 py-3.5">
                     <div class="flex items-center gap-3.5">
-                        <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
+                                                <div class="icon-box w-9 h-9 rounded-xl bg-neutral-800/80 text-neutral-300 flex items-center justify-center text-sm border border-neutral-700/50 relative">
                             <i class="fa-solid fa-bell"></i>
                             <span class="pulse-dot absolute -top-1 -right-1"></span>
                         </div>
@@ -614,15 +616,39 @@
             document.getElementById('auth-container').classList.add('hidden');
             document.getElementById('dashboard-container').classList.remove('hidden');
 
-            const fullName = user.user_metadata?.full_name || 'Valued Customer';
-            const mobileNumber = user.user_metadata?.mobile_number || 'Not provided';
+            const email = user.email || '';
+            const emailPrefix = email ? email.split('@')[0] : '';
             
-            document.getElementById('user-display-name').innerText = fullName;
-            document.getElementById('user-display-email').innerText = user.email || 'No email provided';
-            document.getElementById('user-display-mobile').innerText = `Mobile: ${mobileNumber}`;
+            const fullName = user.user_metadata?.full_name || 
+                             user.user_metadata?.name || 
+                             emailPrefix || 
+                             'User';
 
-            const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            document.getElementById('user-initials').innerText = initials || 'RC';
+            const mobileNumber = user.user_metadata?.mobile_number || 
+                                 user.phone || 
+                                 'Not provided';
+
+            const avatarUrl = user.user_metadata?.avatar_url || 
+                              user.user_metadata?.picture || 
+                              '';
+
+            document.getElementById('user-display-name').innerText = fullName;
+            document.getElementById('user-display-email').innerText = email || 'No email provided';
+            document.getElementById('user-display-mobile').innerText = `Mobile: ${mobileNumber.replace('+91', '')}`;
+
+            const avatarImg = document.getElementById('user-avatar-img');
+            const initialSpan = document.getElementById('user-initials');
+
+            if (avatarUrl) {
+                avatarImg.src = avatarUrl;
+                avatarImg.classList.remove('hidden');
+                initialSpan.classList.add('hidden');
+            } else {
+                avatarImg.classList.add('hidden');
+                initialSpan.classList.remove('hidden');
+                const firstChar = fullName.trim().charAt(0).toUpperCase();
+                initialSpan.innerText = firstChar || 'U';
+            }
         }
 
         async function handleLogout() {
