@@ -418,260 +418,266 @@
         &copy; 2026 RADA CREST. All rights reserved.
     </footer>
 
-    <!-- Supabase Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="supabase-client.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof sbReady === 'function' && !sbReady()) {
-                showAlert('Supabase configuration is missing. Please check config.js.', true);
-                return;
-            }
+    <!-- Sirf Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                localStorage.setItem('rc_user', JSON.stringify({
-                    id: session.user.id,
-                    email: session.user.email,
-                    phone: session.user.phone
-                }));
-                showDashboard(session.user);
-            } else {
-                localStorage.removeItem('rc_user');
-            }
-        });
+<script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        function switchTab(tab) {
-            const loginBox = document.getElementById('login-form-box');
-            const signupBox = document.getElementById('signup-form-box');
-            const loginBtn = document.getElementById('tab-login-btn');
-            const signupBtn = document.getElementById('tab-signup-btn');
-            hideAlert();
-
-            if (tab === 'login') {
-                loginBox.classList.remove('hidden');
-                signupBox.classList.add('hidden');
-                loginBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all";
-                signupBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all";
-            } else {
-                signupBox.classList.remove('hidden');
-                loginBox.classList.add('hidden');
-                signupBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all";
-                loginBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all";
-            }
+    document.addEventListener('DOMContentLoaded', async () => {
+        if (!supabaseClient) {
+            showAlert('Supabase connect nahi ho paya. Internet connection check karein.');
+            return;
         }
 
-        document.addEventListener('input', (event) => {
-            if (event.target.matches('#login-password, #signup-password') && event.target.value.length > 16) {
-                event.target.value = event.target.value.slice(0, 16);
-            }
-        });
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            localStorage.setItem('rc_user', JSON.stringify({
+                id: session.user.id,
+                email: session.user.email,
+                phone: session.user.phone
+            }));
+            showDashboard(session.user);
+        } else {
+            localStorage.removeItem('rc_user');
+        }
+    });
 
-        function togglePassword(fieldId, btn) {
-            const input = document.getElementById(fieldId);
-            const icon = btn.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fa-regular fa-eye-slash';
-            } else {
-                input.type = 'password';
-                icon.className = 'fa-regular fa-eye';
-            }
+    function switchTab(tab) {
+        const loginBox = document.getElementById('login-form-box');
+        const signupBox = document.getElementById('signup-form-box');
+        const loginBtn = document.getElementById('tab-login-btn');
+        const signupBtn = document.getElementById('tab-signup-btn');
+        hideAlert();
+
+        if (tab === 'login') {
+            loginBox.classList.remove('hidden');
+            signupBox.classList.add('hidden');
+            loginBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all";
+            signupBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all";
+        } else {
+            signupBox.classList.remove('hidden');
+            loginBox.classList.add('hidden');
+            signupBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg tab-active transition-all";
+            loginBtn.className = "flex-1 py-2 text-xs uppercase tracking-wider rounded-lg text-neutral-400 hover:text-white transition-all";
+        }
+    }
+
+    document.addEventListener('input', (event) => {
+        if (event.target.matches('#login-password, #signup-password') && event.target.value.length > 16) {
+            event.target.value = event.target.value.slice(0, 16);
+        }
+    });
+
+    function togglePassword(fieldId, btn) {
+        const input = document.getElementById(fieldId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-regular fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-regular fa-eye';
+        }
+    }
+
+    function showAlert(message, isError = true) {
+        const alertBox = document.getElementById('auth-alert');
+        alertBox.className = `mb-4 p-3.5 text-xs font-medium rounded-xl ${isError ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60'}`;
+        alertBox.innerText = message;
+        alertBox.classList.remove('hidden');
+    }
+
+    function hideAlert() {
+        document.getElementById('auth-alert').classList.add('hidden');
+    }
+
+    async function handleSignup(e) {
+        e.preventDefault();
+        hideAlert();
+
+        if (!supabaseClient) {
+            showAlert('Database connection error.');
+            return;
         }
 
-        function showAlert(message, isError = true) {
-            const alertBox = document.getElementById('auth-alert');
-            alertBox.className = `mb-4 p-3.5 text-xs font-medium rounded-xl ${isError ? 'bg-red-950/60 text-red-300 border border-red-800/60' : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60'}`;
-            alertBox.innerText = message;
-            alertBox.classList.remove('hidden');
+        const btn = document.getElementById('signup-btn');
+        btn.disabled = true;
+        btn.innerText = 'Creating Account...';
+
+        const name = document.getElementById('signup-name').value.trim();
+        const mobile = document.getElementById('signup-mobile').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+
+        if (password.length < 8 || password.length > 16) {
+            showAlert('Password must be 8–16 characters.');
+            btn.disabled = false;
+            btn.innerText = 'Create Account';
+            return;
         }
 
-        function hideAlert() {
-            document.getElementById('auth-alert').classList.add('hidden');
+        if (!/^\d{10}$/.test(mobile)) {
+            showAlert('Please enter a valid 10-digit mobile number.');
+            btn.disabled = false;
+            btn.innerText = 'Create Account';
+            return;
         }
 
-        async function handleSignup(e) {
-            e.preventDefault();
-            hideAlert();
+        const phone = `+91${mobile}`;
 
-            if (typeof sbReady === 'function' && !sbReady()) {
-                showAlert('Supabase configuration is not ready. Please check config.js.');
-                return;
-            }
+        try {
+            const { data, error } = await supabaseClient.auth.signUp({
+                phone,
+                password,
+                options: {
+                    channel: 'sms',
+                    data: {
+                        full_name: name,
+                        mobile_number: mobile,
+                        signup_email: email
+                    }
+                }
+            });
 
-            const btn = document.getElementById('signup-btn');
-            btn.disabled = true;
-            btn.innerText = 'Creating Account...';
+            if (error) throw error;
 
-            const name = document.getElementById('signup-name').value.trim();
-            const mobile = document.getElementById('signup-mobile').value.trim();
-            const email = document.getElementById('signup-email').value.trim();
-            const password = document.getElementById('signup-password').value;
+            sessionStorage.setItem('pending_signup_phone', phone);
+            sessionStorage.setItem('pending_signup_name', name);
+            sessionStorage.setItem('pending_signup_email', email);
+            sessionStorage.setItem('pending_signup_mobile', mobile);
 
-            if (password.length < 8 || password.length > 16) {
-                showAlert('Password must be 8–16 characters.');
-                btn.disabled = false;
-                btn.innerText = 'Create Account';
-                return;
-            }
-
-            if (!/^\d{10}$/.test(mobile)) {
-                showAlert('Please enter a valid 10-digit mobile number.');
-                btn.disabled = false;
-                btn.innerText = 'Create Account';
-                return;
-            }
-
-            const phone = `+91${mobile}`;
-
-            try {
-                const { data, error } = await supabaseClient.auth.signUp({
-                    phone,
-                    password,
-                    options: {
-                        channel: 'sms',
-                        data: {
-                            full_name: name,
-                            mobile_number: mobile,
-                            signup_email: email
-                        }
+            if (data.session) {
+                const { error: emailError } = await supabaseClient.auth.updateUser({
+                    email,
+                    data: {
+                        full_name: name,
+                        mobile_number: mobile
                     }
                 });
 
-                if (error) throw error;
+                if (emailError) throw emailError;
 
-                sessionStorage.setItem('pending_signup_phone', phone);
-                sessionStorage.setItem('pending_signup_name', name);
-                sessionStorage.setItem('pending_signup_email', email);
-                sessionStorage.setItem('pending_signup_mobile', mobile);
-
-                if (data.session) {
-                    const { error: emailError } = await supabaseClient.auth.updateUser({
-                        email,
-                        data: {
-                            full_name: name,
-                            mobile_number: mobile
-                        }
-                    });
-
-                    if (emailError) throw emailError;
-
-                    showAlert('Account created successfully! Switching to sign in...', false);
-                    setTimeout(() => switchTab('login'), 2000);
-                } else {
-                    window.location.href = 'verify-phone.html?mode=signup';
-                }
-            } catch (err) {
-                showAlert(err.message || 'Unable to create account.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Create Account';
-            }
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            hideAlert();
-
-            if (typeof sbReady === 'function' && !sbReady()) {
-                showAlert('Supabase configuration is not ready. Please check config.js.');
-                return;
-            }
-
-            const btn = document.getElementById('login-btn');
-            btn.disabled = true;
-            btn.innerText = 'Signing In...';
-
-            const identifier = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            try {
-                if (password.length < 8 || password.length > 16) {
-                    throw new Error('Password must be 8–16 characters.');
-                }
-                if (!identifier || !password) {
-                    throw new Error('Please enter your email/mobile number and password.');
-                }
-
-                let credentials;
-                if (/^\d{10}$/.test(identifier)) {
-                    credentials = { phone: `+91${identifier}`, password };
-                } else {
-                    credentials = { email: identifier, password };
-                }
-
-                const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
-                if (error) throw error;
-
-                localStorage.setItem('rc_user', JSON.stringify({
-                    id: data.user.id,
-                    email: data.user.email,
-                    phone: data.user.phone
-                }));
-
-                showDashboard(data.user);
-
-                const redirectUrl = sessionStorage.getItem('redirect_after_login');
-                if (redirectUrl) {
-                    sessionStorage.removeItem('redirect_after_login');
-                    window.location.href = redirectUrl;
-                }
-            } catch (err) {
-                showAlert(err.message || 'Unable to sign in.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Sign In';
-            }
-        }
-
-        function showDashboard(user) {
-            document.getElementById('auth-container').classList.add('hidden');
-            document.getElementById('dashboard-container').classList.remove('hidden');
-
-            const email = user.email || '';
-            const emailPrefix = email ? email.split('@')[0] : '';
-            
-            const fullName = user.user_metadata?.full_name || 
-                             user.user_metadata?.name || 
-                             emailPrefix || 
-                             'User';
-
-            const mobileNumber = user.user_metadata?.mobile_number || 
-                                 user.phone || 
-                                 'Not provided';
-
-            const avatarUrl = user.user_metadata?.avatar_url || 
-                              user.user_metadata?.picture || 
-                              '';
-
-            document.getElementById('user-display-name').innerText = fullName;
-            document.getElementById('user-display-email').innerText = email || 'No email provided';
-            document.getElementById('user-display-mobile').innerText = `Mobile: ${mobileNumber.replace('+91', '')}`;
-
-            const avatarImg = document.getElementById('user-avatar-img');
-            const initialSpan = document.getElementById('user-initials');
-
-            if (avatarUrl) {
-                avatarImg.src = avatarUrl;
-                avatarImg.classList.remove('hidden');
-                initialSpan.classList.add('hidden');
+                showAlert('Account created successfully! Switching to sign in...', false);
+                setTimeout(() => switchTab('login'), 2000);
             } else {
-                avatarImg.classList.add('hidden');
-                initialSpan.classList.remove('hidden');
-                const firstChar = fullName.trim().charAt(0).toUpperCase();
-                initialSpan.innerText = firstChar || 'U';
+                window.location.href = 'verify-phone.html?mode=signup';
             }
+        } catch (err) {
+            showAlert(err.message || 'Unable to create account.');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Create Account';
+        }
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        hideAlert();
+
+        if (!supabaseClient) {
+            showAlert('Database connection error.');
+            return;
         }
 
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            localStorage.removeItem('rc_user');
-            document.getElementById('dashboard-container').classList.add('hidden');
-            document.getElementById('auth-container').classList.remove('hidden');
-            document.getElementById('loginForm').reset();
-            document.getElementById('signupForm').reset();
+        const btn = document.getElementById('login-btn');
+        btn.disabled = true;
+        btn.innerText = 'Signing In...';
+
+        const identifier = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+
+        try {
+            if (password.length < 8 || password.length > 16) {
+                throw new Error('Password must be 8–16 characters.');
+            }
+            if (!identifier || !password) {
+                throw new Error('Please enter your email/mobile number and password.');
+            }
+
+            let credentials;
+            if (/^\d{10}$/.test(identifier)) {
+                credentials = { phone: `+91${identifier}`, password };
+            } else {
+                credentials = { email: identifier, password };
+            }
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
+            if (error) throw error;
+
+            // Save active session user for Cart isolation
+            localStorage.setItem('rc_user', JSON.stringify({
+                id: data.user.id,
+                email: data.user.email,
+                phone: data.user.phone
+            }));
+
+            showDashboard(data.user);
+
+            const redirectUrl = sessionStorage.getItem('redirect_after_login');
+            if (redirectUrl) {
+                sessionStorage.removeItem('redirect_after_login');
+                window.location.href = redirectUrl;
+            }
+        } catch (err) {
+            showAlert(err.message || 'Unable to sign in.');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Sign In';
         }
-    </script>
+    }
+
+    function showDashboard(user) {
+        document.getElementById('auth-container').classList.add('hidden');
+        document.getElementById('dashboard-container').classList.remove('hidden');
+
+        const email = user.email || '';
+        const emailPrefix = email ? email.split('@')[0] : '';
+        
+        const fullName = user.user_metadata?.full_name || 
+                         user.user_metadata?.name || 
+                         emailPrefix || 
+                         'User';
+
+        const mobileNumber = user.user_metadata?.mobile_number || 
+                             user.phone || 
+                             'Not provided';
+
+        const avatarUrl = user.user_metadata?.avatar_url || 
+                          user.user_metadata?.picture || 
+                          '';
+
+        document.getElementById('user-display-name').innerText = fullName;
+        document.getElementById('user-display-email').innerText = email || 'No email provided';
+        document.getElementById('user-display-mobile').innerText = `Mobile: ${mobileNumber.replace('+91', '')}`;
+
+        const avatarImg = document.getElementById('user-avatar-img');
+        const initialSpan = document.getElementById('user-initials');
+
+        if (avatarUrl) {
+            avatarImg.src = avatarUrl;
+            avatarImg.classList.remove('hidden');
+            initialSpan.classList.add('hidden');
+        } else {
+            avatarImg.classList.add('hidden');
+            initialSpan.classList.remove('hidden');
+            const firstChar = fullName.trim().charAt(0).toUpperCase();
+            initialSpan.innerText = firstChar || 'U';
+        }
+    }
+
+    async function handleLogout() {
+        if (supabaseClient) {
+            await supabaseClient.auth.signOut();
+        }
+        localStorage.removeItem('rc_user');
+        document.getElementById('dashboard-container').classList.add('hidden');
+        document.getElementById('auth-container').classList.remove('hidden');
+        document.getElementById('loginForm').reset();
+        document.getElementById('signupForm').reset();
+    }
+</script>
 </body>
 </html>
