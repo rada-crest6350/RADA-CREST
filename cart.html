@@ -47,7 +47,6 @@
             padding: 16px;
         }
 
-        /* Header */
         .header-nav {
             display: flex;
             align-items: center;
@@ -112,7 +111,6 @@
             cursor: pointer;
         }
 
-        /* Delivery Address Card */
         .address-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -175,7 +173,6 @@
             box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        /* Cart Grid */
         .cart-layout {
             display: grid;
             grid-template-columns: 1.85fr 1.15fr;
@@ -189,7 +186,6 @@
             }
         }
 
-        /* Product Cards */
         .product-list {
             display: flex;
             flex-direction: column;
@@ -390,7 +386,6 @@
             color: var(--danger);
         }
 
-        /* Total Board */
         .total-board {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -485,7 +480,6 @@
             gap: 6px;
         }
 
-        /* Policy Footer */
         .policy-footer {
             margin-top: 45px;
             padding-top: 20px;
@@ -544,7 +538,6 @@
 <body>
 
 <div class="container">
-    <!-- Header -->
     <div class="header-nav">
         <div class="header-left">
             <a href="index.html" class="back-btn" title="Go Back">
@@ -560,13 +553,13 @@
         </label>
     </div>
 
-    <!-- Delivery Address Card (Direct link to address.html) -->
+    <!-- Address Card -->
     <div class="address-card">
         <div class="address-info">
             <i class="fa-solid fa-location-dot addr-icon"></i>
             <div class="addr-text">
-                <h4 id="displayUserName">Deliver to: Set Address</h4>
-                <p id="displayAddress">Click Change / Edit to add your address</p>
+                <h4 id="displayUserName">Deliver to: Kishan, 508213</h4>
+                <p id="displayAddress">Shop No. 4, Main Road Market, Suryapet, Telangana</p>
             </div>
         </div>
         <a href="address.html" class="addr-edit-btn">
@@ -574,14 +567,9 @@
         </a>
     </div>
 
-    <!-- Main Layout -->
     <div class="cart-layout">
-        <!-- Products Column -->
-        <div class="product-list" id="productListContainer">
-            <!-- Dynamic Cart Items -->
-        </div>
+        <div class="product-list" id="productListContainer"></div>
 
-        <!-- Total Board -->
         <div class="total-board">
             <div class="board-title">
                 <i class="fa-solid fa-receipt" style="color: var(--primary);"></i> Price Breakdown
@@ -617,7 +605,6 @@
         </div>
     </div>
 
-    <!-- Policy Footer -->
     <footer class="policy-footer">
         <div class="policy-links">
             <a href="terms.html">Terms & Conditions</a>
@@ -632,65 +619,60 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Initial Default items if storage is empty
-    const defaultProducts = [
-        {
-            id: "RC-001",
-            title: "Rada Crest 9W LED Bulb",
-            variant: "Cool Day Light (6500K) • B22 Base",
-            currentPrice: 180,
-            oldPrice: 240,
-            stockLeft: 3,
-            qty: 2,
-            selected: true,
-            image: "https://images.unsplash.com/photo-1550985616-10810253b84d?w=200&auto=format&fit=crop&q=60"
-        },
-        {
-            id: "RC-002",
-            title: "Rada Crest RGB Smart Strip",
-            variant: "5 Meter Roll • 24 Key Remote Controller",
-            currentPrice: 350,
-            oldPrice: 499,
-            stockLeft: 2,
-            qty: 1,
-            selected: true,
-            image: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=200&auto=format&fit=crop&q=60"
-        },
-        {
-            id: "RC-003",
-            title: "HPF LED Driver & MCPCB Kit",
-            variant: "Pack of 5 • 4kV Surge Protection",
-            currentPrice: 550,
-            oldPrice: 750,
-            stockLeft: 5,
-            qty: 1,
-            selected: true,
-            image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=200&auto=format&fit=crop&q=60"
+    // Universal Cart Reader: checks all possible localStorage keys from your store
+    function getStoredCart() {
+        const possibleKeys = ['cart', 'cartItems', 'cart_items', 'rada_cart', 'shoppingCart'];
+        for (let key of possibleKeys) {
+            let data = localStorage.getItem(key);
+            if (data) {
+                try {
+                    let parsed = JSON.parse(data);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return { key: key, items: parsed };
+                    }
+                } catch (e) {}
+            }
         }
-    ];
-
-    // Load Cart from LocalStorage (Permanent storage)
-    let cartItems = JSON.parse(localStorage.getItem('cart_items'));
-    if (!cartItems) {
-        cartItems = defaultProducts;
-        localStorage.setItem('cart_items', JSON.stringify(cartItems));
+        return { key: 'cart', items: [] };
     }
 
-    // Save Cart to LocalStorage
+    let cartStorageInfo = getStoredCart();
+    let cartKey = cartStorageInfo.key;
+    
+    // Normalize data structure
+    let cartItems = cartStorageInfo.items.map((item, index) => {
+        let price = Number(item.price || item.currentPrice || 50);
+        let oldPrice = Number(item.oldPrice || item.mrp || item.originalPrice || Math.round(price * 2));
+        let qty = Number(item.qty || item.quantity || item.count || 1);
+        let name = item.name || item.title || "Rada Crest Product";
+        let image = item.image || item.img || item.productImage || "https://images.unsplash.com/photo-1550985616-10810253b84d?w=200&auto=format&fit=crop&q=60";
+        let variant = item.variant || item.color || item.size || "Standard Specification";
+
+        return {
+            id: item.id || `item-${index}`,
+            title: name,
+            variant: variant,
+            currentPrice: price,
+            oldPrice: oldPrice,
+            stockLeft: item.stockLeft || 3,
+            qty: qty,
+            selected: item.selected !== undefined ? item.selected : true,
+            image: image
+        };
+    });
+
     function saveCartState() {
+        // Sync back to both current key and standard cart key
+        localStorage.setItem(cartKey, JSON.stringify(cartItems));
+        localStorage.setItem('cart', JSON.stringify(cartItems));
         localStorage.setItem('cart_items', JSON.stringify(cartItems));
     }
 
-    // Load Saved Address from LocalStorage
     function loadSavedAddress() {
         const savedAddress = JSON.parse(localStorage.getItem('user_address'));
-        if (savedAddress && savedAddress.name) {
-            document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name}, ${savedAddress.pincode || ''}`;
+        if (savedAddress && (savedAddress.name || savedAddress.address)) {
+            document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name || 'Customer'}, ${savedAddress.pincode || ''}`;
             document.getElementById('displayAddress').innerText = savedAddress.address || 'Address details saved';
-        } else {
-            // Default Fallback
-            document.getElementById('displayUserName').innerText = `Deliver to: Kishan, 508213`;
-            document.getElementById('displayAddress').innerText = `Shop No. 4, Main Road Market, Suryapet, Telangana`;
         }
     }
 
@@ -701,7 +683,6 @@
         setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // Render Product Cards
     function renderCartItems() {
         const container = document.getElementById('productListContainer');
         container.innerHTML = "";
@@ -727,7 +708,9 @@
                 ? `<span class="stock-badge"><i class="fa-solid fa-bolt"></i> Only ${item.stockLeft} left in stock!</span>`
                 : `<span style="font-size:0.75rem; color:var(--success);"><i class="fa-solid fa-circle-check"></i> In Stock</span>`;
 
-            const discountPercent = Math.round(((item.oldPrice - item.currentPrice) / item.oldPrice) * 100);
+            const discountPercent = item.oldPrice > item.currentPrice 
+                ? Math.round(((item.oldPrice - item.currentPrice) / item.oldPrice) * 100)
+                : 0;
 
             card.innerHTML = `
                 <input type="checkbox" class="custom-checkbox" 
@@ -745,8 +728,7 @@
 
                     <div class="price-section">
                         <span class="current-price">₹${item.currentPrice}</span>
-                        <span class="old-price">₹${item.oldPrice}</span>
-                        <span class="discount-tag">${discountPercent}% OFF</span>
+                        ${discountPercent > 0 ? `<span class="old-price">₹${item.oldPrice}</span><span class="discount-tag">${discountPercent}% OFF</span>` : ''}
                     </div>
 
                     <div class="prod-bottom-row">
@@ -774,7 +756,7 @@
     }
 
     function toggleItemSelect(id, isSelected) {
-        const item = cartItems.find(i => i.id === id);
+        const item = cartItems.find(i => i.id == id);
         if (item) {
             item.selected = isSelected;
             saveCartState();
@@ -791,7 +773,7 @@
     }
 
     function updateItemQty(id, change) {
-        const item = cartItems.find(i => i.id === id);
+        const item = cartItems.find(i => i.id == id);
         if (!item) return;
 
         item.qty += change;
@@ -808,7 +790,7 @@
         if (card) {
             card.classList.add('removing');
             setTimeout(() => {
-                cartItems = cartItems.filter(i => i.id !== id);
+                cartItems = cartItems.filter(i => i.id != id);
                 saveCartState();
                 renderCartItems();
                 showToast("Product Cart se hata diya gaya!");
@@ -817,7 +799,7 @@
     }
 
     function moveToWishlist(id) {
-        const item = cartItems.find(i => i.id === id);
+        const item = cartItems.find(i => i.id == id);
         if (item) {
             let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
             wishlist.push(item);
@@ -834,7 +816,7 @@
 
         const subtotal = selectedItems.reduce((sum, i) => sum + (i.currentPrice * i.qty), 0);
         const totalMRP = selectedItems.reduce((sum, i) => sum + (i.oldPrice * i.qty), 0);
-        const totalDiscount = totalMRP - subtotal;
+        const totalDiscount = totalMRP > subtotal ? totalMRP - subtotal : 0;
 
         document.getElementById('headerCount').innerText = `${totalItemsCount} Items`;
         document.getElementById('selectedCountText').innerText = selectedItemsCount;
@@ -859,7 +841,6 @@
         window.location.href = "buy.html";
     }
 
-    // Initialize on page load
     loadSavedAddress();
     renderCartItems();
 </script>
