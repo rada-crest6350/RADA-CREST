@@ -9,14 +9,13 @@
     
     <style>
         :root {
-            --primary: #d4af37;
-            --primary-light: #f3e5ab;
-            --primary-glow: rgba(212, 175, 55, 0.25);
-            --bg-dark: #080b11;
-            --card-bg: rgba(15, 22, 36, 0.85);
-            --border-color: rgba(212, 175, 55, 0.2);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --primary: #FF7A00;
+            --primary-glow: rgba(255, 122, 0, 0.35);
+            --bg-dark: #0b0d14;
+            --card-bg: rgba(18, 20, 26, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #9ba1b0;
             --danger: #ef4444;
             --success: #22c55e;
             --warning: #f59e0b;
@@ -26,7 +25,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -35,8 +34,8 @@
             color: var(--text-main);
             min-height: 100vh;
             background-image: 
-                radial-gradient(circle at 10% 15%, rgba(212, 175, 55, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 90% 85%, rgba(212, 175, 55, 0.05) 0%, transparent 45%);
+                radial-gradient(circle at 10% 15%, rgba(255, 122, 0, 0.06) 0%, transparent 45%),
+                radial-gradient(circle at 90% 85%, rgba(255, 122, 0, 0.04) 0%, transparent 45%);
             background-attachment: fixed;
             padding-bottom: 50px;
         }
@@ -47,6 +46,7 @@
             padding: 16px;
         }
 
+        /* Header */
         .header-nav {
             display: flex;
             align-items: center;
@@ -79,14 +79,14 @@
 
         .back-btn:hover {
             background: var(--primary);
-            color: #080b11;
+            color: #000;
             transform: translateX(-3px);
             box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .header-title {
             font-size: 1.35rem;
-            font-weight: 700;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -99,7 +99,7 @@
             font-size: 0.8rem;
             padding: 2px 10px;
             border-radius: 20px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .select-all-box {
@@ -109,8 +109,10 @@
             font-size: 0.9rem;
             color: var(--text-muted);
             cursor: pointer;
+            font-weight: 600;
         }
 
+        /* Delivery Address */
         .address-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -141,7 +143,7 @@
             font-size: 0.95rem;
             color: var(--text-main);
             margin-bottom: 3px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .addr-text p {
@@ -157,7 +159,7 @@
             padding: 8px 16px;
             border-radius: 10px;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
@@ -169,10 +171,11 @@
 
         .addr-edit-btn:hover {
             background: var(--primary);
-            color: #080b11;
+            color: #000;
             box-shadow: 0 0 12px var(--primary-glow);
         }
 
+        /* Grid */
         .cart-layout {
             display: grid;
             grid-template-columns: 1.85fr 1.15fr;
@@ -209,7 +212,7 @@
         .cart-item-card:hover {
             border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.12);
+            box-shadow: 0 10px 30px rgba(255, 122, 0, 0.12);
         }
 
         .cart-item-card.removing {
@@ -237,9 +240,9 @@
         .custom-checkbox:checked::after {
             content: '✔';
             position: absolute;
-            color: #080b11;
+            color: #000;
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 900;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -249,15 +252,18 @@
             width: 90px;
             height: 90px;
             border-radius: 14px;
-            background: #111827;
+            background: rgba(255, 255, 255, 0.02);
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .prod-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
         }
 
         .prod-details {
@@ -267,8 +273,8 @@
         }
 
         .prod-title {
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1.05rem;
+            font-weight: 800;
             color: var(--text-main);
         }
 
@@ -282,7 +288,7 @@
             align-items: center;
             gap: 5px;
             font-size: 0.76rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--warning);
             background: rgba(245, 158, 11, 0.12);
             padding: 3px 8px;
@@ -298,8 +304,8 @@
         }
 
         .current-price {
-            font-size: 1.15rem;
-            font-weight: 800;
+            font-size: 1.2rem;
+            font-weight: 900;
             color: var(--primary);
         }
 
@@ -345,18 +351,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 700;
         }
 
         .qty-btn:hover {
             background: var(--primary);
-            color: #080b11;
+            color: #000;
         }
 
         .qty-value {
-            width: 34px;
+            width: 38px;
             text-align: center;
             font-size: 0.95rem;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .action-links {
@@ -386,6 +393,7 @@
             color: var(--danger);
         }
 
+        /* Price Breakdown */
         .total-board {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -399,7 +407,7 @@
 
         .board-title {
             font-size: 1.15rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 18px;
             display: flex;
             align-items: center;
@@ -418,7 +426,7 @@
 
         .summary-line span:last-child {
             color: var(--text-main);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .grand-total-row {
@@ -432,25 +440,25 @@
 
         .grand-total-row .lbl {
             font-size: 1.05rem;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .grand-total-row .val {
-            font-size: 1.45rem;
-            font-weight: 800;
+            font-size: 1.5rem;
+            font-weight: 900;
             color: var(--primary);
             text-shadow: 0 0 15px var(--primary-glow);
         }
 
         .buy-now-btn {
             width: 100%;
-            background: linear-gradient(135deg, #d4af37 0%, #a4821d 100%);
+            background: linear-gradient(135deg, #FF7A00 0%, #ff5500 100%);
             border: none;
-            color: #080b11;
+            color: #000;
             padding: 16px;
             border-radius: 14px;
             font-size: 1.05rem;
-            font-weight: 800;
+            font-weight: 900;
             cursor: pointer;
             margin-top: 20px;
             display: flex;
@@ -463,15 +471,15 @@
 
         .buy-now-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 35px rgba(212, 175, 55, 0.45);
+            box-shadow: 0 10px 35px rgba(255, 122, 0, 0.45);
         }
 
         .order-suggest {
             margin-top: 14px;
             font-size: 0.82rem;
             text-align: center;
-            color: var(--primary-light);
-            background: rgba(212, 175, 55, 0.08);
+            color: #ff9b44;
+            background: rgba(255, 122, 0, 0.08);
             padding: 8px 12px;
             border-radius: 8px;
             display: flex;
@@ -480,6 +488,7 @@
             gap: 6px;
         }
 
+        /* Footer */
         .policy-footer {
             margin-top: 45px;
             padding-top: 20px;
@@ -516,17 +525,18 @@
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: #1e293b;
+            background: #12151B;
             color: #fff;
             padding: 14px 20px;
             border-radius: 12px;
-            border-left: 4px solid var(--primary);
+            border: 1px solid var(--primary);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transform: translateY(120px);
             opacity: 0;
             transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 1000;
             font-size: 0.9rem;
+            font-weight: 700;
         }
 
         .toast-notify.show {
@@ -538,6 +548,7 @@
 <body>
 
 <div class="container">
+    <!-- Header -->
     <div class="header-nav">
         <div class="header-left">
             <a href="index.html" class="back-btn" title="Go Back">
@@ -553,7 +564,7 @@
         </label>
     </div>
 
-    <!-- Address Card -->
+    <!-- Address Link -->
     <div class="address-card">
         <div class="address-info">
             <i class="fa-solid fa-location-dot addr-icon"></i>
@@ -567,6 +578,7 @@
         </a>
     </div>
 
+    <!-- Main Layout -->
     <div class="cart-layout">
         <div class="product-list" id="productListContainer"></div>
 
@@ -605,6 +617,7 @@
         </div>
     </div>
 
+    <!-- Footer -->
     <footer class="policy-footer">
         <div class="policy-links">
             <a href="terms.html">Terms & Conditions</a>
@@ -619,53 +632,53 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Universal Cart Reader: checks all possible localStorage keys from your store
+    // Exact localStorage Key used in product.html
+    const CART_STORAGE_KEY = 'rc_cart_items';
+    const WISHLIST_KEY = 'rc_wishlist';
+
+    // Load Cart from rc_cart_items
     function getStoredCart() {
-        const possibleKeys = ['cart', 'cartItems', 'cart_items', 'rada_cart', 'shoppingCart'];
-        for (let key of possibleKeys) {
-            let data = localStorage.getItem(key);
-            if (data) {
-                try {
-                    let parsed = JSON.parse(data);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        return { key: key, items: parsed };
-                    }
-                } catch (e) {}
-            }
-        }
-        return { key: 'cart', items: [] };
+        let data = localStorage.getItem(CART_STORAGE_KEY);
+        try {
+            let parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) return parsed;
+        } catch(e) {}
+        return [];
     }
 
-    let cartStorageInfo = getStoredCart();
-    let cartKey = cartStorageInfo.key;
-    
-    // Normalize data structure
-    let cartItems = cartStorageInfo.items.map((item, index) => {
-        let price = Number(item.price || item.currentPrice || 50);
-        let oldPrice = Number(item.oldPrice || item.mrp || item.originalPrice || Math.round(price * 2));
-        let qty = Number(item.qty || item.quantity || item.count || 1);
-        let name = item.name || item.title || "Rada Crest Product";
-        let image = item.image || item.img || item.productImage || "https://images.unsplash.com/photo-1550985616-10810253b84d?w=200&auto=format&fit=crop&q=60";
-        let variant = item.variant || item.color || item.size || "Standard Specification";
+    let rawCart = getStoredCart();
+
+    // Map according to exact product.html payload (id, name, price, image, quantity)
+    let cartItems = rawCart.map((item, index) => {
+        let price = Number(item.price || 0);
+        let oldPrice = Number(item.old_price || item.oldPrice || (price > 0 ? Math.round(price * 1.5) : 0));
+        let qty = Number(item.quantity || item.qty || 1);
 
         return {
-            id: item.id || `item-${index}`,
-            title: name,
-            variant: variant,
+            id: item.id !== undefined ? item.id : `prod_${index}`,
+            title: item.name || "Rada Crest Product",
+            variant: item.variant || "Standard Edition",
             currentPrice: price,
             oldPrice: oldPrice,
-            stockLeft: item.stockLeft || 3,
-            qty: qty,
+            stockLeft: item.stock || 3,
+            quantity: qty,
             selected: item.selected !== undefined ? item.selected : true,
-            image: image
+            image: item.image || 'assets/placeholder.jpg'
         };
     });
 
     function saveCartState() {
-        // Sync back to both current key and standard cart key
-        localStorage.setItem(cartKey, JSON.stringify(cartItems));
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-        localStorage.setItem('cart_items', JSON.stringify(cartItems));
+        // Save back exact structure to rc_cart_items
+        let toSave = cartItems.map(item => ({
+            id: item.id,
+            name: item.title,
+            price: item.currentPrice,
+            old_price: item.oldPrice,
+            image: item.image,
+            quantity: item.quantity,
+            selected: item.selected
+        }));
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
     function loadSavedAddress() {
@@ -680,7 +693,7 @@
         const toast = document.getElementById('toastNotify');
         toast.innerText = msg;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2500);
+        setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
     function renderCartItems() {
@@ -689,10 +702,10 @@
 
         if (cartItems.length === 0) {
             container.innerHTML = `
-                <div style="text-align:center; padding:50px 20px; background:var(--card-bg); border-radius:18px; border:1px solid var(--border-color);">
+                <div style="text-align:center; padding:60px 20px; background:var(--card-bg); border-radius:18px; border:1px solid var(--border-color);">
                     <i class="fa-solid fa-box-open" style="font-size:3rem; color:var(--primary); margin-bottom:12px;"></i>
-                    <h3>Aapka Cart Khali Hai!</h3>
-                    <p style="color:var(--text-muted); margin-top:6px;">Store se naye products add karein.</p>
+                    <h3 style="font-weight:800;">Aapka Cart Khali Hai!</h3>
+                    <p style="color:var(--text-muted); margin-top:6px; font-size:0.9rem;">Store se naye products add karein.</p>
                 </div>
             `;
             calculateCart();
@@ -705,7 +718,7 @@
             card.id = `item-card-${item.id}`;
 
             const stockHtml = item.stockLeft <= 3 
-                ? `<span class="stock-badge"><i class="fa-solid fa-bolt"></i> Only ${item.stockLeft} left in stock!</span>`
+                ? `<span class="stock-badge"><i class="fa-solid fa-bolt"></i> Only ${item.stockLeft} left!</span>`
                 : `<span style="font-size:0.75rem; color:var(--success);"><i class="fa-solid fa-circle-check"></i> In Stock</span>`;
 
             const discountPercent = item.oldPrice > item.currentPrice 
@@ -734,7 +747,7 @@
                     <div class="prod-bottom-row">
                         <div class="qty-box">
                             <button class="qty-btn" onclick="updateItemQty('${item.id}', -1)">-</button>
-                            <span class="qty-value">${item.qty}</span>
+                            <span class="qty-value">${item.quantity}</span>
                             <button class="qty-btn" onclick="updateItemQty('${item.id}', 1)">+</button>
                         </div>
 
@@ -776,8 +789,8 @@
         const item = cartItems.find(i => i.id == id);
         if (!item) return;
 
-        item.qty += change;
-        if (item.qty <= 0) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
             deleteItem(id);
             return;
         }
@@ -801,21 +814,23 @@
     function moveToWishlist(id) {
         const item = cartItems.find(i => i.id == id);
         if (item) {
-            let wishlist = JSON.parse(localStorage.getItem('user_wishlist') || '[]');
-            wishlist.push(item);
-            localStorage.setItem('user_wishlist', JSON.stringify(wishlist));
+            let wishlist = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]');
+            if (!wishlist.includes(String(item.id))) {
+                wishlist.push(String(item.id));
+                localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist));
+            }
             deleteItem(id);
-            showToast("Wishlist me add kar diya gaya!");
+            showToast("Saved to Wishlist!");
         }
     }
 
     function calculateCart() {
         const selectedItems = cartItems.filter(i => i.selected);
-        const totalItemsCount = cartItems.reduce((sum, i) => sum + i.qty, 0);
-        const selectedItemsCount = selectedItems.reduce((sum, i) => sum + i.qty, 0);
+        const totalItemsCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+        const selectedItemsCount = selectedItems.reduce((sum, i) => sum + i.quantity, 0);
 
-        const subtotal = selectedItems.reduce((sum, i) => sum + (i.currentPrice * i.qty), 0);
-        const totalMRP = selectedItems.reduce((sum, i) => sum + (i.oldPrice * i.qty), 0);
+        const subtotal = selectedItems.reduce((sum, i) => sum + (i.currentPrice * i.quantity), 0);
+        const totalMRP = selectedItems.reduce((sum, i) => sum + (i.oldPrice * i.quantity), 0);
         const totalDiscount = totalMRP > subtotal ? totalMRP - subtotal : 0;
 
         document.getElementById('headerCount').innerText = `${totalItemsCount} Items`;
@@ -841,6 +856,7 @@
         window.location.href = "buy.html";
     }
 
+    // Initialize
     loadSavedAddress();
     renderCartItems();
 </script>
