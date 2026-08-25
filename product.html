@@ -669,6 +669,22 @@
         showToast(`Quantity: ${currentQty}`);
       }
     }
+    
+    function getActiveUserIdentifier() {
+    if (supabaseClient) {
+        try {
+            const session = supabaseClient.auth.getSession();
+            if (session?.data?.session?.user) {
+                return session.data.session.user.email.replace(/[^a-zA-Z0-9]/g, '_');
+            }
+        } catch(e) {}
+    }
+    const storedUser = JSON.parse(localStorage.getItem('rc_user')) || null;
+    if (storedUser && (storedUser.email || storedUser.id)) {
+        return (storedUser.email || storedUser.id).replace(/[^a-zA-Z0-9]/g, '_');
+    }
+    return 'guest_user';
+    }
 
     function addToCart() {
       if (!currentProduct) return;
