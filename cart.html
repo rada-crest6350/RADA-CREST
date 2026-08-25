@@ -630,15 +630,41 @@
 </div>
 
 <div class="toast-notify" id="toastNotify"></div>
-
+    
 <script>
     const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    const CART_STORAGE_KEY = 'rc_cart_items';
-    const WISHLIST_KEY = 'rc_wishlist';
-    const ADDRESS_KEY = 'rc_user_address';
+    // 1. Unique User Identification (Per-Email Cart Isolation)
+    function getActiveUserIdentifier() {
+        // Supabase session check
+        if (supabaseClient) {
+            try {
+                const session = supabaseClient.auth.getSession();
+                if (session && session.data && session.data.session && session.data.session.user) {
+                    return session.data.session.user.email.replace(/[^a-zA-Z0-9]/g, '_');
+                }
+            } catch(e) {}
+        }
+
+        // Local storage user checks (Common keys)
+        const storedUser = JSON.parse(localStorage.getItem('rc_user')) || 
+                           JSON.parse(localStorage.getItem('supabase_user')) || 
+                           JSON.parse(localStorage.getItem('user_session')) || null;
+
+        if (storedUser && (storedUser.email || storedUser.id)) {
+            const rawId = storedUser.email || storedUser.id;
+            return String(rawId).replace(/[^a-zA-Z0-9]/g, '_');
+        }
+
+        return 'guest_user';
+    }
+
+    const currentUserId = getActiveUserIdentifier();
+    const CART_STORAGE_KEY = `rc_cart_items_${currentUserId}`;
+    const WISHLIST_KEY = `rc_wishlist_${currentUserId}`;
+    const ADDRESS_KEY = `rc_user_address_${currentUserId}`;
 
     let cartItems = [];
     let adminDeliveryRules = {
@@ -646,7 +672,6 @@
         freeAboveThreshold: 0
     };
 
-    // Load dynamic delivery configuration from admin settings if present
     function loadAdminShippingSettings() {
         try {
             const adminConfig = JSON.parse(localStorage.getItem('rc_admin_settings')) || {};
@@ -655,7 +680,6 @@
         } catch(e) {}
     }
 
-    // Sync latest prices and shipping from Supabase products table
     async function syncAndLoadCart() {
         loadAdminShippingSettings();
         let rawCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
@@ -723,9 +747,8 @@
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
-    // Strictly reads saved address from addresses.html without dummy defaults
     function loadSavedAddress() {
-        let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
+        let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('rc_user_address')) || JSON.parse(localStorage.getItem('user_address'));
         
         if (savedAddress && savedAddress.name && savedAddress.address && savedAddress.address.trim() !== '') {
             document.getElementById('displayUserName').innerText = `Deliver to: ${savedAddress.name}, ${savedAddress.pincode || ''}`;
@@ -876,7 +899,6 @@
         }
     }
 
-    // Full Dynamic Calculation
     function calculateCart() {
         const selectedItems = cartItems.filter(i => i.selected);
         const totalItemsCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
@@ -886,7 +908,6 @@
         const totalMRP = selectedItems.reduce((sum, i) => sum + (i.oldPrice * i.quantity), 0);
         const totalDiscount = totalMRP > subtotalSelling ? totalMRP - subtotalSelling : 0;
 
-        // Dynamic Delivery Calculation
         let calculatedShipping = 0;
         if (selectedItems.length > 0) {
             let itemLevelShipping = selectedItems.reduce((sum, i) => sum + ((i.shippingFee || 0) * i.quantity), 0);
@@ -916,44 +937,41 @@
         document.getElementById('grandTotalVal').innerText = `₹${grandFinal.toLocaleString('en-IN')}`;
     }
 
-    // Complete Buy Bridge -> buy.html
-function proceedToBuy() {
-    const selected = cartItems.filter(i => i.selected);
-    if (selected.length === 0) {
-        showToast("Kripya kam se kam ek product select karein!");
-        return;
-    }
+    function proceedToBuy() {
+        const selected = cartItems.filter(i => i.selected);
+        if (selected.length === 0) {
+            showToast("Kripya kam se kam ek product select karein!");
+            return;
+        }
 
-    const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
-    if (!currentAddress || !currentAddress.name || !currentAddress.address) {
-        showToast("Kripya pehle delivery address add karein!");
-        setTimeout(() => {
-            window.location.href = "addresses.html";
-        }, 800);
-        return;
-    }
+        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('rc_user_address')) || JSON.parse(localStorage.getItem('user_address'));
+        if (!currentAddress || !currentAddress.name || !currentAddress.address) {
+            showToast("Kripya pehle delivery address add karein!");
+            setTimeout(() => {
+                window.location.href = "addresses.html";
+            }, 800);
+            return;
+        }
 
-    // Checkout payload save
-    const orderData = {
-        items: selected,
-        deliveryAddress: currentAddress,
-        payableAmount: document.getElementById('grandTotalVal').innerText
-    };
-    localStorage.setItem('checkout_order_data', JSON.stringify(orderData));
-    localStorage.setItem('rc_checkout_data', JSON.stringify(orderData));
+        const orderData = {
+            items: selected,
+            deliveryAddress: currentAddress,
+            payableAmount: document.getElementById('grandTotalVal').innerText
+        };
+        localStorage.setItem('checkout_order_data', JSON.stringify(orderData));
+        localStorage.setItem('rc_checkout_data', JSON.stringify(orderData));
 
-    // Buy URL redirection with ID & Quantity
-    if (selected.length === 1) {
-        window.location.href = `buy.html?id=${encodeURIComponent(selected[0].id)}&qty=${selected[0].quantity}`;
-    } else {
-        const firstId = selected[0].id;
-        const totalQty = selected.reduce((sum, i) => sum + i.quantity, 0);
-        window.location.href = `buy.html?id=${encodeURIComponent(firstId)}&qty=${totalQty}&cart=true`;
+        if (selected.length === 1) {
+            window.location.href = `buy.html?id=${encodeURIComponent(selected[0].id)}&qty=${selected[0].quantity}`;
+        } else {
+            const firstId = selected[0].id;
+            const totalQty = selected.reduce((sum, i) => sum + i.quantity, 0);
+            window.location.href = `buy.html?id=${encodeURIComponent(firstId)}&qty=${totalQty}&cart=true`;
+        }
     }
-}
 
     loadSavedAddress();
     syncAndLoadCart();
-</script>
+</script>  
 </body>
 </html>
