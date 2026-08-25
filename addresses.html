@@ -577,60 +577,82 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function saveAddressForm() {
-        const name = document.getElementById('formName').value.trim();
-        const phone = document.getElementById('formPhone').value.trim();
-        const pincode = document.getElementById('formPincode').value.trim();
-        const city = document.getElementById('formCity').value.trim();
-        const state = document.getElementById('formState').value.trim();
-        const street = document.getElementById('formStreet').value.trim();
-        const editId = document.getElementById('editAddressId').value;
-
-        if (!name || !phone || !pincode || !city || !street) {
-            showToast("Kripya saare required fields bharein!");
-            return;
-        }
-
-        const fullFormatted = `${street}, ${city}, ${state} - ${pincode}`;
-        let savedItem;
-
-        if (editId) {
-            const index = addressList.findIndex(a => a.id === editId);
-            if (index !== -1) {
-                addressList[index] = { id: editId, name, phone, pincode, city, state, street, address: fullFormatted };
-                savedItem = addressList[index];
-            }
-        } else {
-            savedItem = {
-                id: 'addr_' + Date.now(),
-                name,
-                phone,
-                pincode,
-                city,
-                state,
-                street,
-                address: fullFormatted
-            };
-            addressList.unshift(savedItem);
-        }
-
-        // Save list
-        localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify(addressList));
-        
-        // Auto select newly saved address
-        activeAddress = savedItem;
-        localStorage.setItem(ACTIVE_ADDRESS_KEY, JSON.stringify(savedItem));
-        localStorage.setItem('user_address', JSON.stringify(savedItem));
-
-        closeForm();
-        renderAddressList();
-        showToast("Address Safaltapoorvak Save Ho Gaya!");
-
-        // Return to cart after short delay
-        setTimeout(() => {
-            window.location.href = "cart.html";
-        }, 800);
+    function getActiveUserSuffix() {
+    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+    if (user) {
+        const uid = user.email || user.phone || user.id;
+        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
     }
+    return 'guest_user';
+    function getActiveUserSuffix() {
+    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+    if (user) {
+        const uid = user.email || user.phone || user.id;
+        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
+    }
+    return 'guest_user';
+}
+
+function saveAddressForm() {
+    const name = document.getElementById('formName').value.trim();
+    const phone = document.getElementById('formPhone').value.trim();
+    const pincode = document.getElementById('formPincode').value.trim();
+    const city = document.getElementById('formCity').value.trim();
+    const state = document.getElementById('formState').value.trim();
+    const street = document.getElementById('formStreet').value.trim();
+    const editId = document.getElementById('editAddressId').value;
+
+    if (!name || !phone || !pincode || !city || !street) {
+        showToast("Kripya saare required fields bharein!");
+        return;
+    }
+
+    const fullFormatted = `${street}, ${city}, ${state} - ${pincode}`;
+    const suffix = getActiveUserSuffix();
+    const listKey = `rc_addresses_${suffix}`;
+    const activeKey = `rc_address_${suffix}`;
+
+    let userAddressList = JSON.parse(localStorage.getItem(listKey)) || [];
+    let savedItem;
+
+    if (editId) {
+        const index = userAddressList.findIndex(a => a.id === editId);
+        if (index !== -1) {
+            userAddressList[index] = { id: editId, name, phone, pincode, city, state, street, address: fullFormatted };
+            savedItem = userAddressList[index];
+        }
+    } else {
+        savedItem = {
+            id: 'addr_' + Date.now(),
+            name,
+            phone,
+            pincode,
+            city,
+            state,
+            street,
+            address: fullFormatted
+        };
+        userAddressList.unshift(savedItem);
+    }
+
+    // Sirf is active user ke account me save hoga
+    localStorage.setItem(listKey, JSON.stringify(userAddressList));
+    localStorage.setItem(activeKey, JSON.stringify(savedItem));
+    localStorage.setItem(`rc_selected_address_${suffix}`, JSON.stringify(savedItem));
+
+    // Common keys ko delete karein taaki data leak na ho
+    localStorage.removeItem('user_address');
+    localStorage.removeItem('rc_user_address');
+    localStorage.removeItem('rc_selected_address');
+
+    closeForm();
+    renderAddressList();
+    showToast("Address Safalta-poorvak Save Ho Gaya!");
+
+    setTimeout(() => {
+        window.location.href = "cart.html";
+    }, 700);
+}
 
     function selectAddress(id) {
         const addr = addressList.find(a => a.id === id);
