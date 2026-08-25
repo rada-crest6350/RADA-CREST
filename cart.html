@@ -175,10 +175,6 @@
             text-decoration: none;
         }
 
-        .addr-edit-btn:hover {
-            transform: scale(1.03);
-        }
-
         /* Layout */
         .cart-layout {
             display: grid;
@@ -206,22 +202,17 @@
             padding: 16px;
             backdrop-filter: blur(12px);
             display: grid;
-            grid-template-columns: 24px 90px 1fr;
+            grid-template-columns: 24px 95px 1fr;
             gap: 16px;
             align-items: center;
             position: relative;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .cart-item-card:hover {
             border-color: var(--primary);
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(255, 122, 0, 0.12);
-        }
-
-        .cart-item-card.removing {
-            transform: scale(0.9) translateX(40px);
-            opacity: 0;
         }
 
         .custom-checkbox {
@@ -253,21 +244,27 @@
         }
 
         .prod-img-wrap {
-            width: 90px;
-            height: 90px;
+            width: 95px;
+            height: 95px;
             border-radius: 14px;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
 
         .prod-img {
             max-width: 90%;
             max-height: 90%;
             object-fit: contain;
+            transition: transform 0.2s ease;
+        }
+
+        .prod-img-wrap:hover .prod-img {
+            transform: scale(1.08);
         }
 
         .prod-details {
@@ -280,25 +277,32 @@
             font-size: 1.05rem;
             font-weight: 800;
             color: var(--text-main);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .prod-title:hover {
+            color: var(--primary);
         }
 
         .prod-spec {
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
         }
 
-        .stock-badge {
+        .badge-stock {
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            font-size: 0.76rem;
-            font-weight: 700;
-            color: var(--warning);
-            background: rgba(245, 158, 11, 0.12);
             padding: 3px 8px;
             border-radius: 6px;
+            font-size: 0.74rem;
+            font-weight: 700;
             width: fit-content;
         }
+        .in-stock { background: rgba(37,211,102,0.15); color: #25D366; }
+        .low-stock { background: rgba(255,170,0,0.15); color: #FFAA00; }
+        .out-stock { background: rgba(255,68,68,0.15); color: #FF4444; }
 
         .price-section {
             display: flex;
@@ -308,7 +312,7 @@
         }
 
         .current-price {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 900;
             color: var(--primary);
         }
@@ -321,15 +325,18 @@
 
         .discount-tag {
             font-size: 0.75rem;
-            color: var(--success);
-            font-weight: 700;
+            background: var(--primary);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
         }
 
         .prod-bottom-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 10px;
+            margin-top: 8px;
             padding-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -478,20 +485,6 @@
             box-shadow: 0 10px 35px rgba(255, 122, 0, 0.45);
         }
 
-        .order-suggest {
-            margin-top: 14px;
-            font-size: 0.82rem;
-            text-align: center;
-            color: #ff9b44;
-            background: rgba(255, 122, 0, 0.08);
-            padding: 8px 12px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
         .policy-footer {
             margin-top: 45px;
             padding-top: 20px;
@@ -511,12 +504,10 @@
             color: var(--text-muted);
             font-size: 0.82rem;
             text-decoration: none;
-            transition: 0.2s;
         }
 
         .policy-links a:hover {
             color: var(--primary);
-            text-decoration: underline;
         }
 
         .copyright-text {
@@ -536,7 +527,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transform: translateY(120px);
             opacity: 0;
-            transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transition: all 0.35s ease;
             z-index: 2000;
             font-size: 0.9rem;
             font-weight: 700;
@@ -566,7 +557,7 @@
         </label>
     </div>
 
-    <!-- Address Card Linking to adresses.html -->
+    <!-- Address Card -->
     <a href="addresses.html" class="address-card">
         <div class="address-info">
             <i class="fa-solid fa-location-dot addr-icon"></i>
@@ -594,6 +585,11 @@
             </div>
 
             <div class="summary-line">
+                <span>Total MRP</span>
+                <span id="mrpVal">₹0</span>
+            </div>
+
+            <div class="summary-line">
                 <span>Discount</span>
                 <span id="discountVal" style="color: var(--success);">-₹0</span>
             </div>
@@ -606,10 +602,6 @@
             <div class="grand-total-row">
                 <span class="lbl">Final Payment</span>
                 <span class="val" id="grandTotalVal">₹0</span>
-            </div>
-
-            <div class="order-suggest">
-                <i class="fa-solid fa-shield-check"></i> 100% Genuine Quality Guaranteed
             </div>
 
             <button class="buy-now-btn" onclick="proceedToBuy()">
@@ -636,16 +628,30 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    const CART_STORAGE_KEY = 'rc_cart_items';
+    function getActiveUserKey() {
+        const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+        if (user) {
+            const uniqueId = user.email || user.phone || user.id;
+            if (uniqueId) {
+                return `rc_cart_items_${String(uniqueId).replace(/[^a-zA-Z0-9]/g, '_')}`;
+            }
+        }
+        return 'rc_cart_items_guest_user';
+    }
+
+    const CART_STORAGE_KEY = getActiveUserKey();
     const WISHLIST_KEY = 'rc_wishlist';
     const ADDRESS_KEY = 'rc_user_address';
 
     let cartItems = [];
 
-    // Sync latest prices from Supabase products table
     async function syncAndLoadCart() {
         let rawCart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY)) || [];
         
+        if (rawCart.length === 0) {
+            rawCart = JSON.parse(localStorage.getItem('rc_cart_items')) || [];
+        }
+
         if (rawCart.length === 0) {
             cartItems = [];
             renderCartItems();
@@ -659,30 +665,51 @@
             try {
                 const { data, error } = await supabaseClient
                     .from('products')
-                    .select('id, name, price, old_price, stock, image')
+                    .select('id, name, price, old_price, stock, image, images, size, colors, moq')
                     .in('id', productIds);
                 if (!error && data) {
                     data.forEach(p => dbProducts[p.id] = p);
                 }
             } catch(e) {
-                console.warn("Supabase fetch fallback:", e);
+                console.warn("Supabase live sync error:", e);
             }
         }
 
         cartItems = rawCart.map((item, index) => {
             const dbItem = dbProducts[item.id] || {};
-            let price = Number(dbItem.price !== undefined ? dbItem.price : item.price || 0);
-            let oldPrice = Number(dbItem.old_price !== undefined ? dbItem.old_price : (item.old_price || item.oldPrice || price));
-            let stock = dbItem.stock !== undefined ? dbItem.stock : (item.stock || 5);
-            let img = (dbItem.image) || item.image || 'assets/placeholder.jpg';
+            
+            // 1. Live Admin Selling Price & MRP
+            let livePrice = Number(dbItem.price !== undefined && dbItem.price !== null ? dbItem.price : (item.price || item.currentPrice || 0));
+            let liveOldPrice = Number(dbItem.old_price !== undefined && dbItem.old_price !== null ? dbItem.old_price : (item.old_price || item.oldPrice || livePrice));
+            
+            // 2. Live Stock
+            let liveStock = dbItem.stock !== undefined ? dbItem.stock : (item.stock || item.stockLeft || 50);
+            
+            // 3. Image Resolver
+            let img = 'assets/placeholder.jpg';
+            if (dbItem.images && Array.isArray(dbItem.images) && dbItem.images.length > 0) {
+                img = dbItem.images[0];
+            } else if (dbItem.image) {
+                img = dbItem.image;
+            } else if (item.image) {
+                img = item.image;
+            }
+
+            // 4. Variant / Size Specs
+            let variantText = item.variant;
+            if (!variantText) {
+                if (dbItem.colors) variantText = `Color: ${dbItem.colors}`;
+                else if (dbItem.size) variantText = `Size: ${dbItem.size}`;
+                else variantText = "Standard Edition";
+            }
 
             return {
                 id: item.id !== undefined ? item.id : `prod_${index}`,
-                title: dbItem.name || item.name || "Rada Crest Product",
-                variant: item.variant || "Standard Edition",
-                currentPrice: price,
-                oldPrice: oldPrice,
-                stockLeft: stock,
+                title: dbItem.name || item.name || item.title || "Rada Crest Product",
+                variant: variantText,
+                currentPrice: livePrice,
+                oldPrice: liveOldPrice,
+                stockLeft: liveStock,
                 quantity: Number(item.quantity || 1),
                 selected: item.selected !== undefined ? item.selected : true,
                 image: img
@@ -697,16 +724,20 @@
         let toSave = cartItems.map(item => ({
             id: item.id,
             name: item.title,
+            title: item.title,
             price: item.currentPrice,
+            currentPrice: item.currentPrice,
             old_price: item.oldPrice,
+            oldPrice: item.oldPrice,
             image: item.image,
             quantity: item.quantity,
-            selected: item.selected
+            selected: item.selected,
+            variant: item.variant,
+            stockLeft: item.stockLeft
         }));
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(toSave));
     }
 
-    // Strictly reads saved address from adresses.html without dummy default
     function loadSavedAddress() {
         let savedAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
         
@@ -751,13 +782,20 @@
             card.className = "cart-item-card";
             card.id = `item-card-${item.id}`;
 
-            const stockHtml = item.stockLeft <= 3 
-                ? `<span class="stock-badge"><i class="fa-solid fa-bolt"></i> Only ${item.stockLeft} left!</span>`
-                : `<span style="font-size:0.75rem; color:var(--success);"><i class="fa-solid fa-circle-check"></i> In Stock</span>`;
+            // Stock Badge Matching Product.html
+            let stockHtml = '';
+            if (item.stockLeft > 10) {
+                stockHtml = `<span class="badge-stock in-stock"><i class="fa-solid fa-circle-check"></i> In Stock (${item.stockLeft} units)</span>`;
+            } else if (item.stockLeft > 0) {
+                stockHtml = `<span class="badge-stock low-stock"><i class="fa-solid fa-clock"></i> Low Stock (${item.stockLeft} left)</span>`;
+            } else {
+                stockHtml = `<span class="badge-stock out-stock"><i class="fa-solid fa-ban"></i> Out of Stock</span>`;
+            }
 
+            // Discount Calculation Matching Product.html
             const hasDiscount = item.oldPrice > item.currentPrice;
             const discountPercent = hasDiscount 
-                ? Math.round(((item.oldPrice - item.currentPrice) / item.oldPrice) * 100)
+                ? Math.round(((item.oldPrice - item.currentPrice) / item.oldPrice) * 100) 
                 : 0;
 
             card.innerHTML = `
@@ -765,12 +803,14 @@
                     ${item.selected ? 'checked' : ''} 
                     onchange="toggleItemSelect('${item.id}', this.checked)">
 
-                <div class="prod-img-wrap">
-                    <img src="${item.image}" alt="${item.title}" class="prod-img">
+                <!-- Clickable Image -->
+                <div class="prod-img-wrap" onclick="window.location.href='product.html?id=${item.id}'">
+                    <img src="${item.image}" alt="${item.title}" class="prod-img" onerror="this.src='assets/placeholder.jpg'">
                 </div>
 
                 <div class="prod-details">
-                    <div class="prod-title">${item.title}</div>
+                    <!-- Clickable Name -->
+                    <div class="prod-title" onclick="window.location.href='product.html?id=${item.id}'">${item.title}</div>
                     <div class="prod-spec">${item.variant}</div>
                     ${stockHtml}
 
@@ -804,7 +844,7 @@
     }
 
     function toggleItemSelect(id, isSelected) {
-        const item = cartItems.find(i => i.id == id);
+        const item = cartItems.find(i => String(i.id) === String(id));
         if (item) {
             item.selected = isSelected;
             saveCartState();
@@ -821,7 +861,7 @@
     }
 
     function updateItemQty(id, change) {
-        const item = cartItems.find(i => i.id == id);
+        const item = cartItems.find(i => String(i.id) === String(id));
         if (!item) return;
 
         item.quantity += change;
@@ -838,7 +878,7 @@
         if (card) {
             card.classList.add('removing');
             setTimeout(() => {
-                cartItems = cartItems.filter(i => i.id != id);
+                cartItems = cartItems.filter(i => String(i.id) !== String(id));
                 saveCartState();
                 renderCartItems();
                 showToast("Product Cart se hata diya gaya!");
@@ -847,7 +887,7 @@
     }
 
     function moveToWishlist(id) {
-        const item = cartItems.find(i => i.id == id);
+        const item = cartItems.find(i => String(i.id) === String(id));
         if (item) {
             let wishlist = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]');
             if (!wishlist.includes(String(item.id))) {
@@ -871,6 +911,7 @@
         document.getElementById('headerCount').innerText = `${totalItemsCount} Items`;
         document.getElementById('selectedCountText').innerText = selectedItemsCount;
         document.getElementById('subtotalVal').innerText = `₹${subtotalSelling.toLocaleString('en-IN')}`;
+        document.getElementById('mrpVal').innerText = `₹${totalMRP.toLocaleString('en-IN')}`;
         document.getElementById('discountVal').innerText = `-₹${totalDiscount.toLocaleString('en-IN')}`;
         document.getElementById('grandTotalVal').innerText = `₹${subtotalSelling.toLocaleString('en-IN')}`;
     }
@@ -882,11 +923,11 @@
             return;
         }
 
-        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY));
+        const currentAddress = JSON.parse(localStorage.getItem(ADDRESS_KEY)) || JSON.parse(localStorage.getItem('user_address'));
         if (!currentAddress || !currentAddress.name || !currentAddress.address) {
             showToast("Kripya pehle delivery address select ya add karein!");
             setTimeout(() => {
-                window.location.href = "adresses.html";
+                window.location.href = "addresses.html";
             }, 800);
             return;
         }
