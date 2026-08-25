@@ -22,7 +22,6 @@
             min-height: 100vh;
         }
 
-        /* Glassmorphism Panel with soft animation */
         .glass-panel {
             background: rgba(18, 22, 31, 0.85);
             backdrop-filter: blur(18px);
@@ -35,7 +34,6 @@
             border-color: rgba(255, 122, 0, 0.2);
         }
 
-        /* Ambient Lights */
         .ambient-glow {
             position: fixed;
             width: 380px;
@@ -53,7 +51,6 @@
             100% { transform: scale(1.15); opacity: 1; }
         }
 
-        /* Custom Form Inputs */
         .custom-input {
             background: rgba(10, 13, 18, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -70,7 +67,6 @@
             cursor: not-allowed;
         }
 
-        /* Action Buttons */
         .btn-brand-orange {
             background: linear-gradient(135deg, #FF7A00 0%, #E06000 100%);
             box-shadow: 0 6px 20px -4px var(--brand-orange-glow);
@@ -84,20 +80,10 @@
         .btn-brand-orange:active {
             transform: scale(0.98);
         }
-
-        /* Modal Animation */
-        .modal-enter {
-            animation: modalFade 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes modalFade {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col justify-between relative overflow-x-hidden">
 
-    <!-- Ambient Glowing Spheres -->
     <div class="ambient-glow top-0 left-1/2 -translate-x-1/2"></div>
     <div class="ambient-glow bottom-10 right-[-100px]"></div>
 
@@ -114,7 +100,7 @@
         </a>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Container -->
     <main class="max-w-md w-full mx-auto px-4 py-7 flex-grow relative z-10 space-y-5">
 
         <!-- Notification Banner -->
@@ -174,8 +160,8 @@
                         <p class="text-[10px] text-neutral-400">Change old password with confirmation</p>
                     </div>
                 </div>
-                <a href="password-change.html" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-[#FF7A00] font-semibold text-xs transition duration-200">
-                    Change <i class="fa-solid fa-chevron-right text-[10px] ml-1"></i>
+                <a href="forgot-password.html" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-[#FF7A00] font-semibold text-xs transition duration-200">
+                    Reset <i class="fa-solid fa-chevron-right text-[10px] ml-1"></i>
                 </a>
             </div>
         </div>
@@ -198,7 +184,7 @@
 
     <!-- Delete Account Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 border border-red-900/50 relative shadow-2xl modal-enter">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 border border-red-900/50 relative shadow-2xl">
             <div class="w-12 h-12 rounded-2xl bg-red-950/80 border border-red-800/60 text-red-400 flex items-center justify-center text-xl mx-auto mb-3">
                 <i class="fa-solid fa-user-xmark"></i>
             </div>
@@ -329,22 +315,28 @@
 
             try {
                 const updatePayload = {
-                    full_name: name,
-                    mobile_number: mobile
+                    data: {
+                        full_name: name,
+                        mobile_number: mobile
+                    }
                 };
 
                 if (selectedAvatarBase64) {
-                    updatePayload.avatar_url = selectedAvatarBase64;
+                    updatePayload.data.avatar_url = selectedAvatarBase64;
                 }
 
-                const { error } = await supabaseClient.auth.updateUser({
-                    data: updatePayload
-                });
+                // Update metadata in Supabase
+                const { data, error } = await supabaseClient.auth.updateUser(updatePayload);
 
                 if (error) throw error;
 
-                showAlert('Profile updated successfully!', false);
-                document.getElementById('profile-header-name').innerText = name;
+                // Sync latest data
+                if (data?.user) {
+                    currentUser = data.user;
+                    populateUserData(currentUser);
+                }
+
+                showAlert('Profile changes saved successfully!', false);
             } catch (err) {
                 showAlert(err.message || 'Failed to update profile.');
             } finally {
