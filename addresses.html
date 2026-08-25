@@ -601,81 +601,95 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function saveAddressForm() {
-        const name = document.getElementById('formName').value.trim();
-        const phone = document.getElementById('formPhone').value.trim();
-        const pincode = document.getElementById('formPincode').value.trim();
-        const city = document.getElementById('formCity').value.trim();
-        const state = document.getElementById('formState').value.trim();
-        const street = document.getElementById('formStreet').value.trim();
-        const editId = document.getElementById('editAddressId').value;
+    // URL check karega ki user cart se aaya hai ya nahi
+function handlePostAddressRedirect() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTarget = urlParams.get('redirect');
 
-        if (!name || !phone || !pincode || !city || !street) {
-            showToast("Kripya saare required fields bharein!");
-            return;
-        }
-
-        const fullFormatted = `${street}, ${city}, ${state} - ${pincode}`;
-        const keys = getUserKeys();
-        let list = JSON.parse(localStorage.getItem(keys.listKey)) || [];
-        let savedItem;
-
-        if (editId) {
-            const index = list.findIndex(a => a.id === editId);
-            if (index !== -1) {
-                list[index] = { id: editId, name, phone, pincode, city, state, street, address: fullFormatted };
-                savedItem = list[index];
-            }
-        } else {
-            savedItem = {
-                id: 'addr_' + Date.now(),
-                name,
-                phone,
-                pincode,
-                city,
-                state,
-                street,
-                address: fullFormatted
-            };
-            list.unshift(savedItem);
-        }
-
-        // Isolated Save
-        localStorage.setItem(keys.listKey, JSON.stringify(list));
-        localStorage.setItem(keys.activeKey, JSON.stringify(savedItem));
-        localStorage.setItem(keys.selectedKey, JSON.stringify(savedItem));
-
-        // Delete any leftover global leaks
-        localStorage.removeItem('user_address');
-        localStorage.removeItem('rc_user_address');
-        localStorage.removeItem('rc_all_addresses');
-
-        closeForm();
-        renderAddressList();
-        showToast("Address Safalta-poorvak Save Ho Gaya!");
-
+    if (redirectTarget === 'cart') {
         setTimeout(() => {
             window.location.href = "cart.html";
         }, 700);
-    }
-
-    function selectAddress(id) {
-        loadUserAddressData();
-        const addr = addressList.find(a => a.id === id);
-        if (!addr) return;
-
-        const keys = getUserKeys();
-        activeAddress = addr;
-        localStorage.setItem(keys.activeKey, JSON.stringify(addr));
-        localStorage.setItem(keys.selectedKey, JSON.stringify(addr));
-
-        renderAddressList();
-        showToast(`Deliver to: ${addr.name} Selected!`);
-
+    } else if (redirectTarget === 'buy') {
         setTimeout(() => {
-            window.location.href = "cart.html";
+            window.location.href = "buy.html";
         }, 700);
     }
+    // Agar direct account se aaya hai toh koi redirect nahi hoga, page par hi rukega
+}
+
+function saveAddressForm() {
+    const name = document.getElementById('formName').value.trim();
+    const phone = document.getElementById('formPhone').value.trim();
+    const pincode = document.getElementById('formPincode').value.trim();
+    const city = document.getElementById('formCity').value.trim();
+    const state = document.getElementById('formState').value.trim();
+    const street = document.getElementById('formStreet').value.trim();
+    const editId = document.getElementById('editAddressId').value;
+
+    if (!name || !phone || !pincode || !city || !street) {
+        showToast("Kripya saare required fields bharein!");
+        return;
+    }
+
+    const fullFormatted = `${street}, ${city}, ${state} - ${pincode}`;
+    const keys = getUserKeys();
+    let list = JSON.parse(localStorage.getItem(keys.listKey)) || [];
+    let savedItem;
+
+    if (editId) {
+        const index = list.findIndex(a => a.id === editId);
+        if (index !== -1) {
+            list[index] = { id: editId, name, phone, pincode, city, state, street, address: fullFormatted };
+            savedItem = list[index];
+        }
+    } else {
+        savedItem = {
+            id: 'addr_' + Date.now(),
+            name,
+            phone,
+            pincode,
+            city,
+            state,
+            street,
+            address: fullFormatted
+        };
+        list.unshift(savedItem);
+    }
+
+    // Isolated Save
+    localStorage.setItem(keys.listKey, JSON.stringify(list));
+    localStorage.setItem(keys.activeKey, JSON.stringify(savedItem));
+    localStorage.setItem(keys.selectedKey, JSON.stringify(savedItem));
+
+    localStorage.removeItem('user_address');
+    localStorage.removeItem('rc_user_address');
+    localStorage.removeItem('rc_all_addresses');
+
+    closeForm();
+    renderAddressList();
+    showToast("Address Safalta-poorvak Save Ho Gaya!");
+
+    // Smart Redirect
+    handlePostAddressRedirect();
+}
+
+function selectAddress(id) {
+    loadUserAddressData();
+    const addr = addressList.find(a => a.id === id);
+    if (!addr) return;
+
+    const keys = getUserKeys();
+    activeAddress = addr;
+    localStorage.setItem(keys.activeKey, JSON.stringify(addr));
+    localStorage.setItem(keys.selectedKey, JSON.stringify(addr));
+
+    renderAddressList();
+    showToast(`Deliver to: ${addr.name} Selected!`);
+
+    // Smart Redirect
+    handlePostAddressRedirect();
+}
 
     function deleteAddress(id) {
         const keys = getUserKeys();
