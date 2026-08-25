@@ -443,11 +443,34 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    const ADDRESSES_STORAGE_KEY = 'rc_all_addresses';
-    const ACTIVE_ADDRESS_KEY = 'rc_user_address';
+    function getActiveUserSuffix() {
+        const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+        if (user) {
+            const uid = user.email || user.phone || user.id;
+            if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
+        }
+        return 'guest_user';
+    }
 
-    let addressList = JSON.parse(localStorage.getItem(ADDRESSES_STORAGE_KEY)) || [];
-    let activeAddress = JSON.parse(localStorage.getItem(ACTIVE_ADDRESS_KEY)) || null;
+    function getUserKeys() {
+        const suffix = getActiveUserSuffix();
+        return {
+            listKey: `rc_addresses_${suffix}`,
+            activeKey: `rc_address_${suffix}`,
+            selectedKey: `rc_selected_address_${suffix}`
+        };
+    }
+
+    let addressList = [];
+    let activeAddress = null;
+
+    function loadUserAddressData() {
+        const keys = getUserKeys();
+        addressList = JSON.parse(localStorage.getItem(keys.listKey)) || [];
+        activeAddress = JSON.parse(localStorage.getItem(keys.activeKey)) || 
+                        JSON.parse(localStorage.getItem(keys.selectedKey)) || 
+                        (addressList.length > 0 ? addressList[0] : null);
+    }
 
     function showToast(msg) {
         const toast = document.getElementById('toastNotify');
@@ -456,7 +479,6 @@
         setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
-    // Free Postal Pincode API Integration
     let pincodeTimer = null;
     async function handlePincodeLookup(pincode) {
         const statusEl = document.getElementById('pincodeStatus');
@@ -495,6 +517,7 @@
     }
 
     function renderAddressList() {
+        loadUserAddressData();
         const container = document.getElementById('addressListContainer');
         container.innerHTML = "";
 
@@ -509,7 +532,7 @@
             return;
         }
 
-        addressList.forEach((addr, idx) => {
+        addressList.forEach((addr) => {
             const isSelected = activeAddress && (activeAddress.id === addr.id || (activeAddress.address === addr.address && activeAddress.name === addr.name));
             const card = document.createElement('div');
             card.className = `address-item-card ${isSelected ? 'selected' : ''}`;
@@ -559,6 +582,7 @@
     }
 
     function editAddress(id) {
+        loadUserAddressData();
         const addr = addressList.find(a => a.id === id);
         if (!addr) return;
 
@@ -577,90 +601,73 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function getActiveUserSuffix() {
-    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
-    if (user) {
-        const uid = user.email || user.phone || user.id;
-        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
-    }
-    return 'guest_user';
-    function getActiveUserSuffix() {
-    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
-    if (user) {
-        const uid = user.email || user.phone || user.id;
-        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
-    }
-    return 'guest_user';
-}
+    function saveAddressForm() {
+        const name = document.getElementById('formName').value.trim();
+        const phone = document.getElementById('formPhone').value.trim();
+        const pincode = document.getElementById('formPincode').value.trim();
+        const city = document.getElementById('formCity').value.trim();
+        const state = document.getElementById('formState').value.trim();
+        const street = document.getElementById('formStreet').value.trim();
+        const editId = document.getElementById('editAddressId').value;
 
-function saveAddressForm() {
-    const name = document.getElementById('formName').value.trim();
-    const phone = document.getElementById('formPhone').value.trim();
-    const pincode = document.getElementById('formPincode').value.trim();
-    const city = document.getElementById('formCity').value.trim();
-    const state = document.getElementById('formState').value.trim();
-    const street = document.getElementById('formStreet').value.trim();
-    const editId = document.getElementById('editAddressId').value;
-
-    if (!name || !phone || !pincode || !city || !street) {
-        showToast("Kripya saare required fields bharein!");
-        return;
-    }
-
-    const fullFormatted = `${street}, ${city}, ${state} - ${pincode}`;
-    const suffix = getActiveUserSuffix();
-    const listKey = `rc_addresses_${suffix}`;
-    const activeKey = `rc_address_${suffix}`;
-
-    let userAddressList = JSON.parse(localStorage.getItem(listKey)) || [];
-    let savedItem;
-
-    if (editId) {
-        const index = userAddressList.findIndex(a => a.id === editId);
-        if (index !== -1) {
-            userAddressList[index] = { id: editId, name, phone, pincode, city, state, street, address: fullFormatted };
-            savedItem = userAddressList[index];
+        if (!name || !phone || !pincode || !city || !street) {
+            showToast("Kripya saare required fields bharein!");
+            return;
         }
-    } else {
-        savedItem = {
-            id: 'addr_' + Date.now(),
-            name,
-            phone,
-            pincode,
-            city,
-            state,
-            street,
-            address: fullFormatted
-        };
-        userAddressList.unshift(savedItem);
+
+        const fullFormatted = `${street}, ${city}, ${state} - ${pincode}`;
+        const keys = getUserKeys();
+        let list = JSON.parse(localStorage.getItem(keys.listKey)) || [];
+        let savedItem;
+
+        if (editId) {
+            const index = list.findIndex(a => a.id === editId);
+            if (index !== -1) {
+                list[index] = { id: editId, name, phone, pincode, city, state, street, address: fullFormatted };
+                savedItem = list[index];
+            }
+        } else {
+            savedItem = {
+                id: 'addr_' + Date.now(),
+                name,
+                phone,
+                pincode,
+                city,
+                state,
+                street,
+                address: fullFormatted
+            };
+            list.unshift(savedItem);
+        }
+
+        // Isolated Save
+        localStorage.setItem(keys.listKey, JSON.stringify(list));
+        localStorage.setItem(keys.activeKey, JSON.stringify(savedItem));
+        localStorage.setItem(keys.selectedKey, JSON.stringify(savedItem));
+
+        // Delete any leftover global leaks
+        localStorage.removeItem('user_address');
+        localStorage.removeItem('rc_user_address');
+        localStorage.removeItem('rc_all_addresses');
+
+        closeForm();
+        renderAddressList();
+        showToast("Address Safalta-poorvak Save Ho Gaya!");
+
+        setTimeout(() => {
+            window.location.href = "cart.html";
+        }, 700);
     }
-
-    // Sirf is active user ke account me save hoga
-    localStorage.setItem(listKey, JSON.stringify(userAddressList));
-    localStorage.setItem(activeKey, JSON.stringify(savedItem));
-    localStorage.setItem(`rc_selected_address_${suffix}`, JSON.stringify(savedItem));
-
-    // Common keys ko delete karein taaki data leak na ho
-    localStorage.removeItem('user_address');
-    localStorage.removeItem('rc_user_address');
-    localStorage.removeItem('rc_selected_address');
-
-    closeForm();
-    renderAddressList();
-    showToast("Address Safalta-poorvak Save Ho Gaya!");
-
-    setTimeout(() => {
-        window.location.href = "cart.html";
-    }, 700);
-}
 
     function selectAddress(id) {
+        loadUserAddressData();
         const addr = addressList.find(a => a.id === id);
         if (!addr) return;
 
+        const keys = getUserKeys();
         activeAddress = addr;
-        localStorage.setItem(ACTIVE_ADDRESS_KEY, JSON.stringify(addr));
-        localStorage.setItem('user_address', JSON.stringify(addr));
+        localStorage.setItem(keys.activeKey, JSON.stringify(addr));
+        localStorage.setItem(keys.selectedKey, JSON.stringify(addr));
 
         renderAddressList();
         showToast(`Deliver to: ${addr.name} Selected!`);
@@ -671,17 +678,19 @@ function saveAddressForm() {
     }
 
     function deleteAddress(id) {
-        addressList = addressList.filter(a => a.id !== id);
-        localStorage.setItem(ADDRESSES_STORAGE_KEY, JSON.stringify(addressList));
+        const keys = getUserKeys();
+        let list = JSON.parse(localStorage.getItem(keys.listKey)) || [];
+        list = list.filter(a => a.id !== id);
+        localStorage.setItem(keys.listKey, JSON.stringify(list));
 
         if (activeAddress && activeAddress.id === id) {
-            activeAddress = addressList.length > 0 ? addressList[0] : null;
+            activeAddress = list.length > 0 ? list[0] : null;
             if (activeAddress) {
-                localStorage.setItem(ACTIVE_ADDRESS_KEY, JSON.stringify(activeAddress));
-                localStorage.setItem('user_address', JSON.stringify(activeAddress));
+                localStorage.setItem(keys.activeKey, JSON.stringify(activeAddress));
+                localStorage.setItem(keys.selectedKey, JSON.stringify(activeAddress));
             } else {
-                localStorage.removeItem(ACTIVE_ADDRESS_KEY);
-                localStorage.removeItem('user_address');
+                localStorage.removeItem(keys.activeKey);
+                localStorage.removeItem(keys.selectedKey);
             }
         }
 
@@ -689,7 +698,7 @@ function saveAddressForm() {
         showToast("Address delete kar diya gaya!");
     }
 
-    // Init
+    // Initialize on page load
     renderAddressList();
 </script>
 </body>
