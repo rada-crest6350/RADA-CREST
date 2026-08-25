@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -28,7 +28,7 @@
             -webkit-backdrop-filter: blur(18px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: border-color 0.3s ease;
         }
         .glass-panel:hover {
             border-color: rgba(255, 122, 0, 0.2);
@@ -70,12 +70,12 @@
         .btn-brand-orange {
             background: linear-gradient(135deg, #FF7A00 0%, #E06000 100%);
             box-shadow: 0 6px 20px -4px var(--brand-orange-glow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
         .btn-brand-orange:hover {
             background: linear-gradient(135deg, #FF8A1C 0%, #FF7A00 100%);
             box-shadow: 0 8px 25px 0px rgba(255, 122, 0, 0.5);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         .btn-brand-orange:active {
             transform: scale(0.98);
@@ -135,7 +135,10 @@
                     <input type="text" id="profile-name" required placeholder="Enter full name" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1.5">Mobile Number</label>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400">Mobile Number</label>
+                        <span id="phone-auth-status" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-400 font-semibold border border-emerald-800/40">Saved</span>
+                    </div>
                     <input type="tel" id="profile-mobile" required pattern="[0-9]{10}" placeholder="10-digit mobile number" class="w-full px-3.5 py-2.5 custom-input text-white placeholder-neutral-500 rounded-xl text-xs focus:outline-none">
                 </div>
                 <div>
@@ -148,7 +151,7 @@
             </form>
         </div>
 
-        <!-- 3. Password Change Link -->
+        <!-- 3. Password Reset Link -->
         <div class="glass-panel rounded-2xl p-5 shadow-xl">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -157,7 +160,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-bold text-white">Password Change</h3>
-                        <p class="text-[10px] text-neutral-400">Change old password with confirmation</p>
+                        <p class="text-[10px] text-neutral-400">Email reset password link</p>
                     </div>
                 </div>
                 <a href="forgot-password.html" class="px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-[#FF7A00] font-semibold text-xs transition duration-200">
@@ -166,14 +169,14 @@
             </div>
         </div>
 
-        <!-- 4. Delete Account Option -->
+        <!-- 4. Danger Zone (Delete Account) -->
         <div class="glass-panel rounded-2xl p-5 border border-red-900/40 bg-red-950/10 shadow-xl">
             <div class="flex items-center gap-2 mb-2 text-red-400">
                 <i class="fa-solid fa-triangle-exclamation text-sm"></i>
                 <h3 class="text-xs font-bold uppercase tracking-wider">Danger Zone</h3>
             </div>
             <p class="text-[11px] text-neutral-400 leading-relaxed mb-4">
-                Account delete karne par aapka data permanently delete ho jayega. Dubara sign-up karne par bilkul naya fresh account banega.
+                Account delete karne par aapka data permanently remove ho jayega.
             </p>
             <button onclick="openDeleteModal()" class="w-full py-3 bg-red-950/50 hover:bg-red-900/60 text-red-400 border border-red-800/40 rounded-xl font-bold text-xs uppercase tracking-wider transition duration-300 flex items-center justify-center gap-2 active:scale-[0.98]">
                 <i class="fa-solid fa-trash-can"></i> Delete Account
@@ -250,14 +253,15 @@
             const email = user.email || '';
             const emailPrefix = email ? email.split('@')[0] : '';
             const fullName = user.user_metadata?.full_name || user.user_metadata?.name || emailPrefix || 'User';
-            const mobileNumber = user.user_metadata?.mobile_number || (user.phone ? user.phone.replace('+91', '') : '');
+            const rawPhone = user.user_metadata?.mobile_number || user.phone || '';
+            const cleanPhone = rawPhone.replace('+91', '').trim();
             const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
 
             document.getElementById('profile-header-name').innerText = fullName;
             document.getElementById('profile-header-email').innerText = email;
             
             document.getElementById('profile-name').value = fullName;
-            document.getElementById('profile-mobile').value = mobileNumber;
+            document.getElementById('profile-mobile').value = cleanPhone;
             document.getElementById('profile-email').value = email;
 
             const avatarImg = document.getElementById('avatar-preview-img');
@@ -325,12 +329,9 @@
                     updatePayload.data.avatar_url = selectedAvatarBase64;
                 }
 
-                // Update metadata in Supabase
                 const { data, error } = await supabaseClient.auth.updateUser(updatePayload);
-
                 if (error) throw error;
 
-                // Sync latest data
                 if (data?.user) {
                     currentUser = data.user;
                     populateUserData(currentUser);
