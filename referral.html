@@ -1,1 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Refer & Earn Gifts | RADA CREST</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Confetti Celebration -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+  <style>
+    :root {
+      --primary: #FF7A00;
+      --primary-glow: rgba(255, 122, 0, 0.4);
+      --bg: #0b0d14;
+      --card: #12141a;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --muted: #9ba1b0;
+      --success: #22c55e;
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 70px; overflow-x: hidden; }
+
+    .header {
+      background: rgba(18, 20, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-btn {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+      color: var(--primary); display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 1rem;
+    }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    /* Hero Banner */
+    .hero-box {
+      background: linear-gradient(135deg, rgba(255,122,0,0.12) 0%, rgba(18,20,26,0.9) 100%);
+      border: 1px solid rgba(255,122,0,0.3);
+      border-radius: 22px;
+      padding: 24px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .hero-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 6px; }
+    .hero-title span { color: var(--primary); }
+    .hero-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+
+    /* Referral Code & Share Bar */
+    .link-shell {
+      background: rgba(255,255,255,0.04);
+      border: 1.5px dashed var(--primary);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .ref-code-text {
+      font-size: 1.15rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--primary);
+    }
+    .btn-copy {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .share-btn-wa {
+      width: 100%;
+      background: #25D366;
+      color: #000;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(37, 211, 102, 0.35);
+    }
+
+    /* Analytics Counters (Counts Only, Total Privacy) */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .stat-num.highlight { color: var(--primary); }
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* Milestone Gifts Section */
+    .section-head {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gifts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .gift-item-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.25s ease;
+    }
+    .gift-item-card.unlocked {
+      border-color: var(--primary);
+      background: rgba(255, 122, 0, 0.05);
+      box-shadow: 0 4px 20px var(--primary-glow);
+    }
+
+    .gift-thumb {
+      width: 65px;
+      height: 65px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .gift-details { flex: 1; }
+    .gift-title { font-size: 0.92rem; font-weight: 800; }
+    .gift-condition { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .btn-claim {
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      cursor: not-allowed;
+      white-space: nowrap;
+    }
+    .gift-item-card.unlocked .btn-claim {
+      background: linear-gradient(135deg, #FF7A00, #ff5500);
+      color: #000;
+      border: none;
+      box-shadow: 0 2px 10px var(--primary-glow);
+      cursor: pointer;
+    }
+    .btn-claim.claimed {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      border: 1px solid var(--success);
+      cursor: default;
+    }
+
+    /* Modal Confirmation */
+    .modal-wrap {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-wrap.show { display: flex; }
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      text-align: center;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .btn-confirm-order {
+      flex: 1;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 12px;
+      font-weight: 900;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .btn-cancel-modal {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: #12151B;
+      border: 1px solid var(--primary);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      opacity: 0;
+      transition: all 0.3s var(--ease-spring);
+      z-index: 2000;
+    }
+    .toast-msg.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <a href="index.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <span style="font-weight:900; font-size:1.05rem;">Referral Club</span>
+    <div style="width:40px;"></div>
+  </header>
+
+  <div class="container">
+
+    <!-- Hero Card -->
+    <div class="hero-box">
+      <h1 class="hero-title">Refer Friends, <span>Claim Free Gifts!</span></h1>
+      <p class="hero-desc">Apne dosto ko invite karein. Jaise hi wo sign-up ya order karenge, aapke free gifts auto-unlock ho jayenge.</p>
+
+      <div class="link-shell">
+        <span class="ref-code-text" id="myRefCode">GENERATING...</span>
+        <button class="btn-copy" onclick="copyReferralLink()"><i class="fa-regular fa-copy"></i> Copy Link</button>
+      </div>
+
+      <button class="share-btn-wa" onclick="shareOnWhatsApp()">
+        <i class="fa-brands fa-whatsapp fa-lg"></i> Share on WhatsApp
+      </button>
+    </div>
+
+    <!-- Analytics Dashboard (Counts Only) -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statClicks">0</div>
+        <div class="stat-label">Link Clicks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num highlight" id="statSignups">0</div>
+        <div class="stat-label">Sign-ups</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num highlight" id="statOrders">0</div>
+        <div class="stat-label">Orders Placed</div>
+      </div>
+    </div>
+
+    <!-- Milestones / Gifts Selection -->
+    <div class="section-head">
+      <i class="fa-solid fa-gift" style="color:var(--primary);"></i> Available Milestone Gifts
+    </div>
+    
+    <div class="gifts-list" id="giftsContainer">
+      <div style="color:var(--muted); text-align:center; padding: 20px;">Loading rewards...</div>
+    </div>
+
+  </div>
+
+  <!-- Confirm Zero-Rupee Claim Modal -->
+  <div class="modal-wrap" id="claimModal">
+    <div class="modal-box">
+      <i class="fa-solid fa-box-open" style="font-size:2.8rem; color:var(--primary); margin-bottom:10px;"></i>
+      <h3 style="font-size:1.15rem; font-weight:800;" id="modalGiftTitle">Claim Free Gift</h3>
+      <p style="color:var(--muted); font-size:0.85rem; margin-top:6px;">
+        Yeh gift aapke registered delivery address par direct dispatch ke liye ₹0 me book ho jayega.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-cancel-modal" onclick="closeClaimModal()">Cancel</button>
+        <button class="btn-confirm-order" id="confirmClaimBtn">Confirm & Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toastMsg">Action Done</div>
+
+  <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    let currentUser = null;
+    let referralCode = "";
+    let userStats = { clicks: 0, signups: 0, orders: 0 };
+    let claimedRuleIds = [];
+    let selectedRuleToClaim = null;
+
+    async function initReferralPage() {
+      if (!supabase) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = "account.html";
+        return;
+      }
+
+      currentUser = session.user;
+      generateUserRefCode();
+      await fetchUserAnalytics();
+      await fetchClaimedGifts();
+      await fetchMilestoneRules();
+    }
+
+    function generateUserRefCode() {
+      // Deterministic clean code generated from UID
+      const suffix = currentUser.id.replace(/-/g, '').substring(0, 6).toUpperCase();
+      referralCode = `RC-${suffix}`;
+      document.getElementById('myRefCode').innerText = referralCode;
+
+      // Clicks count tracking from localStorage for demo
+      const clickKey = `rc_ref_clicks_${currentUser.id}`;
+      userStats.clicks = parseInt(localStorage.getItem(clickKey) || "0");
+      document.getElementById('statClicks').innerText = userStats.clicks;
+    }
+
+    async function fetchUserAnalytics() {
+      try {
+        // Fetch signups & orders count only (Zero private info leaked)
+        const { data, error } = await supabase
+          .from('referrals')
+          .select('order_completed')
+          .eq('referrer_id', currentUser.id);
+
+        if (!error && data) {
+          userStats.signups = data.length;
+          userStats.orders = data.filter(d => d.order_completed === true).length;
+
+          document.getElementById('statSignups').innerText = userStats.signups;
+          document.getElementById('statOrders').innerText = userStats.orders;
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    async function fetchClaimedGifts() {
+      try {
+        const { data } = await supabase
+          .from('referral_claims')
+          .select('rule_id')
+          .eq('user_id', currentUser.id);
+        if (data) {
+          claimedRuleIds = data.map(d => d.rule_id);
+        }
+      } catch (e) {}
+    }
+
+    async function fetchMilestoneRules() {
+      const container = document.getElementById('giftsContainer');
+      try {
+        const { data: rules, error } = await supabase
+          .from('referral_rules')
+          .select('*')
+          .eq('is_active', true)
+          .order('target_count', { ascending: true });
+
+        if (error || !rules || rules.length === 0) {
+          container.innerHTML = `<div style="color:var(--muted); text-align:center; padding: 20px;">No active reward milestones right now. Check back soon!</div>`;
+          return;
+        }
+
+        container.innerHTML = rules.map(rule => {
+          const isSignup = rule.condition_type === 'signup';
+          const currentProgress = isSignup ? userStats.signups : userStats.orders;
+          const target = rule.target_count;
+          const percent = Math.min(100, Math.round((currentProgress / target) * 100));
+          const isUnlocked = currentProgress >= target;
+          const isClaimed = claimedRuleIds.includes(rule.id);
+
+          let actionBtn = `<button class="btn-claim">${target - currentProgress} more needed</button>`;
+          if (isClaimed) {
+            actionBtn = `<button class="btn-claim claimed"><i class="fa-solid fa-check"></i> Claimed</button>`;
+          } else if (isUnlocked) {
+            actionBtn = `<button class="btn-claim" onclick="openClaimModal(${rule.id}, '${rule.gift_product_name}')">Claim Gift</button>`;
+          }
+
+          return `
+            <div class="gift-item-card ${isUnlocked && !isClaimed ? 'unlocked' : ''}">
+              <img src="${rule.gift_image || 'https://via.placeholder.com/150'}" class="gift-thumb" alt="${rule.gift_product_name}" />
+              <div class="gift-details">
+                <div class="gift-title">${rule.gift_product_name}</div>
+                <div class="gift-condition">Requires ${target} verified ${isSignup ? 'Sign-ups' : 'Delivered Orders'} (${currentProgress}/${target})</div>
+                <div class="progress-bar-wrap">
+                  <div class="progress-fill" style="width: ${percent}%;"></div>
+                </div>
+              </div>
+              <div>${actionBtn}</div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        container.innerHTML = `<div style="color:var(--muted); text-align:center; padding: 20px;">Failed to load reward milestones.</div>`;
+      }
+    }
+
+    function openClaimModal(ruleId, productName) {
+      selectedRuleToClaim = ruleId;
+      document.getElementById('modalGiftTitle').innerText = `Claim: ${productName}`;
+      document.getElementById('claimModal').classList.add('show');
+    }
+
+    function closeClaimModal() {
+      document.getElementById('claimModal').classList.remove('show');
+      selectedRuleToClaim = null;
+    }
+
+    // Direct ₹0 Zero-Rupee Automatic Order Creation
+    document.getElementById('confirmClaimBtn').onclick = async function() {
+      if (!selectedRuleToClaim || !supabase) return;
+      
+      const btn = document.getElementById('confirmClaimBtn');
+      btn.disabled = true;
+      btn.innerText = "Placing ₹0 Order...";
+
+      try {
+        // Step 1: Record the claim
+        const { error: claimErr } = await supabase.from('referral_claims').insert([{
+          user_id: currentUser.id,
+          rule_id: selectedRuleToClaim
+        }]);
+
+        if (claimErr) throw claimErr;
+
+        // Step 2: Auto-create ₹0 Order in orders table
+        const giftTitle = document.getElementById('modalGiftTitle').innerText.replace('Claim: ', '');
+        const autoOrderPayload = {
+          user_id: currentUser.id,
+          customer_name: currentUser.user_metadata?.full_name || 'Customer',
+          customer_email: currentUser.email,
+          items: [{ name: `[REFERRAL GIFT] ${giftTitle}`, price: 0, quantity: 1 }],
+          total_amount: 0,
+          payment_method: 'REFERRAL_REWARD',
+          order_status: 'Placed',
+          shipping_address: 'Registered User Address'
+        };
+
+        await supabase.from('orders').insert([autoOrderPayload]);
+
+        // Celebration Confetti
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+        closeClaimModal();
+        showToast("Free Gift Order Placed Successfully!");
+        claimedRuleIds.push(selectedRuleToClaim);
+        fetchMilestoneRules();
+
+      } catch (err) {
+        alert("Could not process claim: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Confirm & Place Order";
+      }
+    };
+
+    function copyReferralLink() {
+      const shareUrl = `${window.location.origin}/index.html?ref=${referralCode}`;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("Referral link copied!");
+      });
+    }
+
+    function shareOnWhatsApp() {
+      const shareUrl = `${window.location.origin}/index.html?ref=${referralCode}`;
+      const msg = encodeURIComponent(`Explore genuine premium LED lighting and electronics on RADA CREST! Browse the collection here: ${shareUrl}`);
+      window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    window.addEventListener('DOMContentLoaded', initReferralPage);
+  </script>
+</body>
+</html>
