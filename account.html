@@ -544,44 +544,48 @@
                 return;
             }
 
-            const phone = `+91${mobile}`;
-
             try {
+                const appliedRef = localStorage.getItem('rc_applied_referral_code');
+
+                // Email auth se direct signup (Phone disabled error permanently fixed)
+                // Mobile number metadata me hamesha ke liye safe store hoga
                 const { data, error } = await supabaseClient.auth.signUp({
-                    phone,
-                    password,
+                    email: email,
+                    password: password,
                     options: {
-                        channel: 'sms',
                         data: {
                             full_name: name,
                             mobile_number: mobile,
-                            signup_email: email
+                            referred_by: appliedRef || null
                         }
                     }
                 });
 
                 if (error) throw error;
 
-                sessionStorage.setItem('pending_signup_phone', phone);
-                sessionStorage.setItem('pending_signup_name', name);
-                sessionStorage.setItem('pending_signup_email', email);
-                sessionStorage.setItem('pending_signup_mobile', mobile);
+                // Agar kisi ke referral link se aaye hain to referrals table me log karega
+                if (appliedRef && data?.user) {
+                    try {
+                        await supabaseClient.from('referrals').insert([{
+                            referee_id: data.user.id,
+                            order_completed: false
+                        }]);
+                    } catch(refErr) {
+                        console.log("Referral log note:", refErr);
+                    }
+                }
 
-                if (data.session) {
-                    const { error: emailError } = await supabaseClient.auth.updateUser({
-                        email,
-                        data: {
-                            full_name: name,
-                            mobile_number: mobile
-                        }
-                    });
-
-                    if (emailError) throw emailError;
-
-                    showAlert('Account created successfully! Switching to sign in...', false);
-                    setTimeout(() => switchTab('login'), 2000);
+                if (data?.session) {
+                    localStorage.setItem('rc_user', JSON.stringify({
+                        id: data.user.id,
+                        email: data.user.email,
+                        phone: mobile
+                    }));
+                    showAlert('Account created successfully!', false);
+                    setTimeout(() => showDashboard(data.user), 1000);
                 } else {
-                    window.location.href = 'verify-phone.html?mode=signup';
+                    showAlert('Account created successfully! Switching to sign in...', false);
+                    setTimeout(() => switchTab('login'), 1500);
                 }
             } catch (err) {
                 showAlert(err.message || 'Unable to create account.');
