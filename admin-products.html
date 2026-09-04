@@ -1,242 +1,648 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin | Add Product - RADA CREST</title>
+  <title>Product Details | RADA CREST</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="home.css">
-  <!-- Supabase CDN -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    .admin-container { 
-      max-width: 700px; 
-      margin: 20px auto; 
-      padding: 20px; 
-      background: var(--card-bg, #12141a); 
-      border-radius: var(--radius-lg, 16px); 
-      border: 1px solid var(--border-glass, rgba(255,255,255,0.08)); 
+    :root {
+      --primary: #FF7A00;
+      --primary-glow: rgba(255, 122, 0, 0.4);
+      --bg-dark: #0b0d14;
+      --card-bg: rgba(18, 20, 26, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --text-main: #ffffff;
+      --text-muted: #9ba1b0;
+      --success: #22c55e;
+      --danger: #ef4444;
     }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted, #9ba1b0); margin-bottom: 5px; }
-    .form-control { 
-      width: 100%; 
-      background: rgba(255,255,255,0.05); 
-      border: 1px solid var(--border-glass, rgba(255,255,255,0.08)); 
-      padding: 10px; 
-      border-radius: var(--radius-sm, 8px); 
-      color: #fff; 
-      font-size: 0.9rem; 
-      outline: none; 
+
+    * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
-      margin-bottom: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
-    .form-control:focus { border-color: var(--primary, #FF7A00); }
-    .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: #fff; font-size: 0.85rem; }
-    .btn-submit { 
-      width: 100%; 
-      background: var(--primary, #FF7A00); 
-      color: #000; 
-      font-weight: 700; 
-      padding: 14px; 
-      border: none; 
-      border-radius: var(--radius-sm, 8px); 
-      cursor: pointer; 
-      margin-top: 15px; 
-      font-size: 1rem; 
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    /* 1. Premium Animated Page Loader */
+    #pageLoader {
+      position: fixed;
+      inset: 0;
+      background: #0b0d14;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #pageLoader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .loader-spinner {
+      width: 58px;
+      height: 58px;
+      border: 3px solid rgba(255, 122, 0, 0.15);
+      border-top: 3px solid var(--primary);
+      border-right: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spinLoader 0.9s cubic-bezier(0.6, 0.2, 0.4, 0.9) infinite;
+      box-shadow: 0 0 25px var(--primary-glow);
+    }
+    .loader-text {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      animation: pulseText 1.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes spinLoader {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulseText {
+      0% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      margin-bottom: 12px;
+    }
+    .nav-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* Product Image Display */
+    .image-viewer {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .main-product-img {
+      width: 100%;
+      height: 320px;
+      object-fit: contain;
+      background: #0e1118;
+      padding: 15px;
+      transition: opacity 0.3s ease;
+    }
+
+    .product-info-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .product-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .selling-price {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .mrp-price {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    /* 2. Dynamic Color Variant Styling */
+    .variant-section {
+      margin: 14px 0;
+    }
+    .variant-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .color-pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .color-chip {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .color-chip.active {
+      border-color: var(--primary);
+      background: rgba(255, 122, 0, 0.15);
+      color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: inline-block;
+    }
+
+    /* 3. Review & Feedback Section */
+    .review-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .review-form-toggle {
+      background: rgba(255, 122, 0, 0.1);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .add-review-box {
+      display: none;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+    .add-review-box.active {
+      display: block;
+    }
+    .review-input, .review-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 9px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .star-select {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: #ffd700;
+    }
+    .media-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .btn-submit-review {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 10px 14px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .review-card {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .review-card:last-child {
+      border-bottom: none;
+    }
+    .reviewer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .reviewer-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .review-stars {
+      color: #ffd700;
+      font-size: 0.75rem;
+    }
+    .review-comment {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .review-media-preview {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .review-media-preview img, .review-media-preview video {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: #000;
+    }
+
+    /* 4. Bottom Sticky Action Bar */
+    .sticky-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(18, 20, 26, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+    }
+    .action-container {
+      max-width: 650px;
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-cart {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+    .btn-buy {
+      flex: 1.4;
+      background: linear-gradient(135deg, #FF7A00 0%, #ff5500 100%);
+      border: none;
+      color: #000;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 18px var(--primary-glow);
     }
   </style>
 </head>
 <body>
 
-  <header class="header">
-    <div class="header-top">
-      <a href="index.html" class="brand-container"><span class="brand-title">RADA CREST ADMIN</span></a>
-      <a href="admin-dashboard.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+  <!-- 1. Sleek Modern Preloader -->
+  <div id="pageLoader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Rada Crest</div>
+  </div>
+
+  <div class="container">
+    <div class="header-bar">
+      <a href="index.html" class="nav-icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+      <span style="font-weight:800; font-size:1.1rem;">Product Details</span>
+      <a href="cart.html" class="nav-icon-btn"><i class="fa-solid fa-cart-shopping"></i></a>
     </div>
-  </header>
 
-  <div class="admin-container">
-    <h2 style="margin-bottom: 15px;">Add New Product</h2>
-    <form id="addProductForm">
-      
-      <div class="form-group">
-        <label>Product Type</label>
-        <select id="productType" class="form-control" required>
-          <option value="normal">Normal Product</option>
-          <option value="festival">Festival Sale Product</option>
-        </select>
+    <!-- Product Image Preview -->
+    <div class="image-viewer">
+      <img id="mainProductImage" src="" alt="Product Image" class="main-product-img">
+    </div>
+
+    <!-- Product Main Info -->
+    <div class="product-info-box">
+      <h1 class="product-name" id="productTitle">Loading Product...</h1>
+      <div class="price-row">
+        <span class="selling-price" id="sellingPrice">₹0</span>
+        <span class="mrp-price" id="mrpPrice"></span>
       </div>
 
-      <div class="form-group">
-        <label>Product Name</label>
-        <input type="text" id="pName" class="form-control" placeholder="e.g. 9W LED Bulb / Fast Charger" required>
+      <!-- 2. Dynamic Colors Container -->
+      <div class="variant-section" id="colorSection" style="display:none;">
+        <div class="variant-label">Available Colors / Variants:</div>
+        <div class="color-pill-group" id="colorsContainer"></div>
+      </div>
+    </div>
+
+    <!-- 3. Dynamic Customer Reviews -->
+    <div class="review-section">
+      <div class="review-header">
+        <h3 style="font-size:1rem; font-weight:800;">Customer Reviews</h3>
+        <button class="review-form-toggle" onclick="toggleReviewForm()">Write Review</button>
       </div>
 
-      <div class="row-grid">
-        <div class="form-group">
-          <label>Category</label>
-          <select id="pCategory" class="form-control">
-            <option value="led">LED Bulbs</option>
-            <option value="extension">Extension Board</option>
-            <option value="t-bulb">T-Bulbs</option>
-            <option value="accessories">Accessories</option>
-          </select>
+      <!-- Add Review Drawer -->
+      <div class="add-review-box" id="reviewDrawer">
+        <input type="text" id="revAuthor" class="review-input" placeholder="Your Name" />
+        <div class="star-select" id="starPicker">
+          <i class="fa-solid fa-star" data-val="1"></i>
+          <i class="fa-solid fa-star" data-val="2"></i>
+          <i class="fa-solid fa-star" data-val="3"></i>
+          <i class="fa-solid fa-star" data-val="4"></i>
+          <i class="fa-solid fa-star" data-val="5"></i>
         </div>
-        <div class="form-group">
-          <label>Listing Status</label>
-          <select id="pStatus" class="form-control">
-            <option value="live">Direct Live</option>
-            <option value="upcoming">Upcoming Product</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row-grid">
-        <div class="form-group">
-          <label>Full Price (MRP)</label>
-          <input type="number" id="pOldPrice" class="form-control" placeholder="e.g. 499">
-        </div>
-        <div class="form-group">
-          <label>Selling Price</label>
-          <input type="number" id="pPrice" class="form-control" placeholder="e.g. 199" required>
-        </div>
-      </div>
-
-      <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
-        <label style="color: var(--primary, #FF7A00); font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Bulk / Wholesale Tier Pricing</label>
+        <textarea id="revComment" class="review-textarea" rows="3" placeholder="Share your experience with this product..."></textarea>
         
-        <div class="row-grid" style="margin-bottom: 8px;">
-          <div>
-            <small style="color: #9ba1b0;">Tier 1 (e.g. 50 Pcs)</small>
-            <div style="display: flex; gap: 6px; margin-top: 2px;">
-              <input type="number" id="bulkQty1" class="form-control" placeholder="Min Qty (50)" />
-              <input type="number" id="bulkPrice1" class="form-control" placeholder="Price/pc" />
-            </div>
-          </div>
-          <div>
-            <small style="color: #9ba1b0;">Tier 2 (e.g. 100 Pcs)</small>
-            <div style="display: flex; gap: 6px; margin-top: 2px;">
-              <input type="number" id="bulkQty2" class="form-control" placeholder="Min Qty (100)" />
-              <input type="number" id="bulkPrice2" class="form-control" placeholder="Price/pc" />
-            </div>
-          </div>
+        <div class="media-inputs">
+          <input type="url" id="revImg1" class="review-input" placeholder="Paste Photo Link (Optional)" />
+          <input type="url" id="revVideo1" class="review-input" placeholder="Paste Video Link (MP4/Webm Optional)" />
         </div>
+
+        <button class="btn-submit-review" onclick="submitCustomerReview()">Submit Review</button>
       </div>
 
-      <div class="form-group">
-        <label><i class="fa-solid fa-link"></i> Product Image Links (Paste Image URLs)</label>
-        <input type="url" id="pImg1" class="form-control" placeholder="Main Image URL (Required)" required />
-        <input type="url" id="pImg2" class="form-control" placeholder="Image 2 URL (Optional)" />
-        <input type="url" id="pImg3" class="form-control" placeholder="Image 3 URL (Optional)" />
-        <input type="url" id="pImg4" class="form-control" placeholder="Image 4 URL (Optional)" />
-        <input type="url" id="pImg5" class="form-control" placeholder="Image 5 URL (Optional)" />
-        <small style="color: #9ba1b0; display: block;">Direct links only (.jpg, .png, webp, imageshack, etc.)</small>
+      <!-- Reviews Feed Container -->
+      <div id="reviewsList">
+        <p style="color:var(--text-muted); font-size:0.85rem;">Loading verified reviews...</p>
       </div>
+    </div>
+  </div>
 
-      <div class="form-group">
-        <label><i class="fa-solid fa-video"></i> Product Video URL (Optional)</label>
-        <input type="url" id="pVideoUrl" class="form-control" placeholder="Video URL (mp4 link or YouTube embed)" />
-      </div>
-
-      <div class="form-group">
-        <label>Warranty Option</label>
-        <div class="checkbox-group">
-          <input type="checkbox" id="pWarrantyToggle" /> Include Warranty (e.g. 1 Year Replacement)
-        </div>
-      </div>
-
-      <div class="row-grid">
-        <div class="form-group">
-          <label>Size Variant</label>
-          <input type="text" id="pSize" class="form-control" placeholder="e.g. Free Size, 1 Meter, 2 Meter">
-        </div>
-        <div class="form-group">
-          <label>Colors / Multi-color</label>
-          <input type="text" id="pColors" class="form-control" placeholder="e.g. White, Warm Yellow, Multi-color">
-        </div>
-      </div>
-
-      <div class="row-grid">
-        <div class="form-group">
-          <label>Stock Quantity Available</label>
-          <input type="number" id="pStock" class="form-control" placeholder="e.g. 50" required>
-        </div>
-        <div class="form-group">
-          <label>Min Order Quantity (MOQ)</label>
-          <input type="number" id="pMoq" class="form-control" value="1">
-        </div>
-      </div>
-
-      <button type="submit" class="btn-submit" id="submitBtn">Save & Publish Product</button>
-    </form>
+  <!-- 4. Sticky Direct Working Buy / Cart Bar -->
+  <div class="sticky-bottom-bar">
+    <div class="action-container">
+      <button class="btn-cart" onclick="addProductToCart()"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+      <button class="btn-buy" onclick="handleDirectBuy()"><i class="fa-solid fa-bolt"></i> Buy Now</button>
+    </div>
   </div>
 
   <script>
     const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
-    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    document.getElementById('addProductForm').onsubmit = async (e) => {
-      e.preventDefault();
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Publishing...';
+    let currentProduct = null;
+    let selectedColor = "";
+    let selectedStarRating = 5;
 
-      const imageInputs = [
-        document.getElementById('pImg1').value.trim(),
-        document.getElementById('pImg2').value.trim(),
-        document.getElementById('pImg3').value.trim(),
-        document.getElementById('pImg4').value.trim(),
-        document.getElementById('pImg5').value.trim()
-      ];
-      const imageUrls = imageInputs.filter(url => url.length > 0);
+    // Remove preloader smoothly
+    function hideLoader() {
+      const loader = document.getElementById('pageLoader');
+      if (loader) {
+        loader.classList.add('hidden');
+        setTimeout(() => loader.style.display = 'none', 500);
+      }
+    }
 
-      const bulkTiers = [];
-      const q1 = document.getElementById('bulkQty1').value;
-      const p1 = document.getElementById('bulkPrice1').value;
-      if (q1 && p1) bulkTiers.push({ minQty: Number(q1), pricePerPiece: Number(p1) });
+    async function loadProductDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
 
-      const q2 = document.getElementById('bulkQty2').value;
-      const p2 = document.getElementById('bulkPrice2').value;
-      if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
-
-      const supabaseProduct = {
-        name: document.getElementById('pName').value,
-        type: document.getElementById('productType').value,
-        category: document.getElementById('pCategory').value,
-        status: document.getElementById('pStatus').value,
-        old_price: Number(document.getElementById('pOldPrice').value) || 0,
-        price: Number(document.getElementById('pPrice').value),
-        bulk_pricing: bulkTiers,
-        image: imageUrls[0] || '',
-        images: imageUrls,
-        video: document.getElementById('pVideoUrl').value.trim(),
-        has_warranty: document.getElementById('pWarrantyToggle').checked,
-        size: document.getElementById('pSize').value || 'Free Size',
-        colors: document.getElementById('pColors').value || '',
-        stock: Number(document.getElementById('pStock').value) || 0,
-        moq: Number(document.getElementById('pMoq').value) || 1,
-        rating: 5.0,
-        sales_count: 0,
-        is_suggested: true,
-        is_trending: true
-      };
+      if (!productId || !supabase) {
+        hideLoader();
+        return;
+      }
 
       try {
-        if (!supabaseClient) throw new Error("Database connection nahi bana.");
-        const { error } = await supabaseClient.from('products').insert([supabaseProduct]);
-        if (error) throw error;
-
-        alert('Product Live Publish Ho Gaya!');
-        window.location.href = 'index.html';
+        const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
+        if (error || !data) throw error;
+        
+        currentProduct = data;
+        renderProductData(data);
+        loadProductReviews(data.id);
       } catch (err) {
-        alert('Supabase Error: ' + err.message);
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Save & Publish Product';
+        console.error("Load failed:", err);
+      } finally {
+        hideLoader();
       }
-    };
+    }
+
+    function renderProductData(prod) {
+      document.getElementById('productTitle').innerText = prod.name;
+      document.getElementById('sellingPrice').innerText = `₹${prod.price}`;
+      
+      if (prod.old_price && prod.old_price > prod.price) {
+        document.getElementById('mrpPrice').innerText = `₹${prod.old_price}`;
+      } else {
+        document.getElementById('mrpPrice').innerText = "";
+      }
+
+      const mainImg = document.getElementById('mainProductImage');
+      mainImg.src = prod.image || (prod.images && prod.images[0]) || 'https://via.placeholder.com/350';
+
+      // Parse colors from database (e.g., "White, Warm White, Red" or JSON format)
+      if (prod.colors && prod.colors.trim().length > 0) {
+        const colorList = prod.colors.split(',').map(c => c.trim()).filter(Boolean);
+        if (colorList.length > 0) {
+          const container = document.getElementById('colorsContainer');
+          container.innerHTML = "";
+          selectedColor = colorList[0];
+
+          colorList.forEach((col, index) => {
+            const chip = document.createElement('div');
+            chip.className = `color-chip ${index === 0 ? 'active' : ''}`;
+            chip.innerHTML = `<span class="color-dot"></span> <span>${col}</span>`;
+            
+            chip.onclick = () => {
+              document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
+              chip.classList.add('active');
+              selectedColor = col;
+              
+              // Optional: Agar admin ne variant specific image linked ki hai images array me
+              if (prod.images && prod.images[index]) {
+                mainImg.style.opacity = '0.3';
+                setTimeout(() => {
+                  mainImg.src = prod.images[index];
+                  mainImg.style.opacity = '1';
+                }, 200);
+              }
+            };
+            container.appendChild(chip);
+          });
+
+          document.getElementById('colorSection').style.display = "block";
+        }
+      }
+    }
+
+    // Toggle Review Drawer
+    function toggleReviewForm() {
+      document.getElementById('reviewDrawer').classList.toggle('active');
+    }
+
+    // Star Click Handlers
+    document.querySelectorAll('#starPicker i').forEach(star => {
+      star.onclick = () => {
+        const val = parseInt(star.getAttribute('data-val'));
+        selectedStarRating = val;
+        document.querySelectorAll('#starPicker i').forEach((s, idx) => {
+          s.style.color = idx < val ? '#ffd700' : '#4b5563';
+        });
+      };
+    });
+
+    // 3. Load & Submit Real Reviews
+    async function loadProductReviews(prodId) {
+      const container = document.getElementById('reviewsList');
+      if (!supabase) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('product_id', prodId)
+          .order('created_at', { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          container.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">Be the first customer to review this product!</p>`;
+          return;
+        }
+
+        container.innerHTML = data.map(rev => `
+          <div class="review-card">
+            <div class="reviewer-top">
+              <span class="reviewer-name">${rev.author_name || 'Verified Customer'}</span>
+              <span class="review-stars">${'★'.repeat(rev.rating || 5)}</span>
+            </div>
+            <p class="review-comment">${rev.comment}</p>
+            <div class="review-media-preview">
+              ${rev.image_url ? `<img src="${rev.image_url}" alt="Customer photo" onclick="window.open('${rev.image_url}')">` : ''}
+              ${rev.video_url ? `<video src="${rev.video_url}" controls></video>` : ''}
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        container.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">No reviews yet.</p>`;
+      }
+    }
+
+    async function submitCustomerReview() {
+      if (!currentProduct || !supabase) return;
+      const author = document.getElementById('revAuthor').value.trim() || 'Verified Buyer';
+      const comment = document.getElementById('revComment').value.trim();
+      const img = document.getElementById('revImg1').value.trim();
+      const video = document.getElementById('revVideo1').value.trim();
+
+      if (!comment) {
+        alert("Please write some feedback before submitting!");
+        return;
+      }
+
+      const newReview = {
+        product_id: currentProduct.id,
+        author_name: author,
+        rating: selectedStarRating,
+        comment: comment,
+        image_url: img || null,
+        video_url: video || null
+      };
+
+      const { error } = await supabase.from('reviews').insert([newReview]);
+      if (error) {
+        alert("Error saving review: " + error.message);
+      } else {
+        alert("Review posted successfully!");
+        toggleReviewForm();
+        loadProductReviews(currentProduct.id);
+      }
+    }
+
+    // 4. Working Buy Now & Cart Logic
+    function getCheckoutItem() {
+      if (!currentProduct) return null;
+      return {
+        id: currentProduct.id,
+        name: currentProduct.name,
+        price: currentProduct.price,
+        image: document.getElementById('mainProductImage').src,
+        color: selectedColor,
+        quantity: 1
+      };
+    }
+
+    function addProductToCart() {
+      const item = getCheckoutItem();
+      if (!item) return;
+
+      let cart = JSON.parse(localStorage.getItem('rc_cart') || '[]');
+      const existIndex = cart.findIndex(c => c.id === item.id && c.color === item.color);
+      if (existIndex > -1) {
+        cart[existIndex].quantity += 1;
+      } else {
+        cart.push(item);
+      }
+
+      localStorage.setItem('rc_cart', JSON.stringify(cart));
+      alert("Product added to Cart successfully!");
+    }
+
+    function handleDirectBuy() {
+      const item = getCheckoutItem();
+      if (!item) return;
+
+      // Direct Buy single item pass via localStorage
+      localStorage.setItem('rc_direct_checkout_item', JSON.stringify(item));
+      window.location.href = "cart.html?redirect=buy";
+    }
+
+    window.addEventListener('DOMContentLoaded', loadProductDetails);
   </script>
 </body>
 </html>
