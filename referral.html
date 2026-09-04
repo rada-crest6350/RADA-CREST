@@ -523,19 +523,23 @@
       if (!client) return;
 
       try {
+        // 1. Apne referral code aur apni user ID dono se check karein
         const { data, error } = await client
           .from('referrals')
-          .select('order_completed')
-          .eq('referrer_id', userId);
+          .select('*')
+          .or(`referrer_id.eq.${userId},referral_code_used.eq.${referralCode}`);
 
         if (!error && data) {
           userStats.signups = data.length;
           userStats.orders = data.filter(d => d.order_completed === true).length;
           
+          // Screen par count turant update karein
           document.getElementById('statSignups').innerText = userStats.signups;
           document.getElementById('statOrders').innerText = userStats.orders;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("Analytics fetch note:", e);
+      }
     }
 
     async function fetchRulesFromDB() {
