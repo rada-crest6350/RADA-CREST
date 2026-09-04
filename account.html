@@ -426,37 +426,33 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    // account.html ke <script> me SABSE UPAR ye dalein:
-(function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get('ref');
-  const mode = urlParams.get('mode');
+   <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-  if (refCode) {
-    // Referral code hamesha ke liye browser me lock
-    localStorage.setItem('rc_applied_referral_code', refCode);
-    console.log("Referral Code Locked:", refCode);
+    // === YAHAN SE PASTE KAREIN (Line 428 ke theek upar) ===
+    (function checkReferral() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref');
+      const isSignupMode = urlParams.get('mode') === 'signup' || urlParams.get('force_new') === 'true';
 
-    // Agar mode signup hai, to purana session clear karke Register form dikhayega
-    if (mode === 'signup') {
-      localStorage.removeItem('rc_user');
-      
-      // Page load hote hi Sign-up tab open karne ka trigger
-      window.addEventListener('DOMContentLoaded', () => {
-        // Agar aapke account page me sign-up switch karne ka function hai to use call karega
-        if (typeof showSignupTab === 'function') {
-          showSignupTab();
-        } else if (typeof toggleAuthMode === 'function') {
-          toggleAuthMode('signup');
-        } else {
-          // Ya direct signup wale tab/button par click kar dega
-          const signupBtn = document.getElementById('tab-signup') || document.querySelector('[data-tab="signup"]');
-          if (signupBtn) signupBtn.click();
+      if (refCode) {
+        localStorage.setItem('rc_applied_referral_code', refCode);
+      }
+
+      // Agar koi invite link se naya account banane aaya hai, toh purana session clear karke fresh form dikhayega
+      if (isSignupMode) {
+        localStorage.removeItem('rc_user');
+        if (window.supabaseClient && window.supabaseClient.auth) {
+          window.supabaseClient.auth.signOut();
         }
-      });
-    }
-  }
-})();
+      }
+    })();
+    // === YAHAN TAK PASTE KAREIN ===
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Baaki aapka purana code waisa hi rahega...
     
     document.addEventListener('DOMContentLoaded', async () => {
         if (!supabaseClient) {
