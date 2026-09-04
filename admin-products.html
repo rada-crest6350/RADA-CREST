@@ -126,7 +126,7 @@
       width: 100%;
       max-height: 280px;
       object-fit: contain;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
     .product-info-box {
@@ -442,7 +442,14 @@
   <script>
     const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
-    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    
+    // Guaranteed Client Initializer
+    function getSupabase() {
+      if (window.supabase && window.supabase.createClient) {
+        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return null;
+    }
 
     let productData = null;
     let selectedColor = "";
@@ -450,41 +457,43 @@
 
     function hidePreloader() {
       const loader = document.getElementById('pageLoader');
-      if (loader) {
+      if (loader && !loader.classList.contains('hidden')) {
         loader.classList.add('hidden');
-        setTimeout(() => loader.style.display = 'none', 400);
+        setTimeout(() => { loader.style.display = 'none'; }, 400);
       }
     }
 
-    // Safety timeout: Preloader will never hang forever
-    setTimeout(hidePreloader, 1800);
+    // Safety timeout: loader kabhi atka nahi rahega
+    setTimeout(hidePreloader, 1500);
 
     async function initProductPage() {
+      const client = getSupabase();
       const urlParams = new URLSearchParams(window.location.search);
       let prodId = urlParams.get('id');
 
-      if (!supabase) {
-        hidePreloader();
+      if (!client) {
+        setTimeout(initProductPage, 200);
         return;
       }
 
       try {
-        let query = supabase.from('products').select('*');
+        let query = client.from('products').select('*');
         if (prodId) {
           query = query.eq('id', prodId);
         } else {
-          query = query.order('created_at', { ascending: false }).limit(1);
+          // Agar URL me ID nahi hai to pehla product auto load hoga
+          query = query.order('id', { ascending: false }).limit(1);
         }
 
         const { data, error } = await query;
-        if (error || !data || data.length === 0) throw new Error("Product not found");
+        if (error || !data || data.length === 0) throw new Error("Product load failed");
 
         productData = data[0];
         displayProduct(productData);
         loadProductReviews(productData.id);
       } catch (err) {
         console.error(err);
-        document.getElementById('productTitle').innerText = "Product Details";
+        document.getElementById('productTitle').innerText = "Product Not Found";
       } finally {
         hidePreloader();
       }
@@ -496,15 +505,26 @@
       
       if (prod.old_price && prod.old_price > prod.price) {
         document.getElementById('mrpPrice').innerText = `₹${prod.old_price}`;
+      } else {
+        document.getElementById('mrpPrice').innerText = '';
       }
 
       const mainImg = document.getElementById('mainProductImage');
-      const fallbackImg = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80';
-      mainImg.src = prod.image || (prod.images && prod.images[0]) || fallbackImg;
+      
+      // Images list calculate
+      let allImages = [];
+      if (Array.isArray(prod.images) && prod.images.length > 0) {
+        allImages = prod.images;
+      } else if (prod.image) {
+        allImages = [prod.image];
+      } else {
+        allImages = ['https://via.placeholder.com/400x300?text=RADA+CREST'];
+      }
+      mainImg.src = allImages[0];
 
-      // Dynamic Colors
-      if (prod.colors && prod.colors.trim() !== '') {
-        const colors = prod.colors.split(',').map(c => c.trim()).filter(Boolean);
+      // Dynamic Colors Binding
+      if (prod.colors && String(prod.colors).trim() !== '') {
+        const colors = String(prod.colors).split(',').map(c => c.trim()).filter(Boolean);
         if (colors.length > 0) {
           const list = document.getElementById('colorsList');
           list.innerHTML = "";
@@ -520,12 +540,16 @@
               chip.classList.add('active');
               selectedColor = col;
 
-              if (prod.images && prod.images[idx]) {
-                mainImg.style.opacity = '0.3';
+              // Color tap karne par usi index ki photo load hogi
+              const targetImg = allImages[idx] || allImages[0];
+              if (targetImg) {
+                mainImg.style.opacity = '0.2';
+                mainImg.style.transform = 'scale(0.95)';
                 setTimeout(() => {
-                  mainImg.src = prod.images[idx];
+                  mainImg.src = targetImg;
                   mainImg.style.opacity = '1';
-                }, 150);
+                  mainImg.style.transform = 'scale(1)';
+                }, 200);
               }
             };
             list.appendChild(chip);
@@ -549,10 +573,16 @@
     }
 
     async function loadProductReviews(pId) {
+      const client = getSupabase();
+      if (!client) return;
       const container = document.getElementById('reviewsContainer');
+
       try {
-        const { data, error } = await supabase.from('reviews').select('*').eq('product_id', pId);
-        if (error || !data || data.length === 0) return;
+        const { data, error } = await client.from('reviews').select('*').eq('product_id', pId);
+        if (error || !data || data.length === 0) {
+          container.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">No reviews yet. Be the first to review!</p>`;
+          return;
+        }
 
         container.innerHTML = data.map(r => `
           <div class="review-item">
@@ -571,18 +601,20 @@
     }
 
     async function submitReview() {
-      if (!productData) return;
-      const name = document.getElementById('custName').value.trim() || 'Customer';
+      const client = getSupabase();
+      if (!client || !productData) return;
+
+      const name = document.getElementById('custName').value.trim() || 'Verified Customer';
       const comment = document.getElementById('custComment').value.trim();
       const photo = document.getElementById('custPhoto').value.trim();
       const video = document.getElementById('custVideo').value.trim();
 
       if (!comment) {
-        alert("Review text likhna zaroori hai!");
+        alert("Kripya review message likhein!");
         return;
       }
 
-      const { error } = await supabase.from('reviews').insert([{
+      const { error } = await client.from('reviews').insert([{
         product_id: productData.id,
         author_name: name,
         rating: reviewRating,
@@ -592,11 +624,14 @@
       }]);
 
       if (!error) {
-        alert("Review save ho gaya!");
+        alert("Review publish ho gaya!");
+        document.getElementById('custComment').value = "";
+        document.getElementById('custPhoto').value = "";
+        document.getElementById('custVideo').value = "";
         toggleReviewBox();
         loadProductReviews(productData.id);
       } else {
-        alert("Review post karne me problem aayi: " + error.message);
+        alert("Review save nahi ho saka: " + error.message);
       }
     }
 
@@ -614,7 +649,10 @@
 
     function addToCart() {
       const item = getSelectedProductPayload();
-      if (!item) return;
+      if (!item) {
+        alert("Product load hone ka intezar karein!");
+        return;
+      }
 
       let cart = JSON.parse(localStorage.getItem('rc_cart') || '[]');
       const index = cart.findIndex(c => c.id === item.id && c.color === item.color);
@@ -630,14 +668,18 @@
 
     function buyNow() {
       const item = getSelectedProductPayload();
-      if (!item) return;
+      if (!item) {
+        alert("Product load hone ka intezar karein!");
+        return;
+      }
 
-      // Single item direct buy pass
+      // Direct Buy Data pass
       localStorage.setItem('rc_direct_checkout_item', JSON.stringify(item));
       window.location.href = "cart.html?redirect=buy";
     }
 
-    window.addEventListener('DOMContentLoaded', initProductPage);
+    // Page start
+    window.addEventListener('load', initProductPage);
   </script>
 </body>
 </html>
