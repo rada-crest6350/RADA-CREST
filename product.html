@@ -632,7 +632,7 @@
       let warrantyHtml = p.has_warranty ? `<div class="spec-node">Warranty<b>1 Year Replacement</b></div>` : '';
       let sizeHtml = `<div class="spec-node">Size Option<b>${(p.size && p.size.trim() !== '') ? p.size : 'Standard'}</b></div>`;
 
-      // 2. Dynamic Colors Variants from Database
+      // Dynamic Colors Variants from Database
       let colorBlock = '';
       if (p.colors && p.colors.trim() !== '') {
         const colorArray = p.colors.split(',').map(c => c.trim()).filter(Boolean);
@@ -711,7 +711,7 @@
           </div>
         </div>
 
-        <!-- 3. Customer Reviews Section with Photos and Videos -->
+        <!-- Customer Reviews Section with Photos and Videos -->
         <div class="reviews-box">
           <div class="reviews-header">
             <span class="section-title" style="font-size:0.9rem; color:#fff;">Ratings & Reviews</span>
@@ -746,7 +746,7 @@
           </div>
         </div>
 
-        <!-- 4. Fully Working Bottom Bar -->
+        <!-- Fully Working Bottom Bar -->
         <div class="bottom-bar">
           <button class="btn-add-cart" onclick="addToCart()">
             <i class="fa-solid fa-cart-plus"></i> ADD TO CART
@@ -763,7 +763,7 @@
       checkWishlistStatus(p.id);
     }
 
-    // 2. Color Variant Click -> Updates Image and Selection
+    // Color Variant Click -> Updates Image and Selection
     function pickVariant(colorName, colorIndex, element) {
       document.querySelectorAll('.color-chip').forEach(el => el.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -837,7 +837,7 @@
       });
     }
 
-    // 3. Customer Reviews Load & Submit
+    // Customer Reviews Load & Submit
     async function loadProductReviews(prodId) {
       const client = getSupabase();
       const container = document.getElementById('reviewsContainer');
@@ -916,6 +916,7 @@
       return 'rc_cart_items_guest_user';
     }
 
+    // 1. ADD TO CART: सिर्फ कार्ट में आइटम जोड़ेगा
     function addToCart() {
       if (!currentProduct) return;
       const targetKey = getActiveUserKey();
@@ -923,7 +924,7 @@
       let cart = JSON.parse(localStorage.getItem(targetKey)) || [];
       const existingIndex = cart.findIndex(item => String(item.id) === String(currentProduct.id) && item.variant === selectedColorVariant);
 
-      let prodImg = currentActiveImg || 'assets/placeholder.jpg';
+      let prodImg = currentActiveImg || (currentProduct.images && currentProduct.images[0]) || currentProduct.image || 'assets/placeholder.jpg';
       const itemPrice = Number(currentProduct.price || 0);
       const itemOldPrice = Number(currentProduct.old_price || itemPrice);
       const variantInfo = selectedColorVariant ? `Color: ${selectedColorVariant}` : (currentProduct.size ? `Size: ${currentProduct.size}` : 'Standard');
@@ -951,28 +952,26 @@
       showToast("Added to Cart successfully!");
     }
 
-    // 4. Fully Working Buy Now Function
+    // 2. BUY NOW: कार्ट को बिल्कुल नहीं छेड़ेगा, सीधे buy.html पर ले जाएगा
     function goToBuyPage(productId) {
       if (!currentProduct) return;
       
       const itemPrice = Number(currentProduct.price || 0);
-      const singleItemPayload = {
+      const buyNowItem = {
         id: currentProduct.id,
         title: currentProduct.name,
         name: currentProduct.name,
         price: itemPrice,
-        image: currentActiveImg || currentProduct.image,
+        image: currentActiveImg || (currentProduct.images && currentProduct.images[0]) || currentProduct.image || 'assets/placeholder.jpg',
         variant: selectedColorVariant ? `Color: ${selectedColorVariant}` : (currentProduct.size || 'Standard'),
         quantity: Number(currentQty)
       };
 
-      // Direct checkout item set
-      localStorage.setItem('rc_direct_checkout_item', JSON.stringify(singleItemPayload));
+      // डायरेक्ट ख़रीदने वाले आइटम को अलग की (key) में स्टोर करें
+      localStorage.setItem('rc_buy_now_item', JSON.stringify(buyNowItem));
       
-      // Cart sync for checkout flow
-      addToCart();
-      
-      window.location.href = "cart.html?redirect=buy";
+      // सीधे buy.html पर भेजें
+      window.location.href = `buy.html?id=${currentProduct.id}&qty=${currentQty}`;
     }
 
     async function loadSuggestedProducts(category, currentId) {
