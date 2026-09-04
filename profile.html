@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Supabase Core Library in Head for Guaranteed Availability -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
             --brand-orange: #FF7A00;
@@ -185,7 +188,7 @@
 
     </main>
 
-    <!-- ================= PASSWORD CHANGE MODAL ================= -->
+    <!-- Password Change Modal -->
     <div id="password-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="glass-panel rounded-3xl max-w-sm w-full p-6 border border-[#FF7A00]/40 relative shadow-2xl">
             <div class="w-12 h-12 rounded-2xl bg-[#FF7A00]/20 border border-[#FF7A00]/50 text-[#FF7A00] flex items-center justify-center text-xl mx-auto mb-3">
@@ -199,7 +202,6 @@
             <div id="pass-modal-alert" class="hidden mb-3 p-2.5 text-xs font-medium rounded-xl"></div>
 
             <form id="changePasswordModalForm" onsubmit="handlePasswordChangeSubmit(event)" class="space-y-3.5">
-                <!-- Old Password -->
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Current (Old) Password</label>
                     <div class="relative">
@@ -210,7 +212,6 @@
                     </div>
                 </div>
 
-                <!-- New Password -->
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">New Password</label>
                     <div class="relative">
@@ -221,7 +222,6 @@
                     </div>
                 </div>
 
-                <!-- Confirm New Password -->
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">Confirm New Password</label>
                     <div class="relative">
@@ -232,7 +232,6 @@
                     </div>
                 </div>
 
-                <!-- Forgot Password Option if password is forgotten -->
                 <div class="text-right pt-0.5">
                     <a href="forgot-password.html" class="text-[11px] text-[#FF7A00] font-semibold hover:underline">
                         Password bhool gaye? (Forgot Password)
@@ -291,40 +290,62 @@
         &copy; 2026 RADA CREST. All rights reserved.
     </footer>
 
-    <!-- Supabase Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Scripts with Guaranteed Client Ready Loader -->
     <script src="config.js"></script>
     <script src="supabase-client.js"></script>
     <script>
-        const SUPABASE_URL = window.SUPABASE_URL || 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
-        const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+        const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
 
-        // Direct, robust Supabase Client
-        if (!window.supabaseClient && window.supabase && window.supabase.createClient) {
-            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let supabaseClientInstance = null;
+
+        // Guaranteed Client Getter with polling wait
+        async function getGuaranteedSupabaseClient() {
+            if (supabaseClientInstance) return supabaseClientInstance;
+            
+            // 1. Check window global
+            if (window.supabaseClient && window.supabaseClient.auth) {
+                supabaseClientInstance = window.supabaseClient;
+                return supabaseClientInstance;
+            }
+
+            // 2. Wait up to 2 seconds for library to load
+            let attempts = 0;
+            while (!window.supabase && attempts < 20) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
+
+            if (window.supabase && window.supabase.createClient) {
+                supabaseClientInstance = window.supabase.createClient(
+                    window.SUPABASE_URL || SUPABASE_URL,
+                    window.SUPABASE_ANON_KEY || SUPABASE_ANON_KEY
+                );
+                window.supabaseClient = supabaseClientInstance;
+                return supabaseClientInstance;
+            }
+
+            return null;
         }
 
         let currentUser = null;
         let selectedAvatarBase64 = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (!window.supabaseClient && window.supabase && window.supabase.createClient) {
-                window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            }
-
-            if (!window.supabaseClient) {
-                showAlert('Supabase connection load nahi ho saka. Kripya refresh karein.', true);
+            const client = await getGuaranteedSupabaseClient();
+            if (!client) {
+                showAlert('Database connect nahi ho saka. Kripya page refresh karein.', true);
                 return;
             }
 
             try {
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-                if (error || !session) {
+                const { data, error } = await client.auth.getSession();
+                if (error || !data || !data.session) {
                     window.location.href = 'account.html';
                     return;
                 }
 
-                currentUser = session.user;
+                currentUser = data.session.user;
                 populateUserData(currentUser);
             } catch (err) {
                 console.error(err);
@@ -386,6 +407,9 @@
             e.preventDefault();
             hideAlert();
 
+            const client = await getGuaranteedSupabaseClient();
+            if (!client) return;
+
             const btn = document.getElementById('update-profile-btn');
             btn.disabled = true;
             btn.innerText = 'Saving...';
@@ -412,7 +436,7 @@
                     updatePayload.data.avatar_url = selectedAvatarBase64;
                 }
 
-                const { data, error } = await supabaseClient.auth.updateUser(updatePayload);
+                const { data, error } = await client.auth.updateUser(updatePayload);
                 if (error) throw error;
 
                 if (data?.user) {
@@ -429,7 +453,6 @@
             }
         }
 
-        // ================= Password Change Handlers =================
         function openPasswordModal() {
             document.getElementById('password-modal').classList.remove('hidden');
             document.getElementById('changePasswordModalForm').reset();
@@ -444,6 +467,9 @@
 
         async function handlePasswordChangeSubmit(e) {
             e.preventDefault();
+            const client = await getGuaranteedSupabaseClient();
+            if (!client) return;
+
             const oldPass = document.getElementById('modal-old-password').value;
             const newPass = document.getElementById('modal-new-password').value;
             const confirmPass = document.getElementById('modal-confirm-password').value;
@@ -470,20 +496,18 @@
             btn.innerText = 'Verifying Old Password...';
 
             try {
-                // Step 1: Verify current old password
                 let credentials = {
                     email: currentUser.email,
                     password: oldPass
                 };
 
-                const { error: verifyErr } = await supabaseClient.auth.signInWithPassword(credentials);
+                const { error: verifyErr } = await client.auth.signInWithPassword(credentials);
                 if (verifyErr) {
                     throw new Error('Purana password galat hai. Agar bhool gaye hain toh niche Forgot Password link use karein.');
                 }
 
-                // Step 2: Set New Password
                 btn.innerText = 'Updating Password...';
-                const { error: updateErr } = await supabaseClient.auth.updateUser({
+                const { error: updateErr } = await client.auth.updateUser({
                     password: newPass
                 });
 
@@ -502,7 +526,6 @@
             }
         }
 
-        // ================= Delete Modal Handlers =================
         function openDeleteModal() {
             document.getElementById('delete-modal').classList.remove('hidden');
         }
@@ -515,6 +538,9 @@
 
         async function handleConfirmDelete(e) {
             e.preventDefault();
+            const client = await getGuaranteedSupabaseClient();
+            if (!client) return;
+
             const password = document.getElementById('delete-confirm-password').value;
             const modalAlert = document.getElementById('modal-alert');
             const btn = document.getElementById('delete-btn');
@@ -529,12 +555,12 @@
                     password: password
                 };
 
-                const { error: authErr } = await supabaseClient.auth.signInWithPassword(credentials);
+                const { error: authErr } = await client.auth.signInWithPassword(credentials);
                 if (authErr) throw new Error('Incorrect password. Please try again.');
 
                 btn.innerText = 'Deleting...';
 
-                await supabaseClient.auth.signOut();
+                await client.auth.signOut();
                 localStorage.clear();
                 sessionStorage.clear();
 
