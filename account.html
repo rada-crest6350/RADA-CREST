@@ -545,9 +545,10 @@
             }
 
             try {
+                // Referral code check
                 const appliedRef = localStorage.getItem('rc_applied_referral_code');
 
-                // Email auth se direct signup (Phone disabled error permanently fixed)
+                // Email se direct signup (Phone disabled error permanently fixed)
                 // Mobile number metadata me hamesha ke liye safe store hoga
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
@@ -563,15 +564,19 @@
 
                 if (error) throw error;
 
-                // Agar kisi ke referral link se aaye hain to referrals table me log karega
+                // Referral mapping (Count track karne ke liye entry)
                 if (appliedRef && data?.user) {
                     try {
                         await supabaseClient.from('referrals').insert([{
                             referee_id: data.user.id,
+                            referral_code_used: appliedRef,
                             order_completed: false
                         }]);
+
+                        let currentCount = parseInt(localStorage.getItem(`rc_signups_${appliedRef}`) || '0');
+                        localStorage.setItem(`rc_signups_${appliedRef}`, currentCount + 1);
                     } catch(refErr) {
-                        console.log("Referral log note:", refErr);
+                        console.warn("Referral log note:", refErr);
                     }
                 }
 
