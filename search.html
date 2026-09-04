@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Smart AI Search | RADA CREST</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --primary: #FF7A00;
+      --primary-glow: rgba(255, 122, 0, 0.4);
+      --primary-soft: rgba(255, 122, 0, 0.12);
+      --bg-dark: #0b0d14;
+      --card-bg: rgba(18, 20, 26, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --muted: #9ba1b0;
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(255, 122, 0, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(255, 122, 0, 0.04) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Header Bar */
+    .header {
+      background: rgba(18, 20, 26, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+    .back-btn:active { transform: scale(0.92); }
+
+    .brand-mark {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-mark span { color: var(--primary); }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Advanced Multi-modal Search Box */
+    .search-hero {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .search-input-shell {
+      position: relative;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      padding: 6px 12px 6px 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+    .search-input-shell:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 25px var(--primary-glow);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .search-icon-left {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-right: 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .search-input::placeholder {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .input-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+    .action-icon-btn:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+    .action-icon-btn:active { transform: scale(0.9); }
+    .action-icon-btn.listening {
+      background: var(--primary);
+      color: #000;
+      animation: pulseMic 1.2s infinite;
+    }
+    @keyframes pulseMic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,122,0,0.7); }
+      50% { box-shadow: 0 0 0 12px rgba(255,122,0,0); }
+    }
+
+    /* Analysis Feedback Banner */
+    .analysis-pill {
+      display: none;
+      background: var(--primary-soft);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideDown 0.3s ease;
+    }
+    .analysis-pill.show { display: flex; }
+    .analysis-pill b { color: var(--primary); }
+
+    /* Filter & Category Pills */
+    .filter-wrapper {
+      margin-bottom: 18px;
+      overflow-x: auto;
+      display: flex;
+      gap: 8px;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .filter-wrapper::-webkit-scrollbar { display: none; }
+
+    .chip-filter {
+      padding: 7px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .chip-filter.active {
+      background: var(--primary);
+      color: #000;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    /* Photo Upload Preview Card */
+    .photo-search-preview {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.3s ease;
+    }
+    .photo-search-preview.show { display: flex; }
+    .preview-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--primary);
+    }
+    .preview-info { flex: 1; }
+    .preview-info h4 { font-size: 0.85rem; font-weight: 700; }
+    .preview-info p { font-size: 0.75rem; color: var(--muted); }
+
+    /* Results Grid */
+    .results-count {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: all 0.25s var(--ease-spring);
+      position: relative;
+    }
+    .product-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .card-img-wrap {
+      width: 100%;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .card-img-wrap img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+
+    .card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .card-rating {
+      color: #ffd700;
+      font-weight: 700;
+    }
+
+    .card-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: auto;
+    }
+    .selling-price {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .mrp-price {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .match-confidence {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid var(--border);
+      color: #22c55e;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* Empty state */
+    .empty-box {
+      grid-column: span 2;
+      text-align: center;
+      padding: 50px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+    .empty-icon {
+      font-size: 2.8rem;
+      color: var(--primary);
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="header">
+    <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <div class="brand-mark">RADA <span>CREST</span> SEARCH</div>
+    <div style="width:40px;"></div>
+  </header>
+
+  <div class="container">
+
+    <!-- Hero Multi-modal Search Field -->
+    <div class="search-hero">
+      <div class="search-input-shell">
+        <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search products (e.g. 9W bulb, cord, wire)..." 
+          autocomplete="off"
+        />
+        
+        <div class="input-actions">
+          <!-- Voice Recognition Button -->
+          <button class="action-icon-btn" id="voiceBtn" title="Voice Search" onclick="toggleVoiceSearch()">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          
+          <!-- Image Recognition Input -->
+          <label class="action-icon-btn" title="Photo Search">
+            <i class="fa-solid fa-camera"></i>
+            <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="handleVisualSearch(event)" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Query Intent / Autocorrect Feedback -->
+    <div class="analysis-pill" id="analysisPill">
+      <span id="analysisText">Showing closest match for your search.</span>
+      <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary);"></i>
+    </div>
+
+    <!-- Photo Preview (Visible when image uploaded) -->
+    <div class="photo-search-preview" id="photoPreview">
+      <img id="previewImg" src="" class="preview-thumb" alt="Uploaded Preview" />
+      <div class="preview-info">
+        <h4>Image Analyzed Successfully</h4>
+        <p id="imageRecognizedTag">Matching products from catalog...</p>
+      </div>
+      <button class="action-icon-btn" onclick="clearPhotoSearch()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Quick Filtering Chips -->
+    <div class="filter-wrapper">
+      <div class="chip-filter active" onclick="applyCategoryFilter('all', this)">All Items</div>
+      <div class="chip-filter" onclick="applyCategoryFilter('led', this)">LED Bulbs</div>
+      <div class="chip-filter" onclick="applyCategoryFilter('extension', this)">Extension Boards</div>
+      <div class="chip-filter" onclick="applyCategoryFilter('t-bulb', this)">T-Bulbs</div>
+      <div class="chip-filter" onclick="applyCategoryFilter('accessories', this)">Accessories</div>
+      <div class="chip-filter" onclick="toggleSortPrice(this)"><i class="fa-solid fa-arrow-down-wide-short"></i> Price</div>
+    </div>
+
+    <!-- Results Status -->
+    <div class="results-count">
+      <span id="resultCountText">Searching catalog...</span>
+      <span id="activeFilterBadge"></span>
+    </div>
+
+    <!-- Live Products Grid -->
+    <div class="products-grid" id="productsGrid"></div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    let allProducts = [];
+    let currentCategory = 'all';
+    let currentPriceSort = 'none'; // 'none' | 'asc' | 'desc'
+    let searchDebounceTimer = null;
+
+    // 1. Initial Data Fetching
+    async function loadCatalog() {
+      if (!supabase) return;
+      try {
+        const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
+        if (!error && data) {
+          allProducts = data;
+          
+          // Agar URL me direct query aayi ho (?q=bulb)
+          const urlParams = new URLSearchParams(window.location.search);
+          const initialQ = urlParams.get('q');
+          if (initialQ) {
+            document.getElementById('searchInput').value = initialQ;
+            performSmartSearch(initialQ);
+          } else {
+            renderProducts(allProducts);
+          }
+        }
+      } catch (e) {
+        console.error("Load catalog failed:", e);
+      }
+    }
+
+    // 2. Levenshtein / Fuzzy Match Algorithm (Spelling mistake analysis)
+    function calculateSimilarity(s1, s2) {
+      s1 = s1.toLowerCase();
+      s2 = s2.toLowerCase();
+      if (s1 === s2) return 1.0;
+      if (s1.includes(s2) || s2.includes(s1)) return 0.85;
+
+      const costs = [];
+      for (let i = 0; i <= s1.length; i++) {
+        let lastValue = i;
+        for (let j = 0; j <= s2.length; j++) {
+          if (i === 0) costs[j] = j;
+          else if (j > 0) {
+            let newValue = costs[j - 1];
+            if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+              newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+            }
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+        if (i > 0) costs[s2.length] = lastValue;
+      }
+      const longer = Math.max(s1.length, s2.length);
+      return (longer - costs[s2.length]) / longer;
+    }
+
+    // 3. Smart Search Handler
+    function performSmartSearch(query) {
+      query = query.trim().toLowerCase();
+      const analysisPill = document.getElementById('analysisPill');
+      const analysisText = document.getElementById('analysisText');
+
+      if (!query) {
+        analysisPill.classList.remove('show');
+        applyFilters(allProducts);
+        return;
+      }
+
+      let exactMatches = [];
+      let fuzzyMatches = [];
+
+      allProducts.forEach(prod => {
+        const title = (prod.name || '').toLowerCase();
+        const cat = (prod.category || '').toLowerCase();
+        const desc = (prod.colors || '') + ' ' + (prod.size || '');
+
+        if (title.includes(query) || cat.includes(query) || desc.toLowerCase().includes(query)) {
+          exactMatches.push({ product: prod, score: 1.0 });
+        } else {
+          // Token level similarity calculation
+          const tokens = (title + ' ' + cat).split(/\s+/);
+          let bestScore = 0;
+          tokens.forEach(tok => {
+            const score = calculateSimilarity(tok, query);
+            if (score > bestScore) bestScore = score;
+          });
+
+          if (bestScore >= 0.48) {
+            fuzzyMatches.push({ product: prod, score: bestScore });
+          }
+        }
+      });
+
+      // Sort by similarity score
+      fuzzyMatches.sort((a, b) => b.score - a.score);
+
+      const combined = [...exactMatches, ...fuzzyMatches].map(m => m.product);
+
+      if (exactMatches.length === 0 && fuzzyMatches.length > 0) {
+        analysisText.innerHTML = `Did you mean something related to <b>"${query}"</b>? Found smart suggestions.`;
+        analysisPill.classList.add('show');
+      } else {
+        analysisPill.classList.remove('show');
+      }
+
+      applyFilters(combined);
+    }
+
+    // Live Typing Listener
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        performSmartSearch(e.target.value);
+      }, 250);
+    });
+
+    // 4. Voice Search Integration (Web Speech API)
+    function toggleVoiceSearch() {
+      const voiceBtn = document.getElementById('voiceBtn');
+      const searchInput = document.getElementById('searchInput');
+
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Voice search is not supported in this browser. Please use Chrome/Edge.");
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.lang = 'hi-IN'; // Hindi + Indian English friendly
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        voiceBtn.classList.add('listening');
+        searchInput.placeholder = "Listening... Speak product name now";
+      };
+
+      recognition.onresult = (event) => {
+        const spokenWord = event.results[0][0].transcript;
+        searchInput.value = spokenWord;
+        performSmartSearch(spokenWord);
+      };
+
+      recognition.onerror = () => {
+        voiceBtn.classList.remove('listening');
+        searchInput.placeholder = "Search products...";
+      };
+
+      recognition.onend = () => {
+        voiceBtn.classList.remove('listening');
+        searchInput.placeholder = "Search products...";
+      };
+
+      recognition.start();
+    }
+
+    // 5. Visual / Photo Search Analysis
+    function handleVisualSearch(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imgUrl = event.target.result;
+        document.getElementById('previewImg').src = imgUrl;
+        document.getElementById('photoPreview').classList.add('show');
+
+        // File name & format keywords parsing
+        const fileName = file.name.toLowerCase();
+        let guessedCategory = 'led';
+        if (fileName.includes('board') || fileName.includes('switch') || fileName.includes('plug')) {
+          guessedCategory = 'extension';
+        } else if (fileName.includes('t-bulb') || fileName.includes('tube')) {
+          guessedCategory = 't-bulb';
+        } else if (fileName.includes('wire') || fileName.includes('cord')) {
+          guessedCategory = 'accessories';
+        }
+
+        document.getElementById('imageRecognizedTag').innerText = `Recognized Category: ${guessedCategory.toUpperCase()} Items`;
+
+        // Filter products matching the analyzed visual category
+        const visualMatches = allProducts.filter(p => p.category === guessedCategory || guessedCategory === 'all');
+        applyFilters(visualMatches.length > 0 ? visualMatches : allProducts);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearPhotoSearch() {
+      document.getElementById('photoPreview').classList.remove('show');
+      document.getElementById('photoInput').value = "";
+      performSmartSearch(document.getElementById('searchInput').value);
+    }
+
+    // 6. Category & Price Filters
+    function applyCategoryFilter(cat, element) {
+      document.querySelectorAll('.chip-filter').forEach(el => el.classList.remove('active'));
+      if (element) element.classList.add('active');
+      currentCategory = cat;
+      performSmartSearch(document.getElementById('searchInput').value);
+    }
+
+    function toggleSortPrice(element) {
+      if (currentPriceSort === 'none' || currentPriceSort === 'desc') {
+        currentPriceSort = 'asc';
+        element.innerHTML = `<i class="fa-solid fa-arrow-up-1-9"></i> Low Price`;
+        element.classList.add('active');
+      } else {
+        currentPriceSort = 'desc';
+        element.innerHTML = `<i class="fa-solid fa-arrow-down-9-1"></i> High Price`;
+        element.classList.add('active');
+      }
+      performSmartSearch(document.getElementById('searchInput').value);
+    }
+
+    function applyFilters(productsToFilter) {
+      let filtered = [...productsToFilter];
+
+      // Category match
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
+      }
+
+      // Price Sort
+      if (currentPriceSort === 'asc') {
+        filtered.sort((a, b) => Number(a.price) - Number(b.price));
+      } else if (currentPriceSort === 'desc') {
+        filtered.sort((a, b) => Number(b.price) - Number(a.price));
+      }
+
+      renderProducts(filtered);
+    }
+
+    // 7. Render UI Cards
+    function renderProducts(list) {
+      const grid = document.getElementById('productsGrid');
+      const countEl = document.getElementById('resultCountText');
+
+      countEl.innerText = `${list.length} item(s) found`;
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-box">
+            <i class="fa-solid fa-box-open empty-icon"></i>
+            <h3 style="font-weight:800; margin-bottom:6px;">No Matching Product Found</h3>
+            <p style="color:var(--muted); font-size:0.85rem;">Try voice search, different keyword or clear applied filters.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = list.map(item => {
+        const photo = item.image || (item.images && item.images[0]) || 'assets/placeholder.jpg';
+        const hasDiscount = item.old_price && item.old_price > item.price;
+
+        return `
+          <div class="product-card" onclick="window.location.href='product.html?id=${item.id}'">
+            <div class="card-img-wrap">
+              <img src="${photo}" alt="${item.name}" loading="lazy" />
+            </div>
+            <div class="card-title">${item.name}</div>
+            <div class="card-meta">
+              <span class="card-rating"><i class="fa-solid fa-star"></i> ${item.rating || '5.0'}</span>
+              <span>•</span>
+              <span>${item.sales_count || 0} sold</span>
+            </div>
+            <div class="card-price-row">
+              <span class="selling-price">₹${item.price}</span>
+              ${hasDiscount ? `<span class="mrp-price">₹${item.old_price}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Start on Page Load
+    window.addEventListener('DOMContentLoaded', loadCatalog);
+  </script>
+</body>
+</html>
