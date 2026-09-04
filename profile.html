@@ -296,23 +296,40 @@
     <script src="config.js"></script>
     <script src="supabase-client.js"></script>
     <script>
+        const SUPABASE_URL = window.SUPABASE_URL || 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+        const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+
+        // Direct, robust Supabase Client
+        if (!window.supabaseClient && window.supabase && window.supabase.createClient) {
+            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
         let currentUser = null;
         let selectedAvatarBase64 = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof sbReady === 'function' && !sbReady()) {
-                showAlert('Supabase configuration missing.', true);
+            if (!window.supabaseClient && window.supabase && window.supabase.createClient) {
+                window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+
+            if (!window.supabaseClient) {
+                showAlert('Supabase connection load nahi ho saka. Kripya refresh karein.', true);
                 return;
             }
 
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session) {
-                window.location.href = 'account.html';
-                return;
-            }
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error || !session) {
+                    window.location.href = 'account.html';
+                    return;
+                }
 
-            currentUser = session.user;
-            populateUserData(currentUser);
+                currentUser = session.user;
+                populateUserData(currentUser);
+            } catch (err) {
+                console.error(err);
+                showAlert('Error loading profile: ' + err.message, true);
+            }
         });
 
         function populateUserData(user) {
