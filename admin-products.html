@@ -1,1 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Add Product - RADA CREST</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="home.css">
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .admin-container { 
+      max-width: 700px; 
+      margin: 20px auto; 
+      padding: 20px; 
+      background: var(--card-bg, #12141a); 
+      border-radius: var(--radius-lg, 16px); 
+      border: 1px solid var(--border-glass, rgba(255,255,255,0.08)); 
+    }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted, #9ba1b0); margin-bottom: 5px; }
+    .form-control { 
+      width: 100%; 
+      background: rgba(255,255,255,0.05); 
+      border: 1px solid var(--border-glass, rgba(255,255,255,0.08)); 
+      padding: 10px; 
+      border-radius: var(--radius-sm, 8px); 
+      color: #fff; 
+      font-size: 0.9rem; 
+      outline: none; 
+      box-sizing: border-box;
+      margin-bottom: 6px;
+    }
+    .form-control:focus { border-color: var(--primary, #FF7A00); }
+    .row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 5px; color: #fff; font-size: 0.85rem; }
+    .btn-submit { 
+      width: 100%; 
+      background: var(--primary, #FF7A00); 
+      color: #000; 
+      font-weight: 700; 
+      padding: 14px; 
+      border: none; 
+      border-radius: var(--radius-sm, 8px); 
+      cursor: pointer; 
+      margin-top: 15px; 
+      font-size: 1rem; 
+    }
+  </style>
+</head>
+<body>
 
+  <header class="header">
+    <div class="header-top">
+      <a href="index.html" class="brand-container"><span class="brand-title">RADA CREST ADMIN</span></a>
+      <a href="admin-dashboard.html" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    </div>
+  </header>
+
+  <div class="admin-container">
+    <h2 style="margin-bottom: 15px;">Add New Product</h2>
+    <form id="addProductForm">
+      
+      <div class="form-group">
+        <label>Product Type</label>
+        <select id="productType" class="form-control" required>
+          <option value="normal">Normal Product</option>
+          <option value="festival">Festival Sale Product</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Product Name</label>
+        <input type="text" id="pName" class="form-control" placeholder="e.g. 9W LED Bulb / Fast Charger" required>
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Category</label>
+          <select id="pCategory" class="form-control">
+            <option value="led">LED Bulbs</option>
+            <option value="extension">Extension Board</option>
+            <option value="t-bulb">T-Bulbs</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Listing Status</label>
+          <select id="pStatus" class="form-control">
+            <option value="live">Direct Live</option>
+            <option value="upcoming">Upcoming Product</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Full Price (MRP)</label>
+          <input type="number" id="pOldPrice" class="form-control" placeholder="e.g. 499">
+        </div>
+        <div class="form-group">
+          <label>Selling Price</label>
+          <input type="number" id="pPrice" class="form-control" placeholder="e.g. 199" required>
+        </div>
+      </div>
+
+      <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+        <label style="color: var(--primary, #FF7A00); font-weight: 700; margin-bottom: 8px;"><i class="fa-solid fa-boxes-stacked"></i> Bulk / Wholesale Tier Pricing</label>
+        
+        <div class="row-grid" style="margin-bottom: 8px;">
+          <div>
+            <small style="color: #9ba1b0;">Tier 1 (e.g. 50 Pcs)</small>
+            <div style="display: flex; gap: 6px; margin-top: 2px;">
+              <input type="number" id="bulkQty1" class="form-control" placeholder="Min Qty (50)" />
+              <input type="number" id="bulkPrice1" class="form-control" placeholder="Price/pc" />
+            </div>
+          </div>
+          <div>
+            <small style="color: #9ba1b0;">Tier 2 (e.g. 100 Pcs)</small>
+            <div style="display: flex; gap: 6px; margin-top: 2px;">
+              <input type="number" id="bulkQty2" class="form-control" placeholder="Min Qty (100)" />
+              <input type="number" id="bulkPrice2" class="form-control" placeholder="Price/pc" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-link"></i> Product Image Links (Paste Image URLs)</label>
+        <input type="url" id="pImg1" class="form-control" placeholder="Main Image URL (Required)" required />
+        <input type="url" id="pImg2" class="form-control" placeholder="Image 2 URL (Optional)" />
+        <input type="url" id="pImg3" class="form-control" placeholder="Image 3 URL (Optional)" />
+        <input type="url" id="pImg4" class="form-control" placeholder="Image 4 URL (Optional)" />
+        <input type="url" id="pImg5" class="form-control" placeholder="Image 5 URL (Optional)" />
+        <small style="color: #9ba1b0; display: block;">Direct links only (.jpg, .png, webp, imageshack, etc.)</small>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-video"></i> Product Video URL (Optional)</label>
+        <input type="url" id="pVideoUrl" class="form-control" placeholder="Video URL (mp4 link or YouTube embed)" />
+      </div>
+
+      <div class="form-group">
+        <label>Warranty Option</label>
+        <div class="checkbox-group">
+          <input type="checkbox" id="pWarrantyToggle" /> Include Warranty (e.g. 1 Year Replacement)
+        </div>
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Size Variant</label>
+          <input type="text" id="pSize" class="form-control" placeholder="e.g. Free Size, 1 Meter, 2 Meter">
+        </div>
+        <div class="form-group">
+          <label>Colors / Multi-color</label>
+          <input type="text" id="pColors" class="form-control" placeholder="e.g. White, Warm Yellow, Multi-color">
+        </div>
+      </div>
+
+      <div class="row-grid">
+        <div class="form-group">
+          <label>Stock Quantity Available</label>
+          <input type="number" id="pStock" class="form-control" placeholder="e.g. 50" required>
+        </div>
+        <div class="form-group">
+          <label>Min Order Quantity (MOQ)</label>
+          <input type="number" id="pMoq" class="form-control" value="1">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Save & Publish Product</button>
+    </form>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    document.getElementById('addProductForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Publishing...';
+
+      const imageInputs = [
+        document.getElementById('pImg1').value.trim(),
+        document.getElementById('pImg2').value.trim(),
+        document.getElementById('pImg3').value.trim(),
+        document.getElementById('pImg4').value.trim(),
+        document.getElementById('pImg5').value.trim()
+      ];
+      const imageUrls = imageInputs.filter(url => url.length > 0);
+
+      const bulkTiers = [];
+      const q1 = document.getElementById('bulkQty1').value;
+      const p1 = document.getElementById('bulkPrice1').value;
+      if (q1 && p1) bulkTiers.push({ minQty: Number(q1), pricePerPiece: Number(p1) });
+
+      const q2 = document.getElementById('bulkQty2').value;
+      const p2 = document.getElementById('bulkPrice2').value;
+      if (q2 && p2) bulkTiers.push({ minQty: Number(q2), pricePerPiece: Number(p2) });
+
+      const supabaseProduct = {
+        name: document.getElementById('pName').value,
+        type: document.getElementById('productType').value,
+        category: document.getElementById('pCategory').value,
+        status: document.getElementById('pStatus').value,
+        old_price: Number(document.getElementById('pOldPrice').value) || 0,
+        price: Number(document.getElementById('pPrice').value),
+        bulk_pricing: bulkTiers,
+        image: imageUrls[0] || '',
+        images: imageUrls,
+        video: document.getElementById('pVideoUrl').value.trim(),
+        has_warranty: document.getElementById('pWarrantyToggle').checked,
+        size: document.getElementById('pSize').value || 'Free Size',
+        colors: document.getElementById('pColors').value || '',
+        stock: Number(document.getElementById('pStock').value) || 0,
+        moq: Number(document.getElementById('pMoq').value) || 1,
+        rating: 5.0,
+        sales_count: 0,
+        is_suggested: true,
+        is_trending: true
+      };
+
+      try {
+        if (!supabaseClient) throw new Error("Database connection nahi bana.");
+        const { error } = await supabaseClient.from('products').insert([supabaseProduct]);
+        if (error) throw error;
+
+        alert('Product Live Publish Ho Gaya!');
+        window.location.href = 'index.html';
+      } catch (err) {
+        alert('Supabase Error: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Save & Publish Product';
+      }
+    };
+  </script>
+</body>
+</html>
