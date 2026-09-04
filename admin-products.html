@@ -11,21 +11,19 @@
   <style>
     :root {
       --primary: #FF7A00;
-      --primary-glow: rgba(255, 122, 0, 0.4);
+      --primary-glow: rgba(255, 122, 0, 0.45);
       --bg-dark: #0b0d14;
       --card-bg: rgba(18, 20, 26, 0.85);
       --border-color: rgba(255, 255, 255, 0.08);
       --text-main: #ffffff;
       --text-muted: #9ba1b0;
-      --success: #22c55e;
-      --danger: #ef4444;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -33,13 +31,16 @@
       background-color: var(--bg-dark);
       color: var(--text-main);
       min-height: 100vh;
-      padding-bottom: 90px;
+      padding-bottom: 95px;
     }
 
-    /* 1. Premium Animated Page Loader */
+    /* 1. Sleek Modern Glowing Preloader */
     #pageLoader {
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: #0b0d14;
       z-index: 99999;
       display: flex;
@@ -47,36 +48,38 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
+
     #pageLoader.hidden {
       opacity: 0;
       visibility: hidden;
-    }
-    .loader-spinner {
-      width: 58px;
-      height: 58px;
-      border: 3px solid rgba(255, 122, 0, 0.15);
-      border-top: 3px solid var(--primary);
-      border-right: 3px solid var(--primary);
-      border-radius: 50%;
-      animation: spinLoader 0.9s cubic-bezier(0.6, 0.2, 0.4, 0.9) infinite;
-      box-shadow: 0 0 25px var(--primary-glow);
-    }
-    .loader-text {
-      font-size: 0.85rem;
-      letter-spacing: 2px;
-      color: var(--primary);
-      font-weight: 700;
-      text-transform: uppercase;
-      animation: pulseText 1.4s ease-in-out infinite alternate;
+      pointer-events: none;
     }
 
-    @keyframes spinLoader {
-      0% { transform: rotate(0deg); }
+    .loader-ring {
+      width: 52px;
+      height: 52px;
+      border: 3px solid rgba(255, 122, 0, 0.15);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .loader-brand {
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--primary);
+      text-transform: uppercase;
+      animation: pulse 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes spin {
       100% { transform: rotate(360deg); }
     }
-    @keyframes pulseText {
+    @keyframes pulse {
       0% { opacity: 0.4; }
       100% { opacity: 1; }
     }
@@ -91,9 +94,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 0;
-      margin-bottom: 12px;
+      padding: 8px 0 16px;
     }
+
     .nav-icon-btn {
       width: 40px;
       height: 40px;
@@ -112,19 +115,18 @@
     .image-viewer {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 20px;
+      border-radius: 18px;
       overflow: hidden;
       margin-bottom: 16px;
       text-align: center;
-      position: relative;
+      padding: 20px;
     }
+
     .main-product-img {
       width: 100%;
-      height: 320px;
+      max-height: 280px;
       object-fit: contain;
-      background: #0e1118;
-      padding: 15px;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.2s ease;
     }
 
     .product-info-box {
@@ -134,95 +136,103 @@
       padding: 18px;
       margin-bottom: 16px;
     }
+
     .product-name {
       font-size: 1.25rem;
       font-weight: 800;
       margin-bottom: 8px;
     }
+
     .price-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
+
     .selling-price {
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--primary);
     }
+
     .mrp-price {
       font-size: 0.95rem;
       color: var(--text-muted);
       text-decoration: line-through;
     }
 
-    /* 2. Dynamic Color Variant Styling */
-    .variant-section {
-      margin: 14px 0;
-    }
+    /* 2. Color Selection */
     .variant-label {
       font-size: 0.85rem;
+      font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 8px;
-      font-weight: 600;
     }
-    .color-pill-group {
+
+    .color-chip-group {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
+      margin-top: 4px;
     }
+
     .color-chip {
-      padding: 8px 14px;
+      padding: 9px 16px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-color);
       color: #fff;
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: 0.85rem;
+      font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 8px;
+      transition: 0.2s;
     }
+
     .color-chip.active {
       border-color: var(--primary);
       background: rgba(255, 122, 0, 0.15);
       color: var(--primary);
       box-shadow: 0 0 12px var(--primary-glow);
     }
+
     .color-dot {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: var(--primary);
-      display: inline-block;
     }
 
-    /* 3. Review & Feedback Section */
+    /* 3. Customer Reviews Section */
     .review-section {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 18px;
       padding: 18px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
+
     .review-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    .review-form-toggle {
+
+    .btn-write-review {
       background: rgba(255, 122, 0, 0.1);
       border: 1px solid var(--primary);
       color: var(--primary);
       padding: 6px 12px;
       border-radius: 8px;
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
+
     .add-review-box {
       display: none;
       background: rgba(255, 255, 255, 0.03);
@@ -231,87 +241,87 @@
       border: 1px solid var(--border-color);
       margin-bottom: 16px;
     }
+
     .add-review-box.active {
       display: block;
     }
-    .review-input, .review-textarea {
+
+    .form-input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-color);
       color: #fff;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border-radius: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-size: 0.85rem;
       outline: none;
     }
-    .star-select {
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .star-rating-row {
       display: flex;
       gap: 6px;
       margin-bottom: 10px;
       cursor: pointer;
       color: #ffd700;
+      font-size: 1.1rem;
     }
-    .media-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .btn-submit-review {
+
+    .btn-save-review {
       background: var(--primary);
       color: #000;
       border: none;
-      padding: 10px 14px;
-      font-weight: 800;
+      padding: 10px 16px;
       border-radius: 8px;
+      font-weight: 800;
       cursor: pointer;
       font-size: 0.85rem;
     }
 
-    .review-card {
+    .review-item {
       padding: 12px 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .review-card:last-child {
+
+    .review-item:last-child {
       border-bottom: none;
     }
-    .reviewer-top {
+
+    .review-user-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 4px;
     }
-    .reviewer-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-    .review-stars {
-      color: #ffd700;
-      font-size: 0.75rem;
-    }
-    .review-comment {
-      font-size: 0.85rem;
+
+    .review-text {
+      font-size: 0.86rem;
       color: #cbd5e1;
       margin-bottom: 8px;
       line-height: 1.4;
     }
-    .review-media-preview {
+
+    .review-media {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
     }
-    .review-media-preview img, .review-media-preview video {
-      width: 60px;
-      height: 60px;
+
+    .review-media img, .review-media video {
+      width: 65px;
+      height: 65px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
       background: #000;
     }
 
-    /* 4. Bottom Sticky Action Bar */
-    .sticky-bottom-bar {
+    /* 4. Bottom Working Action Bar */
+    .bottom-bar {
       position: fixed;
       bottom: 0;
       left: 0;
@@ -320,30 +330,32 @@
       border-top: 1px solid var(--border-color);
       padding: 12px 16px;
       display: flex;
-      gap: 10px;
       justify-content: center;
       backdrop-filter: blur(12px);
       z-index: 1000;
     }
-    .action-container {
+
+    .action-row {
       max-width: 650px;
       width: 100%;
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
-    .btn-cart {
+
+    .btn-add-cart {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border-color);
       color: #fff;
       font-weight: 700;
       padding: 14px;
       border-radius: 12px;
       cursor: pointer;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
-    .btn-buy {
-      flex: 1.4;
+
+    .btn-buy-now {
+      flex: 1.3;
       background: linear-gradient(135deg, #FF7A00 0%, #ff5500 100%);
       border: none;
       color: #000;
@@ -358,10 +370,10 @@
 </head>
 <body>
 
-  <!-- 1. Sleek Modern Preloader -->
+  <!-- Preloader -->
   <div id="pageLoader">
-    <div class="loader-spinner"></div>
-    <div class="loader-text">Rada Crest</div>
+    <div class="loader-ring"></div>
+    <div class="loader-brand">RADA CREST</div>
   </div>
 
   <div class="container">
@@ -371,12 +383,12 @@
       <a href="cart.html" class="nav-icon-btn"><i class="fa-solid fa-cart-shopping"></i></a>
     </div>
 
-    <!-- Product Image Preview -->
+    <!-- Product Image -->
     <div class="image-viewer">
-      <img id="mainProductImage" src="" alt="Product Image" class="main-product-img">
+      <img id="mainProductImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3C/svg%3E" alt="Product Image" class="main-product-img">
     </div>
 
-    <!-- Product Main Info -->
+    <!-- Product Details -->
     <div class="product-info-box">
       <h1 class="product-name" id="productTitle">Loading Product...</h1>
       <div class="price-row">
@@ -384,52 +396,46 @@
         <span class="mrp-price" id="mrpPrice"></span>
       </div>
 
-      <!-- 2. Dynamic Colors Container -->
-      <div class="variant-section" id="colorSection" style="display:none;">
-        <div class="variant-label">Available Colors / Variants:</div>
-        <div class="color-pill-group" id="colorsContainer"></div>
+      <!-- Colors -->
+      <div id="colorContainer" style="display:none;">
+        <div class="variant-label">Select Color / Variant:</div>
+        <div class="color-chip-group" id="colorsList"></div>
       </div>
     </div>
 
-    <!-- 3. Dynamic Customer Reviews -->
+    <!-- Reviews -->
     <div class="review-section">
       <div class="review-header">
         <h3 style="font-size:1rem; font-weight:800;">Customer Reviews</h3>
-        <button class="review-form-toggle" onclick="toggleReviewForm()">Write Review</button>
+        <button class="btn-write-review" onclick="toggleReviewBox()">Write Review</button>
       </div>
 
-      <!-- Add Review Drawer -->
-      <div class="add-review-box" id="reviewDrawer">
-        <input type="text" id="revAuthor" class="review-input" placeholder="Your Name" />
-        <div class="star-select" id="starPicker">
-          <i class="fa-solid fa-star" data-val="1"></i>
-          <i class="fa-solid fa-star" data-val="2"></i>
-          <i class="fa-solid fa-star" data-val="3"></i>
-          <i class="fa-solid fa-star" data-val="4"></i>
-          <i class="fa-solid fa-star" data-val="5"></i>
+      <div class="add-review-box" id="reviewBox">
+        <input type="text" id="custName" class="form-input" placeholder="Your Name">
+        <div class="star-rating-row" id="starContainer">
+          <i class="fa-solid fa-star" onclick="setStars(1)"></i>
+          <i class="fa-solid fa-star" onclick="setStars(2)"></i>
+          <i class="fa-solid fa-star" onclick="setStars(3)"></i>
+          <i class="fa-solid fa-star" onclick="setStars(4)"></i>
+          <i class="fa-solid fa-star" onclick="setStars(5)"></i>
         </div>
-        <textarea id="revComment" class="review-textarea" rows="3" placeholder="Share your experience with this product..."></textarea>
-        
-        <div class="media-inputs">
-          <input type="url" id="revImg1" class="review-input" placeholder="Paste Photo Link (Optional)" />
-          <input type="url" id="revVideo1" class="review-input" placeholder="Paste Video Link (MP4/Webm Optional)" />
-        </div>
-
-        <button class="btn-submit-review" onclick="submitCustomerReview()">Submit Review</button>
+        <textarea id="custComment" class="form-input" rows="3" placeholder="Write your genuine product review..."></textarea>
+        <input type="url" id="custPhoto" class="form-input" placeholder="Customer Photo URL (Optional)">
+        <input type="url" id="custVideo" class="form-input" placeholder="Customer Video URL (Optional)">
+        <button class="btn-save-review" onclick="submitReview()">Submit Review</button>
       </div>
 
-      <!-- Reviews Feed Container -->
-      <div id="reviewsList">
-        <p style="color:var(--text-muted); font-size:0.85rem;">Loading verified reviews...</p>
+      <div id="reviewsContainer">
+        <p style="color:var(--text-muted); font-size:0.85rem;">No reviews yet. Be the first to review!</p>
       </div>
     </div>
   </div>
 
-  <!-- 4. Sticky Direct Working Buy / Cart Bar -->
-  <div class="sticky-bottom-bar">
-    <div class="action-container">
-      <button class="btn-cart" onclick="addProductToCart()"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
-      <button class="btn-buy" onclick="handleDirectBuy()"><i class="fa-solid fa-bolt"></i> Buy Now</button>
+  <!-- Bottom Buy Now Bar -->
+  <div class="bottom-bar">
+    <div class="action-row">
+      <button class="btn-add-cart" onclick="addToCart()"><i class="fa-solid fa-cart-plus"></i> Cart</button>
+      <button class="btn-buy-now" onclick="buyNow()"><i class="fa-solid fa-bolt"></i> Buy Now</button>
     </div>
   </div>
 
@@ -438,211 +444,200 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-    let currentProduct = null;
+    let productData = null;
     let selectedColor = "";
-    let selectedStarRating = 5;
+    let reviewRating = 5;
 
-    // Remove preloader smoothly
-    function hideLoader() {
+    function hidePreloader() {
       const loader = document.getElementById('pageLoader');
       if (loader) {
         loader.classList.add('hidden');
-        setTimeout(() => loader.style.display = 'none', 500);
+        setTimeout(() => loader.style.display = 'none', 400);
       }
     }
 
-    async function loadProductDetails() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const productId = urlParams.get('id');
+    // Safety timeout: Preloader will never hang forever
+    setTimeout(hidePreloader, 1800);
 
-      if (!productId || !supabase) {
-        hideLoader();
+    async function initProductPage() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let prodId = urlParams.get('id');
+
+      if (!supabase) {
+        hidePreloader();
         return;
       }
 
       try {
-        const { data, error } = await supabase.from('products').select('*').eq('id', productId).single();
-        if (error || !data) throw error;
-        
-        currentProduct = data;
-        renderProductData(data);
-        loadProductReviews(data.id);
+        let query = supabase.from('products').select('*');
+        if (prodId) {
+          query = query.eq('id', prodId);
+        } else {
+          query = query.order('created_at', { ascending: false }).limit(1);
+        }
+
+        const { data, error } = await query;
+        if (error || !data || data.length === 0) throw new Error("Product not found");
+
+        productData = data[0];
+        displayProduct(productData);
+        loadProductReviews(productData.id);
       } catch (err) {
-        console.error("Load failed:", err);
+        console.error(err);
+        document.getElementById('productTitle').innerText = "Product Details";
       } finally {
-        hideLoader();
+        hidePreloader();
       }
     }
 
-    function renderProductData(prod) {
-      document.getElementById('productTitle').innerText = prod.name;
-      document.getElementById('sellingPrice').innerText = `₹${prod.price}`;
+    function displayProduct(prod) {
+      document.getElementById('productTitle').innerText = prod.name || 'Product';
+      document.getElementById('sellingPrice').innerText = `₹${prod.price || 0}`;
       
       if (prod.old_price && prod.old_price > prod.price) {
         document.getElementById('mrpPrice').innerText = `₹${prod.old_price}`;
-      } else {
-        document.getElementById('mrpPrice').innerText = "";
       }
 
       const mainImg = document.getElementById('mainProductImage');
-      mainImg.src = prod.image || (prod.images && prod.images[0]) || 'https://via.placeholder.com/350';
+      const fallbackImg = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80';
+      mainImg.src = prod.image || (prod.images && prod.images[0]) || fallbackImg;
 
-      // Parse colors from database (e.g., "White, Warm White, Red" or JSON format)
-      if (prod.colors && prod.colors.trim().length > 0) {
-        const colorList = prod.colors.split(',').map(c => c.trim()).filter(Boolean);
-        if (colorList.length > 0) {
-          const container = document.getElementById('colorsContainer');
-          container.innerHTML = "";
-          selectedColor = colorList[0];
+      // Dynamic Colors
+      if (prod.colors && prod.colors.trim() !== '') {
+        const colors = prod.colors.split(',').map(c => c.trim()).filter(Boolean);
+        if (colors.length > 0) {
+          const list = document.getElementById('colorsList');
+          list.innerHTML = "";
+          selectedColor = colors[0];
 
-          colorList.forEach((col, index) => {
+          colors.forEach((col, idx) => {
             const chip = document.createElement('div');
-            chip.className = `color-chip ${index === 0 ? 'active' : ''}`;
-            chip.innerHTML = `<span class="color-dot"></span> <span>${col}</span>`;
+            chip.className = `color-chip ${idx === 0 ? 'active' : ''}`;
+            chip.innerHTML = `<span class="color-dot"></span><span>${col}</span>`;
             
             chip.onclick = () => {
               document.querySelectorAll('.color-chip').forEach(c => c.classList.remove('active'));
               chip.classList.add('active');
               selectedColor = col;
-              
-              // Optional: Agar admin ne variant specific image linked ki hai images array me
-              if (prod.images && prod.images[index]) {
+
+              if (prod.images && prod.images[idx]) {
                 mainImg.style.opacity = '0.3';
                 setTimeout(() => {
-                  mainImg.src = prod.images[index];
+                  mainImg.src = prod.images[idx];
                   mainImg.style.opacity = '1';
-                }, 200);
+                }, 150);
               }
             };
-            container.appendChild(chip);
+            list.appendChild(chip);
           });
 
-          document.getElementById('colorSection').style.display = "block";
+          document.getElementById('colorContainer').style.display = 'block';
         }
       }
     }
 
-    // Toggle Review Drawer
-    function toggleReviewForm() {
-      document.getElementById('reviewDrawer').classList.toggle('active');
+    function toggleReviewBox() {
+      document.getElementById('reviewBox').classList.toggle('active');
     }
 
-    // Star Click Handlers
-    document.querySelectorAll('#starPicker i').forEach(star => {
-      star.onclick = () => {
-        const val = parseInt(star.getAttribute('data-val'));
-        selectedStarRating = val;
-        document.querySelectorAll('#starPicker i').forEach((s, idx) => {
-          s.style.color = idx < val ? '#ffd700' : '#4b5563';
-        });
-      };
-    });
+    function setStars(count) {
+      reviewRating = count;
+      const stars = document.querySelectorAll('#starContainer i');
+      stars.forEach((s, idx) => {
+        s.style.color = idx < count ? '#ffd700' : '#4b5563';
+      });
+    }
 
-    // 3. Load & Submit Real Reviews
-    async function loadProductReviews(prodId) {
-      const container = document.getElementById('reviewsList');
-      if (!supabase) return;
-
+    async function loadProductReviews(pId) {
+      const container = document.getElementById('reviewsContainer');
       try {
-        const { data, error } = await supabase
-          .from('reviews')
-          .select('*')
-          .eq('product_id', prodId)
-          .order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('reviews').select('*').eq('product_id', pId);
+        if (error || !data || data.length === 0) return;
 
-        if (error || !data || data.length === 0) {
-          container.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">Be the first customer to review this product!</p>`;
-          return;
-        }
-
-        container.innerHTML = data.map(rev => `
-          <div class="review-card">
-            <div class="reviewer-top">
-              <span class="reviewer-name">${rev.author_name || 'Verified Customer'}</span>
-              <span class="review-stars">${'★'.repeat(rev.rating || 5)}</span>
+        container.innerHTML = data.map(r => `
+          <div class="review-item">
+            <div class="review-user-row">
+              <strong style="font-size:0.9rem;">${r.author_name || 'Customer'}</strong>
+              <span style="color:#ffd700; font-size:0.8rem;">${'★'.repeat(r.rating || 5)}</span>
             </div>
-            <p class="review-comment">${rev.comment}</p>
-            <div class="review-media-preview">
-              ${rev.image_url ? `<img src="${rev.image_url}" alt="Customer photo" onclick="window.open('${rev.image_url}')">` : ''}
-              ${rev.video_url ? `<video src="${rev.video_url}" controls></video>` : ''}
+            <p class="review-text">${r.comment || ''}</p>
+            <div class="review-media">
+              ${r.image_url ? `<img src="${r.image_url}" onclick="window.open('${r.image_url}')">` : ''}
+              ${r.video_url ? `<video src="${r.video_url}" controls></video>` : ''}
             </div>
           </div>
         `).join('');
-      } catch (e) {
-        container.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">No reviews yet.</p>`;
-      }
+      } catch(e) {}
     }
 
-    async function submitCustomerReview() {
-      if (!currentProduct || !supabase) return;
-      const author = document.getElementById('revAuthor').value.trim() || 'Verified Buyer';
-      const comment = document.getElementById('revComment').value.trim();
-      const img = document.getElementById('revImg1').value.trim();
-      const video = document.getElementById('revVideo1').value.trim();
+    async function submitReview() {
+      if (!productData) return;
+      const name = document.getElementById('custName').value.trim() || 'Customer';
+      const comment = document.getElementById('custComment').value.trim();
+      const photo = document.getElementById('custPhoto').value.trim();
+      const video = document.getElementById('custVideo').value.trim();
 
       if (!comment) {
-        alert("Please write some feedback before submitting!");
+        alert("Review text likhna zaroori hai!");
         return;
       }
 
-      const newReview = {
-        product_id: currentProduct.id,
-        author_name: author,
-        rating: selectedStarRating,
+      const { error } = await supabase.from('reviews').insert([{
+        product_id: productData.id,
+        author_name: name,
+        rating: reviewRating,
         comment: comment,
-        image_url: img || null,
+        image_url: photo || null,
         video_url: video || null
-      };
+      }]);
 
-      const { error } = await supabase.from('reviews').insert([newReview]);
-      if (error) {
-        alert("Error saving review: " + error.message);
+      if (!error) {
+        alert("Review save ho gaya!");
+        toggleReviewBox();
+        loadProductReviews(productData.id);
       } else {
-        alert("Review posted successfully!");
-        toggleReviewForm();
-        loadProductReviews(currentProduct.id);
+        alert("Review post karne me problem aayi: " + error.message);
       }
     }
 
-    // 4. Working Buy Now & Cart Logic
-    function getCheckoutItem() {
-      if (!currentProduct) return null;
+    function getSelectedProductPayload() {
+      if (!productData) return null;
       return {
-        id: currentProduct.id,
-        name: currentProduct.name,
-        price: currentProduct.price,
+        id: productData.id,
+        name: productData.name,
+        price: productData.price,
         image: document.getElementById('mainProductImage').src,
-        color: selectedColor,
+        color: selectedColor || 'Standard',
         quantity: 1
       };
     }
 
-    function addProductToCart() {
-      const item = getCheckoutItem();
+    function addToCart() {
+      const item = getSelectedProductPayload();
       if (!item) return;
 
       let cart = JSON.parse(localStorage.getItem('rc_cart') || '[]');
-      const existIndex = cart.findIndex(c => c.id === item.id && c.color === item.color);
-      if (existIndex > -1) {
-        cart[existIndex].quantity += 1;
+      const index = cart.findIndex(c => c.id === item.id && c.color === item.color);
+      if (index > -1) {
+        cart[index].quantity += 1;
       } else {
         cart.push(item);
       }
 
       localStorage.setItem('rc_cart', JSON.stringify(cart));
-      alert("Product added to Cart successfully!");
+      alert("Cart me add ho gaya!");
     }
 
-    function handleDirectBuy() {
-      const item = getCheckoutItem();
+    function buyNow() {
+      const item = getSelectedProductPayload();
       if (!item) return;
 
-      // Direct Buy single item pass via localStorage
+      // Single item direct buy pass
       localStorage.setItem('rc_direct_checkout_item', JSON.stringify(item));
       window.location.href = "cart.html?redirect=buy";
     }
 
-    window.addEventListener('DOMContentLoaded', loadProductDetails);
+    window.addEventListener('DOMContentLoaded', initProductPage);
   </script>
 </body>
 </html>
