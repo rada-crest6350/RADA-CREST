@@ -6,6 +6,8 @@
   <title>Smart AI Search | RADA CREST</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Supabase Library loaded at the top -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -41,7 +43,6 @@
       background-attachment: fixed;
     }
 
-    /* Header Bar */
     .header {
       background: rgba(18, 20, 26, 0.85);
       backdrop-filter: blur(16px);
@@ -88,7 +89,6 @@
       padding: 16px;
     }
 
-    /* Advanced Multi-modal Search Box */
     .search-hero {
       position: relative;
       margin-bottom: 14px;
@@ -166,7 +166,6 @@
       50% { box-shadow: 0 0 0 12px rgba(255,122,0,0); }
     }
 
-    /* Analysis Feedback Banner */
     .analysis-pill {
       display: none;
       background: var(--primary-soft);
@@ -182,7 +181,6 @@
     .analysis-pill.show { display: flex; }
     .analysis-pill b { color: var(--primary); }
 
-    /* Filter & Category Pills */
     .filter-wrapper {
       margin-bottom: 18px;
       overflow-x: auto;
@@ -215,7 +213,6 @@
       box-shadow: 0 4px 14px var(--primary-glow);
     }
 
-    /* Photo Upload Preview Card */
     .photo-search-preview {
       display: none;
       background: var(--card-bg);
@@ -239,7 +236,6 @@
     .preview-info h4 { font-size: 0.85rem; font-weight: 700; }
     .preview-info p { font-size: 0.75rem; color: var(--muted); }
 
-    /* Results Grid */
     .results-count {
       font-size: 0.82rem;
       color: var(--muted);
@@ -331,20 +327,6 @@
       text-decoration: line-through;
     }
 
-    .match-confidence {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(0,0,0,0.7);
-      border: 1px solid var(--border);
-      color: #22c55e;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 6px;
-    }
-
-    /* Empty state */
     .empty-box {
       grid-column: span 2;
       text-align: center;
@@ -368,7 +350,6 @@
 </head>
 <body>
 
-  <!-- Top Header -->
   <header class="header">
     <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
     <div class="brand-mark">RADA <span>CREST</span> SEARCH</div>
@@ -377,7 +358,6 @@
 
   <div class="container">
 
-    <!-- Hero Multi-modal Search Field -->
     <div class="search-hero">
       <div class="search-input-shell">
         <i class="fa-solid fa-magnifying-glass search-icon-left"></i>
@@ -390,12 +370,10 @@
         />
         
         <div class="input-actions">
-          <!-- Voice Recognition Button -->
           <button class="action-icon-btn" id="voiceBtn" title="Voice Search" onclick="toggleVoiceSearch()">
             <i class="fa-solid fa-microphone"></i>
           </button>
           
-          <!-- Image Recognition Input -->
           <label class="action-icon-btn" title="Photo Search">
             <i class="fa-solid fa-camera"></i>
             <input type="file" id="photoInput" accept="image/*" style="display:none;" onchange="handleVisualSearch(event)" />
@@ -404,13 +382,11 @@
       </div>
     </div>
 
-    <!-- AI Query Intent / Autocorrect Feedback -->
     <div class="analysis-pill" id="analysisPill">
       <span id="analysisText">Showing closest match for your search.</span>
       <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary);"></i>
     </div>
 
-    <!-- Photo Preview (Visible when image uploaded) -->
     <div class="photo-search-preview" id="photoPreview">
       <img id="previewImg" src="" class="preview-thumb" alt="Uploaded Preview" />
       <div class="preview-info">
@@ -420,7 +396,6 @@
       <button class="action-icon-btn" onclick="clearPhotoSearch()"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <!-- Quick Filtering Chips -->
     <div class="filter-wrapper">
       <div class="chip-filter active" onclick="applyCategoryFilter('all', this)">All Items</div>
       <div class="chip-filter" onclick="applyCategoryFilter('led', this)">LED Bulbs</div>
@@ -430,13 +405,11 @@
       <div class="chip-filter" onclick="toggleSortPrice(this)"><i class="fa-solid fa-arrow-down-wide-short"></i> Price</div>
     </div>
 
-    <!-- Results Status -->
     <div class="results-count">
       <span id="resultCountText">Searching catalog...</span>
       <span id="activeFilterBadge"></span>
     </div>
 
-    <!-- Live Products Grid -->
     <div class="products-grid" id="productsGrid"></div>
 
   </div>
@@ -444,40 +417,56 @@
   <script>
     const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
-    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+    let supabaseClient = null;
     let allProducts = [];
     let currentCategory = 'all';
-    let currentPriceSort = 'none'; // 'none' | 'asc' | 'desc'
+    let currentPriceSort = 'none';
     let searchDebounceTimer = null;
 
-    // 1. Initial Data Fetching
+    async function getSupabase() {
+      if (supabaseClient) return supabaseClient;
+      let count = 0;
+      while (!window.supabase && count < 25) {
+        await new Promise(r => setTimeout(r, 100));
+        count++;
+      }
+      if (window.supabase && window.supabase.createClient) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return supabaseClient;
+    }
+
     async function loadCatalog() {
-      if (!supabase) return;
+      const client = await getSupabase();
+      if (!client) {
+        document.getElementById('resultCountText').innerText = "Unable to connect database. Please refresh.";
+        return;
+      }
+
       try {
-        const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
-        if (!error && data) {
-          allProducts = data;
-          
-          // Agar URL me direct query aayi ho (?q=bulb)
-          const urlParams = new URLSearchParams(window.location.search);
-          const initialQ = urlParams.get('q');
-          if (initialQ) {
-            document.getElementById('searchInput').value = initialQ;
-            performSmartSearch(initialQ);
-          } else {
-            renderProducts(allProducts);
-          }
+        const { data, error } = await client.from('products').select('*').order('id', { ascending: false });
+        if (error) throw error;
+        
+        allProducts = data || [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialQ = urlParams.get('q');
+        if (initialQ) {
+          document.getElementById('searchInput').value = initialQ;
+          performSmartSearch(initialQ);
+        } else {
+          renderProducts(allProducts);
         }
       } catch (e) {
-        console.error("Load catalog failed:", e);
+        console.error("Fetch error:", e);
+        document.getElementById('resultCountText').innerText = "Failed to load products.";
       }
     }
 
-    // 2. Levenshtein / Fuzzy Match Algorithm (Spelling mistake analysis)
     function calculateSimilarity(s1, s2) {
-      s1 = s1.toLowerCase();
-      s2 = s2.toLowerCase();
+      s1 = (s1 || '').toLowerCase();
+      s2 = (s2 || '').toLowerCase();
       if (s1 === s2) return 1.0;
       if (s1.includes(s2) || s2.includes(s1)) return 0.85;
 
@@ -498,12 +487,11 @@
         if (i > 0) costs[s2.length] = lastValue;
       }
       const longer = Math.max(s1.length, s2.length);
-      return (longer - costs[s2.length]) / longer;
+      return longer === 0 ? 1.0 : (longer - costs[s2.length]) / longer;
     }
 
-    // 3. Smart Search Handler
     function performSmartSearch(query) {
-      query = query.trim().toLowerCase();
+      query = (query || '').trim().toLowerCase();
       const analysisPill = document.getElementById('analysisPill');
       const analysisText = document.getElementById('analysisText');
 
@@ -524,7 +512,6 @@
         if (title.includes(query) || cat.includes(query) || desc.toLowerCase().includes(query)) {
           exactMatches.push({ product: prod, score: 1.0 });
         } else {
-          // Token level similarity calculation
           const tokens = (title + ' ' + cat).split(/\s+/);
           let bestScore = 0;
           tokens.forEach(tok => {
@@ -532,19 +519,17 @@
             if (score > bestScore) bestScore = score;
           });
 
-          if (bestScore >= 0.48) {
+          if (bestScore >= 0.45) {
             fuzzyMatches.push({ product: prod, score: bestScore });
           }
         }
       });
 
-      // Sort by similarity score
       fuzzyMatches.sort((a, b) => b.score - a.score);
-
       const combined = [...exactMatches, ...fuzzyMatches].map(m => m.product);
 
       if (exactMatches.length === 0 && fuzzyMatches.length > 0) {
-        analysisText.innerHTML = `Did you mean something related to <b>"${query}"</b>? Found smart suggestions.`;
+        analysisText.innerHTML = `Showing smart matches for <b>"${query}"</b>`;
         analysisPill.classList.add('show');
       } else {
         analysisPill.classList.remove('show');
@@ -553,34 +538,32 @@
       applyFilters(combined);
     }
 
-    // Live Typing Listener
     document.getElementById('searchInput').addEventListener('input', (e) => {
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(() => {
         performSmartSearch(e.target.value);
-      }, 250);
+      }, 200);
     });
 
-    // 4. Voice Search Integration (Web Speech API)
     function toggleVoiceSearch() {
       const voiceBtn = document.getElementById('voiceBtn');
       const searchInput = document.getElementById('searchInput');
 
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("Voice search is not supported in this browser. Please use Chrome/Edge.");
+        alert("Voice search is not supported in this browser. Please use Chrome.");
         return;
       }
 
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
 
-      recognition.lang = 'hi-IN'; // Hindi + Indian English friendly
+      recognition.lang = 'hi-IN';
       recognition.continuous = false;
       recognition.interimResults = false;
 
       recognition.onstart = () => {
         voiceBtn.classList.add('listening');
-        searchInput.placeholder = "Listening... Speak product name now";
+        searchInput.placeholder = "Listening... Speak now";
       };
 
       recognition.onresult = (event) => {
@@ -602,7 +585,6 @@
       recognition.start();
     }
 
-    // 5. Visual / Photo Search Analysis
     function handleVisualSearch(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -613,7 +595,6 @@
         document.getElementById('previewImg').src = imgUrl;
         document.getElementById('photoPreview').classList.add('show');
 
-        // File name & format keywords parsing
         const fileName = file.name.toLowerCase();
         let guessedCategory = 'led';
         if (fileName.includes('board') || fileName.includes('switch') || fileName.includes('plug')) {
@@ -624,10 +605,9 @@
           guessedCategory = 'accessories';
         }
 
-        document.getElementById('imageRecognizedTag').innerText = `Recognized Category: ${guessedCategory.toUpperCase()} Items`;
+        document.getElementById('imageRecognizedTag').innerText = `Matching: ${guessedCategory.toUpperCase()} Items`;
 
-        // Filter products matching the analyzed visual category
-        const visualMatches = allProducts.filter(p => p.category === guessedCategory || guessedCategory === 'all');
+        const visualMatches = allProducts.filter(p => (p.category || '').toLowerCase() === guessedCategory);
         applyFilters(visualMatches.length > 0 ? visualMatches : allProducts);
       };
       reader.readAsDataURL(file);
@@ -639,7 +619,6 @@
       performSmartSearch(document.getElementById('searchInput').value);
     }
 
-    // 6. Category & Price Filters
     function applyCategoryFilter(cat, element) {
       document.querySelectorAll('.chip-filter').forEach(el => el.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -663,12 +642,10 @@
     function applyFilters(productsToFilter) {
       let filtered = [...productsToFilter];
 
-      // Category match
       if (currentCategory !== 'all') {
         filtered = filtered.filter(p => (p.category || '').toLowerCase() === currentCategory.toLowerCase());
       }
 
-      // Price Sort
       if (currentPriceSort === 'asc') {
         filtered.sort((a, b) => Number(a.price) - Number(b.price));
       } else if (currentPriceSort === 'desc') {
@@ -678,7 +655,6 @@
       renderProducts(filtered);
     }
 
-    // 7. Render UI Cards
     function renderProducts(list) {
       const grid = document.getElementById('productsGrid');
       const countEl = document.getElementById('resultCountText');
@@ -690,14 +666,14 @@
           <div class="empty-box">
             <i class="fa-solid fa-box-open empty-icon"></i>
             <h3 style="font-weight:800; margin-bottom:6px;">No Matching Product Found</h3>
-            <p style="color:var(--muted); font-size:0.85rem;">Try voice search, different keyword or clear applied filters.</p>
+            <p style="color:var(--muted); font-size:0.85rem;">Try voice search or clear filters.</p>
           </div>
         `;
         return;
       }
 
       grid.innerHTML = list.map(item => {
-        const photo = item.image || (item.images && item.images[0]) || 'assets/placeholder.jpg';
+        const photo = item.image || (item.images && item.images[0]) || 'https://via.placeholder.com/300?text=RADA+CREST';
         const hasDiscount = item.old_price && item.old_price > item.price;
 
         return `
@@ -720,7 +696,6 @@
       }).join('');
     }
 
-    // Start on Page Load
     window.addEventListener('DOMContentLoaded', loadCatalog);
   </script>
 </body>
