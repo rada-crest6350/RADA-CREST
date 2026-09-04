@@ -499,20 +499,24 @@
     }
 
     function generateShareUrl() {
-      const cleanId = String(userId).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-      const codeSuffix = cleanId.length >= 6 ? cleanId.substring(cleanId.length - 6) : (cleanId + '786').substring(0, 6);
-      referralCode = `RC-${codeSuffix}`;
+  const cleanId = String(userId).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  const codeSuffix = cleanId.length >= 6 ? cleanId.substring(cleanId.length - 6) : (cleanId + '786').substring(0, 6);
+  referralCode = `RC-${codeSuffix}`;
 
-      // Destination points directly to account.html so new user gets registration form
-      const baseOrigin = window.location.origin;
-      shareableUrl = `${baseOrigin}/account.html?ref=${referralCode}&mode=signup`;
+  // Forcefully direct naya account page trigger karne wali link:
+  const baseOrigin = window.location.origin;
+  shareableUrl = `${baseOrigin}/account.html?ref=${referralCode}&mode=signup&force_new=true`;
 
-      document.getElementById('myRefUrl').innerText = shareableUrl;
+  const urlDisplay = document.getElementById('myRefUrl');
+  if (urlDisplay) {
+    urlDisplay.innerText = shareableUrl;
+  }
 
-      const clickKey = `rc_ref_clicks_${referralCode}`;
-      userStats.clicks = parseInt(localStorage.getItem(clickKey) || "0");
-      document.getElementById('statClicks').innerText = userStats.clicks;
-    }
+  const clickKey = `rc_ref_clicks_${referralCode}`;
+  userStats.clicks = parseInt(localStorage.getItem(clickKey) || "0");
+  const clicksEl = document.getElementById('statClicks');
+  if (clicksEl) clicksEl.innerText = userStats.clicks;
+}
 
     async function fetchUserAnalytics() {
       const client = await getSupabase();
