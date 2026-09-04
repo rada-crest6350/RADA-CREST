@@ -20,6 +20,44 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg); color: var(--text); padding-bottom: 100px; overflow-x: hidden; }
 
+    /* Modern Neon Preloader */
+    #pageLoader {
+      position: fixed;
+      inset: 0;
+      background: #0b0d14;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    #pageLoader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .loader-ring {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255, 122, 0, 0.15);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      animation: spinLoader 0.8s linear infinite;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+    .loader-text {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      color: var(--primary);
+      font-weight: 800;
+      text-transform: uppercase;
+      animation: pulseLoader 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes spinLoader { 100% { transform: rotate(360deg); } }
+    @keyframes pulseLoader { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
     /* Top Bar */
     .header {
       background: rgba(18, 20, 26, 0.85);
@@ -79,7 +117,7 @@
       cursor: zoom-in;
       position: relative;
     }
-    .main-display img, .main-display video { max-width: 95%; max-height: 95%; object-fit: contain; transition: transform 0.3s ease; }
+    .main-display img, .main-display video { max-width: 95%; max-height: 95%; object-fit: contain; transition: transform 0.3s ease, opacity 0.2s ease; }
     
     .zoom-hint {
       position: absolute;
@@ -139,19 +177,37 @@
     .low-stock { background: rgba(255,170,0,0.15); color: #FFAA00; }
     .out-stock { background: rgba(255,68,68,0.15); color: #FF4444; }
 
-    .color-section { margin-top: 12px; }
+    /* Interactive Color Variant Chips */
+    .color-section { margin-top: 14px; }
     .section-title { font-size: 0.8rem; text-transform: uppercase; color: var(--muted); font-weight: 700; letter-spacing: 0.5px; }
-    .swatches-wrap { display: flex; gap: 10px; margin-top: 6px; }
-    .swatch {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+    .swatches-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .color-chip {
+      padding: 7px 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 700;
       cursor: pointer;
-      position: relative;
-      transition: transform 0.2s var(--ease-spring);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s var(--ease-spring);
     }
-    .swatch:hover { transform: scale(1.15); }
-    .swatch.active::after { content: ''; position: absolute; inset: -4px; border: 2px solid var(--primary); border-radius: 50%; }
+    .color-chip.active {
+      border-color: var(--primary);
+      background: rgba(255,122,0,0.15);
+      color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+    .color-dot-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: inline-block;
+    }
 
     .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
     .spec-node { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; font-size: 0.8rem; color: var(--muted); border: 1px solid rgba(255,255,255,0.04); }
@@ -174,7 +230,7 @@
     .qty-btn:active { background: var(--primary); color: #000; transform: scale(0.9); }
     .qty-num { font-size: 1.2rem; font-weight: 800; min-width: 30px; text-align: center; }
 
-    /* Reviews Section */
+    /* Interactive Reviews Section */
     .reviews-box {
       background: var(--card);
       border-radius: 20px;
@@ -188,9 +244,52 @@
       align-items: center;
       margin-bottom: 12px;
     }
+    .btn-review-toggle {
+      background: rgba(255, 122, 0, 0.1);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .review-drawer {
+      display: none;
+      background: rgba(255,255,255,0.03);
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .review-drawer.active { display: block; }
+    .rev-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 9px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .rev-input:focus { border-color: var(--primary); }
+    .stars-picker { display: flex; gap: 6px; margin-bottom: 8px; color: #ffd700; cursor: pointer; font-size: 1rem; }
+    .btn-submit-rev {
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 9px 14px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+
     .review-item {
       border-top: 1px solid rgba(255,255,255,0.05);
-      padding: 10px 0;
+      padding: 12px 0;
     }
     .review-user {
       display: flex;
@@ -208,12 +307,25 @@
       font-size: 0.82rem;
       color: var(--muted);
       line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .review-gallery {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .review-gallery img, .review-gallery video {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: #000;
     }
 
     /* Suggested / Recommendations Section */
-    .suggested-section {
-      margin-top: 24px;
-    }
+    .suggested-section { margin-top: 24px; }
     .suggested-title {
       font-size: 1.1rem;
       font-weight: 800;
@@ -392,6 +504,12 @@
 </head>
 <body>
 
+  <!-- 1. Sleek Modern Glowing Preloader -->
+  <div id="pageLoader">
+    <div class="loader-ring"></div>
+    <div class="loader-text">RADA CREST</div>
+  </div>
+
   <header class="header">
     <a href="index.html" class="brand-title">
       <div class="pulse-dot"></div>
@@ -401,10 +519,7 @@
   </header>
 
   <div class="product-wrap" id="productRoot">
-    <div style="text-align:center; padding: 80px 0; color:var(--muted);">
-      <i class="fa-solid fa-spinner fa-spin fa-2x" style="color:var(--primary);"></i>
-      <p style="margin-top:12px;">Loading product details...</p>
-    </div>
+    <!-- Populated Dynamically -->
   </div>
 
   <!-- Fullscreen Zoom Modal -->
@@ -422,42 +537,66 @@
   <script>
     const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
-    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    function getSupabase() {
+      if (window.supabase && window.supabase.createClient) {
+        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return null;
+    }
 
     let currentQty = 1;
     let minOrderQty = 1;
     let currentActiveImg = '';
     let currentProduct = null;
+    let selectedColorVariant = '';
+    let selectedReviewStars = 5;
+
+    function dismissPreloader() {
+      const pLoader = document.getElementById('pageLoader');
+      if (pLoader && !pLoader.classList.contains('hidden')) {
+        pLoader.classList.add('hidden');
+        setTimeout(() => { pLoader.style.display = 'none'; }, 400);
+      }
+    }
+
+    // Safety timeout: loader 1.5 second se zyada screen par nahi rahega
+    setTimeout(dismissPreloader, 1500);
 
     async function loadProduct() {
+      const client = getSupabase();
       const urlParams = new URLSearchParams(window.location.search);
       const rawId = urlParams.get('id');
 
-      if (!rawId) {
-        showError("Invalid Product Link");
+      if (!client) {
+        setTimeout(loadProduct, 250);
         return;
       }
 
       let prod = null;
-
-      if (supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient
-            .from('products')
-            .select('*')
-            .eq('id', Number(rawId))
-            .single();
-
-          if (!error && data) prod = data;
-        } catch (e) {
-          console.warn("Supabase fetch error:", e);
+      try {
+        let query = client.from('products').select('*');
+        if (rawId) {
+          query = query.eq('id', Number(rawId));
+        } else {
+          query = query.order('id', { ascending: false }).limit(1);
         }
+
+        const { data, error } = await query;
+        if (!error && data && data.length > 0) {
+          prod = data[0];
+        }
+      } catch (e) {
+        console.warn("Supabase fetch error:", e);
       }
+
+      dismissPreloader();
 
       if (prod) {
         currentProduct = prod;
         renderProduct(prod);
         loadSuggestedProducts(prod.category, prod.id);
+        loadProductReviews(prod.id);
       } else {
         showError("Product Not Found");
       }
@@ -470,7 +609,15 @@
 
       const hasDiscount = p.old_price && p.old_price > p.price;
       const discountPercent = hasDiscount ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : null;
-      const photoList = (p.images && p.images.length > 0) ? p.images : (p.image ? [p.image] : ['assets/placeholder.jpg']);
+      
+      let photoList = [];
+      if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+        photoList = p.images;
+      } else if (p.image) {
+        photoList = [p.image];
+      } else {
+        photoList = ['https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80'];
+      }
       currentActiveImg = photoList[0];
 
       let stockHtml = '';
@@ -483,19 +630,28 @@
       }
 
       let warrantyHtml = p.has_warranty ? `<div class="spec-node">Warranty<b>1 Year Replacement</b></div>` : '';
-      let sizeHtml = `<div class="spec-node">Size Option<b>${(p.size && p.size.trim() !== '') ? p.size : 'Free Size'}</b></div>`;
+      let sizeHtml = `<div class="spec-node">Size Option<b>${(p.size && p.size.trim() !== '') ? p.size : 'Standard'}</b></div>`;
 
+      // 2. Dynamic Colors Variants from Database
       let colorBlock = '';
       if (p.colors && p.colors.trim() !== '') {
-        colorBlock = `
-          <div class="color-section">
-            <span class="section-title">Colour Variant: <b>${p.colors}</b></span>
-            <div class="swatches-wrap">
-              <div class="swatch active" style="background:#FF7A00;"></div>
-              <div class="swatch" style="background:#12141a; border:1px solid #fff;"></div>
+        const colorArray = p.colors.split(',').map(c => c.trim()).filter(Boolean);
+        if (colorArray.length > 0) {
+          selectedColorVariant = colorArray[0];
+          colorBlock = `
+            <div class="color-section">
+              <span class="section-title">Select Color / Variant:</span>
+              <div class="swatches-wrap" id="swatchesContainer">
+                ${colorArray.map((c, i) => `
+                  <div class="color-chip ${i === 0 ? 'active' : ''}" onclick="pickVariant('${c}', ${i}, this)">
+                    <span class="color-dot-indicator"></span>
+                    <span>${c}</span>
+                  </div>
+                `).join('')}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
       }
 
       root.innerHTML = `
@@ -509,7 +665,7 @@
             <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Tap to Zoom</div>
           </div>
 
-          <div class="thumbs-row">
+          <div class="thumbs-row" id="thumbsRow">
             ${photoList.map((img, idx) => `
               <img src="${img}" class="${idx === 0 ? 'active' : ''}" onclick="switchMedia('${img}', this)" />
             `).join('')}
@@ -555,25 +711,30 @@
           </div>
         </div>
 
-        <!-- Verified Reviews Section -->
+        <!-- 3. Customer Reviews Section with Photos and Videos -->
         <div class="reviews-box">
           <div class="reviews-header">
             <span class="section-title" style="font-size:0.9rem; color:#fff;">Ratings & Reviews</span>
-            <span class="rating-pill"><i class="fa-solid fa-star"></i> ${p.rating || '5.0'} / 5.0</span>
+            <button class="btn-review-toggle" onclick="toggleReviewDrawer()">Write Review</button>
           </div>
-          <div class="review-item">
-            <div class="review-user">
-              <span>Amit Sharma <i class="fa-solid fa-circle-check" style="color:#25D366; font-size:0.75rem;"></i></span>
-              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+
+          <div class="review-drawer" id="reviewDrawer">
+            <input type="text" id="revAuthor" class="rev-input" placeholder="Your Name">
+            <div class="stars-picker" id="starsPicker">
+              <i class="fa-solid fa-star" onclick="setStars(1)"></i>
+              <i class="fa-solid fa-star" onclick="setStars(2)"></i>
+              <i class="fa-solid fa-star" onclick="setStars(3)"></i>
+              <i class="fa-solid fa-star" onclick="setStars(4)"></i>
+              <i class="fa-solid fa-star" onclick="setStars(5)"></i>
             </div>
-            <p class="review-text">Original quality LED bulb. Brightness is very high and packaging was solid.</p>
+            <textarea id="revComment" class="rev-input" rows="3" placeholder="Share your honest product review..."></textarea>
+            <input type="url" id="revImg" class="rev-input" placeholder="Paste Product Photo URL (Optional)">
+            <input type="url" id="revVid" class="rev-input" placeholder="Paste Product Video URL (Optional)">
+            <button class="btn-submit-rev" onclick="submitReview()">Submit Review</button>
           </div>
-          <div class="review-item">
-            <div class="review-user">
-              <span>Rajesh Patel <i class="fa-solid fa-circle-check" style="color:#25D366; font-size:0.75rem;"></i></span>
-              <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
-            </div>
-            <p class="review-text">Fast delivery within 2 days. Heavy build quality.</p>
+
+          <div id="reviewsContainer">
+            <div style="color:var(--muted); font-size:0.85rem;">Loading verified reviews...</div>
           </div>
         </div>
 
@@ -585,6 +746,7 @@
           </div>
         </div>
 
+        <!-- 4. Fully Working Bottom Bar -->
         <div class="bottom-bar">
           <button class="btn-add-cart" onclick="addToCart()">
             <i class="fa-solid fa-cart-plus"></i> ADD TO CART
@@ -601,55 +763,49 @@
       checkWishlistStatus(p.id);
     }
 
-    async function loadSuggestedProducts(category, currentId) {
-      const scroller = document.getElementById('suggestedScroller');
-      if (!scroller) return;
+    // 2. Color Variant Click -> Updates Image and Selection
+    function pickVariant(colorName, colorIndex, element) {
+      document.querySelectorAll('.color-chip').forEach(el => el.classList.remove('active'));
+      if (element) element.classList.add('active');
+      selectedColorVariant = colorName;
 
-      let list = [];
-      if (supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient
-            .from('products')
-            .select('*')
-            .neq('id', currentId)
-            .limit(6);
-
-          if (!error && data) list = data;
-        } catch (e) {
-          console.warn("Suggested fetch error:", e);
+      const mainImg = document.getElementById('mainImg');
+      if (currentProduct && mainImg) {
+        let photos = currentProduct.images && Array.isArray(currentProduct.images) ? currentProduct.images : [currentProduct.image];
+        const targetPhoto = photos[colorIndex] || photos[0];
+        if (targetPhoto) {
+          mainImg.style.opacity = '0.25';
+          setTimeout(() => {
+            switchMedia(targetPhoto, null);
+            mainImg.style.opacity = '1';
+          }, 180);
         }
       }
-
-      if (list.length === 0) {
-        scroller.innerHTML = `<div style="color:var(--muted); font-size:0.85rem;">No other products in this category.</div>`;
-        return;
-      }
-
-      scroller.innerHTML = list.map(item => `
-        <div class="suggest-card" onclick="window.location.href='product.html?id=${item.id}'">
-          <img src="${item.image || 'assets/placeholder.jpg'}" alt="${item.name}" />
-          <div class="suggest-name">${item.name}</div>
-          <div class="suggest-price">₹${item.price}</div>
-        </div>
-      `).join('');
+      showToast(`Selected: ${colorName}`);
     }
 
     function switchMedia(src, el) {
       currentActiveImg = src;
-      document.getElementById('mainDisplay').innerHTML = `
-        <img src="${src}" id="mainImg" />
-        <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Tap to Zoom</div>
-      `;
+      const display = document.getElementById('mainDisplay');
+      if (display) {
+        display.innerHTML = `
+          <img src="${src}" id="mainImg" />
+          <div class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i> Tap to Zoom</div>
+        `;
+      }
       document.querySelectorAll('.thumbs-row img').forEach(i => i.classList.remove('active'));
       if (el) el.classList.add('active');
     }
 
     function switchVideo(videoUrl) {
-      document.getElementById('mainDisplay').innerHTML = `
-        <video controls autoplay style="width:100%; height:100%; object-fit:contain; border-radius:12px;">
-          <source src="${videoUrl}" type="video/mp4">
-        </video>
-      `;
+      const display = document.getElementById('mainDisplay');
+      if (display) {
+        display.innerHTML = `
+          <video controls autoplay style="width:100%; height:100%; object-fit:contain; border-radius:12px;">
+            <source src="${videoUrl}" type="video/mp4">
+          </video>
+        `;
+      }
     }
 
     function openZoom() {
@@ -666,63 +822,183 @@
       if (currentQty + change >= minOrderQty) {
         currentQty += change;
         document.getElementById('qtyDisplay').innerText = currentQty;
-        showToast(`Quantity: ${currentQty}`);
       }
     }
-    
-    function getActiveUserKey() {
-  const user = JSON.parse(localStorage.getItem('rc_user')) || null;
-  if (user) {
-    const uniqueId = user.email || user.phone || user.id;
-    if (uniqueId) {
-      return `rc_cart_items_${String(uniqueId).replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+    function toggleReviewDrawer() {
+      document.getElementById('reviewDrawer').classList.toggle('active');
     }
-  }
-  return 'rc_cart_items_guest_user';
-}
 
-function addToCart() {
-  if (!currentProduct) return;
-  const targetKey = getActiveUserKey();
-  
-  let cart = JSON.parse(localStorage.getItem(targetKey)) || [];
-  const existingIndex = cart.findIndex(item => String(item.id) === String(currentProduct.id));
+    function setStars(count) {
+      selectedReviewStars = count;
+      const stars = document.querySelectorAll('#starsPicker i');
+      stars.forEach((s, idx) => {
+        s.style.color = idx < count ? '#ffd700' : '#4b5563';
+      });
+    }
 
-  // Handle both array images and single image link
-  let prodImg = 'assets/placeholder.jpg';
-  if (currentProduct.images && Array.isArray(currentProduct.images) && currentProduct.images.length > 0) {
-    prodImg = currentProduct.images[0];
-  } else if (currentProduct.image) {
-    prodImg = currentProduct.image;
-  }
+    // 3. Customer Reviews Load & Submit
+    async function loadProductReviews(prodId) {
+      const client = getSupabase();
+      const container = document.getElementById('reviewsContainer');
+      if (!client || !container) return;
 
-  const itemPrice = Number(currentProduct.price || 0);
-  const itemOldPrice = Number(currentProduct.old_price || currentProduct.price || itemPrice);
-  const variantInfo = currentProduct.size ? `Size: ${currentProduct.size}` : (currentProduct.colors ? `Color: ${currentProduct.colors}` : 'Standard Edition');
+      try {
+        const { data, error } = await client.from('reviews').select('*').eq('product_id', prodId).order('created_at', { ascending: false });
+        if (error || !data || data.length === 0) {
+          container.innerHTML = `<div style="color:var(--muted); font-size:0.85rem; padding: 6px 0;">No reviews yet. Be the first to share your experience!</div>`;
+          return;
+        }
 
-  if (existingIndex > -1) {
-    cart[existingIndex].quantity = Number(cart[existingIndex].quantity || 0) + Number(currentQty);
-  } else {
-    cart.push({
-      id: currentProduct.id,
-      title: currentProduct.name,
-      name: currentProduct.name,
-      price: itemPrice,
-      currentPrice: itemPrice,
-      oldPrice: itemOldPrice,
-      old_price: itemOldPrice,
-      image: prodImg,
-      variant: variantInfo,
-      stockLeft: Number(currentProduct.stock || 55),
-      shippingFee: Number(currentProduct.shipping_fee || 0),
-      quantity: Number(currentQty),
-      selected: true
-    });
-  }
+        container.innerHTML = data.map(r => `
+          <div class="review-item">
+            <div class="review-user">
+              <span>${r.author_name || 'Verified Buyer'} <i class="fa-solid fa-circle-check" style="color:#25D366; font-size:0.75rem;"></i></span>
+              <div class="review-stars">${'<i class="fa-solid fa-star"></i>'.repeat(r.rating || 5)}</div>
+            </div>
+            <p class="review-text">${r.comment || ''}</p>
+            ${(r.image_url || r.video_url) ? `
+              <div class="review-gallery">
+                ${r.image_url ? `<img src="${r.image_url}" onclick="window.open('${r.image_url}')" />` : ''}
+                ${r.video_url ? `<video src="${r.video_url}" controls></video>` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      } catch(e) {
+        container.innerHTML = `<div style="color:var(--muted); font-size:0.85rem;">Could not load reviews.</div>`;
+      }
+    }
 
-  localStorage.setItem(targetKey, JSON.stringify(cart));
-  showToast("Added to Cart successfully!");
-}
+    async function submitReview() {
+      const client = getSupabase();
+      if (!client || !currentProduct) return;
+
+      const author = document.getElementById('revAuthor').value.trim() || 'Verified Customer';
+      const comment = document.getElementById('revComment').value.trim();
+      const img = document.getElementById('revImg').value.trim();
+      const vid = document.getElementById('revVid').value.trim();
+
+      if (!comment) {
+        alert("Please write a review comment!");
+        return;
+      }
+
+      const { error } = await client.from('reviews').insert([{
+        product_id: currentProduct.id,
+        author_name: author,
+        rating: selectedReviewStars,
+        comment: comment,
+        image_url: img || null,
+        video_url: vid || null
+      }]);
+
+      if (!error) {
+        showToast("Review submitted!");
+        document.getElementById('revComment').value = "";
+        document.getElementById('revImg').value = "";
+        document.getElementById('revVid').value = "";
+        toggleReviewDrawer();
+        loadProductReviews(currentProduct.id);
+      } else {
+        alert("Could not post review: " + error.message);
+      }
+    }
+
+    function getActiveUserKey() {
+      try {
+        const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+        if (user) {
+          const uniqueId = user.email || user.phone || user.id;
+          if (uniqueId) return `rc_cart_items_${String(uniqueId).replace(/[^a-zA-Z0-9]/g, '_')}`;
+        }
+      } catch(e) {}
+      return 'rc_cart_items_guest_user';
+    }
+
+    function addToCart() {
+      if (!currentProduct) return;
+      const targetKey = getActiveUserKey();
+      
+      let cart = JSON.parse(localStorage.getItem(targetKey)) || [];
+      const existingIndex = cart.findIndex(item => String(item.id) === String(currentProduct.id) && item.variant === selectedColorVariant);
+
+      let prodImg = currentActiveImg || 'assets/placeholder.jpg';
+      const itemPrice = Number(currentProduct.price || 0);
+      const itemOldPrice = Number(currentProduct.old_price || itemPrice);
+      const variantInfo = selectedColorVariant ? `Color: ${selectedColorVariant}` : (currentProduct.size ? `Size: ${currentProduct.size}` : 'Standard');
+
+      if (existingIndex > -1) {
+        cart[existingIndex].quantity = Number(cart[existingIndex].quantity || 0) + Number(currentQty);
+      } else {
+        cart.push({
+          id: currentProduct.id,
+          title: currentProduct.name,
+          name: currentProduct.name,
+          price: itemPrice,
+          currentPrice: itemPrice,
+          oldPrice: itemOldPrice,
+          old_price: itemOldPrice,
+          image: prodImg,
+          variant: variantInfo,
+          stockLeft: Number(currentProduct.stock || 50),
+          quantity: Number(currentQty),
+          selected: true
+        });
+      }
+
+      localStorage.setItem(targetKey, JSON.stringify(cart));
+      showToast("Added to Cart successfully!");
+    }
+
+    // 4. Fully Working Buy Now Function
+    function goToBuyPage(productId) {
+      if (!currentProduct) return;
+      
+      const itemPrice = Number(currentProduct.price || 0);
+      const singleItemPayload = {
+        id: currentProduct.id,
+        title: currentProduct.name,
+        name: currentProduct.name,
+        price: itemPrice,
+        image: currentActiveImg || currentProduct.image,
+        variant: selectedColorVariant ? `Color: ${selectedColorVariant}` : (currentProduct.size || 'Standard'),
+        quantity: Number(currentQty)
+      };
+
+      // Direct checkout item set
+      localStorage.setItem('rc_direct_checkout_item', JSON.stringify(singleItemPayload));
+      
+      // Cart sync for checkout flow
+      addToCart();
+      
+      window.location.href = "cart.html?redirect=buy";
+    }
+
+    async function loadSuggestedProducts(category, currentId) {
+      const scroller = document.getElementById('suggestedScroller');
+      const client = getSupabase();
+      if (!scroller || !client) return;
+
+      let list = [];
+      try {
+        const { data, error } = await client.from('products').select('*').neq('id', currentId).limit(6);
+        if (!error && data) list = data;
+      } catch (e) {}
+
+      if (list.length === 0) {
+        scroller.innerHTML = `<div style="color:var(--muted); font-size:0.85rem;">No other products found.</div>`;
+        return;
+      }
+
+      scroller.innerHTML = list.map(item => `
+        <div class="suggest-card" onclick="window.location.href='product.html?id=${item.id}'">
+          <img src="${item.image || (item.images && item.images[0]) || 'assets/placeholder.jpg'}" alt="${item.name}" />
+          <div class="suggest-name">${item.name}</div>
+          <div class="suggest-price">₹${item.price}</div>
+        </div>
+      `).join('');
+    }
 
     function toggleWishlist(productId) {
       let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
@@ -768,6 +1044,7 @@ function addToCart() {
     }
 
     function showError(msg) {
+      dismissPreloader();
       document.getElementById('productRoot').innerHTML = `
         <div style="text-align:center; padding: 60px 20px; color:#fff;">
           <h2>${msg}</h2>
@@ -777,7 +1054,7 @@ function addToCart() {
       `;
     }
 
-    document.addEventListener('DOMContentLoaded', loadProduct);
+    window.addEventListener('DOMContentLoaded', loadProduct);
   </script>
 </body>
 </html>
