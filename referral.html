@@ -60,7 +60,6 @@
     .hero-title span { color: var(--primary); }
     .hero-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
 
-    /* Live Link Shell */
     .link-shell {
       background: rgba(255,255,255,0.04);
       border: 1.5px dashed var(--primary);
@@ -123,7 +122,6 @@
       box-shadow: 0 4px 18px rgba(37, 211, 102, 0.35);
     }
 
-    /* Privacy Protected Stats */
     .stats-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -151,7 +149,6 @@
       text-transform: uppercase;
     }
 
-    /* Tabs for Sign-up vs Order Gifts */
     .gift-tabs {
       display: flex;
       gap: 10px;
@@ -261,7 +258,6 @@
       cursor: default;
     }
 
-    /* Modal Confirmation */
     .modal-wrap {
       position: fixed;
       inset: 0;
@@ -340,13 +336,13 @@
     <!-- Hero Card -->
     <div class="hero-box">
       <h1 class="hero-title">Your Referral <span>Link & Gifts</span></h1>
-      <p class="hero-desc">Dosto ke sath apni link share karein. Unke sign-up aur orders par free products unlock karein.</p>
+      <p class="hero-desc">Dosto ke sath apni sign-up link share karein. Naya dost judte hi aapke gifts unlock honge.</p>
 
-      <!-- Live Shareable Website URL -->
+      <!-- Live Shareable Registration URL -->
       <div class="link-shell">
         <div class="url-display-box">
-          <div class="url-sub-label">Your Exclusive Invite URL</div>
-          <span class="ref-url-text" id="myRefUrl">Loading invite link...</span>
+          <div class="url-sub-label">Shareable New User Signup Link</div>
+          <span class="ref-url-text" id="myRefUrl">Generating link...</span>
         </div>
         <button class="btn-copy" onclick="copyReferralLink()"><i class="fa-regular fa-copy"></i> Copy</button>
       </div>
@@ -356,7 +352,7 @@
       </button>
     </div>
 
-    <!-- Analytics Dashboard (Numbers Only) -->
+    <!-- Analytics Dashboard -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-num" id="statClicks">0</div>
@@ -417,7 +413,6 @@
     let allRules = [];
     let selectedRuleToClaim = null;
 
-    // Fallback milestones (Database table connect na ho tab bhi 100% active rahenge)
     const fallbackRules = [
       {
         id: 101,
@@ -495,10 +490,9 @@
         }
       }
 
-      // Generate Live Exclusive URL
+      // Generate Link directly to account.html (New Account Screen)
       generateShareUrl();
 
-      // Load Analytics & Milestones
       await fetchUserAnalytics();
       await fetchRulesFromDB();
       renderMilestones();
@@ -509,13 +503,12 @@
       const codeSuffix = cleanId.length >= 6 ? cleanId.substring(cleanId.length - 6) : (cleanId + '786').substring(0, 6);
       referralCode = `RC-${codeSuffix}`;
 
-      // Complete destination URL pointing to home store with user parameter
+      // Destination points directly to account.html so new user gets registration form
       const baseOrigin = window.location.origin;
-      shareableUrl = `${baseOrigin}/index.html?ref=${referralCode}`;
+      shareableUrl = `${baseOrigin}/account.html?ref=${referralCode}&mode=signup`;
 
       document.getElementById('myRefUrl').innerText = shareableUrl;
 
-      // Click counter
       const clickKey = `rc_ref_clicks_${referralCode}`;
       userStats.clicks = parseInt(localStorage.getItem(clickKey) || "0");
       document.getElementById('statClicks').innerText = userStats.clicks;
@@ -656,14 +649,14 @@
 
     function copyReferralLink() {
       navigator.clipboard.writeText(shareableUrl).then(() => {
-        showToast("Exclusive URL Copied!");
+        showToast("New User Signup Link Copied!");
       }).catch(() => {
         showToast("Copied to clipboard!");
       });
     }
 
     function shareOnWhatsApp() {
-      const msg = encodeURIComponent(`Shop high quality LED lights and electronic accessories on RADA CREST: ${shareableUrl}`);
+      const msg = encodeURIComponent(`Register on RADA CREST to browse premium LED lights and electronics: ${shareableUrl}`);
       window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
     }
 
