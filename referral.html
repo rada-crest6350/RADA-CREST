@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   
-  <!-- Supabase & Confetti in Head for Guaranteed Loading -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -61,32 +60,50 @@
     .hero-title span { color: var(--primary); }
     .hero-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
 
+    /* Live Link Shell */
     .link-shell {
       background: rgba(255,255,255,0.04);
       border: 1.5px dashed var(--primary);
       border-radius: 16px;
-      padding: 14px;
+      padding: 12px 14px;
       margin-top: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      text-align: left;
     }
-    .ref-code-text {
-      font-size: 1.15rem;
-      font-weight: 900;
-      letter-spacing: 2px;
+    .url-display-box {
+      flex: 1;
+      overflow: hidden;
+    }
+    .url-sub-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ref-url-text {
+      font-size: 0.88rem;
+      font-weight: 800;
       color: var(--primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      margin-top: 2px;
     }
     .btn-copy {
       background: var(--primary);
       color: #000;
       border: none;
-      padding: 8px 14px;
+      padding: 10px 14px;
       border-radius: 10px;
       font-weight: 800;
       font-size: 0.8rem;
       cursor: pointer;
+      white-space: nowrap;
     }
     .share-btn-wa {
       width: 100%;
@@ -106,6 +123,7 @@
       box-shadow: 0 4px 18px rgba(37, 211, 102, 0.35);
     }
 
+    /* Privacy Protected Stats */
     .stats-row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -133,13 +151,37 @@
       text-transform: uppercase;
     }
 
-    .section-head {
-      font-size: 1.05rem;
-      font-weight: 800;
-      margin-bottom: 12px;
+    /* Tabs for Sign-up vs Order Gifts */
+    .gift-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      background: rgba(255,255,255,0.03);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+    .gift-tab-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .gift-tab-btn.active {
+      background: var(--primary);
+      color: #000;
+      font-weight: 800;
+      box-shadow: 0 4px 15px var(--primary-glow);
     }
 
     .gifts-list {
@@ -219,6 +261,7 @@
       cursor: default;
     }
 
+    /* Modal Confirmation */
     .modal-wrap {
       position: fixed;
       inset: 0;
@@ -296,12 +339,16 @@
 
     <!-- Hero Card -->
     <div class="hero-box">
-      <h1 class="hero-title">Refer Friends, <span>Claim Free Gifts!</span></h1>
-      <p class="hero-desc">Apne dosto ko invite karein. Jaise hi wo sign-up ya order karenge, aapke free gifts auto-unlock ho jayenge.</p>
+      <h1 class="hero-title">Your Referral <span>Link & Gifts</span></h1>
+      <p class="hero-desc">Dosto ke sath apni link share karein. Unke sign-up aur orders par free products unlock karein.</p>
 
+      <!-- Live Shareable Website URL -->
       <div class="link-shell">
-        <span class="ref-code-text" id="myRefCode">LOADING...</span>
-        <button class="btn-copy" onclick="copyReferralLink()"><i class="fa-regular fa-copy"></i> Copy Link</button>
+        <div class="url-display-box">
+          <div class="url-sub-label">Your Exclusive Invite URL</div>
+          <span class="ref-url-text" id="myRefUrl">Loading invite link...</span>
+        </div>
+        <button class="btn-copy" onclick="copyReferralLink()"><i class="fa-regular fa-copy"></i> Copy</button>
       </div>
 
       <button class="share-btn-wa" onclick="shareOnWhatsApp()">
@@ -309,7 +356,7 @@
       </button>
     </div>
 
-    <!-- Analytics Dashboard (Counts Only) -->
+    <!-- Analytics Dashboard (Numbers Only) -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-num" id="statClicks">0</div>
@@ -321,13 +368,18 @@
       </div>
       <div class="stat-card">
         <div class="stat-num highlight" id="statOrders">0</div>
-        <div class="stat-label">Orders Placed</div>
+        <div class="stat-label">Orders Done</div>
       </div>
     </div>
 
-    <!-- Milestones / Gifts Selection -->
-    <div class="section-head">
-      <i class="fa-solid fa-gift" style="color:var(--primary);"></i> Available Milestone Gifts
+    <!-- Separate Milestone Tabs -->
+    <div class="gift-tabs">
+      <button class="gift-tab-btn active" id="tabSignupBtn" onclick="switchGiftTab('signup')">
+        <i class="fa-solid fa-user-plus"></i> Sign-up Gifts
+      </button>
+      <button class="gift-tab-btn" id="tabOrderBtn" onclick="switchGiftTab('order')">
+        <i class="fa-solid fa-box-check"></i> Order Placed Gifts
+      </button>
     </div>
     
     <div class="gifts-list" id="giftsContainer"></div>
@@ -340,11 +392,11 @@
       <i class="fa-solid fa-box-open" style="font-size:2.8rem; color:var(--primary); margin-bottom:10px;"></i>
       <h3 style="font-size:1.15rem; font-weight:800;" id="modalGiftTitle">Claim Free Gift</h3>
       <p style="color:var(--muted); font-size:0.85rem; margin-top:6px;">
-        Yeh gift aapke registered delivery address par direct dispatch ke liye ₹0 me book ho jayega.
+        Yeh gift aapke registered delivery address par ₹0 me direct dispatch order book ho jayega.
       </p>
       <div class="modal-actions">
         <button class="btn-cancel-modal" onclick="closeClaimModal()">Cancel</button>
-        <button class="btn-confirm-order" id="confirmClaimBtn">Confirm & Place Order</button>
+        <button class="btn-confirm-order" id="confirmClaimBtn">Confirm Order</button>
       </div>
     </div>
   </div>
@@ -358,14 +410,17 @@
     let supabaseClient = null;
     let userId = null;
     let referralCode = "";
+    let shareableUrl = "";
+    let currentTab = "signup";
     let userStats = { clicks: 0, signups: 0, orders: 0 };
     let claimedRuleIds = JSON.parse(localStorage.getItem('rc_claimed_gifts') || '[]');
+    let allRules = [];
     let selectedRuleToClaim = null;
 
-    // Fallback gifts if Supabase table is not yet created
+    // Fallback milestones (Database table connect na ho tab bhi 100% active rahenge)
     const fallbackRules = [
       {
-        id: 1,
+        id: 101,
         title: "Free 9W LED Bulb",
         gift_product_name: "Rada Crest 9W LED Bulb",
         condition_type: "signup",
@@ -373,12 +428,28 @@
         gift_image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80"
       },
       {
-        id: 2,
+        id: 102,
+        title: "Free T-Bulb 12W",
+        gift_product_name: "Wide Angle 12W T-Bulb",
+        condition_type: "signup",
+        target_count: 10,
+        gift_image: "https://images.unsplash.com/photo-1507499739999-097706ad8914?auto=format&fit=crop&w=300&q=80"
+      },
+      {
+        id: 201,
         title: "Heavy Extension Board",
-        gift_product_name: "Smart 4-Way Extension Board",
+        gift_product_name: "Smart 4-Way Surge Protector",
         condition_type: "order",
         target_count: 3,
         gift_image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=300&q=80"
+      },
+      {
+        id: 202,
+        title: "Smart Fast Charger & Cord",
+        gift_product_name: "Fast Charging Station Adapter",
+        condition_type: "order",
+        target_count: 6,
+        gift_image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=300&q=80"
       }
     ];
 
@@ -396,7 +467,6 @@
     }
 
     async function initReferralPage() {
-      // Step 1: Detect user from Supabase or localStorage
       const client = await getSupabase();
       
       if (client) {
@@ -417,7 +487,6 @@
         } catch(e) {}
       }
 
-      // If still no user, assign deterministic device ID so page never hangs
       if (!userId) {
         userId = localStorage.getItem('rc_guest_uid');
         if (!userId) {
@@ -426,22 +495,27 @@
         }
       }
 
-      // Step 2: Instant Code Generation
-      generateUserRefCode();
+      // Generate Live Exclusive URL
+      generateShareUrl();
 
-      // Step 3: Fetch Stats & Rules
+      // Load Analytics & Milestones
       await fetchUserAnalytics();
-      await renderMilestones();
+      await fetchRulesFromDB();
+      renderMilestones();
     }
 
-    function generateUserRefCode() {
+    function generateShareUrl() {
       const cleanId = String(userId).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
       const codeSuffix = cleanId.length >= 6 ? cleanId.substring(cleanId.length - 6) : (cleanId + '786').substring(0, 6);
       referralCode = `RC-${codeSuffix}`;
-      
-      document.getElementById('myRefCode').innerText = referralCode;
 
-      // Local tracking for click counter demo
+      // Complete destination URL pointing to home store with user parameter
+      const baseOrigin = window.location.origin;
+      shareableUrl = `${baseOrigin}/index.html?ref=${referralCode}`;
+
+      document.getElementById('myRefUrl').innerText = shareableUrl;
+
+      // Click counter
       const clickKey = `rc_ref_clicks_${referralCode}`;
       userStats.clicks = parseInt(localStorage.getItem(clickKey) || "0");
       document.getElementById('statClicks').innerText = userStats.clicks;
@@ -464,15 +538,12 @@
           document.getElementById('statSignups').innerText = userStats.signups;
           document.getElementById('statOrders').innerText = userStats.orders;
         }
-      } catch (e) {
-        console.warn("Analytics fetch note:", e);
-      }
+      } catch (e) {}
     }
 
-    async function renderMilestones() {
-      const container = document.getElementById('giftsContainer');
+    async function fetchRulesFromDB() {
       const client = await getSupabase();
-      let rules = fallbackRules;
+      allRules = fallbackRules;
 
       if (client) {
         try {
@@ -483,12 +554,29 @@
             .order('target_count', { ascending: true });
 
           if (!error && data && data.length > 0) {
-            rules = data;
+            allRules = data;
           }
         } catch (e) {}
       }
+    }
 
-      container.innerHTML = rules.map(rule => {
+    function switchGiftTab(tabType) {
+      currentTab = tabType;
+      document.getElementById('tabSignupBtn').classList.toggle('active', tabType === 'signup');
+      document.getElementById('tabOrderBtn').classList.toggle('active', tabType === 'order');
+      renderMilestones();
+    }
+
+    function renderMilestones() {
+      const container = document.getElementById('giftsContainer');
+      const filteredRules = allRules.filter(r => r.condition_type === currentTab);
+
+      if (filteredRules.length === 0) {
+        container.innerHTML = `<div style="color:var(--muted); text-align:center; padding: 20px;">No rewards listed for this section yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = filteredRules.map(rule => {
         const isSignup = rule.condition_type === 'signup';
         const currentProgress = isSignup ? userStats.signups : userStats.orders;
         const target = rule.target_count;
@@ -505,10 +593,10 @@
 
         return `
           <div class="gift-item-card ${isUnlocked && !isClaimed ? 'unlocked' : ''}">
-            <img src="${rule.gift_image || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=80'}" class="gift-thumb" alt="${rule.gift_product_name}" />
+            <img src="${rule.gift_image || 'https://via.placeholder.com/150'}" class="gift-thumb" alt="${rule.gift_product_name}" />
             <div class="gift-details">
               <div class="gift-title">${rule.gift_product_name}</div>
-              <div class="gift-condition">Requires ${target} verified ${isSignup ? 'Sign-ups' : 'Delivered Orders'} (${currentProgress}/${target})</div>
+              <div class="gift-condition">Need ${target} verified ${isSignup ? 'Friends to Sign-up' : 'Delivered Orders'} (${currentProgress}/${target})</div>
               <div class="progress-bar-wrap">
                 <div class="progress-fill" style="width: ${percent}%;"></div>
               </div>
@@ -530,7 +618,6 @@
       selectedRuleToClaim = null;
     }
 
-    // 1-Click ₹0 Direct Order Booking
     document.getElementById('confirmClaimBtn').onclick = async function() {
       if (!selectedRuleToClaim) return;
 
@@ -539,14 +626,13 @@
       btn.innerText = "Placing ₹0 Order...";
 
       const giftTitle = document.getElementById('modalGiftTitle').innerText.replace('Claim: ', '');
-
       const client = await getSupabase();
+
       if (client) {
         try {
-          // Auto-insert order into Supabase
           await client.from('orders').insert([{
-            customer_name: 'Referral Winner',
-            items: [{ name: `[FREE REWARD] ${giftTitle}`, price: 0, quantity: 1 }],
+            customer_name: 'Referral Club Winner',
+            items: [{ name: `[REFERRAL REWARD] ${giftTitle}`, price: 0, quantity: 1 }],
             total_amount: 0,
             payment_method: 'REFERRAL_REWARD',
             order_status: 'Placed'
@@ -554,7 +640,6 @@
         } catch (e) {}
       }
 
-      // Mark claimed locally
       claimedRuleIds.push(selectedRuleToClaim);
       localStorage.setItem('rc_claimed_gifts', JSON.stringify(claimedRuleIds));
 
@@ -565,22 +650,20 @@
       closeClaimModal();
       showToast("Free Gift Order Booked Successfully!");
       btn.disabled = false;
-      btn.innerText = "Confirm & Place Order";
+      btn.innerText = "Confirm Order";
       renderMilestones();
     };
 
     function copyReferralLink() {
-      const shareUrl = `${window.location.origin}/index.html?ref=${referralCode}`;
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        showToast("Referral Link Copied!");
+      navigator.clipboard.writeText(shareableUrl).then(() => {
+        showToast("Exclusive URL Copied!");
       }).catch(() => {
-        showToast(`Code: ${referralCode}`);
+        showToast("Copied to clipboard!");
       });
     }
 
     function shareOnWhatsApp() {
-      const shareUrl = `${window.location.origin}/index.html?ref=${referralCode}`;
-      const msg = encodeURIComponent(`Hey! Check out premium lighting & electronics on RADA CREST: ${shareUrl}`);
+      const msg = encodeURIComponent(`Shop high quality LED lights and electronic accessories on RADA CREST: ${shareableUrl}`);
       window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
     }
 
