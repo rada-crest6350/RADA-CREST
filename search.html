@@ -7,8 +7,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Supabase Library loaded at the top -->
+  <!-- Supabase Core Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Real AI Vision Model: TensorFlow.js & MobileNet -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
 
   <style>
     :root {
@@ -20,6 +23,7 @@
       --border: rgba(255, 255, 255, 0.08);
       --text: #ffffff;
       --muted: #9ba1b0;
+      --danger: #ef4444;
       --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
@@ -181,6 +185,30 @@
     .analysis-pill.show { display: flex; }
     .analysis-pill b { color: var(--primary); }
 
+    /* Photo AI Preview Banner */
+    .photo-search-preview {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      align-items: center;
+      gap: 12px;
+      animation: slideDown 0.3s ease;
+    }
+    .photo-search-preview.show { display: flex; }
+    .preview-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1.5px solid var(--primary);
+    }
+    .preview-info { flex: 1; }
+    .preview-info h4 { font-size: 0.85rem; font-weight: 700; color: #fff; }
+    .preview-info p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
     .filter-wrapper {
       margin-bottom: 18px;
       overflow-x: auto;
@@ -212,29 +240,6 @@
       border-color: var(--primary);
       box-shadow: 0 4px 14px var(--primary-glow);
     }
-
-    .photo-search-preview {
-      display: none;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
-      align-items: center;
-      gap: 12px;
-      animation: slideDown 0.3s ease;
-    }
-    .photo-search-preview.show { display: flex; }
-    .preview-thumb {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
-      object-fit: cover;
-      border: 1px solid var(--primary);
-    }
-    .preview-info { flex: 1; }
-    .preview-info h4 { font-size: 0.85rem; font-weight: 700; }
-    .preview-info p { font-size: 0.75rem; color: var(--muted); }
 
     .results-count {
       font-size: 0.82rem;
@@ -365,7 +370,7 @@
           type="text" 
           id="searchInput" 
           class="search-input" 
-          placeholder="Search products (e.g. 9W bulb, cord, wire)..." 
+          placeholder="Search bulbs, extensions, lights..." 
           autocomplete="off"
         />
         
@@ -382,16 +387,18 @@
       </div>
     </div>
 
+    <!-- AI Intent Autocorrect Feedback -->
     <div class="analysis-pill" id="analysisPill">
       <span id="analysisText">Showing closest match for your search.</span>
       <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--primary);"></i>
     </div>
 
+    <!-- Real AI Photo Analysis Banner -->
     <div class="photo-search-preview" id="photoPreview">
       <img id="previewImg" src="" class="preview-thumb" alt="Uploaded Preview" />
       <div class="preview-info">
-        <h4>Image Analyzed Successfully</h4>
-        <p id="imageRecognizedTag">Matching products from catalog...</p>
+        <h4 id="photoAiHeader">AI Analyzing Image...</h4>
+        <p id="imageRecognizedTag"><i class="fa-solid fa-spinner fa-spin"></i> Detecting object pixels...</p>
       </div>
       <button class="action-icon-btn" onclick="clearPhotoSearch()"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -406,7 +413,7 @@
     </div>
 
     <div class="results-count">
-      <span id="resultCountText">Searching catalog...</span>
+      <span id="resultCountText">Loading catalog...</span>
       <span id="activeFilterBadge"></span>
     </div>
 
@@ -419,33 +426,36 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
 
     let supabaseClient = null;
+    let aiModel = null;
     let allProducts = [];
     let currentCategory = 'all';
     let currentPriceSort = 'none';
     let searchDebounceTimer = null;
 
-    async function getSupabase() {
-      if (supabaseClient) return supabaseClient;
-      let count = 0;
-      while (!window.supabase && count < 25) {
-        await new Promise(r => setTimeout(r, 100));
-        count++;
-      }
+    // 1. Initialize Client & Preload AI Model in Background
+    async function initPage() {
       if (window.supabase && window.supabase.createClient) {
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
-      return supabaseClient;
+
+      // Preload MobileNet AI Model for Image Analysis
+      if (window.mobilenet) {
+        window.mobilenet.load().then(model => {
+          aiModel = model;
+        }).catch(err => console.warn("AI Model load deferred:", err));
+      }
+
+      await loadCatalog();
     }
 
     async function loadCatalog() {
-      const client = await getSupabase();
-      if (!client) {
-        document.getElementById('resultCountText').innerText = "Unable to connect database. Please refresh.";
-        return;
+      if (!supabaseClient && window.supabase) {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
+      if (!supabaseClient) return;
 
       try {
-        const { data, error } = await client.from('products').select('*').order('id', { ascending: false });
+        const { data, error } = await supabaseClient.from('products').select('*').order('id', { ascending: false });
         if (error) throw error;
         
         allProducts = data || [];
@@ -459,11 +469,101 @@
           renderProducts(allProducts);
         }
       } catch (e) {
-        console.error("Fetch error:", e);
         document.getElementById('resultCountText').innerText = "Failed to load products.";
       }
     }
 
+    // 2. Real AI Visual Recognition
+    async function handleVisualSearch(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const previewBox = document.getElementById('photoPreview');
+      const previewImg = document.getElementById('previewImg');
+      const tagText = document.getElementById('imageRecognizedTag');
+      const headerText = document.getElementById('photoAiHeader');
+
+      previewBox.classList.add('show');
+      headerText.innerText = "Scanning Image Pixels...";
+      tagText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Running object classifier...`;
+
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        previewImg.src = event.target.result;
+
+        previewImg.onload = async () => {
+          try {
+            if (!aiModel && window.mobilenet) {
+              aiModel = await window.mobilenet.load();
+            }
+
+            if (!aiModel) {
+              headerText.innerText = "Model Unavailable";
+              tagText.innerText = "AI Vision could not initialize in browser.";
+              renderProducts([]);
+              return;
+            }
+
+            // Real AI Prediction
+            const predictions = await aiModel.classify(previewImg);
+            
+            // Electronic / Hardware Target Keywords
+            const lightingKeywords = [
+              'lamp', 'light', 'bulb', 'spotlight', 'lantern', 'candle', 'lampshade', 'chandelier', 'torch'
+            ];
+            const hardwareKeywords = [
+              'plug', 'socket', 'switch', 'cord', 'wire', 'cable', 'extension', 'power', 'adapter'
+            ];
+
+            let matchedKeyword = null;
+            let detectedClass = predictions[0] ? predictions[0].className.toLowerCase() : '';
+
+            for (const pred of predictions) {
+              const name = pred.className.toLowerCase();
+              if (lightingKeywords.some(k => name.includes(k))) {
+                matchedKeyword = 'led';
+                detectedClass = pred.className;
+                break;
+              }
+              if (hardwareKeywords.some(k => name.includes(k))) {
+                matchedKeyword = 'extension';
+                detectedClass = pred.className;
+                break;
+              }
+            }
+
+            // If user uploads an unrelated photo (e.g. human face, animal, shoe, vehicle)
+            if (!matchedKeyword) {
+              headerText.innerText = "Unrecognized Category";
+              tagText.innerText = `Detected: "${detectedClass.split(',')[0]}". No matching light/electrical product found in store.`;
+              renderProducts([]);
+              return;
+            }
+
+            // Filter relevant catalog products
+            headerText.innerText = "Matched Product Category";
+            tagText.innerText = `AI recognized: ${detectedClass.split(',')[0]} (${matchedKeyword.toUpperCase()})`;
+            
+            const matchedProducts = allProducts.filter(p => (p.category || '').toLowerCase().includes(matchedKeyword));
+            applyFilters(matchedProducts.length > 0 ? matchedProducts : []);
+
+          } catch (err) {
+            headerText.innerText = "Analysis Failed";
+            tagText.innerText = "Could not analyze image pixels.";
+            renderProducts([]);
+          }
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearPhotoSearch() {
+      document.getElementById('photoPreview').classList.remove('show');
+      document.getElementById('photoInput').value = "";
+      performSmartSearch(document.getElementById('searchInput').value);
+    }
+
+    // 3. Fuzzy Text Matching
     function calculateSimilarity(s1, s2) {
       s1 = (s1 || '').toLowerCase();
       s2 = (s2 || '').toLowerCase();
@@ -545,6 +645,7 @@
       }, 200);
     });
 
+    // 4. Voice Recognition
     function toggleVoiceSearch() {
       const voiceBtn = document.getElementById('voiceBtn');
       const searchInput = document.getElementById('searchInput');
@@ -585,40 +686,7 @@
       recognition.start();
     }
 
-    function handleVisualSearch(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imgUrl = event.target.result;
-        document.getElementById('previewImg').src = imgUrl;
-        document.getElementById('photoPreview').classList.add('show');
-
-        const fileName = file.name.toLowerCase();
-        let guessedCategory = 'led';
-        if (fileName.includes('board') || fileName.includes('switch') || fileName.includes('plug')) {
-          guessedCategory = 'extension';
-        } else if (fileName.includes('t-bulb') || fileName.includes('tube')) {
-          guessedCategory = 't-bulb';
-        } else if (fileName.includes('wire') || fileName.includes('cord')) {
-          guessedCategory = 'accessories';
-        }
-
-        document.getElementById('imageRecognizedTag').innerText = `Matching: ${guessedCategory.toUpperCase()} Items`;
-
-        const visualMatches = allProducts.filter(p => (p.category || '').toLowerCase() === guessedCategory);
-        applyFilters(visualMatches.length > 0 ? visualMatches : allProducts);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function clearPhotoSearch() {
-      document.getElementById('photoPreview').classList.remove('show');
-      document.getElementById('photoInput').value = "";
-      performSmartSearch(document.getElementById('searchInput').value);
-    }
-
+    // 5. Category & Filters
     function applyCategoryFilter(cat, element) {
       document.querySelectorAll('.chip-filter').forEach(el => el.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -666,7 +734,7 @@
           <div class="empty-box">
             <i class="fa-solid fa-box-open empty-icon"></i>
             <h3 style="font-weight:800; margin-bottom:6px;">No Matching Product Found</h3>
-            <p style="color:var(--muted); font-size:0.85rem;">Try voice search or clear filters.</p>
+            <p style="color:var(--muted); font-size:0.85rem;">Try searching light bulbs, cords, or clear filters.</p>
           </div>
         `;
         return;
@@ -696,7 +764,7 @@
       }).join('');
     }
 
-    window.addEventListener('DOMContentLoaded', loadCatalog);
+    window.addEventListener('DOMContentLoaded', initPage);
   </script>
 </body>
 </html>
