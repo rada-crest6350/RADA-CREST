@@ -118,7 +118,7 @@ body{
   cursor:pointer;
 }
 
-/* SMART FRIENDLY RESOLUTION CARD */
+/* SMART RESOLUTION OUTPUT CARD */
 #smartSolutionCard{
   display:none;
   background:linear-gradient(145deg, rgba(28, 20, 15, 0.98) 0%, rgba(18, 18, 24, 0.98) 100%);
@@ -252,29 +252,24 @@ body{
     <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
   </div>
 
-  <!-- AUTO SEARCH BAR -->
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Bataiye kya help chahiye (e.g. order kaise kare, return, bulb nahi chal raha)..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
+    <input type="text" id="helpInput" placeholder="Bataiye kya help chahiye (e.g. mene website khol li age kya karu)..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
     <button class="search-action-btn" onclick="runAutoAnalysis()">🔍 Analyze</button>
   </div>
 
-  <!-- FRIENDLY AUTO-GUIDE CARD (ANALYSIS OUTPUT) -->
   <div id="smartSolutionCard">
     <div class="sol-head">
-      <span class="sol-badge">🤝 RADA CREST Personal Guide</span>
+      <span class="sol-badge">🤝 RADA CREST Personal Guide (हिंदी & English)</span>
       <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="document.getElementById('smartSolutionCard').style.display='none'">✕ Band Karein</span>
     </div>
     <div class="sol-body" id="smartSolText"></div>
   </div>
 
   <div class="cat-heading">📋 Solutions & Troubleshooting</div>
-  
-  <!-- DYNAMIC TOPICS LIST (ADMIN + PRE-BUILT ESSENTIALS) -->
   <div id="dynamicTopicsContainer">
     <div style="color:var(--text-muted);text-align:center;padding:30px;">Loading resolutions...</div>
   </div>
 
-  <!-- TERMS AND CONDITIONS -->
   <a href="terms.html" style="display:flex;justify-content:space-between;align-items:center;background:var(--panel-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:#fff;margin-top:24px;">
     <div><strong>Terms & Policies</strong><small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Service, return aur warranty terms padhein</small></div>
     <div style="color:var(--brand);font-weight:bold;">➔</div>
@@ -317,7 +312,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 let liveTopics = [];
 let detectedUser = { phone: '', email: '', id: '' };
 
-// 1. AUTO DETECT CUSTOMER
 async function autoDetectUser(){
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -334,7 +328,6 @@ async function autoDetectUser(){
   }
 }
 
-// 2. LOAD TOPICS (ADMIN TOPICS + FALLBACK PRE-BUILT GUIDES SO IT'S NEVER EMPTY)
 async function loadTopics(){
   try {
     const { data, error } = await supabase
@@ -346,7 +339,6 @@ async function loadTopics(){
     if(!error && data && data.length > 0){
       liveTopics = data;
     } else {
-      // Pre-built default guides if admin hasn't added any yet
       liveTopics = [
         {
           id: 'def-1',
@@ -401,82 +393,133 @@ async function loadTopics(){
   }
 }
 
-// 3. SMART FRIEND-GUIDE NLP ANALYZING ENGINE (ANSWERS EVERYTHING NATURALLY)
+// FULLY AUTOMATED INTELLIGENT DIALOGUE & KNOWLEDGE ENGINE
 window.runAutoAnalysis = function(){
-  const q = document.getElementById('helpInput').value.trim().toLowerCase();
-  if(!q) return;
+  const rawQ = document.getElementById('helpInput').value.trim();
+  if(!rawQ) return;
+  const q = rawQ.toLowerCase();
 
   const card = document.getElementById('smartSolutionCard');
   const solText = document.getElementById('smartSolText');
   card.style.display = 'block';
 
-  // SCENARIO 1: ORDER KAISE KARE / DIKKAT AA RAHI HAI
-  if(q.includes('order') || q.includes('kharid') || q.includes('buy') || q.includes('dikat') || q.includes('problem')){
+  // INTENT 1: ONBOARDING / "AGE KYA KARU" / "KAISE CHALAU" / "SHURU KAISE KARE"
+  if(
+    q.includes('age kya karu') || q.includes('aage kya karu') || q.includes('khol li') ||
+    q.includes('start kaise') || q.includes('kaise use') || q.includes('kaise chalaye') ||
+    q.includes('what to do') || q.includes('how to use') || q.includes('kya karna hai')
+  ){
     solText.innerHTML = `
-      <strong>Arre dost, fikar mat karo! Order karne me bilkul aasan step hain:</strong><br><br>
-      1. Sabse pehle Store par jakar apna bulb ya extension board dekhein.<br>
-      2. Product ke niche <strong>"Buy Now"</strong> button par click karein.<br>
-      3. Agle page par apna <strong>Delivery Address</strong> aur mobile number bharein.<br>
-      4. <strong>Cash on Delivery (COD)</strong> ya Online UPI select karke confirm karein.<br><br>
-      <a href="index.html" class="sol-action-btn">🛒 Abhi Store par jayein aur Order karein</a>
+      <strong>👋 नमस्ते / Welcome Dost! Website kholne ke baad aapko bas ye 3 simple steps karne hain:</strong><br><br>
+      <strong>1. Product Pasand Karein (Browse & Choose):</strong><br>
+      Store par jayein aur LED Bulbs, Radar Motion Lights ya Heavy Extension Boards me se jo chahiye use dekhein.<br><br>
+      <strong>2. "Buy Now" Button Dabayein:</strong><br>
+      Product ke niche diye gaye <em>Buy Now</em> par click karein.<br><br>
+      <strong>3. Address Aur Payment (Delivery & Checkout):</strong><br>
+      Apna delivery address bharein aur Cash on Delivery (COD) ya UPI select karke order place kar dein.<br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="index.html" class="sol-action-btn">🛒 Store Kholein Aur Shopping Shuru Karein</a>
+        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders Page</a>
+      </div>
     `;
+    return;
   }
-  // SCENARIO 2: ADDRESS / LOCATION / PATA
-  else if(q.includes('address') || q.includes('pata') || q.includes('location') || q.includes('jagah')){
-    solText.innerHTML = `
-      <strong>Address kaise badalna ya chuna hai:</strong><br><br>
-      Jab aap product par <em>Buy Now</em> dabate hain, toh aap seedha <strong>Address Page</strong> par pahunch jaate hain. Wahan aap naya address jod sakte hain ya jo address pehle se hai use select kar sakte hain.<br><br>
-      <a href="address.html" class="sol-action-btn">📍 Address Settings Kholein</a>
-    `;
-  }
-  // SCENARIO 3: REFUND / PAISA / CANCEL
-  else if(q.includes('refund') || q.includes('paisa') || q.includes('money') || q.includes('cancel')){
-    solText.innerHTML = `
-      <strong>Refund aur Payment ki jankari:</strong><br><br>
-      Cancel ya Return hone ke <strong>24 se 48 working ghante</strong> ke andar paisa aapke account me wapas transfer kar diya jata hai. Bank statement zaroor check karein. Agar 48 ghante se zyada ho gaye hain toh niche diye gaye form se admin desk par report karein.
-    `;
-    scrollToFirstTopic();
-  }
-  // SCENARIO 4: RETURN / PICKUP
-  else if(q.includes('return') || q.includes('wapas') || q.includes('pickup')){
-    solText.innerHTML = `
-      <strong>Return kaise karna hai:</strong><br><br>
-      Aap apne <strong>Orders</strong> page par jakar us product ke aage "Request Return" par click karein. Delivery partner 24-48 ghante me aapke ghar aakar item collect kar lega.
-    `;
-  }
-  // SCENARIO 5: KHARAB / DAMAGE / REPLACEMENT
-  else if(q.includes('kharab') || q.includes('damage') || q.includes('chalta') || q.includes('replace') || q.includes('toota')){
-    solText.innerHTML = `
-      <strong>Defective / Damaged Item Resolution:</strong><br><br>
-      RADA CREST sabhi items par <strong>7 Din ki 100% Free Replacement</strong> deta hai. Agar item power nahi le raha ya damage hai, toh form bhar dijiye, delivery boy naya piece dekar purana le jayega.
-    `;
-    scrollToFirstTopic();
-  }
-  // GENERAL MATCH FROM ADMIN TOPICS
-  else {
-    let matched = null;
-    liveTopics.forEach(t => {
-      if(t.title.toLowerCase().includes(q) || t.explanation.toLowerCase().includes(q)){
-        matched = t;
-      }
-    });
 
-    if(matched){
-      solText.innerHTML = `<strong>${matched.title}:</strong><br><br>${matched.explanation}`;
-    } else {
-      solText.innerHTML = `
-        <strong>Maine aapka sawal analyze kiya hai:</strong><br><br>
-        Aapko website par kisi bhi tarah ki dikkat hai toh aap niche topic dekh sakte hain ya direct hamari support team se WhatsApp par baat kar sakte hain.<br><br>
-        <a href="https://wa.me/919509204090?text=Hello%20RADA%20CREST,%20mujhe%20order%20karne%20me%20help%20chahiye." target="_blank" class="sol-action-btn" style="background:#25D366;color:#000;">💬 Direct WhatsApp Help</a>
-      `;
-    }
+  // INTENT 2: ORDER KAISE KARE / BUY
+  if(q.includes('order') || q.includes('kharid') || q.includes('buy') || q.includes('purchase')){
+    solText.innerHTML = `
+      <strong>🛍️ Order Process Guide (हिंदी & English):</strong><br><br>
+      <strong>Step 1:</strong> Home page par jakar item select karein aur <strong>Buy Now</strong> dabayein.<br>
+      <strong>Step 2:</strong> <code>address.html</code> page par apna pata aur mobile number bharein.<br>
+      <strong>Step 3:</strong> COD ya Online payment chun kar <strong>Place Order</strong> karein.<br><br>
+      <a href="index.html" class="sol-action-btn">🛒 Abhi Product Select Karein</a>
+    `;
+    return;
   }
+
+  // INTENT 3: ADDRESS CHANGE / ADD
+  if(q.includes('address') || q.includes('pata') || q.includes('location')){
+    solText.innerHTML = `
+      <strong>📍 Address Kaise Badlein ya Save Karein:</strong><br><br>
+      Order karte waqt aapke samne Address window aati hai jahan aap naya address save kar sakte hain ya purana select kar sakte hain.<br><br>
+      <a href="address.html" class="sol-action-btn">📍 Address Manager Kholein</a>
+    `;
+    return;
+  }
+
+  // INTENT 4: REFUND / PAYMENT RETURN
+  if(q.includes('refund') || q.includes('paisa') || q.includes('money') || q.includes('paise')){
+    solText.innerHTML = `
+      <strong>💰 Refund Timeline & Banking Resolution:</strong><br><br>
+      Cancel ya Return hone ke <strong>24 se 48 working hours</strong> ke andar refund aapke original bank account me credit ho jata hai. Agar 48 ghante se zyada ho gaye hain toh niche diye gaye form se Admin ko complaint ticket bhej dein.
+    `;
+    scrollToFirstTopic();
+    return;
+  }
+
+  // INTENT 5: RETURN / PICKUP
+  if(q.includes('return') || q.includes('wapas') || q.includes('pickup')){
+    solText.innerHTML = `
+      <strong>📦 Return Process:</strong><br><br>
+      Aapke <strong>Orders</strong> page par har delivered item ke sath <em>Return Order</em> ka option hota hai. Courier partner 24-48 ghante me pickup karega.
+    `;
+    return;
+  }
+
+  // INTENT 6: DAMAGE / KHARAB / NOT WORKING
+  if(q.includes('kharab') || q.includes('damage') || q.includes('chalta') || q.includes('replace') || q.includes('toota')){
+    solText.innerHTML = `
+      <strong>🔄 7 Days Free Replacement Guarantee:</strong><br><br>
+      Agar koi bhi item kharab ya toota hua mila hai, toh bina kisi extra charge ke naya piece deliver kiya jayega aur purana collect kar liya jayega. Niche form me Order ID likh kar request submit karein.
+    `;
+    scrollToFirstTopic();
+    return;
+  }
+
+  // INTENT 7: MATCH WITH ADMIN'S CUSTOM TOPICS
+  let matched = null;
+  liveTopics.forEach(t => {
+    if(t.title.toLowerCase().includes(q) || t.explanation.toLowerCase().includes(q)){
+      matched = t;
+    }
+  });
+
+  if(matched){
+    solText.innerHTML = `
+      <strong>📌 ${matched.title}:</strong><br><br>
+      ${matched.explanation}<br><br>
+      <button class="sol-action-btn" onclick="scrollToItem('topic-${matched.id}')">📖 Open Detail Section & Form</button>
+    `;
+    return;
+  }
+
+  // NATURAL FALLBACK: HELPFUL WEBSITE GUIDE (NO WHATSAPP POPUP)
+  solText.innerHTML = `
+    <strong>🤖 RADA CREST Website Guide:</strong><br><br>
+    Aapke sawal <em>"${rawQ}"</em> ke anusaar hum aapko suggest karte hain:<br>
+    • Naye products dekhne ke liye <strong>Home Store</strong> par jayein.<br>
+    • Apne pichle orders dekhne ke liye <strong>Orders</strong> page par jayein.<br>
+    • Agar kisi order me dikkat hai, toh niche diye gaye form se direct Admin Desk par ticket submit karein.<br><br>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a href="index.html" class="sol-action-btn">🛒 Store par Jayein</a>
+      <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 Orders Kholein</a>
+    </div>
+  `;
 };
 
 function scrollToFirstTopic(){
   const el = document.getElementById('dynamicTopicsContainer');
   if(el) el.scrollIntoView({ behavior: 'smooth' });
 }
+
+window.scrollToItem = function(id){
+  const el = document.getElementById(id);
+  if(el){
+    document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 window.toggleAcc = function(headerEl){
   const item = headerEl.closest('.acc-item');
@@ -490,7 +533,6 @@ window.toggleForm = function(formId){
   if(f) f.style.display = (f.style.display === 'block') ? 'none' : 'block';
 };
 
-// SUBMIT TICKET
 window.submitTicket = async function(e, topicTitle){
   e.preventDefault();
   const form = e.target;
@@ -532,7 +574,6 @@ window.submitTicket = async function(e, topicTitle){
   }
 };
 
-// TRACKER MODAL LOGIC
 window.openAutoTrackerModal = async function(){
   const modal = document.getElementById('trackerModal');
   modal.style.display = 'grid';
