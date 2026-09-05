@@ -25,11 +25,10 @@ Nirdesh:
 2. Bilkul ek sachche dost ki tarah Step 1, Step 2, Step 3 karke simple, seedha aur practical rasta samjhayein ki website par aage kahan jana hai aur kya dabana hai.
 3. Koi chhota ya boring template jawab na dein, conversational aur genuinely helpful guide karein.`;
 
-  // Active Groq Models Priority List
+  // Sirf active aur supported Groq models
   const modelsToTry = [
-    "llama-3.3-70b-versatile",
     "llama-3.1-8b-instant",
-    "mixtral-8x7b-32768"
+    "llama-3.3-70b-versatile"
   ];
 
   let lastError = null;
