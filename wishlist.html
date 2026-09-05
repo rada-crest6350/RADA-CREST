@@ -206,23 +206,24 @@ function loadWishlist(){
   container.innerHTML = wishlist.map((item, index) => {
     const originalPrice = parseFloat(item.price) || 500;
     const discountedPrice = Math.round(originalPrice * (1 - discountPercent / 100));
-    // Product page link (agar item me id ya link hai toh wo use karega, nahi toh default product.html)
     const productLink = item.link || item.url || `product.html?name=${encodeURIComponent(item.name || '')}`;
+    const safeImage = item.image || '';
+    const safeName = item.name || 'RADA CREST LED Bulb';
 
     return `
       <div class="wish-card" id="wish-item-${index}">
         <a href="${productLink}" class="wish-img-link">
-          <img src="${item.image || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
+          <img src="${safeImage || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
         </a>
         <div class="wish-info">
           <div class="discount-badge">🔥 Wishlist Special: ${discountPercent}% OFF</div>
-          <a href="${productLink}" class="wish-title">${item.name || 'RADA CREST LED Bulb'}</a>
+          <a href="${productLink}" class="wish-title">${safeName}</a>
           <div class="price-box">
             <span class="old-price">₹${originalPrice}</span>
             <span class="new-price">₹${discountedPrice}</span>
           </div>
           <div class="wish-actions">
-            <button class="action-btn" onclick="proceedToBuy('${item.name}', ${discountedPrice}, '${item.image || ''}')">⚡ Buy Now</button>
+            <button class="action-btn" onclick="proceedToBuy('${safeName.replace(/'/g, "\\'")}', ${discountedPrice}, '${safeImage}')">⚡ Buy Now</button>
             <button class="remove-btn" onclick="removeItem(${index})">✕ Remove</button>
           </div>
         </div>
@@ -239,19 +240,18 @@ window.removeItem = function(index){
 };
 
 window.proceedToBuy = function(name, finalPrice, image){
-  // Checkout item save kar rahe hain
-  localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice, image: image }));
+  const checkoutData = { name: name, price: finalPrice, image: image };
+  localStorage.setItem('rc_checkout_item', JSON.stringify(checkoutData));
   
-  // Check karenge ki user ka koi address already selected hai ya nahi
+  const queryParam = `?name=${encodeURIComponent(name)}&price=${finalPrice}&image=${encodeURIComponent(image)}`;
+
   const keys = getUserKeys();
   const selectedAddr = localStorage.getItem(keys.selectedKey) || localStorage.getItem(keys.activeKey);
 
   if (selectedAddr) {
-    // Agar address pehle se hai, toh seedha buy.html par chale jayenge
-    window.location.href = 'buy.html';
+    window.location.href = 'buy.html' + queryParam;
   } else {
-    // Agar address nahi hai, toh address.html par bhejenge aur wapas buy.html par lane ke liye return set karenge
-    window.location.href = 'addresses.html?return=buy.html';
+    window.location.href = 'addresses.html?return=' + encodeURIComponent('buy.html' + queryParam);
   }
 };
 
