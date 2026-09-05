@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>24x7 Help Center & Resolutions — RADA CREST</title>
+<title>Help & Resolutions — RADA CREST</title>
 
-<!-- Google Font -->
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,15 +14,15 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 
 :root{
-  --bg-deep:#050507;
+  --bg-deep:#060608;
   --panel:rgba(18, 18, 22, 0.7);
-  --panel-card:rgba(26, 26, 32, 0.6);
+  --panel-card:rgba(24, 24, 30, 0.65);
   --border:rgba(255, 255, 255, 0.08);
-  --border-glow:rgba(255, 122, 0, 0.3);
+  --border-glow:rgba(255, 122, 0, 0.35);
   --text:#ffffff;
   --text-muted:#9da0b0;
   --brand:#FF7A00;
-  --brand-glow:rgba(255, 122, 0, 0.4);
+  --brand-glow:rgba(255, 122, 0, 0.35);
   --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
   --green:#3dd598;
 }
@@ -39,13 +39,11 @@ body{
 }
 
 /* FLOATING AMBIENT GLOW */
-.ambient-glow-1{
+.ambient-glow{
   position:fixed;
-  width:360px;
-  height:360px;
-  background:radial-gradient(circle, rgba(255,122,0,0.14) 0%, rgba(0,0,0,0) 70%);
-  top:-80px;
-  left:50%;
+  width:380px;height:380px;
+  background:radial-gradient(circle, rgba(255,122,0,0.12) 0%, rgba(0,0,0,0) 70%);
+  top:-80px;left:50%;
   transform:translateX(-50%);
   z-index:0;
   pointer-events:none;
@@ -53,293 +51,189 @@ body{
 
 /* NAVBAR */
 .header{
-  position:sticky;
-  top:0;
-  z-index:100;
+  position:sticky;top:0;z-index:100;
   background:rgba(8, 8, 10, 0.85);
   backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   padding:14px 20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;
 }
-.header-left{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
+.header-left{display:flex;align-items:center;gap:14px;}
 .back-btn{
   background:rgba(255,255,255,0.06);
   border:1px solid var(--border);
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  color:#fff;
-  text-decoration:none;
-  font-size:16px;
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;color:#fff;
+  text-decoration:none;font-size:16px;
+  transition:0.2s;
 }
-.header-title h1{
-  font-size:17px;
-  font-weight:800;
-}
+.back-btn:hover{background:var(--brand-glow);border-color:var(--brand);}
+.header-title h1{font-size:17px;font-weight:800;}
 .header-title span{
-  font-size:11px;
-  color:var(--brand);
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  gap:5px;
+  font-size:11px;color:var(--brand);font-weight:600;
+  display:flex;align-items:center;gap:5px;
 }
 .header-title span::before{
   content:'';width:6px;height:6px;background:var(--green);border-radius:50%;
   box-shadow:0 0 8px var(--green);
 }
 
-.container{
-  max-width:640px;
-  margin:0 auto;
-  padding:24px 18px;
-  position:relative;
-  z-index:1;
-}
+.container{max-width:640px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
 
-.hero{
-  text-align:center;
-  margin-bottom:24px;
-}
+.hero{text-align:center;margin-bottom:24px;}
 .hero-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  background:rgba(255,122,0,0.12);
-  border:1px solid rgba(255,122,0,0.3);
-  padding:5px 12px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:700;
-  color:var(--brand);
-  text-transform:uppercase;
-  letter-spacing:1px;
-  margin-bottom:10px;
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,122,0,0.12);border:1px solid rgba(255,122,0,0.3);
+  padding:5px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;color:var(--brand);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
 }
-.hero h2{
-  font-size:24px;
-  font-weight:800;
-  letter-spacing:-0.5px;
-  margin-bottom:6px;
-}
+.hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.hero p{font-size:13.5px;color:var(--text-muted);}
 
-/* SMART AUTOMATED SEARCH BOX */
+/* AUTOMATED SEARCH */
 .smart-search-box{
   background:rgba(22, 22, 28, 0.85);
   border:1.5px solid rgba(255, 122, 0, 0.4);
-  box-shadow:0 0 25px rgba(255, 122, 0, 0.15);
+  box-shadow:0 0 25px rgba(255, 122, 0, 0.12);
   border-radius:20px;
   padding:8px 10px 8px 18px;
-  display:flex;
-  align-items:center;
-  gap:12px;
+  display:flex;align-items:center;gap:12px;
   margin-bottom:20px;
-  transition:border-color 0.3s;
 }
-.smart-search-box:focus-within{
-  border-color:var(--brand);
-  box-shadow:0 0 30px var(--brand-glow);
-}
-.smart-search-box input{
-  flex:1;
-  background:transparent;
-  border:none;
-  color:#fff;
-  font-size:14.5px;
-  outline:none;
-  font-family:inherit;
-}
+.smart-search-box:focus-within{border-color:var(--brand);box-shadow:0 0 30px var(--brand-glow);}
+.smart-search-box input{flex:1;background:transparent;border:none;color:#fff;font-size:14.5px;outline:none;font-family:inherit;}
 .search-action-btn{
-  background:var(--brand-gradient);
-  color:#000;
-  border:none;
-  font-weight:800;
-  font-size:13px;
-  padding:12px 18px;
-  border-radius:14px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  box-shadow:0 4px 12px var(--brand-glow);
+  background:var(--brand-gradient);color:#000;border:none;
+  font-weight:800;font-size:13px;padding:12px 18px;border-radius:14px;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
 }
 
-/* AUTOMATED SMART ANSWER CARD */
-#smartAnswerCard{
+/* SMART RESOLUTION CARD */
+#smartSolutionCard{
   display:none;
   background:linear-gradient(145deg, rgba(28, 20, 15, 0.95) 0%, rgba(18, 18, 24, 0.95) 100%);
   border:1.5px solid var(--brand);
-  border-radius:20px;
-  padding:22px;
-  margin-bottom:28px;
+  border-radius:20px;padding:20px;margin-bottom:28px;
   box-shadow:0 10px 30px rgba(0,0,0,0.6), 0 0 25px rgba(255,122,0,0.25);
-  animation:fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation:fadeSlideIn 0.3s ease;
 }
-@keyframes fadeSlideIn{
-  from{opacity:0;transform:translateY(-10px);}
-  to{opacity:1;transform:translateY(0);}
-}
-.ans-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:12px;
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  padding-bottom:10px;
-}
-.ans-badge{
-  font-size:12px;
-  color:var(--brand);
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-.ans-text{
-  font-size:14px;
-  line-height:1.7;
-  color:#f0f0f5;
-  margin-bottom:14px;
-}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
+.sol-badge{font-size:12px;color:var(--brand);font-weight:800;display:flex;align-items:center;gap:6px;}
+.sol-body{font-size:13.5px;line-height:1.7;color:#f0f0f5;}
 
-/* CATEGORY HEADINGS */
+/* CATEGORY LABELS */
 .cat-heading{
-  font-size:12px;
-  font-weight:800;
-  color:var(--brand);
-  text-transform:uppercase;
-  letter-spacing:1.2px;
-  margin:24px 4px 12px;
+  font-size:12px;font-weight:800;color:var(--brand);
+  text-transform:uppercase;letter-spacing:1.2px;margin:24px 4px 12px;
 }
 
 /* ACCORDIONS (CARDS) */
 .acc-item{
-  background:var(--panel-card);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--border);
-  border-radius:18px;
-  margin-bottom:12px;
-  overflow:hidden;
-  transition:0.3s;
+  background:var(--panel-card);backdrop-filter:blur(16px);
+  border:1px solid var(--border);border-radius:18px;
+  margin-bottom:12px;overflow:hidden;transition:0.3s;
 }
 .acc-item:hover{border-color:rgba(255,255,255,0.16);}
-.acc-trigger{
-  padding:18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  cursor:pointer;
-}
-.acc-trigger-left{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
+.acc-trigger{padding:18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.acc-trigger-left{display:flex;align-items:center;gap:14px;}
 .icon-box{
-  width:40px;height:40px;
-  border-radius:12px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid var(--border);
-  display:grid;place-items:center;
-  font-size:18px;
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  display:grid;place-items:center;font-size:18px;
 }
 .acc-trigger-left h3{font-size:14.5px;font-weight:700;color:#fff;}
 .acc-trigger-left small{color:var(--text-muted);font-size:12px;}
 .chevron{font-size:11px;color:var(--text-muted);transition:0.3s;}
 .acc-item.active .chevron{transform:rotate(180deg);color:var(--brand);}
 .acc-body{
-  max-height:0;
-  overflow:hidden;
-  transition:max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height:0;overflow:hidden;
+  transition:max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
   background:rgba(12, 12, 15, 0.5);
 }
-.acc-item.active .acc-body{max-height:800px;border-top:1px solid var(--border);}
-.acc-content{padding:18px;font-size:13.5px;color:var(--text-muted);line-height:1.6;}
+.acc-item.active .acc-body{max-height:1300px;border-top:1px solid var(--border);}
+.acc-content{padding:20px;font-size:13.5px;color:var(--text-muted);line-height:1.7;}
 
-/* COMPLAINT FORM */
+/* STEP BY STEP GUIDANCE LIST */
+.solve-step{
+  background:rgba(255,255,255,0.02);
+  border-left:3px solid var(--brand);
+  border-radius:6px;
+  padding:10px 14px;
+  margin:10px 0;
+  color:#e4e4eb;
+}
+.solve-step strong{color:#fff;display:block;margin-bottom:2px;}
+
+/* FALLBACK REPLY BOX */
+.fallback-box{
+  margin-top:18px;
+  background:#131318;
+  border:1px dashed #343440;
+  border-radius:12px;
+  padding:14px 16px;
+}
+.fallback-box p{margin-bottom:10px;font-size:12.5px;color:#a0a0ab;}
+.open-ticket-link{
+  background:transparent;
+  color:var(--brand);
+  border:1px solid var(--brand);
+  border-radius:8px;
+  padding:8px 14px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:0.2s;
+}
+.open-ticket-link:hover{background:var(--brand-glow);}
+
+/* COMPLAINT FORM (HIDDEN UNTIL CLICKED) */
 .ticket-form{
+  display:none;
   margin-top:14px;
-  background:rgba(20, 20, 25, 0.9);
-  border:1px solid rgba(255,122,0,0.25);
+  background:rgba(20, 20, 25, 0.95);
+  border:1px solid rgba(255,122,0,0.3);
   border-radius:14px;
   padding:16px;
 }
-.ticket-form h4{font-size:13.5px;color:#fff;margin-bottom:12px;}
+.ticket-form h4{font-size:13px;color:#fff;margin-bottom:10px;}
 .form-field{margin-bottom:10px;}
 .ticket-form input, .ticket-form textarea{
   width:100%;background:#0d0d10;border:1px solid #292933;color:#fff;
-  border-radius:10px;padding:11px 14px;font-size:13px;font-family:inherit;
+  border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;
 }
-.ticket-form textarea{resize:vertical;min-height:75px;}
+.ticket-form textarea{resize:vertical;min-height:65px;}
 .ticket-form input:focus, .ticket-form textarea:focus{outline:none;border-color:var(--brand);}
 .submit-btn{
   width:100%;background:var(--brand-gradient);color:#000;font-weight:800;
-  border:none;padding:12px;border-radius:10px;font-size:13.5px;cursor:pointer;
+  border:none;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;
 }
 
 /* SHOPPING STEP GUIDES */
-.guide-step{
-  display:flex;
-  gap:14px;
-  margin-bottom:14px;
-}
+.guide-step{display:flex;gap:14px;margin-bottom:14px;}
 .guide-badge{
-  width:28px;
-  height:28px;
-  border-radius:8px;
-  background:var(--brand-glow);
-  border:1px solid var(--brand);
-  color:var(--brand);
-  font-weight:800;
-  font-size:12px;
-  display:grid;
-  place-items:center;
-  flex-shrink:0;
+  width:28px;height:28px;border-radius:8px;
+  background:var(--brand-glow);border:1px solid var(--brand);
+  color:var(--brand);font-weight:800;font-size:12px;
+  display:grid;place-items:center;flex-shrink:0;
 }
 .guide-text strong{color:#fff;display:block;margin-bottom:2px;}
 .guide-text{font-size:13px;color:var(--text-muted);}
 
-/* LIVE WHATSAPP BAR */
+/* SUPPORT BAR & TERMS */
 .support-card{
   background:linear-gradient(135deg, #092015 0%, #0d1218 100%);
-  border:1px solid rgba(37,211,102,0.3);
-  border-radius:18px;
-  padding:18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-top:24px;
-  gap:12px;
+  border:1px solid rgba(37,211,102,0.3);border-radius:18px;
+  padding:18px;display:flex;align-items:center;justify-content:space-between;
+  margin-top:24px;gap:12px;
 }
 .support-card h4{font-size:14px;font-weight:700;color:#fff;}
 .support-card p{font-size:12px;color:#7ee4a7;margin-top:2px;}
 .wa-link{
-  background:#25D366;
-  color:#000;
-  font-weight:800;
-  text-decoration:none;
-  font-size:12.5px;
-  padding:10px 16px;
-  border-radius:10px;
-  white-space:nowrap;
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  box-shadow:0 4px 14px rgba(37,211,102,0.3);
+  background:#25D366;color:#000;font-weight:800;text-decoration:none;
+  font-size:12.5px;padding:10px 16px;border-radius:10px;white-space:nowrap;
 }
-
-/* TERMS LINK */
 .terms-card{
   background:var(--panel-card);border:1px solid var(--border);
   border-radius:16px;padding:16px 20px;display:flex;align-items:center;
@@ -349,7 +243,7 @@ body{
 .terms-card:hover{border-color:var(--brand);background:rgba(255,255,255,0.04);}
 .terms-arrow{color:var(--brand);font-weight:800;font-size:16px;}
 
-/* SUCCESS MODAL */
+/* MODAL */
 .modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
   display:none;place-items:center;padding:20px;z-index:999;
@@ -366,146 +260,217 @@ body{
 </head>
 <body>
 
-<div class="ambient-glow-1"></div>
+<div class="ambient-glow"></div>
 
 <!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
-      <h1>Help & Support Desk</h1>
-      <span>Automated Assistance Live</span>
+      <h1>Problem Solving & Guidance</h1>
+      <span>Customer Help Center</span>
     </div>
   </div>
 </header>
 
 <div class="container">
 
-  <!-- HERO -->
   <div class="hero">
-    <div class="hero-badge">⚡ Instant Automated Resolution</div>
-    <h2>Hum Aapki Kya Madad Kar Sakte Hain?</h2>
+    <div class="hero-badge">💡 Instant Resolution Desk</div>
+    <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
+    <p>Apni samasya search karein ya sahi category chun kar guidance padhein.</p>
   </div>
 
-  <!-- AUTOMATED SEARCH BOX -->
+  <!-- AUTOMATED SEARCH -->
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apni problem likhein (e.g. bulb kharab hai, refund kab aayega, replace)..." onkeydown="if(event.key==='Enter') runSmartAnalysis()">
-    <button class="search-action-btn" onclick="runSmartAnalysis()">🔍 Analyze</button>
+    <input type="text" id="helpInput" placeholder="Apni problem likhein (e.g. bulb jal nahi raha, refund check, return)..." onkeydown="if(event.key==='Enter') analyzeProblem()">
+    <button class="search-action-btn" onclick="analyzeProblem()">🔍 Solve</button>
   </div>
 
   <!-- SMART AUTO ANSWER CARD -->
-  <div id="smartAnswerCard">
-    <div class="ans-head">
-      <span class="ans-badge">⚡ RADA CREST Auto Solution</span>
-      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="document.getElementById('smartAnswerCard').style.display='none'">✕ Band Karein</span>
+  <div id="smartSolutionCard">
+    <div class="sol-head">
+      <span class="sol-badge">⚡ Recommended Resolution</span>
+      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="document.getElementById('smartSolutionCard').style.display='none'">✕ Band Karein</span>
     </div>
-    <div class="ans-text" id="smartAnswerText"></div>
-    <div id="smartActionBox"></div>
+    <div class="sol-body" id="smartSolText"></div>
   </div>
 
-  <!-- 1. ORDER RELATED ISSUES -->
-  <div class="cat-heading">📦 Order & Product Problems</div>
+  <!-- 1. ORDER & PRODUCT SOLUTIONS -->
+  <div class="cat-heading">📦 Order & Product Guidance</div>
 
-  <!-- Refund Issue -->
+  <!-- A. Refund Issue -->
   <div class="acc-item" id="acc-refund">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">💰</div>
-        <div><h3>Refund nahi mila / Pending</h3><small>Cancelled ya Returned item ka refund</small></div>
+        <div><h3>Refund Issue — Paisa Kaise Check Karein?</h3><small>Banking cycle & refund status</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Order cancel ya return hone ke baad refund amount <strong>24 se 48 ghante</strong> ke andar aapke original bank/UPI account me bhej diya jata hai.</p>
-        <form class="ticket-form" onsubmit="submitTicket(event, 'Refund Issue')">
-          <h4>Raise Refund Ticket to Admin</h4>
-          <div class="form-field"><input type="text" placeholder="Order ID (e.g. RC-102)" required></div>
-          <div class="form-field"><input type="tel" placeholder="Aapka Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Apni refund se judi samasya likhein..." required></textarea></div>
-          <button type="submit" class="submit-btn">Send to Admin Desk ➔</button>
-        </form>
+        <p>Agar aapne order cancel ya return kiya hai aur refund ka intezar kar rahe hain, toh yeh steps follow karein:</p>
+        
+        <div class="solve-step">
+          <strong>1. Banking Processing Time</strong>
+          UPI/Netbanking refunds me 24 se 48 working hours lagte hain. Bank holidays par process agle working day shuru hota hai.
+        </div>
+        <div class="solve-step">
+          <strong>2. Bank Statement / Mini Statement Check</strong>
+          Kayi baar bank ka SMS alert miss ho jata hai. Apne Bank App me jakar statement check karein.
+        </div>
+        <div class="solve-step">
+          <strong>3. Cash on Delivery (COD) Refund</strong>
+          COD orders ka refund aapke diye gaye UPI ID ya Bank Details par sidha transfer hota hai.
+        </div>
+
+        <div class="fallback-box">
+          <p>Agar 48 ghante se zyada ho gaye hain aur paisa credit nahi hua?</p>
+          <button class="open-ticket-link" onclick="toggleTicketForm('form-refund')">📩 Reply to Admin Desk (Not Solved)</button>
+          
+          <form class="ticket-form" id="form-refund" onsubmit="submitTicket(event, 'Refund Issue')">
+            <h4>Submit Refund Details to Admin:</h4>
+            <div class="form-field"><input type="text" placeholder="Order ID (e.g. RC-102)" required></div>
+            <div class="form-field"><input type="tel" placeholder="Aapka Mobile Number" required></div>
+            <div class="form-field"><textarea placeholder="Aapne kab cancel kiya aur bank me kya dikh raha hai?" required></textarea></div>
+            <button type="submit" class="submit-btn">Send Refund Ticket ➔</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Replace Issue -->
+  <!-- B. Replace Issue -->
   <div class="acc-item" id="acc-replace">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">🔄</div>
-        <div><h3>Product Replace kaise karein?</h3><small>Damage ya defective LED replacement</small></div>
+        <div><h3>Product Replace Kaise Karein? (Kharab / Damage)</h3><small>Testing steps & 7-day replacement</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Agar aapko koi kharab ya toota hua product mila hai, toh delivery ke <strong>7 dino ke andar</strong> 100% Free Replacement milta hai.</p>
-        <form class="ticket-form" onsubmit="submitTicket(event, 'Replace Request')">
-          <h4>Request Replacement to Admin</h4>
-          <div class="form-field"><input type="text" placeholder="Order ID" required></div>
-          <div class="form-field"><input type="tel" placeholder="Aapka Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Product me kya dikkat aa rahi hai (bulb jal nahi raha ya damaged hai)?" required></textarea></div>
-          <button type="submit" class="submit-btn">Send Replacement Request ➔</button>
-        </form>
+        <p>Agar LED bulb nahi jal raha ya sensor kaam nahi kar raha, toh replacement lene se pehle yeh 2 test zaroor karein:</p>
+        
+        <div class="solve-step">
+          <strong>1. Holder & Wiring Check</strong>
+          Bulb ko ghar ke kisi doosre holder me laga kar check karein taaki holder ki loose wiring verify ho sake.
+        </div>
+        <div class="solve-step">
+          <strong>2. Radar Motion Light Test</strong>
+          Radar motion bulb daylight me auto-off rehta hai. Isko andhere kamre me movement karke test karein.
+        </div>
+        <div class="solve-step">
+          <strong>3. 7 Days Free Replacement</strong>
+          Delivery ke 7 dino ke andar defective/damaged piece par 100% free replacement milta hai.
+        </div>
+
+        <div class="fallback-box">
+          <p>Bulb check karne ke baad bhi nahi chala aur replace karwana hai?</p>
+          <button class="open-ticket-link" onclick="toggleTicketForm('form-replace')">🔄 Request Replacement From Admin</button>
+          
+          <form class="ticket-form" id="form-replace" onsubmit="submitTicket(event, 'Replace Request')">
+            <h4>Request Replacement to Admin:</h4>
+            <div class="form-field"><input type="text" placeholder="Order ID" required></div>
+            <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
+            <div class="form-field"><textarea placeholder="Bulb me kya dikkat hai (flicker ho raha hai, bilkul dead hai)?" required></textarea></div>
+            <button type="submit" class="submit-btn">Submit Replacement Request ➔</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Return Issue -->
+  <!-- C. Return Issue -->
   <div class="acc-item" id="acc-return">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">📦</div>
-        <div><h3>Order Return kaise karein?</h3><small>Pickup aur return policy help</small></div>
+        <div><h3>Return Kaise Karein? (Website Steps)</h3><small>Orders page flow & pickup instructions</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Aap apne <strong>Orders</strong> page se bhi Return request daal sakte hain. Agar wahan dikkat aa rahi hai toh yahan se direct request raise karein:</p>
-        <form class="ticket-form" onsubmit="submitTicket(event, 'Return Request')">
-          <h4>Submit Return Request</h4>
-          <div class="form-field"><input type="text" placeholder="Order ID" required></div>
-          <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Aap order return kyu karna chahte hain?" required></textarea></div>
-          <button type="submit" class="submit-btn">Send Return Request ➔</button>
-        </form>
+        <p>Website se return karne ka asaan tareeka:</p>
+        
+        <div class="solve-step">
+          <strong>Step 1: Orders Page Kholein</strong>
+          Website ke 'Orders' menu me jayein aur apne order par click karke 'Request Return' chunein.
+        </div>
+        <div class="solve-step">
+          <strong>Step 2: Box & Items Ready Rakhein</strong>
+          Product ko uske original box aur safe packing ke sath ready rakhein.
+        </div>
+        <div class="solve-step">
+          <strong>Step 3: Courier Pickup</strong>
+          Delivery partner agle 24 se 48 ghante me aapke ghar se parcel pickup karega.
+        </div>
+
+        <div class="fallback-box">
+          <p>Website par Return button kaam nahi kar raha ya dikkat hai?</p>
+          <button class="open-ticket-link" onclick="toggleTicketForm('form-return')">📦 Inform Admin Desk for Pickup</button>
+          
+          <form class="ticket-form" id="form-return" onsubmit="submitTicket(event, 'Return Request')">
+            <h4>Direct Return Assistance:</h4>
+            <div class="form-field"><input type="text" placeholder="Order ID" required></div>
+            <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
+            <div class="form-field"><textarea placeholder="Aap return kyu karna chahte hain?" required></textarea></div>
+            <button type="submit" class="submit-btn">Send Return Request ➔</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Wrong Product -->
+  <!-- D. Wrong Product Delivered -->
   <div class="acc-item" id="acc-wrong">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">⚠️</div>
-        <div><h3>Galat Product deliver ho gaya?</h3><small>Dusra item ya different wattage deliver hua</small></div>
+        <div><h3>Galat Product Deliver Ho Gaya?</h3><small>Wrong wattage / item resolution</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Hume khed hai! Agar galti se galat item deliver ho gaya hai toh admin team 2 ghante me aapse contact karke sahi item dispatch karwayegi.</p>
-        <form class="ticket-form" onsubmit="submitTicket(event, 'Wrong Product Delivered')">
-          <h4>Report Wrong Product to Admin</h4>
-          <div class="form-field"><input type="text" placeholder="Order ID" required></div>
-          <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Aapne kya order kiya tha aur box me kya nikla?" required></textarea></div>
-          <button type="submit" class="submit-btn">Send Report Now ➔</button>
-        </form>
+        <p>Agar box ke andar alag wattage (jaise 9W ki jagah kuch aur) ya dusra item nikal gaya hai:</p>
+        
+        <div class="solve-step">
+          <strong>1. Box Label & Bill Match</strong>
+          Box par laga shipping label aur bill check karein ki kya ordered item se match karta hai.
+        </div>
+        <div class="solve-step">
+          <strong>2. 100% Free Exchange</strong>
+          Aapko koi extra charge nahi dena hoga. Hamari team sahi item dispatch karwayegi.
+        </div>
+
+        <div class="fallback-box">
+          <p>Galat item deliver hone ki report Admin ko bhejein:</p>
+          <button class="open-ticket-link" onclick="toggleTicketForm('form-wrong')">⚠️ Report to Admin Desk</button>
+          
+          <form class="ticket-form" id="form-wrong" onsubmit="submitTicket(event, 'Wrong Product Delivered')">
+            <h4>Report Wrong Item:</h4>
+            <div class="form-field"><input type="text" placeholder="Order ID" required></div>
+            <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
+            <div class="form-field"><textarea placeholder="Aapko kya deliver hua aur kya order tha?" required></textarea></div>
+            <button type="submit" class="submit-btn">Submit Report ➔</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. SHOPPING GUIDANCE -->
-  <div class="cat-heading">📱 Shopping & Website Guidance</div>
+  <!-- 2. SHOPPING HELP -->
+  <div class="cat-heading">🛍️ Shopping Help & Guidance</div>
 
   <div class="acc-item" id="acc-shopping">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">💡</div>
-        <div><h3>Website par Order kaise karein?</h3><small>Step-by-step complete purchasing guide</small></div>
+        <div><h3>Website Ko Use Kaise Karein? (Order Guidance)</h3><small>Address selection aur purchase guide</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
@@ -515,21 +480,21 @@ body{
           <div class="guide-badge">1</div>
           <div class="guide-text">
             <strong>Product Select Karein</strong>
-            Store par jakar apna bulb (jaise Radar Bulb, Emergency LED) select karein aur <em>Buy Now</em> dabayein.
+            Website par jakar apna bulb (Radar Motion LED ya Normal Bulb) select karein aur <em>Buy Now</em> dabayein.
           </div>
         </div>
         <div class="guide-step">
           <div class="guide-badge">2</div>
           <div class="guide-text">
-            <strong>Address Fill Karein</strong>
-            Apna poora delivery address, landmark aur mobile number dhyan se bharein.
+            <strong>Address Page (Pata Chunein)</strong>
+            Aap <code>address.html</code> par jayenge. Wahan jo address choose kiya hai wahi screen par show hoga, ya aap naya pata edit/add kar sakte hain.
           </div>
         </div>
         <div class="guide-step">
           <div class="guide-badge">3</div>
           <div class="guide-text">
             <strong>Payment & Confirm</strong>
-            Online UPI ya Cash on Delivery (COD) select karein aur order successfully book ho jayega.
+            Cash on Delivery (COD) ya Online UPI select karein aur order successfully place ho jayega.
           </div>
         </div>
       </div>
@@ -561,8 +526,8 @@ body{
 <!-- SUCCESS MODAL POPUP -->
 <div id="successModal" class="modal-overlay">
   <div class="modal-box">
-    <h3 style="color:#fff;margin-bottom:8px;font-size:20px;">Ticket Sent Successfully!</h3>
-    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapki complaint seedha Admin Desk par pahunch gayi hai. Hamari team jald resolve karegi.</p>
+    <h3 style="color:#fff;margin-bottom:8px;font-size:20px;">Ticket Sent to Admin Desk!</h3>
+    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka message aur problem details seedha Admin Desk par notification bankar pahunch chuka hai. Hum jald update karenge.</p>
     <button class="modal-close-btn" onclick="document.getElementById('successModal').style.display='none'">Theek Hai</button>
   </div>
 </div>
@@ -574,60 +539,45 @@ const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// SMART NLP AUTOMATED SEARCH ENGINE
-window.runSmartAnalysis = function(){
-  const query = document.getElementById('helpInput').value.trim().toLowerCase();
-  if(!query) return;
+// SMART PROBLEM RESOLUTION ANALYZER
+window.analyzeProblem = function(){
+  const q = document.getElementById('helpInput').value.trim().toLowerCase();
+  if(!q) return;
 
-  const card = document.getElementById('smartAnswerCard');
-  const textElem = document.getElementById('smartAnswerText');
-  const actionBox = document.getElementById('smartActionBox');
-
+  const card = document.getElementById('smartSolutionCard');
+  const body = document.getElementById('smartSolText');
   card.style.display = 'block';
 
-  // 1. Refund Related
-  if(query.includes('refund') || query.includes('paisa') || query.includes('paise') || query.includes('money') || query.includes('payment wapas')){
-    textElem.innerHTML = `<strong>💰 Refund Status & Policy:</strong><br>
-    Aapka refund order cancel ya return hone ke <strong>24 se 48 ghante</strong> ke andar bank account me transfer ho jata hai.<br><br>
-    Agar 48 ghante ho gaye hain aur paisa nahi mila, toh niche diye gaye button se direct Admin Desk par complaint daal dijiye:`;
-    actionBox.innerHTML = `<button class="submit-btn" onclick="scrollToSection('acc-refund')">📝 Open Refund Ticket Form</button>`;
-  }
-  // 2. Replacement / Damage / Kharab
-  else if(query.includes('replace') || query.includes('kharab') || query.includes('damage') || query.includes('toota') || query.includes('chalta nahi') || query.includes('jal nahi')){
-    textElem.innerHTML = `<strong>🔄 Free Replacement Guarantee:</strong><br>
-    RADA CREST sabhi defective aur damaged bulbs par <strong>7 Dino ki 100% Free Replacement</strong> deta hai.<br><br>
-    Hamari delivery team purana bulb pickup karegi aur naya bulb deliver karegi:`;
-    actionBox.innerHTML = `<button class="submit-btn" onclick="scrollToSection('acc-replace')">📝 Open Replacement Request Form</button>`;
-  }
-  // 3. Return Related
-  else if(query.includes('return') || query.includes('wapas') || query.includes('bhejna')){
-    textElem.innerHTML = `<strong>📦 Easy Return Policy:</strong><br>
-    Aap product delivery ke baad return request daal sakte hain. Aapka pickup 24-48 ghante me arrange kar diya jayega:`;
-    actionBox.innerHTML = `<button class="submit-btn" onclick="scrollToSection('acc-return')">📝 Open Return Ticket Form</button>`;
-  }
-  // 4. Wrong Product
-  else if(query.includes('galat') || query.includes('wrong') || query.includes('alag') || query.includes('dusra') || query.includes('fake')){
-    textElem.innerHTML = `<strong>⚠️ Wrong Product Delivered:</strong><br>
-    Hume khed hai! Agar galti se galat wattage ya dusra product deliver ho gaya hai, toh turant apna Order ID dekar report karein. Hum sahi bulb bhejenge:`;
-    actionBox.innerHTML = `<button class="submit-btn" onclick="scrollToSection('acc-wrong')">📝 Open Wrong Product Report Form</button>`;
-  }
-  // 5. Order Kaise Kare
-  else if(query.includes('order') || query.includes('buy') || query.includes('kharide') || query.includes('kaise')){
-    textElem.innerHTML = `<strong>🛍️ How to Place Order:</strong><br>
-    1. Home/Product page par jakar apna bulb chunein.<br>
-    2. 'Buy Now' par click karein.<br>
-    3. Delivery Address bharein aur Cash on Delivery ya Online payment chunein.`;
-    actionBox.innerHTML = `<button class="submit-btn" onclick="scrollToSection('acc-shopping')">📖 Read Full Ordering Guide</button>`;
-  }
-  // Default general
-  else {
-    textElem.innerHTML = `<strong>🔍 RADA CREST Support:</strong><br>
-    Aapki query "<em>${query}</em>" ke liye aap niche diye gaye kisi bhi vishay par click karke turant ticket raise kar sakte hain ya hamari WhatsApp support team se baat kar sakte hain.`;
-    actionBox.innerHTML = `<a href="https://wa.me/919509204090?text=Hello%20RADA%20CREST,%20mujhe%20support%20chahiye." target="_blank" class="submit-btn" style="text-decoration:none;text-align:center;background:#25D366;">💬 Chat on WhatsApp</a>`;
+  if(q.includes('bulb') || q.includes('chalta') || q.includes('jal') || q.includes('kharab') || q.includes('damage') || q.includes('replace')){
+    body.innerHTML = `<strong>💡 Bulb Testing Guidance:</strong><br>
+    1. Bulb ko pehle kisi doosre holder me test karein.<br>
+    2. Radar sensor bulb daylight me band rehta hai, andhere me check karein.<br>
+    3. Agar phir bhi nahi chala, toh 7 din ki free replacement ke liye niche diye gaye <strong>Replace Guide</strong> par click karein.`;
+    scrollToAcc('acc-replace');
+  } else if(q.includes('refund') || q.includes('paisa') || q.includes('money') || q.includes('kat gaya')){
+    body.innerHTML = `<strong>💰 Refund Guidance:</strong><br>
+    1. Cancel/Return hone ke 24-48 working hours me bank statement check karein.<br>
+    2. UPI reversals aksar bina SMS alert ke add ho jaate hain.<br>
+    3. Niche <strong>Refund Guide</strong> me jaakar steps dekhein.`;
+    scrollToAcc('acc-refund');
+  } else if(q.includes('return') || q.includes('wapas') || q.includes('pickup')){
+    body.innerHTML = `<strong>📦 Return Guidance:</strong><br>
+    Website par <strong>Orders ➔ Order Details ➔ Request Return</strong> par jayein. Courier partner 24-48 ghante me pickup karega.`;
+    scrollToAcc('acc-return');
+  } else if(q.includes('wrong') || q.includes('galat') || q.includes('dusra')){
+    body.innerHTML = `<strong>⚠️ Wrong Product Guidance:</strong><br>
+    Box ka delivery label aur bill match karein. Niche <strong>Wrong Product Section</strong> se admin ko turant report karein.`;
+    scrollToAcc('acc-wrong');
+  } else if(q.includes('order') || q.includes('buy') || q.includes('kharid') || q.includes('address')){
+    body.innerHTML = `<strong>🛍️ Shopping Guidance:</strong><br>
+    Product select karein ➔ Buy Now ➔ <code>address.html</code> par pata select/edit karein ➔ COD ya Online payment confirm karein.`;
+    scrollToAcc('acc-shopping');
+  } else {
+    body.innerHTML = `Aapki query "<em>${q}</em>" ke liye niche diye gaye relevant topic par click karke problem solving guidance padhein:`;
   }
 };
 
-window.scrollToSection = function(id){
+window.scrollToAcc = function(id){
   const el = document.getElementById(id);
   if(el){
     document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
@@ -644,11 +594,23 @@ window.toggleAcc = function(el){
   if(!isOpen) item.classList.add('active');
 };
 
-// SUBMIT TICKET TO SUPABASE
+// TOGGLE TICKET FORM (ONLY WHEN USER ASKS)
+window.toggleTicketForm = function(formId){
+  const form = document.getElementById(formId);
+  if(form){
+    form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+  }
+};
+
+// SUBMIT TICKET TO SUPABASE (DIRECT NOTIFICATION FOR ADMIN DESK)
 window.submitTicket = async function(e, type){
   e.preventDefault();
   const form = e.target;
   const inputs = form.querySelectorAll('input, textarea');
+  const btn = form.querySelector('.submit-btn');
+
+  btn.disabled = true;
+  btn.innerHTML = 'Sending to Admin Desk...';
 
   try {
     const { error } = await supabase.from('help_tickets').insert([{
@@ -661,9 +623,13 @@ window.submitTicket = async function(e, type){
 
     if(error) throw error;
     form.reset();
+    form.style.display = 'none';
     document.getElementById('successModal').style.display = 'grid';
   } catch(err){
     alert('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Ticket ➔';
   }
 };
 </script>
