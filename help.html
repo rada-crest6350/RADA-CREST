@@ -400,7 +400,7 @@ function renderTopics(){
   `).join('');
 }
 
-// INTELLIGENT ULTRA-SMART BROWSER ENGINE (HAR ALAG SAWAL PAR BILKUL NAYA & SATISFYING JAWAB)
+// 100% ROBUST & ERROR-FREE BROWSER-BASED SMART ENGINE
 window.executeSmartSearch = function(){
   const input = document.getElementById('helpInput');
   const rawQ = input ? input.value.trim().toLowerCase() : '';
@@ -415,76 +415,60 @@ window.executeSmartSearch = function(){
   let title = "💡 RADA CREST Smart Assistant";
   let answerHTML = "";
 
-  // 1. Pricing / Discount / Rate / Mehenga
   if(rawQ.includes('pric') || rawQ.includes('rate') || rawQ.includes('daam') || rawQ.includes('sahi nahi') || rawQ.includes('mehenga') || rawQ.includes('discount') || rawQ.includes('offer') || rawQ.includes('kam karo') || rawQ.includes('paisa')){
-    title = "🏷️ Pricing & Discount Special Assistance";
+    title = "🏷️ Pricing & Discount Assistance";
     answerHTML = `
-      <strong>Aapki pricing aur discount ki baat bilkul sahi jagah pahunchi hai!</strong><br><br>
-      • RADA CREST par hamare LED bulbs aur extension boards ki pricing pehle se hi wholesale aur best value par set hai.<br>
-      • Agar aapko bulk order ya kisi specific product ke daam me adjustment chahiye, toh hum ise direct review kar sakte hain.<br>
-      • Aap niche diye gaye form se apni request bhej dein, hamari admin team turant aapse contact karegi.<br><br>
+      <strong>RADA CREST Pricing Policy:</strong><br><br>
+      • Hamare LED bulbs aur extension boards ki pricing sabse behtareen wholesale aur retail rates par set hai.<br>
+      • Agar aapko bulk order ya kisi specific product ke daam me help chahiye, toh aap niche diye gaye ticket form ke zariye apni baat hum tak pahuncha sakte hain.<br><br>
       <button class="sol-action-btn" style="background:var(--brand);color:#000;" onclick="window.scrollTo({top: 500, behavior: 'smooth'});">💬 Niche Ticket Form Bharein</button>
     `;
-  } 
-  // 2. Quality / Bulb check / Warranty / Kharab
-  else if(rawQ.includes('quality') || rawQ.includes('warranty') || rawQ.includes('guarantee') || rawQ.includes('chalega') || rawQ.includes('light') || rawQ.includes('bulb')){
+  } else if(rawQ.includes('quality') || rawQ.includes('warranty') || rawQ.includes('guarantee') || rawQ.includes('chalega') || rawQ.includes('light') || rawQ.includes('bulb')){
     title = "💡 Product Quality & Warranty Guide";
     answerHTML = `
       <strong>RADA CREST Quality Assurance:</strong><br><br>
       • Hamare sabhi LED Bulbs (Radar Motion Sensor & Emergency Inverter Bulbs) aur Heavy Extension Boards high-grade materials se bane hain.<br>
-      • Har product par 7 din ki free replacement warranty milti hai agar koi bhi technical fault ya damage nikle.<br>
-      • Aap bina kisi fikar ke order kar sakte hain!<br><br>
+      • Har product par 7 din ki free replacement warranty milti hai.<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
     `;
-  }
-  // 3. Order process / Aage kya karu
-  else if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('shuru') || rawQ.includes('kya karu') || rawQ.includes('order') || rawQ.includes('buy')){
+  } else if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('shuru') || rawQ.includes('kya karu') || rawQ.includes('order') || rawQ.includes('buy')){
     title = "🚀 Order Kaise Karein (Step-by-Step)";
     answerHTML = `
-      <strong>Website par aane ke baad order karne ka asaan tarika:</strong><br><br>
-      1. Home page se apna pasandida LED Bulb ya Extension Board select karein.<br>
-      2. Product ke niche diye gaye <strong>'Buy Now'</strong> button par click karein.<br>
-      3. Address page par apna naam, poora pata aur mobile number enter karein.<br>
-      4. Payment me Cash on Delivery (COD) ya UPI chun kar order place kar dein!<br><br>
+      <strong>Website par order karne ka tarika:</strong><br><br>
+      1. Home page se apna pasandida item select karein.<br>
+      2. <strong>'Buy Now'</strong> button par click karein.<br>
+      3. Address page par apna pata aur mobile number enter karein.<br>
+      4. COD ya UPI chun kar order place kar dein!<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
     `;
-  } 
-  // 4. Delivery time / Tracking
-  else if(rawQ.includes('delivery') || rawQ.includes('time') || rawQ.includes('kab') || rawQ.includes('din') || rawQ.includes('track') || rawQ.includes('kaha hai')){
+  } else if(rawQ.includes('delivery') || rawQ.includes('time') || rawQ.includes('kab') || rawQ.includes('din') || rawQ.includes('track') || rawQ.includes('kaha hai')){
     title = "📦 Delivery & Order Tracking";
     answerHTML = `
-      <strong>Delivery aur Tracking ki jankari:</strong><br><br>
-      • Order confirm hone ke 24 ghante ke andar dispatch kar diya jata hai.<br>
-      • Aapke pata par saman aamtaur par 3 se 5 working days me pahunch jata hai.<br>
-      • Aap apne pichle saare orders ka status live dekh sakte hain.<br><br>
+      <strong>Delivery ki jankari:</strong><br><br>
+      • Order 24 ghante ke andar dispatch hota hai aur 3 se 5 working days me pahunch jata hai.<br>
+      • Aap apne pichle orders ka status live track kar sakte hain.<br><br>
       <a href="orders.html" class="sol-action-btn">📦 Track My Orders</a>
     `;
-  } 
-  // 5. Refund / Return
-  else if(rawQ.includes('refund') || rawQ.includes('return') || rawQ.includes('paisa wapas') || rawQ.includes('replace') || rawQ.includes('damage')){
+  } else if(rawQ.includes('refund') || rawQ.includes('return') || rawQ.includes('paisa wapas') || rawQ.includes('replace') || rawQ.includes('damage')){
     title = "🔄 Return & Refund Policy";
     answerHTML = `
-      <strong>7 Days Free Replacement & Refund:</strong><br><br>
-      • Agar product toota ya kharab mile toh 7 din ke andar free replacement milta hai.<br>
-      • Refund ya cancellation ke 24-48 working hours ke andar paisa seedha aapke bank/UPI account me bhej diya jata hai.<br><br>
+      <strong>7 Days Free Replacement:</strong><br><br>
+      • Kharab ya damaged item milne par 7 din ke andar free replacement milta hai.<br>
+      • Refund cancellation ke 24-48 working hours me bank/UPI me transfer hota hai.<br><br>
       <a href="orders.html" class="sol-action-btn">📦 Request Return</a>
     `;
-  }
-  // 6. Greetings
-  else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
-    title = "👋 Namaste! RADA CREST Support Me Swagat Hai";
+  } else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
+    title = "👋 Namaste! RADA CREST Support";
     answerHTML = `
-      <strong>Hello dost! Main aapki kya madad kar sakta hoon?</strong><br><br>
-      Aapko pricing, product quality, order tracking ya kisi bhi nayi cheez ke baare me janna ho, aap yahan seedha type karke pooch sakte hain!
+      <strong>Hello dost! Main aapki kya sahayata kar sakta hoon?</strong><br><br>
+      Aapko pricing, order, ya replacement se judi jo bhi jankari chahiye, yahan type karke pooch sakte hain!
     `;
-  } 
-  // 7. Dynamic smart fallback for any custom question
-  else {
+  } else {
     title = `💡 RADA CREST Guide for: "${input.value}"`;
     answerHTML = `
-      <strong>Aapke is unique sawal ke liye hamari salah:</strong><br><br>
-      • Aapke sawal ko humne note kar liya hai. Iske behtareen samadhan ke liye aap <strong>Store</strong> par product ki details check kar sakte hain.<br>
-      • Agar aapko koi khas requirement ya bulk requirement hai, toh niche diye gaye ticket form se seedha admin ko message bhej sakte hain!<br><br>
+      <strong>Aapke is sawal ke liye hamari salah:</strong><br><br>
+      • Product details dekhne ke liye <strong>Store</strong> par jayein.<br>
+      • Kisi khas requirement ke liye niche diye gaye ticket form se admin ko message bhej dein.<br><br>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
         <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
@@ -496,7 +480,6 @@ window.executeSmartSearch = function(){
   if(solText) solText.innerHTML = answerHTML;
 };
 
-// EVENT BINDINGS
 document.addEventListener('DOMContentLoaded', () => {
   const aiBtn = document.getElementById('aiSearchBtn');
   if(aiBtn) aiBtn.addEventListener('click', window.executeSmartSearch);
@@ -634,7 +617,7 @@ window.fetchTickets = async function(phone){
           <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
         </div>
         <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
-        <div style="font-size:12px;color:var(--text-muted);${tk.description}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
         ${tk.status === 'rejected' && tk.rejection_reason ? `
           <div class="reject-reason-box">
             <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
