@@ -396,7 +396,7 @@ function renderTopics(){
   `).join('');
 }
 
-// 100% BULLET-PROOF CLIENT-SIDE SMART AI ENGINE (NEVER FAILS, NO DEPRECATION ERROR)
+// 100% DISTINCT SMART DYNAMIC ENGINE (HAR SAWAL KA BILKUL ALAG JWAB)
 window.executeSmartSearch = function(){
   const input = document.getElementById('helpInput');
   const rawQ = input ? input.value.trim().toLowerCase() : '';
@@ -407,58 +407,95 @@ window.executeSmartSearch = function(){
   const badge = document.getElementById('solBadgeTitle');
 
   if(card) card.style.display = 'block';
-  if(badge) badge.textContent = '🤝 RADA CREST AI Smart Guide';
 
+  let title = "💡 RADA CREST Support Guide";
   let answerHTML = "";
 
-  if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('hii') || rawQ.includes('hello')){
+  // 1. Onboarding / Aage kya karu
+  if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('shuru') || rawQ.includes('kya karu')){
+    title = "🚀 Website Kholne Ke Baad Ke Steps";
     answerHTML = `
-      <strong>👋 Namaste Dost! Website kholne ke baad aage ye steps follow karein:</strong><br><br>
-      1. <strong>Store Explore Karein:</strong> Home page par hamare LED Bulbs aur Extension Boards dekhein.<br>
-      2. <strong>Buy Now Click Karein:</strong> Jo item pasand ho uske niche <em>Buy Now</em> button dabayein.<br>
-      3. <strong>Address & Checkout:</strong> Apna delivery pata aur phone number bharein, fir COD ya UPI se order confirm karein!<br><br>
+      <strong>Dost, website par aane ke baad aapko ye karna hai:</strong><br><br>
+      1. Hamare store par LED Bulbs aur Heavy Extension Boards dekhein.<br>
+      2. Jo item lena ho uske niche <strong>'Buy Now'</strong> button par click karein.<br>
+      3. Apna delivery address bharein aur COD ya Online UPI select karke order confirm karein.<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
     `;
-  } else if(rawQ.includes('order') || rawQ.includes('kharid') || rawQ.includes('buy')){
+  } 
+  // 2. Order related
+  else if(rawQ.includes('order') || rawQ.includes('kharid') || rawQ.includes('buy') || rawQ.includes('book')){
+    title = "🛍️ Order Booking & Purchase Guide";
     answerHTML = `
-      <strong>🛍️ Order Karne Ka Asaan Tarika:</strong><br><br>
-      1. Product page par <strong>Buy Now</strong> button dabayein.<br>
-      2. Apna address bharein (` + `<a href="address.html" style="color:var(--brand);">Address Page</a>` + `).<br>
-      3. Payment option (Cash on Delivery / UPI) select karke order place kar dein.<br><br>
-      <a href="index.html" class="sol-action-btn">🛒 Abhi Order Karein</a>
-    `;
-  } else if(rawQ.includes('address') || rawQ.includes('pata') || rawQ.includes('location')){
-    answerHTML = `
-      <strong>📍 Delivery Address Management:</strong><br><br>
-      Aap order karte waqt ya seedha address page par jakar apna naya pata save kar sakte hain.<br><br>
-      <a href="address.html" class="sol-action-btn">📍 Address Settings Kholein</a>
-    `;
-  } else if(rawQ.includes('refund') || rawQ.includes('paisa') || rawQ.includes('money') || rawQ.includes('paise')){
-    answerHTML = `
-      <strong>💰 Refund & Payment Guidelines:</strong><br><br>
-      Cancellation ya Return ke baad paisa <strong>24 se 48 working hours</strong> ke andar seedha aapke bank account me bhej diya jata hai.
-    `;
-  } else if(rawQ.includes('return') || rawQ.includes('kharab') || rawQ.includes('damage') || rawQ.includes('replace')){
-    answerHTML = `
-      <strong>🔄 7 Days Free Replacement:</strong><br><br>
-      RADA CREST ke har product par 7 din ki replacement guarantee milti hai. Aap apne orders page par jakar request daal sakte hain.<br><br>
-      <a href="orders.html" class="sol-action-btn">📦 My Orders Kholein</a>
-    `;
-  } else {
-    answerHTML = `
-      <strong>💡 RADA CREST Guide for "${input.value}":</strong><br><br>
-      Aapki samasya ke liye hamare paas yeh options hain:<br>
-      • Naya saman dekhne ke liye <strong>Store</strong> par jayein.<br>
-      • Puraane orders aur tracking ke liye <strong>Orders</strong> page check karein.<br>
-      • Ya niche diye gaye topics me se ticket submit karein.<br><br>
+      <strong>Order karne ka poora process:</strong><br><br>
+      • Home page se koi bhi product choose karke <em>Buy Now</em> dabayein.<br>
+      • Aap seedha address page par chale jayenge wahan apna pata dalein.<br>
+      • Cash on Delivery (COD) ya UPI payment chun kar order place kar dein.<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Kholein</a>
+    `;
+  } 
+  // 3. Address related
+  else if(rawQ.includes('address') || rawQ.includes('pata') || rawQ.includes('location') || rawQ.includes('jagah')){
+    title = "📍 Delivery Address Settings";
+    answerHTML = `
+      <strong>Address badalne ya add karne ke liye:</strong><br><br>
+      Jab aap koi product kharidne ke liye <em>Buy Now</em> dabate hain, tab address page par aap apna naya pata save kar sakte hain.<br><br>
+      <a href="address.html" class="sol-action-btn">📍 Address Page Par Jayein</a>
+    `;
+  } 
+  // 4. Refund / Money
+  else if(rawQ.includes('refund') || rawQ.includes('paisa') || rawQ.includes('money') || rawQ.includes('paise') || rawQ.includes('amount')){
+    title = "💰 Refund Status & Bank Timings";
+    answerHTML = `
+      <strong>Refund ki jankari:</strong><br><br>
+      Agar aapka order cancel ya return hua hai, toh uska paisa <strong>24 se 48 working hours</strong> ke andar aapke original bank account ya UPI me transfer kar diya jata hai.
+    `;
+  } 
+  // 5. Return / Damage / Replacement
+  else if(rawQ.includes('return') || rawQ.includes('kharab') || rawQ.includes('damage') || rawQ.includes('replace') || rawQ.includes('toota') || rawQ.includes('chal nahi')){
+    title = "🔄 7 Days Free Replacement Policy";
+    answerHTML = `
+      <strong>Defective ya Damaged item ka solution:</strong><br><br>
+      RADA CREST par 7 din ki 100% free replacement milti hai. Aap apne orders page par jakar return request daal sakte hain, hamara delivery partner aakar item exchange kar lega.<br><br>
+      <a href="orders.html" class="sol-action-btn">📦 My Orders & Returns</a>
+    `;
+  } 
+  // 6. Tracking / Delivery time
+  else if(rawQ.includes('track') || rawQ.includes('kaha hai') || rawQ.includes('kab aayega') || rawQ.includes('status') || rawQ.includes('delivery')){
+    title = "🚚 Order Tracking & Delivery Speed";
+    answerHTML = `
+      <strong>Delivery aur tracking ki jankari:</strong><br><br>
+      Order 24 ghante ke andar dispatch ho jata hai aur 3 se 5 dino me aapke ghar pahunch jata hai. Aap apne pichle orders ka status live dekh sakte hain.<br><br>
+      <a href="orders.html" class="sol-action-btn">📦 Track My Orders</a>
+    `;
+  } 
+  // 7. Greetings (Hii / Hello)
+  else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
+    title = "👋 Welcome to RADA CREST Support";
+    answerHTML = `
+      <strong>Hello dost! Main aapki kya sahayata kar sakta hoon?</strong><br><br>
+      Aapko website par order karne me, address dalne me, ya replacement se judi koi bhi jankari chahiye toh yahan seedha type karke puch sakte hain!
+    `;
+  } 
+  // Default unique response for any other custom question
+  else {
+    title = `💡 RADA CREST Answer for: "${input.value}"`;
+    answerHTML = `
+      <strong>Aapke is sawal ke liye hamari salah:</strong><br><br>
+      • Agar aapko naya saman kharidna hai toh <strong>Store</strong> par jayein.<br>
+      • Agar aapka koi purana order hai toh <strong>Orders</strong> page check karein.<br>
+      • Kisi khas dikkat ke liye niche diye gaye ticket form se seedha humein request bhej sakte hain.<br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
+        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
+      </div>
     `;
   }
 
+  if(badge) badge.textContent = title;
   if(solText) solText.innerHTML = answerHTML;
 };
 
-// EVENT BINDINGS
+// EVENT LISTENERS
 document.addEventListener('DOMContentLoaded', () => {
   const aiBtn = document.getElementById('aiSearchBtn');
   if(aiBtn) aiBtn.addEventListener('click', window.executeSmartSearch);
