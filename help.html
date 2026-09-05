@@ -251,7 +251,7 @@ body{
   </div>
 
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. website khol li age kya karu, bulb kaise chune, refund)...">
+    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. pricing sahi nahi hai, discount milega kya)...">
     <button class="search-action-btn" id="aiSearchBtn">🔍 Analyze</button>
   </div>
 
@@ -396,7 +396,7 @@ function renderTopics(){
   `).join('');
 }
 
-// 100% DISTINCT SMART DYNAMIC ENGINE (HAR SAWAL KA BILKUL ALAG JWAB)
+// 100% ACCURATE INTENT MATCHING ENGINE (PRICING, DISCOUNT, & CUSTOM QUERIES)
 window.executeSmartSearch = function(){
   const input = document.getElementById('helpInput');
   const rawQ = input ? input.value.trim().toLowerCase() : '';
@@ -411,18 +411,28 @@ window.executeSmartSearch = function(){
   let title = "💡 RADA CREST Support Guide";
   let answerHTML = "";
 
-  // 1. Onboarding / Aage kya karu
-  if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('shuru') || rawQ.includes('kya karu')){
+  // 1. PRICING / DISCOUNT / RATE / SAHI NHI HAI
+  if(rawQ.includes('pric') || rawQ.includes('rate') || rawQ.includes('daam') || rawQ.includes('sahi nahi') || rawQ.includes('mehenga') || rawQ.includes('discount') || rawQ.includes('offer') || rawQ.includes('kam karo') || rawQ.includes('paisa')){
+    title = "🏷️ Pricing & Special Discount Request";
+    answerHTML = `
+      <strong>Dost, aapko pricing ya discount ke liye direct special offer chahiye?</strong><br><br>
+      • RADA CREST apne customers ko sabse behtareen wholesale aur retail daamo par best quality LED bulbs aur extension boards deta hai.<br>
+      • Agar aapko bulk order me ya kisi specific product par pricing ki dikat hai, toh aap niche direct Admin Desk par apni request bhej sakte hain taaki hum aapke liye best deal set kar sakein!<br><br>
+      <button class="sol-action-btn" style="background:var(--brand);color:#000;" onclick="window.scrollTo({top: 500, behavior: 'smooth'});">💬 Niche Ticket Form Bharein</button>
+    `;
+  } 
+  // 2. Onboarding / Aage kya karu
+  else if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('shuru') || rawQ.includes('kya karu')){
     title = "🚀 Website Kholne Ke Baad Ke Steps";
     answerHTML = `
       <strong>Dost, website par aane ke baad aapko ye karna hai:</strong><br><br>
       1. Hamare store par LED Bulbs aur Heavy Extension Boards dekhein.<br>
       2. Jo item lena ho uske niche <strong>'Buy Now'</strong> button par click karein.<br>
-      3. Apna delivery address bharein aur COD ya Online UPI select karke order confirm karein.<br><br>
+      3. Apna delivery address bharein aur COD ya Online UPI select karke order confirm karein!<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
     `;
   } 
-  // 2. Order related
+  // 3. Order related
   else if(rawQ.includes('order') || rawQ.includes('kharid') || rawQ.includes('buy') || rawQ.includes('book')){
     title = "🛍️ Order Booking & Purchase Guide";
     answerHTML = `
@@ -433,7 +443,7 @@ window.executeSmartSearch = function(){
       <a href="index.html" class="sol-action-btn">🛒 Store Kholein</a>
     `;
   } 
-  // 3. Address related
+  // 4. Address related
   else if(rawQ.includes('address') || rawQ.includes('pata') || rawQ.includes('location') || rawQ.includes('jagah')){
     title = "📍 Delivery Address Settings";
     answerHTML = `
@@ -442,48 +452,30 @@ window.executeSmartSearch = function(){
       <a href="address.html" class="sol-action-btn">📍 Address Page Par Jayein</a>
     `;
   } 
-  // 4. Refund / Money
-  else if(rawQ.includes('refund') || rawQ.includes('paisa') || rawQ.includes('money') || rawQ.includes('paise') || rawQ.includes('amount')){
-    title = "💰 Refund Status & Bank Timings";
-    answerHTML = `
-      <strong>Refund ki jankari:</strong><br><br>
-      Agar aapka order cancel ya return hua hai, toh uska paisa <strong>24 se 48 working hours</strong> ke andar aapke original bank account ya UPI me transfer kar diya jata hai.
-    `;
-  } 
   // 5. Return / Damage / Replacement
   else if(rawQ.includes('return') || rawQ.includes('kharab') || rawQ.includes('damage') || rawQ.includes('replace') || rawQ.includes('toota') || rawQ.includes('chal nahi')){
     title = "🔄 7 Days Free Replacement Policy";
     answerHTML = `
       <strong>Defective ya Damaged item ka solution:</strong><br><br>
-      RADA CREST par 7 din ki 100% free replacement milti hai. Aap apne orders page par jakar return request daal sakte hain, hamara delivery partner aakar item exchange kar lega.<br><br>
+      RADA CREST ke har product par 7 din ki 100% free replacement milti hai. Aap apne orders page par jakar return request daal sakte hain, hamara delivery partner aakar item exchange kar lega.<br><br>
       <a href="orders.html" class="sol-action-btn">📦 My Orders & Returns</a>
     `;
   } 
-  // 6. Tracking / Delivery time
-  else if(rawQ.includes('track') || rawQ.includes('kaha hai') || rawQ.includes('kab aayega') || rawQ.includes('status') || rawQ.includes('delivery')){
-    title = "🚚 Order Tracking & Delivery Speed";
-    answerHTML = `
-      <strong>Delivery aur tracking ki jankari:</strong><br><br>
-      Order 24 ghante ke andar dispatch ho jata hai aur 3 se 5 dino me aapke ghar pahunch jata hai. Aap apne pichle orders ka status live dekh sakte hain.<br><br>
-      <a href="orders.html" class="sol-action-btn">📦 Track My Orders</a>
-    `;
-  } 
-  // 7. Greetings (Hii / Hello)
+  // 6. Greetings
   else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
     title = "👋 Welcome to RADA CREST Support";
     answerHTML = `
       <strong>Hello dost! Main aapki kya sahayata kar sakta hoon?</strong><br><br>
-      Aapko website par order karne me, address dalne me, ya replacement se judi koi bhi jankari chahiye toh yahan seedha type karke puch sakte hain!
+      Aapko pricing, order karne, ya replacement se judi koi bhi jankari chahiye toh yahan seedha type karke puch sakte hain!
     `;
   } 
-  // Default unique response for any other custom question
+  // Default unique response
   else {
     title = `💡 RADA CREST Answer for: "${input.value}"`;
     answerHTML = `
       <strong>Aapke is sawal ke liye hamari salah:</strong><br><br>
-      • Agar aapko naya saman kharidna hai toh <strong>Store</strong> par jayein.<br>
-      • Agar aapka koi purana order hai toh <strong>Orders</strong> page check karein.<br>
-      • Kisi khas dikkat ke liye niche diye gaye ticket form se seedha humein request bhej sakte hain.<br><br>
+      • Agar aapko saman ya pricing dekhni hai toh <strong>Store</strong> par jayein.<br>
+      • Kisi khas discount ya requirement ke liye niche diye gaye ticket form se humein message bhej dein.<br><br>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
         <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
@@ -495,7 +487,7 @@ window.executeSmartSearch = function(){
   if(solText) solText.innerHTML = answerHTML;
 };
 
-// EVENT LISTENERS
+// EVENT BINDINGS
 document.addEventListener('DOMContentLoaded', () => {
   const aiBtn = document.getElementById('aiSearchBtn');
   if(aiBtn) aiBtn.addEventListener('click', window.executeSmartSearch);
