@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select Language — RADA CREST</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg-deep:#060608;
+  --panel-card:rgba(24, 24, 32, 0.85);
+  --border:rgba(255, 255, 255, 0.08);
+  --text:#ffffff;
+  --text-muted:#9da0b0;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.35);
+  --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+  --green:#3dd598;
+}
+
+body{
+  background:var(--bg-deep);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+.ambient-glow{
+  position:fixed;
+  width:400px;height:400px;
+  background:radial-gradient(circle, rgba(255,122,0,0.15) 0%, rgba(0,0,0,0) 70%);
+  top:50%;left:50%;
+  transform:translate(-50%, -50%);
+  z-index:0;
+  pointer-events:none;
+}
+
+.container{
+  width:100%;
+  max-width:480px;
+  background:var(--panel-card);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:30px 24px;
+  position:relative;
+  z-index:1;
+  box-shadow:0 20px 40px rgba(0,0,0,0.6);
+  animation:fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.header-top{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;
+}
+.back-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  width:36px;height:36px;border-radius:10px;
+  display:grid;place-items:center;color:#fff;
+  text-decoration:none;font-size:15px;
+}
+.title-box h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;}
+.title-box p{font-size:12.5px;color:var(--text-muted);margin-top:2px;}
+
+.lang-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  margin-top:16px;
+}
+
+.lang-card{
+  background:rgba(255,255,255,0.03);
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-card:hover{
+  border-color:var(--brand);
+  background:rgba(255,122,0,0.08);
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px var(--brand-glow);
+}
+
+.lang-card.selected{
+  background:var(--brand-gradient);
+  border-color:transparent;
+  color:#000;
+  box-shadow:0 6px 20px var(--brand-glow);
+}
+
+.lang-card.selected .native-name{color:#000;}
+.lang-card.selected .eng-name{color:rgba(0,0,0,0.7);}
+
+.lang-info .native-name{
+  font-size:15px;font-weight:700;color:#fff;display:block;
+}
+.lang-info .eng-name{
+  font-size:11.5px;color:var(--text-muted);display:block;margin-top:1px;
+}
+
+.check-icon{
+  font-size:14px;display:none;font-weight:bold;
+}
+.lang-card.selected .check-icon{display:block;}
+
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--green);color:#000;font-weight:800;padding:10px 20px;
+  border-radius:12px;font-size:13px;box-shadow:0 10px 25px rgba(61,213,152,0.4);
+  transition:0.3s;z-index:999;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<div class="container">
+  <div class="header-top">
+    <a href="index.html" class="back-btn">←</a>
+    <div style="font-size:12px;color:var(--brand);font-weight:700;">🌐 RADA CREST Multilingual</div>
+  </div>
+
+  <div class="title-box">
+    <h1>Choose Your Language</h1>
+    <p>Apni pasand ki bhasha chunein</p>
+  </div>
+
+  <div class="lang-grid" id="langGrid">
+    <div class="lang-card" data-code="en" onclick="selectLang('en')">
+      <div class="lang-info">
+        <span class="native-name">English</span>
+        <span class="eng-name">Default</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="hi" onclick="selectLang('hi')">
+      <div class="lang-info">
+        <span class="native-name">हिंदी</span>
+        <span class="eng-name">Hindi</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="te" onclick="selectLang('te')">
+      <div class="lang-info">
+        <span class="native-name">తెలుగు</span>
+        <span class="eng-name">Telugu</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="ta" onclick="selectLang('ta')">
+      <div class="lang-info">
+        <span class="native-name">தமிழ்</span>
+        <span class="eng-name">Tamil</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="kn" onclick="selectLang('kn')">
+      <div class="lang-info">
+        <span class="native-name">ಕನ್ನಡ</span>
+        <span class="eng-name">Kannada</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="ml" onclick="selectLang('ml')">
+      <div class="lang-info">
+        <span class="native-name">മലയാളം</span>
+        <span class="eng-name">Malayalam</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="mr" onclick="selectLang('mr')">
+      <div class="lang-info">
+        <span class="native-name">मराठी</span>
+        <span class="eng-name">Marathi</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="gu" onclick="selectLang('gu')">
+      <div class="lang-info">
+        <span class="native-name">ગુજરાતી</span>
+        <span class="eng-name">Gujarati</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="bn" onclick="selectLang('bn')">
+      <div class="lang-info">
+        <span class="native-name">বাংলা</span>
+        <span class="eng-name">Bengali</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+
+    <div class="lang-card" data-code="pa" onclick="selectLang('pa')">
+      <div class="lang-info">
+        <span class="native-name">ਪੰਜਾਬੀ</span>
+        <span class="eng-name">Punjabi</span>
+      </div>
+      <span class="check-icon">✓</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="successToast">Language Updated Successfully!</div>
+
+<script>
+function selectLang(code) {
+  localStorage.setItem('rc_lang', code);
+  
+  // Highlight selected card
+  document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
+  const activeCard = document.querySelector(`[data-code="${code}"]`);
+  if(activeCard) activeCard.classList.add('selected');
+
+  // Show toast
+  const toast = document.getElementById('successToast');
+  if(toast) toast.classList.add('show');
+
+  // Redirect back to store after 600ms
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 600);
+}
+
+// Highlight currently active language on load
+document.addEventListener('DOMContentLoaded', () => {
+  const currentLang = localStorage.getItem('rc_lang') || 'en';
+  const activeCard = document.querySelector(`[data-code="${currentLang}"]`);
+  if(activeCard) activeCard.classList.add('selected');
+});
+</script>
+
+</body>
+</html>
