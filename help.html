@@ -400,8 +400,8 @@ function renderTopics(){
   `).join('');
 }
 
-// 3. CORE AI SEARCH LOGIC
-async function executeSmartSearch(){
+// 3. CORE AI SEARCH FUNCTION (WINDOW SCOPE)
+window.executeSmartSearch = async function(){
   const input = document.getElementById('helpInput');
   const rawQ = input ? input.value.trim() : '';
   if(!rawQ) return;
@@ -427,7 +427,7 @@ async function executeSmartSearch(){
     });
 
     const data = await res.json();
-    if(!res.ok || !data.answer) throw new Error(data.error || "API error status: " + res.status);
+    if(!res.ok || !data.answer) throw new Error(data.error || ("Status: " + res.status));
 
     if(badge) badge.textContent = "💡 RADA CREST Personal Guide";
     if(solText){
@@ -440,9 +440,9 @@ async function executeSmartSearch(){
       `;
     }
   } catch(err){
-    console.error("AI fetch fail:", err);
+    console.error("AI error:", err);
     if(solText){
-      solText.innerHTML = `<span style="color:var(--red);">⚠️ Error: ${err.message}</span><br><br><small style="color:var(--text-muted);">Groq API call check karein.</small>`;
+      solText.innerHTML = `<span style="color:var(--red);">⚠️ Error: ${err.message}</span>`;
     }
   } finally {
     if(btn){
@@ -450,19 +450,19 @@ async function executeSmartSearch(){
       btn.textContent = '🔍 Analyze';
     }
   }
-}
+};
 
-// 4. EVENT LISTENERS (ATTACH CLEANLY)
+// 4. EVENT BINDINGS
 document.addEventListener('DOMContentLoaded', () => {
   const aiBtn = document.getElementById('aiSearchBtn');
   if(aiBtn){
-    aiBtn.addEventListener('click', executeSmartSearch);
+    aiBtn.addEventListener('click', window.executeSmartSearch);
   }
 
   const helpInput = document.getElementById('helpInput');
   if(helpInput){
     helpInput.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter') executeSmartSearch();
+      if(e.key === 'Enter') window.executeSmartSearch();
     });
   }
 
@@ -476,12 +476,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const trackTrigger = document.getElementById('trackBtnModalTrigger');
   if(trackTrigger){
-    trackTrigger.addEventListener('click', openAutoTrackerModal);
+    trackTrigger.addEventListener('click', window.openAutoTrackerModal);
   }
 
   const closeTracker = document.getElementById('closeTrackerModalBtn');
   if(closeTracker){
-    closeTracker.addEventListener('click', closeTrackerModal);
+    closeTracker.addEventListener('click', window.closeTrackerModal);
   }
 
   const closeSuccess = document.getElementById('closeSuccessModalBtn');
@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 5. GLOBAL HELPERS
+// 5. GLOBAL ACCORDION & TICKET HELPERS
 window.toggleAcc = function(headerEl){
   const item = headerEl.closest('.acc-item');
   const isOpen = item.classList.contains('active');
@@ -547,7 +547,7 @@ window.submitTicket = async function(e, topicTitle){
   }
 };
 
-async function openAutoTrackerModal(){
+window.openAutoTrackerModal = async function(){
   const modal = document.getElementById('trackerModal');
   if(modal) modal.style.display = 'grid';
   const idBox = document.getElementById('identityDetectedBox');
@@ -570,7 +570,7 @@ async function openAutoTrackerModal(){
       if(manualBtn){
         manualBtn.addEventListener('click', () => {
           const inp = document.getElementById('manualTrackInput');
-          if(inp) fetchTickets(inp.value.trim());
+          if(inp) window.fetchTickets(inp.value.trim());
         });
       }
     }
@@ -578,10 +578,10 @@ async function openAutoTrackerModal(){
   }
 
   if(idBox) idBox.innerHTML = `<span>Customer Mobile: <strong>${activePhone}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
-  await fetchTickets(activePhone);
-}
+  await window.fetchTickets(activePhone);
+};
 
-async function fetchTickets(phone){
+window.fetchTickets = async function(phone){
   const resBox = document.getElementById('trackResultList');
   if(!resBox) return;
   resBox.innerHTML = `<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Analyzing your requests...</p>`;
@@ -619,14 +619,14 @@ async function fetchTickets(phone){
   } catch(err){
     resBox.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Error: ${err.message}</div>`;
   }
-}
+};
 
-function closeTrackerModal(){
+window.closeTrackerModal = function(){
   const modal = document.getElementById('trackerModal');
   if(modal) modal.style.display = 'none';
-}
+};
 
-// 6. INITIAL LOAD
+// INITIAL LOAD
 (async () => {
   await autoDetectUser();
   await loadTopics();
