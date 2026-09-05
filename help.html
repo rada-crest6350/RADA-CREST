@@ -403,8 +403,8 @@ window.executeSmartSearch = async function(){
   btn.disabled = true;
   btn.textContent = 'Analyzing...';
   card.style.display = 'block';
-  badge.textContent = '🤖 RADA CREST AI Thinking...';
-  solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapka sawal analyze ho raha hai...</span>';
+  badge.textContent = '🤖 RADA CREST AI Solution (Thinking)';
+  solText.innerHTML = '<span style="color:var(--brand);">⚡ RADA CREST AI aapka sawal analyze kar raha hai...</span>';
 
   try {
     const response = await fetch('/api/ask', {
@@ -416,10 +416,10 @@ window.executeSmartSearch = async function(){
     const data = await response.json();
 
     if(!response.ok || !data.answer) {
-      throw new Error(data.error || ("Status: " + response.status));
+      throw new Error(data.error || "Backend response missing");
     }
 
-    badge.textContent = "💡 RADA CREST AI Solution";
+    badge.textContent = "💡 RADA CREST Personal Guide";
     solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
       <br><br>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -430,14 +430,13 @@ window.executeSmartSearch = async function(){
 
   } catch(err){
     console.error("AI Error:", err);
-    // Asali error seedha screen par dikhega taaki pata chale Groq key me issue hai ya model me
-    solText.innerHTML = `<span style="color:var(--red);font-weight:bold;">⚠️ Backend Error:</span> ${err.message}<br><br><small style="color:var(--text-muted);">Agar 'Invalid API Key' likha aaye, toh api/ask.js me Groq key check karein.</small>`;
+    solText.innerHTML = `<span style="color:var(--red);font-weight:bold;">⚠️ Error:</span> ${err.message}`;
   } finally {
     btn.disabled = false;
     btn.textContent = '🔍 Analyze';
   }
 };
-
+  
   try {
     const response = await fetch('/api/ask', {
       method: 'POST',
