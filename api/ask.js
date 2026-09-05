@@ -1,40 +1,27 @@
 export default async function handler(req, res) {
-  // CORS Headers allow karein
-  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  const { query } = req.body || {};
+  if (!query) return res.status(400).json({ error: 'Query empty' });
 
-  const { query } = req.body;
-  if (!query) {
-    return res.status(400).json({ error: 'Query is required' });
-  }
-
-  // Yahan apni Groq API Key daalein
+  // YAHAN APNI GROQ KEY PASTE KAREIN
   const GROQ_API_KEY = process.env.GROQ_API_KEY || "YAHAN_APNI_GROQ_KEY_DAALEIN";
 
-  const systemContext = `Aap RADA CREST brand ke personal AI customer support guide hain.
-RADA CREST Website ki Jankari:
-- index.html: Storefront jahan LED lights (Motion Radar bulb, Inverter emergency bulb) aur Heavy extension boards milte hain. Customer item pasand karke 'Buy Now' dabata hai.
-- address.html: Jahan customer apna delivery address chunta ya naya address jodta hai.
-- orders.html: Jahan customer past orders track kar sakta hai aur 7 dino ke andar 'Request Return' kar sakta hai.
-- Policies: 7 din ki free replacement milti hai agar bulb/board kharab ya damaged nikle. Refund cancel/return ke 24-48 ghante me direct bank/UPI me credit hota hai. Cash on Delivery (COD) aur Online UPI dono uplabdh hain.
+  const systemContext = `Aap RADA CREST brand ke ultra-intelligent, friendly customer support AI hain.
+Store Details:
+- Website: LED Bulbs (Radar Motion sensor, emergency inverter) aur Heavy Extension Boards bechti hai.
+- Process: Customer index.html par jakar item dekhta hai, Buy Now dabata hai, address.html par pata bharta hai, aur COD ya UPI se order confirm karta hai.
+- Policies: 7 din ki free replacement kharab/damaged saman par. 24-48 ghante me refund seedha bank account me.
 
-Nirdesh:
-- Customer ke sawal ko dhyan se samajh kar bilkul dost ki tarah (warm, friendly) Hinglish aur Hindi me point-by-point gehra aur clear guidance dein.
-- Kabhi bhi chhota ya adha-adhura jawab na dein. Step 1, Step 2 karke samjhayein ki website par aage kahan jana hai aur kya karna hai.`;
+Rules:
+1. Customer ke sawal ko deeply analyze karein chahe tooti-footi Hindi ho ya Hinglish (jaise 'ME AGE KYA KATU' ya 'khol li aage kya karu').
+2. Bilkul ek samajhdar dost ki tarah Step 1, Step 2, Step 3 karke complete, detailed aur practical rasta samjhayein ki website par use abhi kya karna hai.
+3. Chhota ya template jawab mat dein, poora vistaar se guide karein.`;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -50,18 +37,20 @@ Nirdesh:
           { role: "user", content: query }
         ],
         temperature: 0.6,
-        max_tokens: 600
+        max_tokens: 800
       })
     });
 
     const data = await response.json();
+    
     if (data.choices && data.choices[0]) {
       return res.status(200).json({ answer: data.choices[0].message.content });
     } else {
-      throw new Error(data.error?.message || "Invalid API response");
+      console.error("Groq API Error Detail:", data);
+      return res.status(500).json({ error: data.error?.message || "Groq failed" });
     }
   } catch (err) {
-    console.error(err);
+    console.error("Fetch Exception:", err);
     return res.status(500).json({ error: err.message });
   }
 }
