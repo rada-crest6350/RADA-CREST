@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RADA CREST — Referral Management</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#090909;
+  --panel:#121212;
+  --panel2:#171717;
+  --border:#242424;
+  --text:#ffffff;
+  --muted:#8e8e93;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.15);
+  --green:#7dff9b;
+  --red:#ff6b6b;
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,select{font:inherit;}
+button{cursor:pointer;}
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{
+  width:265px;
+  background:#0d0d0d;
+  border-right:1px solid var(--border);
+  padding:22px 14px;
+  position:fixed;
+  left:0;top:0;bottom:0;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+.brand{
+  padding:6px 10px 18px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo{
+  width:42px;height:42px;
+  border:2px solid var(--brand);
+  background:#141414;
+  color:var(--brand);
+  border-radius:12px;
+  display:grid;place-items:center;
+  font-weight:900;font-size:16px;
+  box-shadow:0 0 14px var(--brand-glow);
+}
+.brand-details small{
+  color:var(--brand);letter-spacing:2px;
+  font-size:9px;font-weight:bold;text-transform:uppercase;
+}
+.brand-details h2{margin:2px 0 0;font-size:18px;color:#fff;}
+.menu{flex:1;display:flex;flex-direction:column;gap:4px;}
+.menu button{
+  width:100%;background:transparent;
+  color:#a1a1aa;border:1px solid transparent;
+  padding:10px 12px;text-align:left;
+  border-radius:10px;font-weight:600;font-size:13.5px;
+  display:flex;align-items:center;gap:10px;
+  transition:all 0.2s ease;
+}
+.menu button:hover{background:#171717;color:#fff;}
+.menu button.active{
+  background:var(--brand-glow);
+  color:#fff;
+  border-color:rgba(255,122,0,0.4);
+  font-weight:700;
+}
+.back-btn{
+  margin-top:auto;
+  padding:11px;
+  background:#141414;
+  border:1px solid #282828;
+  color:#d4d4d8;
+  border-radius:10px;
+  font-weight:700;
+  font-size:13px;
+}
+
+/* MAIN CONTENT */
+.main{
+  margin-left:265px;
+  width:calc(100% - 265px);
+  min-height:100vh;
+  padding:28px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:24px;
+}
+.topbar h1{margin:0;font-size:22px;font-weight:800;}
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  position:relative;
+}
+.card small{color:var(--muted);font-size:12px;font-weight:600;}
+.card h2{margin:8px 0 0;font-size:26px;color:#fff;}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:24px;
+}
+.panel h2{margin:0 0 16px;font-size:17px;font-weight:700;}
+.table-box{
+  width:100%;
+  border-collapse:collapse;
+  text-align:left;
+  font-size:13.5px;
+}
+.table-box th{
+  padding:12px;
+  border-bottom:1px solid var(--border);
+  color:var(--muted);
+  font-weight:600;
+}
+.table-box td{
+  padding:12px;
+  border-bottom:1px solid #1a1a1a;
+}
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:700;
+}
+.badge.active{background:rgba(125,255,155,0.15);color:var(--green);}
+.badge.inactive{background:rgba(255,107,107,0.15);color:var(--red);}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">RC</div>
+      <div class="brand-details">
+        <small>RADA CREST</small>
+        <h2>Admin Panel</h2>
+      </div>
+    </div>
+    <div class="menu">
+      <button onclick="window.location.href='admin-dashboard.html'"><span>⚡</span> Dashboard</button>
+      <button class="active"><span>🔗</span> Referral Rules</button>
+    </div>
+    <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">⬅ Back to Dashboard</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>Referral Control & Rules</h1>
+      <span id="syncStatus" style="color:var(--green);font-size:13px;">● Live Connected</span>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <small>Total Rules</small>
+        <h2 id="totalRules">0</h2>
+      </div>
+      <div class="card">
+        <small>Total Referrals Recorded</small>
+        <h2 id="totalReferrals">0</h2>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Active Referral Rules (Rewards)</h2>
+      <table class="table-box">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Condition Type</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="rulesTableBody">
+          <tr><td colspan="4" style="color:var(--muted);text-align:center;">Loading rules...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Recent Referrals Activity</h2>
+      <table class="table-box">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Referrer ID</th>
+            <th>Referee ID</th>
+          </tr>
+        </thead>
+        <tbody id="referralsTableBody">
+          <tr><td colspan="3" style="color:var(--muted);text-align:center;">Loading referrals...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadData(){
+  try {
+    // 1. Fetch Referral Rules
+    const { data: rules, error: rErr } = await supabase
+      .from('referral_rules')
+      .select('*')
+      .order('id', { ascending: true });
+
+    if(rErr) throw rErr;
+    document.getElementById('totalRules').textContent = rules ? rules.length : 0;
+
+    const rBody = document.getElementById('rulesTableBody');
+    if(rules && rules.length > 0){
+      rBody.innerHTML = rules.map(r => `
+        <tr>
+          <td>#${r.id}</td>
+          <td><strong>${r.title}</strong></td>
+          <td><code>${r.condition_type}</code></td>
+          <td><span class="badge ${r.is_active !== false ? 'active' : 'inactive'}">${r.is_active !== false ? 'Active' : 'Inactive'}</span></td>
+        </tr>
+      `).join('');
+    } else {
+      rBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">No rules found</td></tr>';
+    }
+
+    // 2. Fetch Referrals Count & List
+    const { data: refs, error: refErr } = await supabase
+      .from('referrals')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if(refErr) throw refErr;
+    document.getElementById('totalReferrals').textContent = refs ? refs.length : 0;
+
+    const refBody = document.getElementById('referralsTableBody');
+    if(refs && refs.length > 0){
+      refBody.innerHTML = refs.map(rf => `
+        <tr>
+          <td>#${rf.id}</td>
+          <td>${rf.referrer_id || 'N/A'}</td>
+          <td>${rf.referee_id || 'N/A'}</td>
+        </tr>
+      `).join('');
+    } else {
+      refBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);">No referrals recorded yet</td></tr>';
+    }
+
+  } catch(err){
+    console.error(err);
+    document.getElementById('syncStatus').textContent = '● Sync Error';
+    document.getElementById('syncStatus').style.color = 'var(--red)';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
