@@ -241,6 +241,8 @@ body{
 <script>
 function selectLang(code) {
   localStorage.setItem('rc_lang', code);
+  window.location.href = 'index.html';
+}
   
   // Highlight selected card
   document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
