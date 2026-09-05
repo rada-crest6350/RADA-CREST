@@ -238,7 +238,7 @@ body{
       <span>Smart AI Support Active</span>
     </div>
   </div>
-  <button class="track-pill-btn" onclick="openAutoTrackerModal()">
+  <button class="track-pill-btn" onclick="window.openAutoTrackerModal()">
     <span>🔔</span> Track My Requests
   </button>
 </header>
@@ -251,8 +251,8 @@ body{
   </div>
 
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. website khol li age kya karu, bulb kaise chune, refund)..." onkeydown="if(event.key==='Enter') executeSmartSearch()">
-    <button class="search-action-btn" id="aiSearchBtn" onclick="executeSmartSearch()">🔍 Analyze</button>
+    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. website khol li age kya karu, bulb kaise chune, refund)..." onkeydown="if(event.key==='Enter') window.executeSmartSearch()">
+    <button class="search-action-btn" id="aiSearchBtn" onclick="window.executeSmartSearch()">🔍 Analyze</button>
   </div>
 
   <div id="smartSolutionCard">
@@ -280,7 +280,7 @@ body{
   <div class="modal-box">
     <div class="modal-head">
       <h3>Live Requests & Status</h3>
-      <span class="modal-close" onclick="closeTrackerModal()">✕</span>
+      <span class="modal-close" onclick="window.closeTrackerModal()">✕</span>
     </div>
     <div class="auto-identity-box" id="identityDetectedBox">
       <span>Auto Analyzing Customer Identity...</span>
@@ -309,6 +309,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 let liveTopics = [];
 let detectedUser = { phone: '', email: '', id: '' };
 
+// 1. AUTO DETECT USER
 async function autoDetectUser(){
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -325,7 +326,26 @@ async function autoDetectUser(){
   }
 }
 
+// 2. LOAD TOPICS (FALLBACK DEFAULTS ENSURE NO HANG)
 async function loadTopics(){
+  const defaultGuides = [
+    {
+      id: 'def-1',
+      title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
+      explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
+    },
+    {
+      id: 'def-2',
+      title: 'Delivery Address Kaise Badlein ya Add Karein?',
+      explanation: 'Order karte waqt address.html page par aap naya address save kar sakte hain ya purane address ko select kar sakte hain.'
+    },
+    {
+      id: 'def-3',
+      title: 'Product Kharab / Damage Hone par 7 Days Free Replacement',
+      explanation: 'Agar koi item kharab ya toota hua mile toh 7 din tak 100% Free replacement milta hai. Delivery partner naya piece laakar purana collect karega.'
+    }
+  ];
+
   try {
     const { data, error } = await supabase
       .from('help_topics')
@@ -336,61 +356,51 @@ async function loadTopics(){
     if(!error && data && data.length > 0){
       liveTopics = data;
     } else {
-      liveTopics = [
-        {
-          id: 'def-1',
-          title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
-          explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
-        },
-        {
-          id: 'def-2',
-          title: 'Delivery Address Kaise Badlein ya Add Karein?',
-          explanation: 'Order karte waqt address.html page par aap naya address save kar sakte hain ya purane address ko select kar sakte hain.'
-        },
-        {
-          id: 'def-3',
-          title: 'Product Kharab / Damage Hone par 7 Days Free Replacement',
-          explanation: 'Agar koi item kharab ya toota hua mile toh 7 din tak 100% Free replacement milta hai. Delivery partner naya piece laakar purana collect karega.'
-        }
-      ];
+      liveTopics = defaultGuides;
     }
+  } catch(err){
+    console.error("Supabase load error:", err);
+    liveTopics = defaultGuides;
+  }
 
-    const container = document.getElementById('dynamicTopicsContainer');
-    container.innerHTML = liveTopics.map(t => `
-      <div class="acc-item" id="topic-${t.id}">
-        <div class="acc-trigger" onclick="toggleAcc(this)">
-          <div class="acc-trigger-left">
-            <div class="icon-box">📌</div>
-            <h3>${t.title}</h3>
-          </div>
-          <div class="chevron">▼</div>
+  renderTopics();
+}
+
+function renderTopics(){
+  const container = document.getElementById('dynamicTopicsContainer');
+  if(!container) return;
+
+  container.innerHTML = liveTopics.map(t => `
+    <div class="acc-item" id="topic-${t.id}">
+      <div class="acc-trigger" onclick="window.toggleAcc(this)">
+        <div class="acc-trigger-left">
+          <div class="icon-box">📌</div>
+          <h3>${t.title}</h3>
         </div>
-        <div class="acc-body">
-          <div class="acc-content">
-            <div class="explanation-text">${t.explanation}</div>
+        <div class="chevron">▼</div>
+      </div>
+      <div class="acc-body">
+        <div class="acc-content">
+          <div class="explanation-text">${t.explanation}</div>
+          
+          <div class="fallback-box">
+            <p style="color:#a0a0ab;font-size:12.5px;">Problem solve nahi hui? Admin desk ko direct request bhejein:</p>
+            <button class="open-ticket-link" onclick="window.toggleForm('form-${t.id}')">📩 Submit Request to Admin</button>
             
-            <div class="fallback-box">
-              <p style="color:#a0a0ab;font-size:12.5px;">Problem solve nahi hui? Admin desk ko direct request bhejein:</p>
-              <button class="open-ticket-link" onclick="toggleForm('form-${t.id}')">📩 Submit Request to Admin</button>
-              
-              <form class="ticket-form" id="form-${t.id}" onsubmit="submitTicket(event, '${t.title.replace(/'/g, "\\'")}')">
-                <input type="text" placeholder="Order ID (Optional)">
-                <input type="tel" placeholder="Aapka Mobile Number" value="${detectedUser.phone || ''}" required>
-                <textarea placeholder="Apni problem detail me likhein..." required></textarea>
-                <button type="submit" class="submit-btn">Send to Admin Desk ➔</button>
-              </form>
-            </div>
+            <form class="ticket-form" id="form-${t.id}" onsubmit="window.submitTicket(event, '${t.title.replace(/'/g, "\\'")}')">
+              <input type="text" placeholder="Order ID (Optional)">
+              <input type="tel" placeholder="Aapka Mobile Number" value="${detectedUser.phone || ''}" required>
+              <textarea placeholder="Apni problem detail me likhein..." required></textarea>
+              <button type="submit" class="submit-btn">Send to Admin Desk ➔</button>
+            </form>
           </div>
         </div>
       </div>
-    `).join('');
-
-  } catch(err){
-    console.error(err);
-  }
+    </div>
+  `).join('');
 }
 
-// REAL GENERATIVE AI ANALYSIS FUNCTION (VERCEL SERVERLESS BACKEND)
+// 3. AI SEARCH (LIVE DIRECT CALL TO /api/ask)
 window.executeSmartSearch = async function(){
   const rawQ = document.getElementById('helpInput').value.trim();
   if(!rawQ) return;
@@ -403,21 +413,18 @@ window.executeSmartSearch = async function(){
   btn.disabled = true;
   btn.textContent = 'Analyzing...';
   card.style.display = 'block';
-  badge.textContent = '🤖 RADA CREST AI Solution (Thinking)';
-  solText.innerHTML = '<span style="color:var(--brand);">⚡ RADA CREST AI aapka sawal analyze kar raha hai...</span>';
+  badge.textContent = '🤖 RADA CREST AI Solution (Live)';
+  solText.innerHTML = '<span style="color:var(--brand);">⚡ RADA CREST AI live soch raha hai...</span>';
 
   try {
-    const response = await fetch('/api/ask', {
+    const res = await fetch('/api/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: rawQ })
     });
 
-    const data = await response.json();
-
-    if(!response.ok || !data.answer) {
-      throw new Error(data.error || "Backend response missing");
-    }
+    const data = await res.json();
+    if(!res.ok || !data.answer) throw new Error(data.error || "API error status: " + res.status);
 
     badge.textContent = "💡 RADA CREST Personal Guide";
     solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
@@ -427,61 +434,12 @@ window.executeSmartSearch = async function(){
         <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
       </div>
     `;
-
   } catch(err){
-    console.error("AI Error:", err);
-    solText.innerHTML = `<span style="color:var(--red);font-weight:bold;">⚠️ Error:</span> ${err.message}`;
+    console.error("AI fetch fail:", err);
+    solText.innerHTML = `<span style="color:var(--red);">⚠️ Error: ${err.message}</span><br><br><small style="color:var(--text-muted);">Groq API connect nahi hui ya key check karein.</small>`;
   } finally {
     btn.disabled = false;
     btn.textContent = '🔍 Analyze';
-  }
-};
-  
-  try {
-    const response = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: rawQ })
-    });
-
-    const data = await response.json();
-    if(!response.ok || !data.answer) throw new Error(data.error || "AI error");
-
-    badge.textContent = "💡 RADA CREST Solution";
-    solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
-      <br><br>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
-        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
-        ${matchedTopic ? `<button class="sol-action-btn" style="background:#222;color:#fff;border:1px solid var(--brand);" onclick="scrollToItem('topic-${matchedTopic.id}')">📌 Open Related Topic</button>` : ''}
-      </div>
-    `;
-
-  } catch(err){
-    console.error("AI Error:", err);
-    if(rawQ.toLowerCase().includes('age kya karu') || rawQ.toLowerCase().includes('khol li') || rawQ.toLowerCase().includes('order')){
-      solText.innerHTML = `
-        <strong>Dost, website par aage badhne ke asaan steps:</strong><br><br>
-        1. <strong>Product Chunein:</strong> Home store par jakar apna bulb ya extension board dekhein.<br>
-        2. <strong>Buy Now Dabayein:</strong> Item ke niche "Buy Now" button par click karein.<br>
-        3. <strong>Address & Checkout:</strong> Apna delivery pata bharein aur Cash on Delivery ya UPI se confirm karein.<br><br>
-        <a href="index.html" class="sol-action-btn">🛒 Store Kholein Aur Shopping Karein</a>
-      `;
-    } else {
-      solText.innerHTML = `Aapke sawal ke liye niche diye gaye topics me se topic chunein ya direct ticket form submit karein. Hamari team turant action legi.`;
-    }
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '🔍 Analyze';
-  }
-};
-
-window.scrollToItem = function(id){
-  const el = document.getElementById(id);
-  if(el){
-    document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
-    el.scrollIntoView({ behavior: 'smooth' });
   }
 };
 
@@ -553,14 +511,14 @@ window.openAutoTrackerModal = async function(){
       <div style="text-align:center;padding:20px;">
         <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Apna mobile number likhein jisse order/request ki thi:</p>
         <input type="tel" id="manualTrackInput" placeholder="Mobile Number daalein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
-        <button class="submit-btn" onclick="fetchTickets(document.getElementById('manualTrackInput').value.trim())">Search My Requests</button>
+        <button class="submit-btn" onclick="window.fetchTickets(document.getElementById('manualTrackInput').value.trim())">Search My Requests</button>
       </div>
     `;
     return;
   }
 
   idBox.innerHTML = `<span>Customer Mobile: <strong>${activePhone}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
-  await fetchTickets(activePhone);
+  await window.fetchTickets(activePhone);
 };
 
 window.fetchTickets = async function(phone){
@@ -606,6 +564,7 @@ window.closeTrackerModal = function(){
   document.getElementById('trackerModal').style.display = 'none';
 };
 
+// INITIAL LOAD
 (async () => {
   await autoDetectUser();
   await loadTopics();
