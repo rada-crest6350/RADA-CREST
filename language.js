@@ -11,8 +11,8 @@ const translations = {
     wishlist: "Wishlist",
     address_title: "Delivery Address"
   },
-  hi: { // Hindi
-    store_title: "राडा क्रెస్ट स्टोर",
+  hi: {
+    store_title: "राडा क्रस्ट स्टोर",
     help_title: "सहायता और समर्थन",
     notif_title: "गतिविधि केंद्र",
     orders_title: "मेरे ऑर्डर",
@@ -22,7 +22,7 @@ const translations = {
     wishlist: "विशलिस्ट",
     address_title: "डिलीवरी का पता"
   },
-  te: { // Telugu
+  te: {
     store_title: "రాడా క్రెస్ట్ స్టోర్",
     help_title: "సహాయం & మద్దతు",
     notif_title: "యాక్టివిటీ సెంటర్",
@@ -33,7 +33,7 @@ const translations = {
     wishlist: "విష్‌లిస్ట్",
     address_title: "డెలివరీ చిరునామా"
   },
-  ta: { // Tamil
+  ta: {
     store_title: "ராடா கிரெஸ்ட் ஸ்டோர்",
     help_title: "உதவி & ஆதரவு",
     notif_title: "செயல்பாட்டு மையம்",
@@ -44,7 +44,7 @@ const translations = {
     wishlist: "விருப்பப் பட்டியல்",
     address_title: "டெலிவரி முகவரி"
   },
-  kn: { // Kannada
+  kn: {
     store_title: "ರಾಡಾ ಕ್ರೆಸ್ಟ್ ಸ್ಟೋರ್",
     help_title: "ಸಹಾಯ ಮತ್ತು ಬೆಂಬಲ",
     notif_title: "ಚಟುವಟಿಕೆ ಕೇಂದ್ರ",
@@ -55,7 +55,7 @@ const translations = {
     wishlist: "ವಿಶ್‌ಲಿಸ್ಟ್",
     address_title: "ವಿಳಾಸ"
   },
-  ml: { // Malayalam
+  ml: {
     store_title: "രാഡ ക്രെസ്റ്റ് സ്റ്റോർ",
     help_title: "സഹായം & പിന്തുണ",
     notif_title: "ആക്ടിവിറ്റി സെന്റർ",
@@ -66,7 +66,7 @@ const translations = {
     wishlist: "വിഷ്‌ലിസ്റ്റ്",
     address_title: "വിലാസം"
   },
-  mr: { // Marathi
+  mr: {
     store_title: "राडा क्रेस्ट स्टोअर",
     help_title: "मदत आणि समर्थन",
     notif_title: "ॲक्टिव्हिटी सेंटर",
@@ -77,7 +77,7 @@ const translations = {
     wishlist: "विशलिस्ट",
     address_title: "पत्ता"
   },
-  gu: { // Gujarati
+  gu: {
     store_title: "રાડા ક્રસ્ટ સ્ટોર",
     help_title: "મદદ અને સપોર્ટ",
     notif_title: "એક્ટિવિટી સેન્ટર",
@@ -88,7 +88,7 @@ const translations = {
     wishlist: "વિશલિસ્ટ",
     address_title: "સરનામું"
   },
-  bn: { // Bengali
+  bn: {
     store_title: "রাডা ক্রুস্ট স্টোর",
     help_title: "সহায়তা এবং সমর্থন",
     notif_title: "অ্যাক্টিভিটি সেন্টার",
@@ -99,9 +99,9 @@ const translations = {
     wishlist: "উইশলিস্ট",
     address_title: "ঠিকানা"
   },
-  pa: { // Punjabi
+  pa: {
     store_title: "ਰਾਡਾ ਕਰੈਸਟ ਸਟੋਰ",
-    help_title: "ਮਦद ਅਤੇ ਸਹਾਇਤਾ",
+    help_title: "ਮਦਦ ਅਤੇ ਸਹਾਇਤਾ",
     notif_title: "ਸਰਗਰਮੀ ਕੇਂਦਰ",
     orders_title: "ਮੇਰੇ ਆਰਡਰ",
     buy_now: "ਹੁਣੇ ਖਰੀਦੋ",
@@ -114,7 +114,7 @@ const translations = {
 
 function setLanguage(lang) {
   localStorage.setItem('rc_lang', lang);
-  applyTranslations();
+  window.location.reload();
 }
 
 function getLanguage() {
@@ -139,4 +139,31 @@ function applyTranslations() {
 
 document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
+
+  if (!document.getElementById('globalLangBar')) {
+    const langBar = document.createElement('div');
+    langBar.id = 'globalLangBar';
+    langBar.style.cssText = "position:fixed;bottom:15px;right:15px;z-index:9999;background:rgba(18,18,24,0.95);border:1px solid rgba(255,122,0,0.4);padding:8px 12px;border-radius:14px;box-shadow:0 5px 20px rgba(0,0,0,0.6);display:flex;align-items:center;gap:8px;";
+    
+    langBar.innerHTML = `
+      <span style="font-size:12px;color:#FF7A00;font-weight:700;">🌐 Lang:</span>
+      <select id='floatingLangSelect' onchange='setLanguage(this.value)' style="background:#0d0d10;color:#fff;border:1px solid #333;padding:5px 8px;border-radius:8px;font-size:12px;outline:none;cursor:pointer;">
+        <option value="en">English</option>
+        <option value="hi">हिंदी</option>
+        <option value="te">తెలుగు</option>
+        <option value="ta">தமிழ்</option>
+        <option value="kn">ಕನ್ನಡ</option>
+        <option value="ml">മലയാളം</option>
+        <option value="mr">मराठी</option>
+        <option value="gu">ગુજરાતી</option>
+        <option value="bn">বাংলা</option>
+        <option value="pa">ਪੰਜਾਬੀ</option>
+      </select>
+    `;
+    document.body.appendChild(langBar);
+  }
+
+  const currentLang = getLanguage();
+  const selector = document.getElementById('floatingLangSelect');
+  if(selector) selector.value = currentLang;
 });
