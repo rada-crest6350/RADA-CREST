@@ -390,7 +390,7 @@ async function loadTopics(){
   }
 }
 
-// REAL GENERATIVE AI ANALYSIS FUNCTION
+// REAL GENERATIVE AI ANALYSIS FUNCTION (VERCEL SERVERLESS BACKEND)
 window.executeSmartSearch = async function(){
   const rawQ = document.getElementById('helpInput').value.trim();
   if(!rawQ) return;
@@ -406,7 +406,6 @@ window.executeSmartSearch = async function(){
   badge.textContent = '🤖 RADA CREST AI Solution (Live Analyzing)';
   solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapke sawal ko analyze kiya ja raha hai...</span>';
 
-  // Check custom topics first for exact reference
   let matchedTopic = null;
   liveTopics.forEach(t => {
     if(t.title.toLowerCase().includes(rawQ.toLowerCase())){
@@ -414,27 +413,18 @@ window.executeSmartSearch = async function(){
     }
   });
 
-  const systemContext = `Aap "RADA CREST" e-commerce store ke ek friendly, helpful aur smart customer support assistant hain.
-RADA CREST Website Structure:
-- index.html: Yahan LED Bulbs, Radar Motion sensor bulbs, Emergency bulbs aur Heavy Extension boards milte hain.
-- address.html: Yahan customer apna delivery address chunta ya naya address save karta hai.
-- orders.html: Yahan live status dekh sakte hain aur Return order request daal sakte hain.
-- Policies: 7 Days Free Replacement for damaged/defective items. Refund cancellation/return ke 24-48 working hours me aata hai. Cash on Delivery (COD) aur Online payment dono uplabdh hain.
-
-Nirdesh:
-1. Customer ke sawal ko dhyan se padhein aur bina kisi robotic template ke natural Hindi/Hinglish me 3-4 clear points me seedha rasta batayein.
-2. Agar customer puche ki "website khol li aage kya karu", toh use product chunne, Buy Now dabane aur address/payment fill karne ka rasta samjhayein.
-3. Jawab friendly aur direct hona chahiye.`;
-
   try {
-    const promptPayload = `${systemContext}\n\nCustomer Ka Sawal: ${rawQ}\n\nJawab:`;
-    const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(promptPayload)}?model=openai&seed=${Math.floor(Math.random()*100000)}`);
-    
-    if(!response.ok) throw new Error("AI stream error");
-    const aiAnswer = await response.text();
+    const response = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: rawQ })
+    });
+
+    const data = await response.json();
+    if(!response.ok || !data.answer) throw new Error(data.error || "AI error");
 
     badge.textContent = "💡 RADA CREST Solution";
-    solText.innerHTML = aiAnswer.replace(/\n/g, "<br>") + `
+    solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
       <br><br>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
