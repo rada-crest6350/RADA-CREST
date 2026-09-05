@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wishlist — RADA CREST</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg-deep:#060608;
+  --panel-card:rgba(24, 24, 30, 0.75);
+  --border:rgba(255, 255, 255, 0.08);
+  --text:#ffffff;
+  --text-muted:#9da0b0;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.35);
+  --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+  --green:#3dd598;
+  --red:#f87171;
+}
+
+body{
+  background:var(--bg-deep);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+  padding-bottom:60px;
+}
+
+.ambient-glow{
+  position:fixed;
+  width:400px;height:400px;
+  background:radial-gradient(circle, rgba(255,122,0,0.12) 0%, rgba(0,0,0,0) 70%);
+  top:-100px;left:50%;
+  transform:translateX(-50%);
+  z-index:0;
+  pointer-events:none;
+}
+
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8, 8, 10, 0.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.back-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;color:#fff;
+  text-decoration:none;font-size:16px;
+  transition:0.2s;
+}
+.back-btn:hover{background:rgba(255,255,255,0.12);}
+.header-title h1{font-size:16px;font-weight:800;}
+.header-title span{font-size:11px;color:var(--brand);font-weight:600;}
+
+.container{max-width:680px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
+
+.hero{text-align:center;margin-bottom:24px;}
+.hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.hero p{font-size:13.5px;color:var(--text-muted);}
+
+.wishlist-grid{display:grid;gap:16px;}
+
+.wish-card{
+  background:var(--panel-card);
+  backdrop-filter:blur(16px);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px;
+  display:flex;gap:16px;align-items:center;
+  position:relative;
+  animation:fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:0.3s;
+}
+.wish-card:hover{border-color:rgba(255,122,0,0.3);box-shadow:0 8px 30px rgba(0,0,0,0.4);}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.wish-img{
+  width:90px;height:90px;border-radius:14px;background:#131318;
+  object-fit:cover;border:1px solid var(--border);flex-shrink:0;
+}
+
+.wish-info{flex:1;}
+.discount-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(61, 213, 152, 0.12);border:1px solid rgba(61, 213, 152, 0.3);
+  color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;
+  border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;
+}
+.wish-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;}
+.price-box{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.old-price{font-size:13px;color:var(--text-muted);text-decoration:line-through;}
+.new-price{font-size:16px;font-weight:800;color:var(--brand);}
+
+.wish-actions{display:flex;gap:10px;}
+.action-btn{
+  background:var(--brand-gradient);color:#000;font-weight:800;
+  border:none;padding:8px 16px;border-radius:10px;font-size:12.5px;
+  cursor:pointer;text-decoration:none;box-shadow:0 4px 12px var(--brand-glow);
+  transition:0.2s;display:inline-flex;align-items:center;gap:6px;
+}
+.action-btn:hover{transform:scale(1.02);opacity:0.95;}
+.remove-btn{
+  background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.3);
+  font-weight:700;padding:8px 12px;border-radius:10px;font-size:12.5px;cursor:pointer;transition:0.2s;
+}
+.remove-btn:hover{background:rgba(248,113,113,0.2);}
+
+.empty-state{
+  text-align:center;padding:60px 20px;color:var(--text-muted);
+}
+.empty-state span{font-size:48px;display:block;margin-bottom:14px;}
+.empty-state h3{font-size:18px;color:#fff;margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<header class="header">
+  <div class="header-left">
+    <a href="index.html" class="back-btn">←</a>
+    <div class="header-title">
+      <h1>My Wishlist</h1>
+      <span>Special Discount Active</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="hero">
+    <h2>Saved Products & Offers</h2>
+    <p>Wishlist me save kiye gaye products par automatic discount mil raha hai!</p>
+  </div>
+
+  <div class="wishlist-grid" id="wishlistContainer">
+    <div class="empty-state">
+      <span>🛍️</span>
+      <h3>Aapki Wishlist Khaali Hai</h3>
+      <p>Store se koi product wishlist me add karein.</p>
+      <a href="index.html" class="action-btn" style="margin-top:16px;">Store Par Jayein</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Wishlist Data Load aur Automatic Discount Logic
+function loadWishlist(){
+  const container = document.getElementById('wishlistContainer');
+  let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
+
+  if(wishlist.length === 0){
+    container.innerHTML = `
+      <div class="empty-state">
+        <span>🛍️</span>
+        <h3>Aapki Wishlist Khaali Hai</h3>
+        <p>Store se koi product wishlist me add karein.</p>
+        <a href="index.html" class="action-btn" style="margin-top:16px;">Store Par Jayein</a>
+      </div>
+    `;
+    return;
+  }
+
+  // Maan lete hain admin control se default 15% discount wishlist items par mil raha hai
+  const discountPercent = 15; 
+
+  container.innerHTML = wishlist.map((item, index) => {
+    const originalPrice = parseFloat(item.price) || 500;
+    const discountedPrice = Math.round(originalPrice * (1 - discountPercent / 100));
+
+    return `
+      <div class="wish-card" id="wish-item-${index}">
+        <img src="${item.image || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
+        <div class="wish-info">
+          <div class="discount-badge">🔥 Wishlist Special: ${discountPercent}% OFF</div>
+          <div class="wish-title">${item.name || 'RADA CREST LED Bulb'}</div>
+          <div class="price-box">
+            <span class="old-price">₹${originalPrice}</span>
+            <span class="new-price">₹${discountedPrice}</span>
+          </div>
+          <div class="wish-actions">
+            <button class="action-btn" onclick="moveToCheckout('${item.name}', ${discountedPrice})">⚡ Buy at ₹${discountedPrice}</button>
+            <button class="remove-btn" onclick="removeItem(${index})">✕ Remove</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+window.removeItem = function(index){
+  let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
+  wishlist.splice(index, 1);
+  localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
+  loadWishlist();
+};
+
+window.moveToCheckout = function(name, finalPrice){
+  // Discounted price ko checkout/address ke liye save karke address page par bhej rahe hain
+  localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice }));
+  window.location.href = 'address.html';
+};
+
+document.addEventListener('DOMContentLoaded', loadWishlist);
+</script>
+
+</body>
+</html>
