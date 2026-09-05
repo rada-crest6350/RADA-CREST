@@ -241,25 +241,19 @@ body{
 <script>
 function selectLang(code) {
   localStorage.setItem('rc_lang', code);
-  window.location.href = 'index.html';
-}
   
-  // Highlight selected card
+  // Visual click effect ke liye selected card highlight karna
   document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
   const activeCard = document.querySelector(`[data-code="${code}"]`);
   if(activeCard) activeCard.classList.add('selected');
 
-  // Show toast
-  const toast = document.getElementById('successToast');
-  if(toast) toast.classList.add('show');
-
-  // Redirect back to store after 600ms
+  // Turant main store page par bhejna
   setTimeout(() => {
     window.location.href = 'index.html';
-  }, 600);
+  }, 200);
 }
 
-// Highlight currently active language on load
+// Page khulte hi jo bhasha pehle se saved hai use highlight karna
 document.addEventListener('DOMContentLoaded', () => {
   const currentLang = localStorage.getItem('rc_lang') || 'en';
   const activeCard = document.querySelector(`[data-code="${currentLang}"]`);
