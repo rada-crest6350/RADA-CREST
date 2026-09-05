@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Help & Ticket Desk — RADA CREST</title>
+<title>Admin Help & Requests Management — RADA CREST</title>
 
 <style>
 *{box-sizing:border-box}
@@ -17,27 +17,18 @@
   --brand:#FF7A00;
   --brand-glow:rgba(255, 122, 0, 0.15);
   --green:#7dff9b;
+  --blue:#38bdf8;
   --red:#ff6b6b;
 }
 
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
-}
-
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;}
 button,input,textarea{font:inherit;}
 button{cursor:pointer;}
 .app{display:flex;min-height:100vh;}
 
 .sidebar{
-  width:260px;
-  background:#0d0d0d;
-  border-right:1px solid var(--border);
-  padding:22px 14px;
-  position:fixed;left:0;top:0;bottom:0;
-  display:flex;flex-direction:column;
+  width:260px;background:#0d0d0d;border-right:1px solid var(--border);
+  padding:22px 14px;position:fixed;left:0;top:0;bottom:0;display:flex;flex-direction:column;
 }
 .brand{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
 .logo{
@@ -51,9 +42,9 @@ button{cursor:pointer;}
 
 .main{margin-left:260px;width:calc(100% - 260px);padding:28px;}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
-.cards{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px;margin-bottom:24px;}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;}
-.card h2{margin:6px 0 0;font-size:26px;}
+.cards{display:grid;grid-template-columns:repeat(4, 1fr);gap:14px;margin-bottom:24px;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;}
+.card h2{margin:6px 0 0;font-size:24px;}
 
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:24px;}
 .panel h2{margin:0 0 16px;font-size:18px;}
@@ -73,17 +64,32 @@ button{cursor:pointer;}
 
 table{width:100%;border-collapse:collapse;text-align:left;font-size:13px;}
 th{padding:12px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;font-size:11px;}
-td{padding:12px;border-bottom:1px solid #1c1c1c;vertical-align:top;}
+td{padding:12px;border-bottom:1px solid #1c1c1c;vertical-align:middle;}
 
-.badge{padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+.badge{display:inline-block;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:800;text-transform:uppercase;}
 .badge.pending{background:rgba(255,122,0,0.2);color:var(--brand);}
-.badge.resolved{background:rgba(125,255,155,0.2);color:var(--green);}
+.badge.proceeding{background:rgba(56,189,248,0.2);color:var(--blue);}
+.badge.confirmed{background:rgba(125,255,155,0.2);color:var(--green);}
+.badge.rejected{background:rgba(255,107,107,0.2);color:var(--red);}
 
 .action-btn{
   background:#1c1c1c;border:1px solid var(--border);color:#fff;
   padding:6px 10px;border-radius:6px;font-size:12px;margin-right:4px;
 }
 .action-btn.del{color:var(--red);}
+.action-btn.proceed{background:rgba(56,189,248,0.15);color:var(--blue);border-color:rgba(56,189,248,0.3);}
+.action-btn.confirm{background:rgba(125,255,155,0.15);color:var(--green);border-color:rgba(125,255,155,0.3);}
+.action-btn.reject{background:rgba(255,107,107,0.15);color:var(--red);border-color:rgba(255,107,107,0.3);}
+
+/* REJECTION REASON MODAL */
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
+  display:none;place-items:center;padding:20px;z-index:999;
+}
+.modal-box{
+  background:#141418;border:1px solid rgba(255,107,107,0.4);border-radius:20px;
+  padding:24px;max-width:400px;width:100%;
+}
 </style>
 </head>
 <body>
@@ -92,39 +98,63 @@ td{padding:12px;border-bottom:1px solid #1c1c1c;vertical-align:top;}
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">RC</div>
-      <div><strong>RADA CREST</strong><br><small style="color:var(--muted);">Help & Desk</small></div>
+      <div><strong>RADA CREST</strong><br><small style="color:var(--muted);">Help Admin Desk</small></div>
     </div>
     <a href="admin-dashboard.html" class="back-btn">⬅ Back to Dashboard</a>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <h1>Help Desk & Topic Manager</h1>
+      <h1>Customer Help & Resolution Desk</h1>
       <span style="color:var(--green);font-size:13px;">● Live Connected</span>
     </div>
 
+    <!-- METRICS -->
     <div class="cards">
-      <div class="card"><small style="color:var(--muted);">Total Help Topics</small><h2 id="metricTopics">0</h2></div>
-      <div class="card"><small style="color:var(--muted);">Pending Customer Tickets</small><h2 id="metricTickets">0</h2></div>
+      <div class="card"><small style="color:var(--muted);">Pending</small><h2 id="cntPending" style="color:var(--brand);">0</h2></div>
+      <div class="card"><small style="color:var(--muted);">Proceeding</small><h2 id="cntProceeding" style="color:var(--blue);">0</h2></div>
+      <div class="card"><small style="color:var(--muted);">Confirmed</small><h2 id="cntConfirmed" style="color:var(--green);">0</h2></div>
+      <div class="card"><small style="color:var(--muted);">Rejected</small><h2 id="cntRejected" style="color:var(--red);">0</h2></div>
+    </div>
+
+    <!-- INCOMING TICKETS DESK -->
+    <div class="panel">
+      <h2>📩 Customer Help Requests</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket ID</th>
+            <th>Requested For (Issue)</th>
+            <th>Order ID</th>
+            <th>Customer Phone</th>
+            <th>Details</th>
+            <th>Status / Reason</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ticketsTableBody">
+          <tr><td colspan="7" style="text-align:center;color:var(--muted);">Loading requests...</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- ADD HELP TOPIC -->
     <div class="panel">
-      <h2>➕ Add New Help Topic (Heading & Explanation)</h2>
+      <h2>➕ Add / Manage Help Topics (Guidance)</h2>
       <form id="addTopicForm">
         <div class="form-group">
           <label>Topic Heading / Problem Name</label>
-          <input type="text" id="tTitle" placeholder="e.g. Heavy Extension Board Sockets Not Working" required>
+          <input type="text" id="tTitle" placeholder="e.g. Extension Board Not Powering On" required>
         </div>
         <div class="form-group">
-          <label>Explanation / Resolution Steps (Customer will read this)</label>
-          <textarea id="tExplanation" placeholder="Step 1: Check master switch indicator.&#10;Step 2: Plug in a simple charger..." required></textarea>
+          <label>Explanation & Troubleshooting (Customer will read this first)</label>
+          <textarea id="tExplanation" placeholder="Step 1: Check master switch...&#10;Step 2: Test individual sockets..." required></textarea>
         </div>
-        <button type="submit" class="submit-btn" id="saveTopicBtn">Save Help Topic</button>
+        <button type="submit" class="submit-btn" id="saveTopicBtn">Save Topic to Help Desk</button>
       </form>
     </div>
 
-    <!-- TOPICS LIST -->
+    <!-- CONFIGURED TOPICS -->
     <div class="panel">
       <h2>Configured Help Topics</h2>
       <table>
@@ -133,7 +163,7 @@ td{padding:12px;border-bottom:1px solid #1c1c1c;vertical-align:top;}
             <th>ID</th>
             <th>Heading</th>
             <th>Explanation Preview</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="topicsTableBody">
@@ -142,28 +172,20 @@ td{padding:12px;border-bottom:1px solid #1c1c1c;vertical-align:top;}
       </table>
     </div>
 
-    <!-- INCOMING TICKETS -->
-    <div class="panel">
-      <h2>📩 Customer Complaints / Requests Desk</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Issue Type</th>
-            <th>Order ID</th>
-            <th>Phone</th>
-            <th>Details</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="ticketsTableBody">
-          <tr><td colspan="7" style="text-align:center;color:var(--muted);">Loading tickets...</td></tr>
-        </tbody>
-      </table>
-    </div>
-
   </main>
+</div>
+
+<!-- REJECT REASON MODAL -->
+<div id="rejectModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 style="color:#fff;margin-bottom:6px;">Reject Request Reason</h3>
+    <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px;">Reason likhna zaroori hai. Ye customer ko uske track status me dikhega:</p>
+    <textarea id="rejectReasonInput" style="width:100%;height:80px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;padding:10px;font-family:inherit;margin-bottom:14px;" placeholder="e.g. Product 7-day return period se bahar hai / Wrong Order ID..."></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="action-btn" onclick="closeRejectModal()">Cancel</button>
+      <button class="action-btn reject" onclick="confirmRejection()">Confirm Reject</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -173,50 +195,111 @@ const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+let activeRejectTicketId = null;
+
 async function loadAll(){
-  // 1. Topics
+  // 1. Fetch Topics
   const { data: topics } = await supabase.from('help_topics').select('*').order('id', { ascending: false });
-  document.getElementById('metricTopics').textContent = topics ? topics.length : 0;
-  
   const tBody = document.getElementById('topicsTableBody');
   if(topics && topics.length){
     tBody.innerHTML = topics.map(t => `
       <tr>
         <td>#${t.id}</td>
         <td><strong>${t.title}</strong></td>
-        <td style="max-width:300px;color:#a0a0ab;">${t.explanation.substring(0, 100)}...</td>
+        <td style="max-width:300px;color:#a0a0ab;">${t.explanation.substring(0, 120)}...</td>
         <td><button class="action-btn del" onclick="deleteTopic(${t.id})">Delete</button></td>
       </tr>
     `).join('');
   } else {
-    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);">No topics added yet.</td></tr>`;
+    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);">No topics created yet.</td></tr>`;
   }
 
-  // 2. Tickets
+  // 2. Fetch Customer Tickets
   const { data: tickets } = await supabase.from('help_tickets').select('*').order('id', { ascending: false });
-  const pendingCount = tickets ? tickets.filter(tk => tk.status === 'pending').length : 0;
-  document.getElementById('metricTickets').textContent = pendingCount;
+  
+  let p = 0, pr = 0, c = 0, r = 0;
+  if(tickets){
+    tickets.forEach(tk => {
+      if(tk.status === 'pending') p++;
+      else if(tk.status === 'proceeding') pr++;
+      else if(tk.status === 'confirmed') c++;
+      else if(tk.status === 'rejected') r++;
+    });
+  }
+  document.getElementById('cntPending').textContent = p;
+  document.getElementById('cntProceeding').textContent = pr;
+  document.getElementById('cntConfirmed').textContent = c;
+  document.getElementById('cntRejected').textContent = r;
 
   const tkBody = document.getElementById('ticketsTableBody');
   if(tickets && tickets.length){
     tkBody.innerHTML = tickets.map(tk => `
       <tr>
-        <td><small>${new Date(tk.created_at).toLocaleDateString()}</small></td>
-        <td><strong>${tk.issue_type}</strong></td>
+        <td><strong>#${tk.id}</strong></td>
+        <td><span style="color:var(--brand);font-weight:700;">${tk.issue_type}</span></td>
         <td><code>${tk.order_id || 'N/A'}</code></td>
-        <td><a href="tel:${tk.customer_phone}" style="color:var(--brand);">${tk.customer_phone}</a></td>
-        <td style="max-width:250px;">${tk.description}</td>
-        <td><span class="badge ${tk.status}">${tk.status}</span></td>
+        <td><a href="tel:${tk.customer_phone}" style="color:#fff;text-decoration:none;">📞 ${tk.customer_phone}</a></td>
+        <td style="max-width:240px;font-size:12.5px;color:#d0d0d8;">${tk.description}</td>
         <td>
-          <a href="https://wa.me/91${tk.customer_phone.replace(/\D/g,'')}?text=Hello%20RADA%20CREST%20Support%20here" target="_blank" class="action-btn">WhatsApp</a>
-          ${tk.status === 'pending' ? `<button class="action-btn" onclick="resolveTicket(${tk.id})">Resolve</button>` : ''}
+          <span class="badge ${tk.status}">${tk.status}</span>
+          ${tk.rejection_reason ? `<div style="font-size:11px;color:var(--red);margin-top:4px;">Reason: ${tk.rejection_reason}</div>` : ''}
+        </td>
+        <td>
+          <a href="https://wa.me/91${tk.customer_phone.replace(/\D/g,'')}?text=Hello%20RADA%20CREST%20Support%20regarding%20Ticket%20%23${tk.id}" target="_blank" class="action-btn">WA</a>
+          <button class="action-btn proceed" onclick="updateTicketStatus(${tk.id}, 'proceeding')">Proceed</button>
+          <button class="action-btn confirm" onclick="updateTicketStatus(${tk.id}, 'confirmed')">Confirm</button>
+          <button class="action-btn reject" onclick="openRejectModal(${tk.id})">Reject</button>
         </td>
       </tr>
     `).join('');
   } else {
-    tkBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);">No requests received yet.</td></tr>`;
+    tkBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);">No customer requests received yet.</td></tr>`;
   }
 }
+
+// STATUS UPDATES
+window.updateTicketStatus = async (id, newStatus) => {
+  try {
+    const { error } = await supabase.from('help_tickets').update({ status: newStatus }).eq('id', id);
+    if(error) throw error;
+    loadAll();
+  } catch(err){
+    alert('Status update error: ' + err.message);
+  }
+};
+
+// REJECT MODAL & REASON
+window.openRejectModal = (id) => {
+  activeRejectTicketId = id;
+  document.getElementById('rejectReasonInput').value = '';
+  document.getElementById('rejectModal').style.display = 'grid';
+};
+
+window.closeRejectModal = () => {
+  activeRejectTicketId = null;
+  document.getElementById('rejectModal').style.display = 'none';
+};
+
+window.confirmRejection = async () => {
+  const reason = document.getElementById('rejectReasonInput').value.trim();
+  if(!reason){
+    alert('Rejection reason likhna mandatory hai!');
+    return;
+  }
+
+  try {
+    const { error } = await supabase.from('help_tickets').update({
+      status: 'rejected',
+      rejection_reason: reason
+    }).eq('id', activeRejectTicketId);
+
+    if(error) throw error;
+    closeRejectModal();
+    loadAll();
+  } catch(err){
+    alert('Reject update error: ' + err.message);
+  }
+};
 
 // ADD TOPIC
 document.getElementById('addTopicForm').addEventListener('submit', async (e) => {
@@ -242,11 +325,6 @@ document.getElementById('addTopicForm').addEventListener('submit', async (e) => 
 window.deleteTopic = async (id) => {
   if(!confirm("Is topic ko delete karein?")) return;
   await supabase.from('help_topics').delete().eq('id', id);
-  loadAll();
-};
-
-window.resolveTicket = async (id) => {
-  await supabase.from('help_tickets').update({ status: 'resolved' }).eq('id', id);
   loadAll();
 };
 
