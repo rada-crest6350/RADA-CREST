@@ -403,15 +403,40 @@ window.executeSmartSearch = async function(){
   btn.disabled = true;
   btn.textContent = 'Analyzing...';
   card.style.display = 'block';
-  badge.textContent = '🤖 RADA CREST AI Solution (Live Analyzing)';
-  solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapke sawal ko analyze kiya ja raha hai...</span>';
+  badge.textContent = '🤖 RADA CREST AI Thinking...';
+  solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapka sawal analyze ho raha hai...</span>';
 
-  let matchedTopic = null;
-  liveTopics.forEach(t => {
-    if(t.title.toLowerCase().includes(rawQ.toLowerCase())){
-      matchedTopic = t;
+  try {
+    const response = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: rawQ })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.answer) {
+      throw new Error(data.error || ("Status: " + response.status));
     }
-  });
+
+    badge.textContent = "💡 RADA CREST AI Solution";
+    solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
+      <br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
+        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
+      </div>
+    `;
+
+  } catch(err){
+    console.error("AI Error:", err);
+    // Asali error seedha screen par dikhega taaki pata chale Groq key me issue hai ya model me
+    solText.innerHTML = `<span style="color:var(--red);font-weight:bold;">⚠️ Backend Error:</span> ${err.message}<br><br><small style="color:var(--text-muted);">Agar 'Invalid API Key' likha aaye, toh api/ask.js me Groq key check karein.</small>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze';
+  }
+};
 
   try {
     const response = await fetch('/api/ask', {
