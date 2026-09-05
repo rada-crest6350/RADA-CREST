@@ -212,7 +212,7 @@ window.removeItem = function(index){
 window.moveToCheckout = function(name, finalPrice){
   // Discounted price ko checkout/address ke liye save karke address page par bhej rahe hain
   localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice }));
-  window.location.href = 'address.html';
+  window.location.href = 'addresses.html';
 };
 
 document.addEventListener('DOMContentLoaded', loadWishlist);
