@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Help & Resolutions Desk — RADA CREST</title>
+<title>Help & Support Desk — RADA CREST</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,16 +14,14 @@
 
 :root{
   --bg-deep:#060608;
-  --panel-card:rgba(24, 24, 30, 0.65);
+  --panel-card:rgba(24, 24, 30, 0.85);
   --border:rgba(255, 255, 255, 0.08);
   --text:#ffffff;
   --text-muted:#9da0b0;
   --brand:#FF7A00;
   --brand-glow:rgba(255, 122, 0, 0.35);
   --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
-  --green:#3dd598;
-  --blue:#38bdf8;
-  --red:#f87171;
+  --green:#25D366; /* WhatsApp Green */
 }
 
 body{
@@ -32,30 +30,17 @@ body{
   font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
   min-height:100vh;
   position:relative;
-  overflow-x:hidden;
   padding-bottom:60px;
-}
-
-.ambient-glow{
-  position:fixed;
-  width:380px;height:380px;
-  background:radial-gradient(circle, rgba(255,122,0,0.12) 0%, rgba(0,0,0,0) 70%);
-  top:-80px;left:50%;
-  transform:translateX(-50%);
-  z-index:0;
-  pointer-events:none;
 }
 
 .header{
   position:sticky;top:0;z-index:100;
-  background:rgba(8, 8, 10, 0.85);
+  background:rgba(8, 8, 10, 0.9);
   backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   padding:14px 20px;
   display:flex;align-items:center;justify-content:space-between;
 }
-.header-left{display:flex;align-items:center;gap:12px;}
 .back-btn{
   background:rgba(255,255,255,0.06);
   border:1px solid var(--border);
@@ -64,78 +49,34 @@ body{
   text-decoration:none;font-size:16px;
 }
 .header-title h1{font-size:16px;font-weight:800;}
-.header-title span{
-  font-size:11px;color:var(--brand);font-weight:600;
-  display:flex;align-items:center;gap:5px;
-}
-.header-title span::before{
-  content:'';width:6px;height:6px;background:var(--green);border-radius:50%;
-  box-shadow:0 0 8px var(--green);
-}
+.header-title span{font-size:11px;color:var(--brand);font-weight:600;}
 
-.track-pill-btn{
-  background:rgba(255, 122, 0, 0.12);
-  border:1px solid var(--brand);
-  color:#fff;
-  font-size:12px;
-  font-weight:700;
-  padding:8px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  box-shadow:0 0 12px var(--brand-glow);
-  transition:0.2s;
-}
-.track-pill-btn:hover{background:var(--brand);color:#000;}
-
-.container{max-width:640px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
+.container{max-width:640px;margin:0 auto;padding:24px 18px;}
 
 .hero{text-align:center;margin-bottom:24px;}
-.hero-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(255,122,0,0.12);border:1px solid rgba(255,122,0,0.3);
-  padding:5px 12px;border-radius:20px;
-  font-size:11px;font-weight:700;color:var(--brand);
-  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
-}
-.hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.hero h2{font-size:22px;font-weight:800;margin-bottom:8px;}
+.hero p{font-size:13.5px;color:var(--text-muted);line-height:1.5;}
 
-.smart-search-box{
-  background:rgba(22, 22, 28, 0.85);
-  border:1.5px solid rgba(255, 122, 0, 0.4);
-  box-shadow:0 0 25px rgba(255, 122, 0, 0.12);
+/* DIRECT WHATSAPP SUPPORT BOX */
+.whatsapp-box{
+  background:linear-gradient(145deg, rgba(37, 211, 102, 0.15) 0%, rgba(24, 24, 30, 0.9) 100%);
+  border:1.5px solid var(--green);
   border-radius:20px;
-  padding:8px 10px 8px 18px;
-  display:flex;align-items:center;gap:12px;
-  margin-bottom:20px;
+  padding:24px;
+  text-align:center;
+  margin-bottom:30px;
+  box-shadow:0 0 25px rgba(37, 211, 102, 0.15);
 }
-.smart-search-box input{flex:1;background:transparent;border:none;color:#fff;font-size:14.5px;outline:none;font-family:inherit;}
-.search-action-btn{
-  background:var(--brand-gradient);color:#000;border:none;
-  font-weight:800;font-size:13px;padding:12px 18px;border-radius:14px;
-  cursor:pointer;
+.whatsapp-box h3{font-size:18px;font-weight:800;margin-bottom:8px;color:#fff;}
+.whatsapp-box p{font-size:13.5px;color:var(--text-muted);margin-bottom:18px;}
+.wa-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--green);color:#000;font-weight:800;
+  padding:14px 24px;border-radius:14px;text-decoration:none;font-size:14.5px;
+  box-shadow:0 4px 15px rgba(37, 211, 102, 0.3);
+  transition:0.2s;
 }
-
-#smartSolutionCard{
-  display:none;
-  background:linear-gradient(145deg, rgba(28, 20, 15, 0.98) 0%, rgba(18, 18, 24, 0.98) 100%);
-  border:1.5px solid var(--brand);
-  border-radius:20px;padding:22px;margin-bottom:28px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.6), 0 0 25px rgba(255,122,0,0.25);
-  animation:fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
-.sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
-.sol-badge{font-size:12px;color:var(--brand);font-weight:800;display:flex;align-items:center;gap:6px;}
-.sol-body{font-size:14px;line-height:1.75;color:#f0f0f5;white-space:pre-wrap;}
-.sol-action-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--brand-gradient);color:#000;font-weight:800;
-  padding:10px 18px;border-radius:10px;text-decoration:none;font-size:13px;
-  margin-top:14px;box-shadow:0 4px 14px var(--brand-glow);
-}
+.wa-btn:hover{transform:scale(1.02);opacity:0.95;}
 
 .cat-heading{
   font-size:12px;font-weight:800;color:var(--brand);
@@ -143,9 +84,9 @@ body{
 }
 
 .acc-item{
-  background:var(--panel-card);backdrop-filter:blur(16px);
+  background:var(--panel-card);
   border:1px solid var(--border);border-radius:18px;
-  margin-bottom:12px;overflow:hidden;transition:0.3s;
+  margin-bottom:12px;overflow:hidden;
 }
 .acc-trigger{padding:18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
 .acc-trigger-left{display:flex;align-items:center;gap:14px;}
@@ -159,501 +100,99 @@ body{
 .acc-item.active .chevron{transform:rotate(180deg);color:var(--brand);}
 .acc-body{
   max-height:0;overflow:hidden;
-  transition:max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:max-height 0.4s ease;
   background:rgba(12, 12, 15, 0.5);
 }
-.acc-item.active .acc-body{max-height:1400px;border-top:1px solid var(--border);}
-.acc-content{padding:20px;font-size:13.5px;color:var(--text-muted);line-height:1.7;}
-
-.explanation-text{white-space:pre-wrap;color:#e4e4eb;margin-bottom:16px;}
-
-.fallback-box{
-  margin-top:18px;background:#131318;border:1px dashed #343440;
-  border-radius:12px;padding:14px 16px;
-}
-.open-ticket-link{
-  background:transparent;color:var(--brand);border:1px solid var(--brand);
-  border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;
-  margin-top:8px;
-}
-
-.ticket-form{
-  display:none;margin-top:14px;background:rgba(20, 20, 25, 0.95);
-  border:1px solid rgba(255,122,0,0.3);border-radius:14px;padding:16px;
-}
-.ticket-form input, .ticket-form textarea{
-  width:100%;background:#0d0d10;border:1px solid #292933;color:#fff;
-  border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;margin-bottom:10px;
-}
-.submit-btn{
-  width:100%;background:var(--brand-gradient);color:#000;font-weight:800;
-  border:none;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;
-}
-
-.modal-overlay{
-  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  display:none;place-items:center;padding:20px;z-index:999;
-}
-.modal-box{
-  background:#141418;border:1px solid rgba(255,122,0,0.4);border-radius:24px;
-  padding:26px;max-width:460px;width:100%;
-}
-.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.modal-head h3{font-size:17px;color:#fff;}
-.modal-close{cursor:pointer;color:var(--text-muted);font-size:18px;}
-
-.auto-identity-box{
-  background:rgba(255,255,255,0.03);border:1px solid #24242c;
-  padding:10px 14px;border-radius:12px;margin-bottom:14px;font-size:12px;
-  color:#a1a1aa;display:flex;align-items:center;justify-content:space-between;
-}
-.auto-identity-box strong{color:#fff;}
-
-.ticket-status-card{background:#1a1a22;border:1px solid #2a2a36;border-radius:14px;padding:14px;margin-bottom:12px;}
-.status-pill{
-  display:inline-block;padding:3px 8px;border-radius:6px;
-  font-size:11px;font-weight:800;text-transform:uppercase;margin-bottom:8px;
-}
-.status-pill.pending{background:rgba(255,122,0,0.2);color:var(--brand);}
-.status-pill.proceeding{background:rgba(56,189,248,0.2);color:var(--blue);}
-.status-pill.confirmed{background:rgba(61,213,152,0.2);color:var(--green);}
-.status-pill.rejected{background:rgba(248,113,113,0.2);color:var(--red);}
-
-.reject-reason-box{
-  background:rgba(248,113,113,0.1);border-left:3px solid var(--red);
-  padding:10px;border-radius:6px;margin-top:8px;font-size:12.5px;color:#ffcaca;
-}
+.acc-item.active .acc-body{max-height:500px;border-top:1px solid var(--border);}
+.acc-content{padding:20px;font-size:13.5px;color:var(--text-muted);line-height:1.7;white-space:pre-wrap;}
 </style>
 </head>
 <body>
-
-<div class="ambient-glow"></div>
 
 <header class="header">
   <div class="header-left">
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
-      <h1>Help & Resolutions</h1>
-      <span>Support Desk Active</span>
+      <h1>Help & Support</h1>
+      <span>RADA CREST Direct Desk</span>
     </div>
   </div>
-  <button class="track-pill-btn" id="trackBtnModalTrigger">
-    <span>🔔</span> Track My Requests
-  </button>
 </header>
 
 <div class="container">
 
   <div class="hero">
-    <div class="hero-badge">💡 Smart Support</div>
-    <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
+    <h2>Aapki Samasya Ka Turant Samadhan</h2>
+    <p>Pricing, bulk order ya kisi bhi sahayata ke liye seedha hamari team se judein.</p>
   </div>
 
-  <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apna sawal likhein (jaise: pricing sahi nahi hai, order kaise kare)...">
-    <button class="search-action-btn" id="aiSearchBtn">🔍 Analyze</button>
+  <!-- DIRECT WHATSAPP SUPPORT BUTTON -->
+  <div class="whatsapp-box">
+    <h3>💬 Pricing ya Order Me Dikkat Hai?</h3>
+    <p>Agar aapko price negotiate karni hai ya koi special requirement hai, toh humein seedha WhatsApp par message bhejein!</p>
+    <!-- Yahan apna WhatsApp number daal dein (91 ke sath) -->
+    <a href="https://wa.me/919999999999?text=Hi%20RADA%20CREST,%20mujhe%20pricing%20aur%20order%20ke%20bare%20me%20baat%20karni%20hai." target="_blank" class="wa-btn">
+      <span>💬</span> Seedha WhatsApp Par Chat Karein
+    </a>
   </div>
 
-  <div id="smartSolutionCard">
-    <div class="sol-head">
-      <span class="sol-badge" id="solBadgeTitle">🤝 RADA CREST Personal Guide</span>
-      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" id="closeSolCardBtn">✕ Band Karein</span>
-    </div>
-    <div class="sol-body" id="smartSolText"></div>
-  </div>
-
-  <div class="cat-heading">📋 Solutions & Troubleshooting</div>
+  <div class="cat-heading">📋 Frequently Asked Questions</div>
   
-  <div id="dynamicTopicsContainer">
-    <div style="color:var(--text-muted);text-align:center;padding:30px;">Loading resolutions...</div>
+  <div class="acc-item">
+    <div class="acc-trigger" onclick="toggleAcc(this)">
+      <div class="acc-trigger-left">
+        <div class="icon-box">🛒</div>
+        <h3>Website par Naya Order Kaise Karein?</h3>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-content">1. Home page par jakar apna pasandida LED Bulb ya Extension Board chunein.
+2. 'Buy Now' button dabayein aur apna delivery address bharein.
+3. Cash on Delivery (COD) ya Online UPI payment select karke order confirm karein.</div>
+    </div>
+  </div>
+
+  <div class="acc-item">
+    <div class="acc-trigger" onclick="toggleAcc(this)">
+      <div class="acc-trigger-left">
+        <div class="icon-box">🔄</div>
+        <h3>Product Kharab Hone par 7 Days Free Replacement</h3>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-content">Agar koi item kharab ya toota hua mile toh 7 din ke andar 100% free replacement milta hai. Delivery partner naya piece laakar purana collect kar lega.</div>
+    </div>
+  </div>
+
+  <div class="acc-item">
+    <div class="acc-trigger" onclick="toggleAcc(this)">
+      <div class="acc-trigger-left">
+        <div class="icon-box">💰</div>
+        <h3>Refund Kitne Din me Aata hai?</h3>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-content">Cancellation ya return ke 24 se 48 working hours ke andar paisa seedha aapke bank account ya UPI me transfer kar diya jata hai.</div>
+    </div>
   </div>
 
   <a href="terms.html" style="display:flex;justify-content:space-between;align-items:center;background:var(--panel-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:#fff;margin-top:24px;">
-    <div><strong>Terms & Policies</strong><small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Service, return aur warranty terms padhein</small></div>
+    <div><strong>Terms & Policies</strong><small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Service aur warranty terms padhein</small></div>
     <div style="color:var(--brand);font-weight:bold;">➔</div>
   </a>
 
 </div>
 
-<div id="trackerModal" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3>Live Requests & Status</h3>
-      <span class="modal-close" id="closeTrackerModalBtn">✕</span>
-    </div>
-    <div class="auto-identity-box" id="identityDetectedBox">
-      <span>Auto Analyzing Customer Identity...</span>
-    </div>
-    <div id="trackResultList" style="max-height:350px;overflow-y:auto;">
-      <p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Fetching your past requests...</p>
-    </div>
-  </div>
-</div>
-
-<div id="successModal" class="modal-overlay">
-  <div class="modal-box" style="text-align:center;">
-    <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
-    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track My Requests'</strong> se live status dekh sakte hain.</p>
-    <button class="submit-btn" style="margin-top:16px;" id="closeSuccessModalBtn">Theek Hai</button>
-  </div>
-</div>
-
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-let liveTopics = [];
-let detectedUser = { phone: '', email: '', id: '' };
-
-async function autoDetectUser(){
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if(user){
-      detectedUser.email = user.email || '';
-      detectedUser.phone = user.phone || user.user_metadata?.phone || '';
-      detectedUser.id = user.id || '';
-    }
-    if(!detectedUser.phone){
-      detectedUser.phone = localStorage.getItem('rc_user_phone') || localStorage.getItem('customer_phone') || '';
-    }
-  } catch(e){
-    console.warn("Auto-detect:", e);
-  }
-}
-
-async function loadTopics(){
-  try {
-    const { data, error } = await supabase
-      .from('help_topics')
-      .select('*')
-      .eq('is_active', true)
-      .order('id', { ascending: false });
-
-    if(!error && data && data.length > 0){
-      liveTopics = data;
-    } else {
-      liveTopics = [
-        {
-          id: 'def-1',
-          title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
-          explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
-        },
-        {
-          id: 'def-2',
-          title: 'Delivery Address Kaise Badlein ya Add Karein?',
-          explanation: 'Order karte waqt address.html page par aap naya address save kar sakte hain ya purane address ko select kar sakte hain.'
-        },
-        {
-          id: 'def-3',
-          title: 'Product Kharab / Damage Hone par 7 Days Free Replacement',
-          explanation: 'Agar koi item kharab ya toota hua mile toh 7 din tak 100% Free replacement milta hai. Delivery partner naya piece laakar purana collect karega.'
-        }
-      ];
-    }
-  } catch(err){
-    liveTopics = [
-      {
-        id: 'def-1',
-        title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
-        explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
-      }
-    ];
-  }
-  renderTopics();
-}
-
-function renderTopics(){
-  const container = document.getElementById('dynamicTopicsContainer');
-  if(!container) return;
-
-  container.innerHTML = liveTopics.map(t => `
-    <div class="acc-item" id="topic-${t.id}">
-      <div class="acc-trigger" onclick="window.toggleAcc(this)">
-        <div class="acc-trigger-left">
-          <div class="icon-box">📌</div>
-          <h3>${t.title}</h3>
-        </div>
-        <div class="chevron">▼</div>
-      </div>
-      <div class="acc-body">
-        <div class="acc-content">
-          <div class="explanation-text">${t.explanation}</div>
-          
-          <div class="fallback-box">
-            <p style="color:#a0a0ab;font-size:12.5px;">Problem solve nahi hui? Admin desk ko direct request bhejein:</p>
-            <button class="open-ticket-link" onclick="window.toggleForm('form-${t.id}')">📩 Submit Request to Admin</button>
-            
-            <form class="ticket-form" id="form-${t.id}" onsubmit="window.submitTicket(event, '${t.title.replace(/'/g, "\\'")}')">
-              <input type="text" placeholder="Order ID (Optional)">
-              <input type="tel" placeholder="Aapka Mobile Number" value="${detectedUser.phone || ''}" required>
-              <textarea placeholder="Apni problem detail me likhein..." required></textarea>
-              <button type="submit" class="submit-btn">Send to Admin Desk ➔</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  `).join('');
-}
-
-// 100% EXACT & ACCURATE MATCHING ENGINE (NO MORE REPEATING ANSWERS)
-window.executeSmartSearch = function(){
-  const input = document.getElementById('helpInput');
-  const rawQ = input ? input.value.trim().toLowerCase() : '';
-  if(!rawQ) return;
-
-  const card = document.getElementById('smartSolutionCard');
-  const solText = document.getElementById('smartSolText');
-  const badge = document.getElementById('solBadgeTitle');
-
-  if(card) card.style.display = 'block';
-
-  let title = "💡 RADA CREST Support Guide";
-  let answerHTML = "";
-
-  // Pricing / Discount Intent
-  if(rawQ.includes('pric') || rawQ.includes('rate') || rawQ.includes('daam') || rawQ.includes('sahi nahi') || rawQ.includes('mehenga') || rawQ.includes('discount') || rawQ.includes('offer') || rawQ.includes('kam karo') || rawQ.includes('paisa')){
-    title = "🏷️ Pricing & Discount Support";
-    answerHTML = `
-      <strong>RADA CREST Pricing Assistance:</strong><br><br>
-      • Hamare LED bulbs aur extension boards ki pricing sabse behtareen wholesale aur retail rates par set hai.<br>
-      • Agar aapko bulk order ya kisi specific product ke daam me help chahiye, toh aap niche diye gaye ticket form ke zariye apni baat hum tak pahuncha sakte hain.<br><br>
-      <button class="sol-action-btn" style="background:var(--brand);color:#000;" onclick="window.scrollTo({top: 500, behavior: 'smooth'});">💬 Niche Ticket Form Bharein</button>
-    `;
-  } 
-  // Quality / Bulb check
-  else if(rawQ.includes('quality') || rawQ.includes('warranty') || rawQ.includes('guarantee') || rawQ.includes('chalega') || rawQ.includes('light') || rawQ.includes('bulb')){
-    title = "💡 Product Quality & Warranty";
-    answerHTML = `
-      <strong>RADA CREST Quality Assurance:</strong><br><br>
-      • Hamare sabhi LED Bulbs aur Extension Boards high-grade materials se bane hain.<br>
-      • Har product par 7 din ki free replacement warranty milti hai.<br><br>
-      <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
-    `;
-  } 
-  // Order Process Intent
-  else if(rawQ.includes('order') || rawQ.includes('buy') || rawQ.includes('kharid') || rawQ.includes('age kya') || rawQ.includes('khol li') || rawQ.includes('kya karu')){
-    title = "🚀 Order Kaise Karein (Step-by-Step)";
-    answerHTML = `
-      <strong>Website par order karne ka tarika:</strong><br><br>
-      1. Home page se apna pasandida item select karein.<br>
-      2. <strong>'Buy Now'</strong> button par click karein.<br>
-      3. Address page par apna pata aur mobile number enter karein.<br>
-      4. COD ya UPI chun kar order place kar dein!<br><br>
-      <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
-    `;
-  } 
-  // Delivery & Tracking Intent
-  else if(rawQ.includes('delivery') || rawQ.includes('time') || rawQ.includes('kab') || rawQ.includes('din') || rawQ.includes('track') || rawQ.includes('kaha hai')){
-    title = "📦 Delivery & Order Tracking";
-    answerHTML = `
-      <strong>Delivery ki jankari:</strong><br><br>
-      • Order 24 ghante ke andar dispatch hota hai aur 3 se 5 working days me pahunch jata hai.<br>
-      • Aap apne pichle orders ka status live track kar sakte hain.<br><br>
-      <a href="orders.html" class="sol-action-btn">📦 Track My Orders</a>
-    `;
-  } 
-  // Return & Refund Intent
-  else if(rawQ.includes('refund') || rawQ.includes('return') || rawQ.includes('wapas') || rawQ.includes('replace') || rawQ.includes('damage') || rawQ.includes('kharab')){
-    title = "🔄 Return & Refund Policy";
-    answerHTML = `
-      <strong>7 Days Free Replacement:</strong><br><br>
-      • Kharab ya damaged item milne par 7 din ke andar free replacement milta hai.<br>
-      • Refund cancellation ke 24-48 working hours me bank/UPI me transfer hota hai.<br><br>
-      <a href="orders.html" class="sol-action-btn">📦 Request Return</a>
-    `;
-  } 
-  // Greetings Intent
-  else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
-    title = "👋 Namaste! RADA CREST Support";
-    answerHTML = `
-      <strong>Hello dost! Main aapki kya sahayata kar sakta hoon?</strong><br><br>
-      Aapko pricing, order, ya replacement se judi jo bhi jankari chahiye, yahan type karke pooch sakte hain!
-    `;
-  } 
-  // Default fallback for other queries
-  else {
-    title = `💡 RADA CREST Guide for: "${input.value}"`;
-    answerHTML = `
-      <strong>Aapke is sawal ke liye hamari salah:</strong><br><br>
-      • Product details dekhne ke liye <strong>Store</strong> par jayein.<br>
-      • Kisi khas requirement ke liye niche diye gaye ticket form se admin ko message bhej dein.<br><br>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
-        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
-      </div>
-    `;
-  }
-
-  if(badge) badge.textContent = title;
-  if(solText) solText.innerHTML = answerHTML;
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  const aiBtn = document.getElementById('aiSearchBtn');
-  if(aiBtn) aiBtn.addEventListener('click', window.executeSmartSearch);
-
-  const helpInput = document.getElementById('helpInput');
-  if(helpInput){
-    helpInput.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter') window.executeSmartSearch();
-    });
-  }
-
-  const closeSol = document.getElementById('closeSolCardBtn');
-  if(closeSol) closeSol.addEventListener('click', () => {
-    const card = document.getElementById('smartSolutionCard');
-    if(card) card.style.display = 'none';
-  });
-
-  const trackTrigger = document.getElementById('trackBtnModalTrigger');
-  if(trackTrigger) trackTrigger.addEventListener('click', window.openAutoTrackerModal);
-
-  const closeTracker = document.getElementById('closeTrackerModalBtn');
-  if(closeTracker) closeTracker.addEventListener('click', window.closeTrackerModal);
-
-  const closeSuccess = document.getElementById('closeSuccessModalBtn');
-  if(closeSuccess) closeSuccess.addEventListener('click', () => {
-    const modal = document.getElementById('successModal');
-    if(modal) modal.style.display = 'none';
-  });
-});
-
-window.toggleAcc = function(headerEl){
+<script>
+function toggleAcc(headerEl){
   const item = headerEl.closest('.acc-item');
   const isOpen = item.classList.contains('active');
   document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
   if(!isOpen) item.classList.add('active');
-};
-
-window.toggleForm = function(formId){
-  const f = document.getElementById(formId);
-  if(f) f.style.display = (f.style.display === 'block') ? 'none' : 'block';
-};
-
-window.submitTicket = async function(e, topicTitle){
-  e.preventDefault();
-  const form = e.target;
-  const inputs = form.querySelectorAll('input, textarea');
-  const btn = form.querySelector('.submit-btn');
-
-  const orderId = inputs[0].value.trim() || null;
-  const phone = inputs[1].value.trim();
-  const desc = inputs[2].value.trim();
-
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-
-  try {
-    const { data, error } = await supabase.from('help_tickets').insert([{
-      issue_type: topicTitle,
-      order_id: orderId,
-      customer_phone: phone,
-      description: desc,
-      status: 'pending'
-    }]).select();
-
-    if(error) throw error;
-    localStorage.setItem('rc_user_phone', phone);
-    detectedUser.phone = phone;
-
-    form.reset();
-    form.style.display = 'none';
-    if(data && data[0]) document.getElementById('createdTicketId').textContent = '#' + data[0].id;
-    document.getElementById('successModal').style.display = 'grid';
-  } catch(err){
-    alert('Error: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Send to Admin Desk ➔';
-  }
-};
-
-window.openAutoTrackerModal = async function(){
-  const modal = document.getElementById('trackerModal');
-  if(modal) modal.style.display = 'grid';
-  const idBox = document.getElementById('identityDetectedBox');
-  const resBox = document.getElementById('trackResultList');
-
-  await autoDetectUser();
-  const activePhone = detectedUser.phone;
-
-  if(!activePhone){
-    if(idBox) idBox.innerHTML = `<span>Guest Device (No order history)</span>`;
-    if(resBox){
-      resBox.innerHTML = `
-        <div style="text-align:center;padding:20px;">
-          <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Apna mobile number likhein jisse order/request ki thi:</p>
-          <input type="tel" id="manualTrackInput" placeholder="Mobile Number daalein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
-          <button class="submit-btn" id="manualSearchBtn">Search My Requests</button>
-        </div>
-      `;
-      const manualBtn = document.getElementById('manualSearchBtn');
-      if(manualBtn) manualBtn.addEventListener('click', () => {
-        const inp = document.getElementById('manualTrackInput');
-        if(inp) window.fetchTickets(inp.value.trim());
-      });
-    }
-    return;
-  }
-
-  if(idBox) idBox.innerHTML = `<span>Customer Mobile: <strong>${activePhone}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
-  await window.fetchTickets(activePhone);
-};
-
-window.fetchTickets = async function(phone){
-  const resBox = document.getElementById('trackResultList');
-  if(!resBox) return;
-  resBox.innerHTML = `<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Analyzing your requests...</p>`;
-
-  try {
-    const { data: tickets, error } = await supabase
-      .from('help_tickets')
-      .select('*')
-      .eq('customer_phone', phone)
-      .order('id', { ascending: false });
-
-    if(error) throw error;
-    if(!tickets || !tickets.length){
-      resBox.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:30px;">Is number par abhi koi active request nahi mili.</div>`;
-      return;
-    }
-
-    resBox.innerHTML = tickets.map(tk => `
-      <div class="ticket-status-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span class="status-pill ${tk.status}">${tk.status}</span>
-          <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
-        </div>
-        <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
-        <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
-        ${tk.status === 'rejected' && tk.rejection_reason ? `
-          <div class="reject-reason-box">
-            <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
-          </div>
-        ` : ''}
-        ${tk.status === 'confirmed' ? `<div style="color:var(--green);font-size:12px;margin-top:6px;">✓ Admin team has approved & confirmed this request.</div>` : ''}
-        ${tk.status === 'proceeding' ? `<div style="color:var(--blue);font-size:12px;margin-top:6px;">⚙️ Request in progress (Action underway).</div>` : ''}
-      </div>
-    `).join('');
-  } catch(err){
-    resBox.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Error: ${err.message}</div>`;
-  }
-};
-
-window.closeTrackerModal = function(){
-  const modal = document.getElementById('trackerModal');
-  if(modal) modal.style.display = 'none';
-};
-
-(async () => {
-  await autoDetectUser();
-  await loadTopics();
-})();
+}
 </script>
 
 </body>
