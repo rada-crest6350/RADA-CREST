@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RADA CREST — Referral & Rewards Control</title>
+<title>RADA CREST — Gift & Referral Rewards Manager</title>
+
 <style>
 *{box-sizing:border-box}
 
@@ -29,7 +30,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-button,input,select{font:inherit;}
+button,input,select,textarea{font:inherit;}
 button{cursor:pointer;}
 .app{display:flex;min-height:100vh;}
 
@@ -103,7 +104,7 @@ button{cursor:pointer;}
 }
 .back-btn:hover{background:#1f1f1f;color:#fff;}
 
-/* MAIN */
+/* MAIN AREA */
 .main{
   margin-left:265px;
   width:calc(100% - 265px);
@@ -152,7 +153,7 @@ button{cursor:pointer;}
 .card small{color:#a1a1aa;font-size:12px;font-weight:600;}
 .card h2{margin:8px 0 0;font-size:28px;font-weight:800;color:#fff;}
 
-/* PANELS & FORMS */
+/* PANELS */
 .panel{
   background:var(--panel);
   border:1px solid var(--border);
@@ -168,11 +169,12 @@ button{cursor:pointer;}
 }
 .panel-head h2{margin:0;font-size:18px;font-weight:700;}
 
+/* FORM */
 .form-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-  gap:14px;
-  margin-bottom:14px;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:16px;
+  margin-bottom:16px;
 }
 .form-group{display:flex;flex-direction:column;gap:6px;}
 .form-group label{font-size:12px;font-weight:600;color:var(--muted);}
@@ -194,15 +196,89 @@ button{cursor:pointer;}
   color:#000;
   font-weight:800;
   border:none;
-  padding:11px 20px;
+  padding:12px 24px;
   border-radius:8px;
-  font-size:13.5px;
+  font-size:14px;
   display:inline-flex;
   align-items:center;
   gap:8px;
   transition:0.2s;
 }
 .submit-btn:hover{background:#ff9433;}
+
+/* GIFTS PREVIEW GRID (CARDS DISPLAY) */
+.gifts-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:18px;
+  margin-bottom:10px;
+}
+.gift-card{
+  background:#161616;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  transition:border-color 0.2s;
+}
+.gift-card:hover{border-color:#383838;}
+.gift-img-wrap{
+  width:100%;
+  height:150px;
+  background:#0f0f0f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid var(--border);
+}
+.gift-img-wrap img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:cover;
+}
+.gift-img-wrap .no-img{
+  font-size:40px;
+  color:#333;
+}
+.gift-details{
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  flex:1;
+}
+.gift-details h3{
+  margin:0;
+  font-size:16px;
+  font-weight:700;
+  color:#fff;
+}
+.target-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--brand-glow);
+  color:var(--brand);
+  font-size:12px;
+  font-weight:800;
+  padding:4px 10px;
+  border-radius:20px;
+  border:1px solid rgba(255,122,0,0.3);
+  width:fit-content;
+}
+.condition-tag{
+  font-size:11.5px;
+  color:#a1a1aa;
+}
+.gift-actions{
+  margin-top:auto;
+  padding-top:12px;
+  border-top:1px solid #222;
+  display:flex;
+  gap:8px;
+}
 
 /* TABLES */
 .table-wrapper{overflow-x:auto;}
@@ -235,18 +311,21 @@ td{
 }
 .badge.active{background:rgba(125,255,155,0.15);color:var(--green);}
 .badge.inactive{background:rgba(255,107,107,0.15);color:var(--red);}
+
 .action-btn{
   background:#1c1c1c;
   border:1px solid var(--border);
   color:#fff;
-  padding:6px 10px;
+  padding:6px 12px;
   border-radius:6px;
   font-size:12px;
-  margin-right:6px;
+  font-weight:600;
   transition:0.2s;
+  flex:1;
 }
 .action-btn:hover{border-color:var(--brand);}
-.action-btn.delete:hover{background:#301414;color:var(--red);border-color:var(--red);}
+.action-btn.delete{color:var(--red);}
+.action-btn.delete:hover{background:#301414;border-color:var(--red);}
 
 @media(max-width:768px){
   .sidebar{width:100%;position:relative;height:auto;}
@@ -272,7 +351,7 @@ td{
     </div>
     <div class="menu">
       <button onclick="window.location.href='admin-dashboard.html'"><span>⚡</span> Dashboard</button>
-      <button class="active"><span>🔗</span> Referral Control</button>
+      <button class="active"><span>🎁</span> Gifts & Rewards</button>
       <button onclick="window.location.href='admin-products.html'"><span>📦</span> Products</button>
       <button onclick="window.location.href='admin-orders.html'"><span>🛍️</span> Orders</button>
       <button onclick="window.location.href='admin-customers.html'"><span>👥</span> Customers</button>
@@ -280,17 +359,17 @@ td{
     <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">⬅ Back to Dashboard</button>
   </aside>
 
-  <!-- MAIN AREA -->
+  <!-- MAIN CONTENT -->
   <main class="main">
     <div class="topbar">
-      <h1>Referral & Rewards Manager</h1>
+      <h1>Multi-Gift Referral Management</h1>
       <span id="syncStatus" class="status-pill">Connected to Supabase</span>
     </div>
 
     <!-- METRICS -->
     <div class="cards">
       <div class="card">
-        <small>Total Reward Rules</small>
+        <small>Total Gifts Available</small>
         <h2 id="metricRules">0</h2>
       </div>
       <div class="card">
@@ -298,88 +377,73 @@ td{
         <h2 id="metricReferrals">0</h2>
       </div>
       <div class="card">
-        <small>Unique Referrers</small>
+        <small>Active Customers Referring</small>
         <h2 id="metricReferrers">0</h2>
       </div>
     </div>
 
-    <!-- FORM: CREATE / EDIT RULE -->
+    <!-- ADD NEW GIFT FORM -->
     <div class="panel">
       <div class="panel-head">
-        <h2>Add New Referral Reward Rule</h2>
+        <h2>➕ Add New Referral Gift</h2>
       </div>
       <form id="addRuleForm">
         <div class="form-grid">
           <div class="form-group">
-            <label>Rule Title / Milestone</label>
-            <input type="text" id="ruleTitle" placeholder="e.g. Free 9W LED Bulb" required />
+            <label>Gift / Milestone Title</label>
+            <input type="text" id="ruleTitle" placeholder="e.g. Free 9W Motion Sensor Bulb" required />
           </div>
           <div class="form-group">
-            <label>Condition Type</label>
-            <select id="ruleCondition" required>
-              <option value="signup">Successful Friend Signup</option>
-              <option value="order">Friend's First Delivered Order</option>
-            </select>
+            <label>Gift Product Name</label>
+            <input type="text" id="ruleGiftName" placeholder="e.g. 9W LED Radar Bulb" required />
           </div>
           <div class="form-group">
             <label>Target Referrals Needed</label>
             <input type="number" id="ruleTarget" placeholder="e.g. 5" min="1" required />
           </div>
           <div class="form-group">
-            <label>Gift Product Name</label>
-            <input type="text" id="ruleGiftName" placeholder="e.g. 9W Radar LED" required />
+            <label>Condition / Trigger</label>
+            <select id="ruleCondition" required>
+              <option value="signup">When Friend Signs Up (Free)</option>
+              <option value="order">When Friend Places 1st Order</option>
+            </select>
           </div>
-          <div class="form-group">
-            <label>Gift Image URL (Optional)</label>
-            <input type="url" id="ruleGiftImage" placeholder="https://..." />
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Gift Product Image URL</label>
+            <input type="url" id="ruleGiftImage" placeholder="https://example.com/bulb-image.jpg" />
           </div>
         </div>
-        <button type="submit" class="submit-btn" id="saveBtn">➕ Save Referral Rule</button>
+        <button type="submit" class="submit-btn" id="saveBtn">🎁 Add This Gift to Rewards</button>
       </form>
     </div>
 
-    <!-- ACTIVE REWARD RULES LIST -->
+    <!-- GIFTS DISPLAY CARDS -->
     <div class="panel">
       <div class="panel-head">
-        <h2>Configured Rules & Gifts</h2>
+        <h2>Active Gifts Showcase</h2>
       </div>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Rule Name</th>
-              <th>Trigger Type</th>
-              <th>Target</th>
-              <th>Gift Product</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="rulesTableBody">
-            <tr><td colspan="7" style="text-align:center;color:var(--muted);">Loading rules...</td></tr>
-          </tbody>
-        </table>
+      <div id="giftsContainer" class="gifts-grid">
+        <div style="color:var(--muted);padding:20px;">Loading gifts...</div>
       </div>
     </div>
 
-    <!-- REFERRER ACTIVITY LOG -->
+    <!-- REFERRAL USERS LOG -->
     <div class="panel">
       <div class="panel-head">
-        <h2>Referral Activity Log</h2>
+        <h2>Live Referrals Activity</h2>
       </div>
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
               <th>Log ID</th>
-              <th>Referrer UUID</th>
-              <th>Referee UUID</th>
+              <th>Referrer (User ID)</th>
+              <th>Referee (Friend ID)</th>
               <th>Status</th>
             </tr>
           </thead>
           <tbody id="referralsTableBody">
-            <tr><td colspan="4" style="text-align:center;color:var(--muted);">Loading referral activity...</td></tr>
+            <tr><td colspan="4" style="text-align:center;color:var(--muted);">Loading live logs...</td></tr>
           </tbody>
         </table>
       </div>
@@ -388,7 +452,7 @@ td{
   </main>
 </div>
 
-<!-- SUPABASE SCRIPT -->
+<!-- SUPABASE LOGIC -->
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -399,41 +463,52 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 let rulesData = [];
 let referralsData = [];
 
-// FETCH DATA
+// LOAD ALL DATA
 async function loadAllData(){
   try {
-    // 1. Get Rules
+    // 1. Fetch Gifts / Rules
     const { data: rules, error: rErr } = await supabase
       .from("referral_rules")
       .select("*")
-      .order("id", { ascending: true });
+      .order("target_count", { ascending: true });
 
     if(rErr) throw rErr;
     rulesData = rules || [];
     document.getElementById("metricRules").textContent = rulesData.length;
 
-    // Render Rules Table
-    const rBody = document.getElementById("rulesTableBody");
+    // Render Gift Cards
+    const gContainer = document.getElementById("giftsContainer");
     if(!rulesData.length){
-      rBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px;">No referral rules created yet.</td></tr>`;
+      gContainer.innerHTML = `<div style="color:var(--muted);padding:20px;grid-column:1/-1;">Abhi koi gift add nahi hai. Upar form se naya gift add karein!</div>`;
     } else {
-      rBody.innerHTML = rulesData.map(r => `
-        <tr>
-          <td>#${r.id}</td>
-          <td><strong>${r.title || "Unnamed"}</strong></td>
-          <td><code>${r.condition_type}</code></td>
-          <td><strong>${r.target_count || 1}</strong> referrals</td>
-          <td>${r.gift_product_name || "Gift"}</td>
-          <td><span class="badge ${r.is_active !== false ? "active" : "inactive"}">${r.is_active !== false ? "Active" : "Disabled"}</span></td>
-          <td>
-            <button class="action-btn" onclick="toggleRuleStatus(${r.id}, ${r.is_active !== false})">${r.is_active !== false ? "Disable" : "Enable"}</button>
-            <button class="action-btn delete" onclick="deleteRule(${r.id})">Delete</button>
-          </td>
-        </tr>
+      gContainer.innerHTML = rulesData.map(r => `
+        <div class="gift-card">
+          <div class="gift-img-wrap">
+            ${r.gift_image 
+              ? `<img src="${r.gift_image}" alt="${r.gift_product_name || 'Gift'}" onerror="this.src='https://placehold.co/300x180/1c1c1c/white?text=Gift+Product'">` 
+              : `<span class="no-img">🎁</span>`}
+          </div>
+          <div class="gift-details">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <h3>${r.title || r.gift_product_name}</h3>
+              <span class="badge ${r.is_active !== false ? 'active' : 'inactive'}">${r.is_active !== false ? 'Active' : 'Disabled'}</span>
+            </div>
+            <div class="target-tag">🎯 Goal: ${r.target_count || 1} Friends</div>
+            <div class="condition-tag">Trigger: ${r.condition_type === 'signup' ? '👤 Friend Signup' : '🛍️ Friend 1st Order'}</div>
+            <div style="font-size:12px;color:#ccc;">Product: <strong>${r.gift_product_name || 'Free Gift'}</strong></div>
+            
+            <div class="gift-actions">
+              <button class="action-btn" onclick="toggleGiftStatus(${r.id}, ${r.is_active !== false})">
+                ${r.is_active !== false ? 'Disable' : 'Enable'}
+              </button>
+              <button class="action-btn delete" onclick="deleteGift(${r.id})">Delete</button>
+            </div>
+          </div>
+        </div>
       `).join("");
     }
 
-    // 2. Get Referrals
+    // 2. Fetch Live Referrals
     const { data: refs, error: refErr } = await supabase
       .from("referrals")
       .select("*")
@@ -443,21 +518,19 @@ async function loadAllData(){
     referralsData = refs || [];
     document.getElementById("metricReferrals").textContent = referralsData.length;
 
-    // Unique referrers count
-    const uniqueReferrers = new Set(referralsData.map(rf => rf.referrer_id).filter(Boolean));
-    document.getElementById("metricReferrers").textContent = uniqueReferrers.size;
+    const uniqueUsers = new Set(referralsData.map(rf => rf.referrer_id).filter(Boolean));
+    document.getElementById("metricReferrers").textContent = uniqueUsers.size;
 
-    // Render Referrals Log
     const refBody = document.getElementById("referralsTableBody");
     if(!referralsData.length){
-      refBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px;">No referrals recorded in database yet.</td></tr>`;
+      refBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px;">No referrals logged yet.</td></tr>`;
     } else {
       refBody.innerHTML = referralsData.map(rf => `
         <tr>
           <td>#${rf.id}</td>
           <td><code>${rf.referrer_id || "N/A"}</code></td>
           <td><code>${rf.referee_id || "N/A"}</code></td>
-          <td><span class="badge active">Recorded</span></td>
+          <td><span class="badge active">Logged</span></td>
         </tr>
       `).join("");
     }
@@ -465,42 +538,42 @@ async function loadAllData(){
   } catch(err){
     console.error(err);
     const sync = document.getElementById("syncStatus");
-    sync.textContent = "Sync Error with Database";
+    sync.textContent = "Database Error";
     sync.style.color = "var(--red)";
   }
 }
 
-// CREATE NEW RULE
+// FORM SUBMIT: ADD NEW GIFT
 document.getElementById("addRuleForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = document.getElementById("saveBtn");
   btn.disabled = true;
-  btn.textContent = "Saving...";
+  btn.textContent = "Adding Gift...";
 
-  const newRule = {
+  const newGift = {
     title: document.getElementById("ruleTitle").value.trim(),
-    condition_type: document.getElementById("ruleCondition").value,
-    target_count: parseInt(document.getElementById("ruleTarget").value, 10),
     gift_product_name: document.getElementById("ruleGiftName").value.trim(),
+    target_count: parseInt(document.getElementById("ruleTarget").value, 10),
+    condition_type: document.getElementById("ruleCondition").value,
     gift_image: document.getElementById("ruleGiftImage").value.trim() || null,
     is_active: true
   };
 
   try {
-    const { error } = await supabase.from("referral_rules").insert([newRule]);
+    const { error } = await supabase.from("referral_rules").insert([newGift]);
     if(error) throw error;
     document.getElementById("addRuleForm").reset();
     await loadAllData();
   } catch(err){
-    alert("Rule add karne me error aaya: " + err.message);
+    alert("Gift add karne me dikkat aayi: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = "➕ Save Referral Rule";
+    btn.textContent = "🎁 Add This Gift to Rewards";
   }
 });
 
-// TOGGLE RULE
-window.toggleRuleStatus = async (id, currentStatus) => {
+// TOGGLE STATUS
+window.toggleGiftStatus = async (id, currentStatus) => {
   try {
     const { error } = await supabase
       .from("referral_rules")
@@ -509,23 +582,24 @@ window.toggleRuleStatus = async (id, currentStatus) => {
     if(error) throw error;
     loadAllData();
   } catch(err){
-    alert("Status update fail: " + err.message);
+    alert("Status change error: " + err.message);
   }
 };
 
-// DELETE RULE
-window.deleteRule = async (id) => {
-  if(!confirm("Kya aap sach me is rule ko delete karna chahte hain?")) return;
+// DELETE GIFT
+window.deleteGift = async (id) => {
+  if(!confirm("Kya aap sach me is gift reward ko delete karna chahte hain?")) return;
   try {
     const { error } = await supabase.from("referral_rules").delete().eq("id", id);
     if(error) throw error;
     loadAllData();
   } catch(err){
-    alert("Delete karne me error: " + err.message);
+    alert("Delete error: " + err.message);
   }
 };
 
 loadAllData();
 </script>
+
 </body>
 </html>
