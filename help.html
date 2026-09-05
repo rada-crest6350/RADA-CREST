@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Help & Resolutions — RADA CREST</title>
+<title>Help & Resolutions Desk — RADA CREST</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,6 +22,8 @@
   --brand-glow:rgba(255, 122, 0, 0.35);
   --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
   --green:#3dd598;
+  --blue:#38bdf8;
+  --red:#f87171;
 }
 
 body{
@@ -48,11 +50,12 @@ body{
   position:sticky;top:0;z-index:100;
   background:rgba(8, 8, 10, 0.85);
   backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   padding:14px 20px;
   display:flex;align-items:center;justify-content:space-between;
 }
-.header-left{display:flex;align-items:center;gap:14px;}
+.header-left{display:flex;align-items:center;gap:12px;}
 .back-btn{
   background:rgba(255,255,255,0.06);
   border:1px solid var(--border);
@@ -60,7 +63,7 @@ body{
   display:grid;place-items:center;color:#fff;
   text-decoration:none;font-size:16px;
 }
-.header-title h1{font-size:17px;font-weight:800;}
+.header-title h1{font-size:16px;font-weight:800;}
 .header-title span{
   font-size:11px;color:var(--brand);font-weight:600;
   display:flex;align-items:center;gap:5px;
@@ -69,6 +72,24 @@ body{
   content:'';width:6px;height:6px;background:var(--green);border-radius:50%;
   box-shadow:0 0 8px var(--green);
 }
+
+/* TRACK STATUS BADGE IN HEADER CORNER */
+.track-pill-btn{
+  background:rgba(255, 122, 0, 0.12);
+  border:1px solid var(--brand);
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  padding:8px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 0 12px var(--brand-glow);
+  transition:0.2s;
+}
+.track-pill-btn:hover{background:var(--brand);color:#000;}
 
 .container{max-width:640px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
 
@@ -104,9 +125,7 @@ body{
   border:1.5px solid var(--brand);
   border-radius:20px;padding:20px;margin-bottom:28px;
   box-shadow:0 10px 30px rgba(0,0,0,0.6), 0 0 25px rgba(255,122,0,0.25);
-  animation:fadeSlideIn 0.3s ease;
 }
-@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
 .sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
 .sol-badge{font-size:12px;color:var(--brand);font-weight:800;}
 .sol-body{font-size:13.5px;line-height:1.7;color:#f0f0f5;}
@@ -118,6 +137,7 @@ body{
 
 .acc-item{
   background:var(--panel-card);backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
   border:1px solid var(--border);border-radius:18px;
   margin-bottom:12px;overflow:hidden;transition:0.3s;
 }
@@ -139,18 +159,11 @@ body{
 .acc-item.active .acc-body{max-height:1400px;border-top:1px solid var(--border);}
 .acc-content{padding:20px;font-size:13.5px;color:var(--text-muted);line-height:1.7;}
 
-.explanation-text{
-  white-space:pre-wrap;
-  color:#e4e4eb;
-  margin-bottom:16px;
-}
+.explanation-text{white-space:pre-wrap;color:#e4e4eb;margin-bottom:16px;}
 
 .fallback-box{
-  margin-top:18px;
-  background:#131318;
-  border:1px dashed #343440;
-  border-radius:12px;
-  padding:14px 16px;
+  margin-top:18px;background:#131318;border:1px dashed #343440;
+  border-radius:12px;padding:14px 16px;
 }
 .open-ticket-link{
   background:transparent;color:var(--brand);border:1px solid var(--brand);
@@ -171,13 +184,46 @@ body{
   border:none;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;
 }
 
+/* STATUS TRACKER MODAL */
 .modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   display:none;place-items:center;padding:20px;z-index:999;
 }
 .modal-box{
   background:#141418;border:1px solid rgba(255,122,0,0.4);border-radius:24px;
-  padding:30px;max-width:380px;width:100%;text-align:center;
+  padding:26px;max-width:440px;width:100%;
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.modal-head h3{font-size:17px;color:#fff;}
+.modal-close{cursor:pointer;color:var(--text-muted);font-size:18px;}
+
+.track-input-grp{display:flex;gap:8px;margin-bottom:16px;}
+.track-input-grp input{
+  flex:1;background:#0d0d10;border:1px solid #292933;color:#fff;
+  border-radius:10px;padding:10px 12px;font-size:13px;
+}
+.track-btn{
+  background:var(--brand);color:#000;border:none;font-weight:800;
+  padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;
+}
+
+.ticket-status-card{
+  background:#1a1a22;border:1px solid #2a2a36;border-radius:14px;
+  padding:14px;margin-bottom:12px;
+}
+.status-pill{
+  display:inline-block;padding:3px 8px;border-radius:6px;
+  font-size:11px;font-weight:800;text-transform:uppercase;margin-bottom:8px;
+}
+.status-pill.pending{background:rgba(255,122,0,0.2);color:var(--brand);}
+.status-pill.proceeding{background:rgba(56,189,248,0.2);color:var(--blue);}
+.status-pill.confirmed{background:rgba(61,213,152,0.2);color:var(--green);}
+.status-pill.rejected{background:rgba(248,113,113,0.2);color:var(--red);}
+
+.reject-reason-box{
+  background:rgba(248,113,113,0.1);border-left:3px solid var(--red);
+  padding:10px;border-radius:6px;margin-top:8px;font-size:12.5px;color:#ffcaca;
 }
 </style>
 </head>
@@ -193,6 +239,10 @@ body{
       <span>Support Desk Active</span>
     </div>
   </div>
+  <!-- TOP RIGHT TRACKER BADGE -->
+  <button class="track-pill-btn" onclick="openTrackerModal()">
+    <span>🔔</span> Track Request
+  </button>
 </header>
 
 <div class="container">
@@ -202,13 +252,11 @@ body{
     <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
   </div>
 
-  <!-- AUTO ANALYZING SEARCH BAR -->
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apni dikkat yahan likhein (e.g. socket kaam nahi kar raha, refund)..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
+    <input type="text" id="helpInput" placeholder="Apni dikkat yahan likhein (e.g. extension board socket, refund)..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
     <button class="search-action-btn" onclick="runAutoAnalysis()">🔍 Analyze</button>
   </div>
 
-  <!-- POPUP ANALYSIS CARD -->
   <div id="smartSolutionCard">
     <div class="sol-head">
       <span class="sol-badge">⚡ Auto Matched Solution</span>
@@ -222,7 +270,6 @@ body{
     <div style="color:var(--text-muted);text-align:center;padding:30px;">Loading resolutions...</div>
   </div>
 
-  <!-- TERMS AND CONDITIONS BUTTON -->
   <a href="terms.html" style="display:flex;justify-content:space-between;align-items:center;background:var(--panel-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:#fff;margin-top:24px;">
     <div><strong>Terms & Policies</strong><small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Service, return aur warranty terms padhein</small></div>
     <div style="color:var(--brand);font-weight:bold;">➔</div>
@@ -230,11 +277,28 @@ body{
 
 </div>
 
-<!-- SUCCESS POPUP -->
-<div id="successModal" class="modal-overlay">
+<!-- STATUS TRACKER MODAL -->
+<div id="trackerModal" class="modal-overlay">
   <div class="modal-box">
+    <div class="modal-head">
+      <h3>Track Your Request Status</h3>
+      <span class="modal-close" onclick="closeTrackerModal()">✕</span>
+    </div>
+    <div class="track-input-grp">
+      <input type="tel" id="trackPhone" placeholder="Apna Mobile Number ya Ticket ID daalein">
+      <button class="track-btn" onclick="checkStatus()">Search</button>
+    </div>
+    <div id="trackResultList" style="max-height:300px;overflow-y:auto;">
+      <p style="color:var(--text-muted);font-size:12.5px;text-align:center;">Apna registered phone number daal kar check karein.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET CREATED SUCCESS POPUP -->
+<div id="successModal" class="modal-overlay">
+  <div class="modal-box" style="text-align:center;">
     <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
-    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka message Admin Help Desk me submit ho chuka hai. Hamari team jald reply karegi.</p>
+    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID hai: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track Request'</strong> se status check kar sakte hain.</p>
     <button class="submit-btn" style="margin-top:16px;" onclick="document.getElementById('successModal').style.display='none'">Theek Hai</button>
   </div>
 </div>
@@ -248,7 +312,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let liveTopics = [];
 
-// FETCH TOPICS DYNAMICALLY
 async function loadTopics(){
   try {
     const { data, error } = await supabase
@@ -301,7 +364,6 @@ async function loadTopics(){
   }
 }
 
-// IN-BUILT SMART AUTO-ANALYSIS ENGINE
 window.runAutoAnalysis = function(){
   const query = document.getElementById('helpInput').value.trim().toLowerCase();
   if(!query || !liveTopics.length) return;
@@ -309,7 +371,6 @@ window.runAutoAnalysis = function(){
   const card = document.getElementById('smartSolutionCard');
   const solText = document.getElementById('smartSolText');
 
-  // Find best match by keyword scanning
   const words = query.split(/\s+/);
   let bestTopic = null;
   let maxMatches = 0;
@@ -331,7 +392,7 @@ window.runAutoAnalysis = function(){
     solText.innerHTML = `<strong>${bestTopic.title}:</strong><br><br>${bestTopic.explanation.substring(0, 200)}...<br><br><button class="submit-btn" onclick="scrollToItem('topic-${bestTopic.id}')">📖 Open Full Guidance & Form</button>`;
   } else {
     card.style.display = 'block';
-    solText.innerHTML = `Aapki query ke liye exact match nahi mila. Aap niche diye gaye topics me se guidance dekh sakte hain ya direct admin desk se sampark karein.`;
+    solText.innerHTML = `Aapki query ke liye exact match nahi mila. Niche diye gaye topics se help lein ya ticket submit karein.`;
   }
 };
 
@@ -366,17 +427,21 @@ window.submitTicket = async function(e, topicTitle){
   btn.textContent = 'Sending...';
 
   try {
-    const { error } = await supabase.from('help_tickets').insert([{
+    const { data, error } = await supabase.from('help_tickets').insert([{
       issue_type: topicTitle,
       order_id: inputs[0].value.trim() || null,
       customer_phone: inputs[1].value.trim(),
       description: inputs[2].value.trim(),
       status: 'pending'
-    }]);
+    }]).select();
 
     if(error) throw error;
+    
     form.reset();
     form.style.display = 'none';
+    if(data && data[0]){
+      document.getElementById('createdTicketId').textContent = '#' + data[0].id;
+    }
     document.getElementById('successModal').style.display = 'grid';
   } catch(err){
     alert('Error: ' + err.message);
@@ -384,6 +449,64 @@ window.submitTicket = async function(e, topicTitle){
     btn.disabled = false;
     btn.textContent = 'Send to Admin Desk ➔';
   }
+};
+
+// LIVE STATUS TRACKING LOGIC
+window.openTrackerModal = function(){
+  document.getElementById('trackerModal').style.display = 'grid';
+};
+window.closeTrackerModal = function(){
+  document.getElementById('trackerModal').style.display = 'none';
+};
+
+window.checkStatus = async function(){
+  const val = document.getElementById('trackPhone').value.trim();
+  const resBox = document.getElementById('trackResultList');
+  if(!val){
+    resBox.innerHTML = '<p style="color:var(--red);text-align:center;">Kripya phone number ya Ticket ID likhein.</p>';
+    return;
+  }
+
+  resBox.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Checking status...</p>';
+
+  let query = supabase.from('help_tickets').select('*');
+  if(!isNaN(val) && val.length < 7){
+    query = query.eq('id', parseInt(val, 10));
+  } else {
+    query = query.eq('customer_phone', val);
+  }
+
+  const { data: tickets, error } = await query.order('id', { ascending: false });
+  if(error || !tickets || !tickets.length){
+    resBox.innerHTML = '<p style="color:var(--red);text-align:center;">Koi ticket nahi mili. Kripya sahi number/ID daalein.</p>';
+    return;
+  }
+
+  resBox.innerHTML = tickets.map(tk => `
+    <div class="ticket-status-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="status-pill ${tk.status}">${tk.status}</span>
+        <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
+      </div>
+      <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
+      <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
+      ${tk.status === 'rejected' && tk.rejection_reason ? `
+        <div class="reject-reason-box">
+          <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
+        </div>
+      ` : ''}
+      ${tk.status === 'confirmed' ? `
+        <div style="color:var(--green);font-size:12px;margin-top:6px;">
+          ✓ Admin team has approved & confirmed this request.
+        </div>
+      ` : ''}
+      ${tk.status === 'proceeding' ? `
+        <div style="color:var(--blue);font-size:12px;margin-top:6px;">
+          ⚙️ Request is in progress (Courier/Resolution underway).
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
 };
 
 loadTopics();
