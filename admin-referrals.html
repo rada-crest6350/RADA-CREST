@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RADA CREST — Referral Management</title>
+<title>RADA CREST — Referral & Rewards Control</title>
 <style>
 *{box-sizing:border-box}
+
 :root{
   --bg:#090909;
   --panel:#121212;
@@ -17,7 +18,9 @@
   --brand-glow:rgba(255, 122, 0, 0.15);
   --green:#7dff9b;
   --red:#ff6b6b;
+  --yellow:#ffd66b;
 }
+
 body{
   margin:0;
   background:var(--bg);
@@ -25,6 +28,7 @@ body{
   font-family:Arial,Helvetica,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
+
 button,input,select{font:inherit;}
 button{cursor:pointer;}
 .app{display:flex;min-height:100vh;}
@@ -41,6 +45,7 @@ button{cursor:pointer;}
   display:flex;
   flex-direction:column;
 }
+
 .brand{
   padding:6px 10px 18px;
   border-bottom:1px solid var(--border);
@@ -49,6 +54,7 @@ button{cursor:pointer;}
   align-items:center;
   gap:12px;
 }
+
 .logo{
   width:42px;height:42px;
   border:2px solid var(--brand);
@@ -59,11 +65,14 @@ button{cursor:pointer;}
   font-weight:900;font-size:16px;
   box-shadow:0 0 14px var(--brand-glow);
 }
+
 .brand-details small{
   color:var(--brand);letter-spacing:2px;
   font-size:9px;font-weight:bold;text-transform:uppercase;
 }
+
 .brand-details h2{margin:2px 0 0;font-size:18px;color:#fff;}
+
 .menu{flex:1;display:flex;flex-direction:column;gap:4px;}
 .menu button{
   width:100%;background:transparent;
@@ -80,6 +89,7 @@ button{cursor:pointer;}
   border-color:rgba(255,122,0,0.4);
   font-weight:700;
 }
+
 .back-btn{
   margin-top:auto;
   padding:11px;
@@ -89,15 +99,18 @@ button{cursor:pointer;}
   border-radius:10px;
   font-weight:700;
   font-size:13px;
+  transition:0.2s;
 }
+.back-btn:hover{background:#1f1f1f;color:#fff;}
 
-/* MAIN CONTENT */
+/* MAIN */
 .main{
   margin-left:265px;
   width:calc(100% - 265px);
   min-height:100vh;
-  padding:28px;
+  padding:26px 28px;
 }
+
 .topbar{
   display:flex;
   align-items:center;
@@ -105,44 +118,113 @@ button{cursor:pointer;}
   margin-bottom:24px;
 }
 .topbar h1{margin:0;font-size:22px;font-weight:800;}
-.card-grid{
+.status-pill{
+  font-size:12.5px;
+  color:var(--green);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.status-pill::before{
+  content:'';width:8px;height:8px;
+  border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);
+}
+
+/* STATS */
+.cards{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns:repeat(3, 1fr);
   gap:16px;
   margin-bottom:24px;
 }
 .card{
   background:var(--panel);
   border:1px solid var(--border);
-  border-radius:14px;
-  padding:18px;
+  border-radius:16px;
+  padding:20px;
   position:relative;
 }
-.card small{color:var(--muted);font-size:12px;font-weight:600;}
-.card h2{margin:8px 0 0;font-size:26px;color:#fff;}
+.card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:3px;height:100%;background:var(--brand);
+}
+.card small{color:#a1a1aa;font-size:12px;font-weight:600;}
+.card h2{margin:8px 0 0;font-size:28px;font-weight:800;color:#fff;}
+
+/* PANELS & FORMS */
 .panel{
   background:var(--panel);
   border:1px solid var(--border);
-  border-radius:14px;
-  padding:20px;
+  border-radius:16px;
+  padding:22px;
   margin-bottom:24px;
 }
-.panel h2{margin:0 0 16px;font-size:17px;font-weight:700;}
-.table-box{
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+.panel-head h2{margin:0;font-size:18px;font-weight:700;}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:14px;
+  margin-bottom:14px;
+}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-size:12px;font-weight:600;color:var(--muted);}
+.form-group input, .form-group select{
+  background:#171717;
+  border:1px solid var(--border);
+  color:#fff;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:13.5px;
+}
+.form-group input:focus, .form-group select:focus{
+  outline:none;
+  border-color:var(--brand);
+}
+
+.submit-btn{
+  background:var(--brand);
+  color:#000;
+  font-weight:800;
+  border:none;
+  padding:11px 20px;
+  border-radius:8px;
+  font-size:13.5px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:0.2s;
+}
+.submit-btn:hover{background:#ff9433;}
+
+/* TABLES */
+.table-wrapper{overflow-x:auto;}
+table{
   width:100%;
   border-collapse:collapse;
   text-align:left;
   font-size:13.5px;
 }
-.table-box th{
+th{
   padding:12px;
   border-bottom:1px solid var(--border);
   color:var(--muted);
   font-weight:600;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
 }
-.table-box td{
-  padding:12px;
-  border-bottom:1px solid #1a1a1a;
+td{
+  padding:14px 12px;
+  border-bottom:1px solid #1c1c1c;
+  vertical-align:middle;
 }
 .badge{
   display:inline-block;
@@ -153,11 +235,33 @@ button{cursor:pointer;}
 }
 .badge.active{background:rgba(125,255,155,0.15);color:var(--green);}
 .badge.inactive{background:rgba(255,107,107,0.15);color:var(--red);}
+.action-btn{
+  background:#1c1c1c;
+  border:1px solid var(--border);
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:12px;
+  margin-right:6px;
+  transition:0.2s;
+}
+.action-btn:hover{border-color:var(--brand);}
+.action-btn.delete:hover{background:#301414;color:var(--red);border-color:var(--red);}
+
+@media(max-width:768px){
+  .sidebar{width:100%;position:relative;height:auto;}
+  .app{display:block;}
+  .main{margin-left:0;width:100%;padding:18px;}
+  .cards{grid-template-columns:1fr;}
+}
 </style>
 </head>
+
 <body>
 
 <div class="app">
+
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">RC</div>
@@ -168,63 +272,123 @@ button{cursor:pointer;}
     </div>
     <div class="menu">
       <button onclick="window.location.href='admin-dashboard.html'"><span>⚡</span> Dashboard</button>
-      <button class="active"><span>🔗</span> Referral Rules</button>
+      <button class="active"><span>🔗</span> Referral Control</button>
+      <button onclick="window.location.href='admin-products.html'"><span>📦</span> Products</button>
+      <button onclick="window.location.href='admin-orders.html'"><span>🛍️</span> Orders</button>
+      <button onclick="window.location.href='admin-customers.html'"><span>👥</span> Customers</button>
     </div>
     <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">⬅ Back to Dashboard</button>
   </aside>
 
+  <!-- MAIN AREA -->
   <main class="main">
     <div class="topbar">
-      <h1>Referral Control & Rules</h1>
-      <span id="syncStatus" style="color:var(--green);font-size:13px;">● Live Connected</span>
+      <h1>Referral & Rewards Manager</h1>
+      <span id="syncStatus" class="status-pill">Connected to Supabase</span>
     </div>
 
-    <div class="card-grid">
+    <!-- METRICS -->
+    <div class="cards">
       <div class="card">
-        <small>Total Rules</small>
-        <h2 id="totalRules">0</h2>
+        <small>Total Reward Rules</small>
+        <h2 id="metricRules">0</h2>
       </div>
       <div class="card">
-        <small>Total Referrals Recorded</small>
-        <h2 id="totalReferrals">0</h2>
+        <small>Total Successful Referrals</small>
+        <h2 id="metricReferrals">0</h2>
+      </div>
+      <div class="card">
+        <small>Unique Referrers</small>
+        <h2 id="metricReferrers">0</h2>
       </div>
     </div>
 
+    <!-- FORM: CREATE / EDIT RULE -->
     <div class="panel">
-      <h2>Active Referral Rules (Rewards)</h2>
-      <table class="table-box">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Condition Type</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="rulesTableBody">
-          <tr><td colspan="4" style="color:var(--muted);text-align:center;">Loading rules...</td></tr>
-        </tbody>
-      </table>
+      <div class="panel-head">
+        <h2>Add New Referral Reward Rule</h2>
+      </div>
+      <form id="addRuleForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Rule Title / Milestone</label>
+            <input type="text" id="ruleTitle" placeholder="e.g. Free 9W LED Bulb" required />
+          </div>
+          <div class="form-group">
+            <label>Condition Type</label>
+            <select id="ruleCondition" required>
+              <option value="signup">Successful Friend Signup</option>
+              <option value="order">Friend's First Delivered Order</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Target Referrals Needed</label>
+            <input type="number" id="ruleTarget" placeholder="e.g. 5" min="1" required />
+          </div>
+          <div class="form-group">
+            <label>Gift Product Name</label>
+            <input type="text" id="ruleGiftName" placeholder="e.g. 9W Radar LED" required />
+          </div>
+          <div class="form-group">
+            <label>Gift Image URL (Optional)</label>
+            <input type="url" id="ruleGiftImage" placeholder="https://..." />
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" id="saveBtn">➕ Save Referral Rule</button>
+      </form>
     </div>
 
+    <!-- ACTIVE REWARD RULES LIST -->
     <div class="panel">
-      <h2>Recent Referrals Activity</h2>
-      <table class="table-box">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Referrer ID</th>
-            <th>Referee ID</th>
-          </tr>
-        </thead>
-        <tbody id="referralsTableBody">
-          <tr><td colspan="3" style="color:var(--muted);text-align:center;">Loading referrals...</td></tr>
-        </tbody>
-      </table>
+      <div class="panel-head">
+        <h2>Configured Rules & Gifts</h2>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Rule Name</th>
+              <th>Trigger Type</th>
+              <th>Target</th>
+              <th>Gift Product</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rulesTableBody">
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);">Loading rules...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- REFERRER ACTIVITY LOG -->
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Referral Activity Log</h2>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Log ID</th>
+              <th>Referrer UUID</th>
+              <th>Referee UUID</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="referralsTableBody">
+            <tr><td colspan="4" style="text-align:center;color:var(--muted);">Loading referral activity...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>
 
+<!-- SUPABASE SCRIPT -->
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -232,61 +396,136 @@ const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function loadData(){
+let rulesData = [];
+let referralsData = [];
+
+// FETCH DATA
+async function loadAllData(){
   try {
-    // 1. Fetch Referral Rules
+    // 1. Get Rules
     const { data: rules, error: rErr } = await supabase
-      .from('referral_rules')
-      .select('*')
-      .order('id', { ascending: true });
+      .from("referral_rules")
+      .select("*")
+      .order("id", { ascending: true });
 
     if(rErr) throw rErr;
-    document.getElementById('totalRules').textContent = rules ? rules.length : 0;
+    rulesData = rules || [];
+    document.getElementById("metricRules").textContent = rulesData.length;
 
-    const rBody = document.getElementById('rulesTableBody');
-    if(rules && rules.length > 0){
-      rBody.innerHTML = rules.map(r => `
+    // Render Rules Table
+    const rBody = document.getElementById("rulesTableBody");
+    if(!rulesData.length){
+      rBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px;">No referral rules created yet.</td></tr>`;
+    } else {
+      rBody.innerHTML = rulesData.map(r => `
         <tr>
           <td>#${r.id}</td>
-          <td><strong>${r.title}</strong></td>
+          <td><strong>${r.title || "Unnamed"}</strong></td>
           <td><code>${r.condition_type}</code></td>
-          <td><span class="badge ${r.is_active !== false ? 'active' : 'inactive'}">${r.is_active !== false ? 'Active' : 'Inactive'}</span></td>
+          <td><strong>${r.target_count || 1}</strong> referrals</td>
+          <td>${r.gift_product_name || "Gift"}</td>
+          <td><span class="badge ${r.is_active !== false ? "active" : "inactive"}">${r.is_active !== false ? "Active" : "Disabled"}</span></td>
+          <td>
+            <button class="action-btn" onclick="toggleRuleStatus(${r.id}, ${r.is_active !== false})">${r.is_active !== false ? "Disable" : "Enable"}</button>
+            <button class="action-btn delete" onclick="deleteRule(${r.id})">Delete</button>
+          </td>
         </tr>
-      `).join('');
-    } else {
-      rBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);">No rules found</td></tr>';
+      `).join("");
     }
 
-    // 2. Fetch Referrals Count & List
+    // 2. Get Referrals
     const { data: refs, error: refErr } = await supabase
-      .from('referrals')
-      .select('*')
-      .order('id', { ascending: false });
+      .from("referrals")
+      .select("*")
+      .order("id", { ascending: false });
 
     if(refErr) throw refErr;
-    document.getElementById('totalReferrals').textContent = refs ? refs.length : 0;
+    referralsData = refs || [];
+    document.getElementById("metricReferrals").textContent = referralsData.length;
 
-    const refBody = document.getElementById('referralsTableBody');
-    if(refs && refs.length > 0){
-      refBody.innerHTML = refs.map(rf => `
+    // Unique referrers count
+    const uniqueReferrers = new Set(referralsData.map(rf => rf.referrer_id).filter(Boolean));
+    document.getElementById("metricReferrers").textContent = uniqueReferrers.size;
+
+    // Render Referrals Log
+    const refBody = document.getElementById("referralsTableBody");
+    if(!referralsData.length){
+      refBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px;">No referrals recorded in database yet.</td></tr>`;
+    } else {
+      refBody.innerHTML = referralsData.map(rf => `
         <tr>
           <td>#${rf.id}</td>
-          <td>${rf.referrer_id || 'N/A'}</td>
-          <td>${rf.referee_id || 'N/A'}</td>
+          <td><code>${rf.referrer_id || "N/A"}</code></td>
+          <td><code>${rf.referee_id || "N/A"}</code></td>
+          <td><span class="badge active">Recorded</span></td>
         </tr>
-      `).join('');
-    } else {
-      refBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);">No referrals recorded yet</td></tr>';
+      `).join("");
     }
 
   } catch(err){
     console.error(err);
-    document.getElementById('syncStatus').textContent = '● Sync Error';
-    document.getElementById('syncStatus').style.color = 'var(--red)';
+    const sync = document.getElementById("syncStatus");
+    sync.textContent = "Sync Error with Database";
+    sync.style.color = "var(--red)";
   }
 }
 
-loadData();
+// CREATE NEW RULE
+document.getElementById("addRuleForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  const newRule = {
+    title: document.getElementById("ruleTitle").value.trim(),
+    condition_type: document.getElementById("ruleCondition").value,
+    target_count: parseInt(document.getElementById("ruleTarget").value, 10),
+    gift_product_name: document.getElementById("ruleGiftName").value.trim(),
+    gift_image: document.getElementById("ruleGiftImage").value.trim() || null,
+    is_active: true
+  };
+
+  try {
+    const { error } = await supabase.from("referral_rules").insert([newRule]);
+    if(error) throw error;
+    document.getElementById("addRuleForm").reset();
+    await loadAllData();
+  } catch(err){
+    alert("Rule add karne me error aaya: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "➕ Save Referral Rule";
+  }
+});
+
+// TOGGLE RULE
+window.toggleRuleStatus = async (id, currentStatus) => {
+  try {
+    const { error } = await supabase
+      .from("referral_rules")
+      .update({ is_active: !currentStatus })
+      .eq("id", id);
+    if(error) throw error;
+    loadAllData();
+  } catch(err){
+    alert("Status update fail: " + err.message);
+  }
+};
+
+// DELETE RULE
+window.deleteRule = async (id) => {
+  if(!confirm("Kya aap sach me is rule ko delete karna chahte hain?")) return;
+  try {
+    const { error } = await supabase.from("referral_rules").delete().eq("id", id);
+    if(error) throw error;
+    loadAllData();
+  } catch(err){
+    alert("Delete karne me error: " + err.message);
+  }
+};
+
+loadAllData();
 </script>
 </body>
 </html>
