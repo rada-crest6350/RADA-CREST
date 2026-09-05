@@ -238,7 +238,7 @@ body{
       <span>Smart AI Support Active</span>
     </div>
   </div>
-  <button class="track-pill-btn" onclick="window.openAutoTrackerModal()">
+  <button class="track-pill-btn" id="trackBtnModalTrigger">
     <span>🔔</span> Track My Requests
   </button>
 </header>
@@ -251,14 +251,14 @@ body{
   </div>
 
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. website khol li age kya karu, bulb kaise chune, refund)..." onkeydown="if(event.key==='Enter') window.executeSmartSearch()">
-    <button class="search-action-btn" id="aiSearchBtn" onclick="window.executeSmartSearch()">🔍 Analyze</button>
+    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. website khol li age kya karu, bulb kaise chune, refund)...">
+    <button class="search-action-btn" id="aiSearchBtn">🔍 Analyze</button>
   </div>
 
   <div id="smartSolutionCard">
     <div class="sol-head">
       <span class="sol-badge" id="solBadgeTitle">🤝 RADA CREST Personal Guide</span>
-      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="document.getElementById('smartSolutionCard').style.display='none'">✕ Band Karein</span>
+      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" id="closeSolCardBtn">✕ Band Karein</span>
     </div>
     <div class="sol-body" id="smartSolText"></div>
   </div>
@@ -280,7 +280,7 @@ body{
   <div class="modal-box">
     <div class="modal-head">
       <h3>Live Requests & Status</h3>
-      <span class="modal-close" onclick="window.closeTrackerModal()">✕</span>
+      <span class="modal-close" id="closeTrackerModalBtn">✕</span>
     </div>
     <div class="auto-identity-box" id="identityDetectedBox">
       <span>Auto Analyzing Customer Identity...</span>
@@ -295,7 +295,7 @@ body{
   <div class="modal-box" style="text-align:center;">
     <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
     <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track My Requests'</strong> se live status dekh sakte hain.</p>
-    <button class="submit-btn" style="margin-top:16px;" onclick="document.getElementById('successModal').style.display='none'">Theek Hai</button>
+    <button class="submit-btn" style="margin-top:16px;" id="closeSuccessModalBtn">Theek Hai</button>
   </div>
 </div>
 
@@ -326,7 +326,7 @@ async function autoDetectUser(){
   }
 }
 
-// 2. LOAD TOPICS (FALLBACK DEFAULTS ENSURE NO HANG)
+// 2. LOAD TOPICS
 async function loadTopics(){
   const defaultGuides = [
     {
@@ -400,66 +400,100 @@ function renderTopics(){
   `).join('');
 }
 
-// 3. AI SEARCH (LIVE DIRECT CALL TO /api/ask)
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+// 3. CORE AI SEARCH LOGIC
+async function executeSmartSearch(){
+  const input = document.getElementById('helpInput');
+  const rawQ = input ? input.value.trim() : '';
+  if(!rawQ) return;
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
+  const btn = document.getElementById('aiSearchBtn');
+  const card = document.getElementById('smartSolutionCard');
+  const solText = document.getElementById('smartSolText');
+  const badge = document.getElementById('solBadgeTitle');
 
-  const { query } = req.body || {};
-  if (!query) return res.status(400).json({ error: 'Query is empty' });
-
-  const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
-
-  const systemContext = `Aap RADA CREST brand ke ultra-intelligent aur friendly customer support assistant hain.
-RADA CREST Store details:
-- Products: High-quality LED Bulbs (Radar Motion Sensor lights, Emergency Inverter Bulbs) aur Heavy Extension Boards.
-- Website flow:
-  * index.html: Storefront jahan customer item dekh kar 'Buy Now' dabata hai.
-  * address.html: Jahan customer apna delivery address aur mobile number set karta hai.
-  * orders.html: Jahan customer live tracking aur 7 dino ke andar 'Request Return' kar sakta hai.
-- Policies: 7 din ki free replacement policy agar bulb/board me koi problem ya physical damage ho. Refund cancellation/return ke 24-48 working hours me bank/UPI account me wapas aata hai. Cash on Delivery (COD) aur Online UPI dono uplabdh hain.
-
-Nirdesh:
-1. Customer ke sawal ko deeply analyze karein, chahe Hindi, Hinglish ya aam bolchaal me ho (jaise: 'hii', 'me age kya karu', 'order kaise book karu').
-2. Ek friendly guide ki tarah seedha aur clear step-by-step rasta samjhayein ki website par aage kahan jana hai aur kya karna hai.
-3. Chhota ya robotic jawab na dein, conversational aur genuinely helpful guide karein.`;
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = 'Analyzing...';
+  }
+  if(card) card.style.display = 'block';
+  if(badge) badge.textContent = '🤖 RADA CREST AI Solution (Live)';
+  if(solText) solText.innerHTML = '<span style="color:var(--brand);">⚡ RADA CREST AI live soch raha hai...</span>';
 
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant", // 100% Active & Free Groq Production Model
-        messages: [
-          { role: "system", content: systemContext },
-          { role: "user", content: query }
-        ],
-        temperature: 0.6,
-        max_tokens: 800
-      })
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: rawQ })
     });
 
-    const data = await response.json();
+    const data = await res.json();
+    if(!res.ok || !data.answer) throw new Error(data.error || "API error status: " + res.status);
 
-    if (data.choices && data.choices[0]) {
-      return res.status(200).json({ answer: data.choices[0].message.content });
-    } else {
-      console.error("Groq API Error:", data);
-      return res.status(500).json({ error: data.error?.message || "Groq request failed" });
+    if(badge) badge.textContent = "💡 RADA CREST Personal Guide";
+    if(solText){
+      solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
+        <br><br>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
+          <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
+        </div>
+      `;
     }
-  } catch (err) {
-    console.error("Server Exception:", err);
-    return res.status(500).json({ error: err.message });
+  } catch(err){
+    console.error("AI fetch fail:", err);
+    if(solText){
+      solText.innerHTML = `<span style="color:var(--red);">⚠️ Error: ${err.message}</span><br><br><small style="color:var(--text-muted);">Groq API call check karein.</small>`;
+    }
+  } finally {
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = '🔍 Analyze';
+    }
   }
 }
 
+// 4. EVENT LISTENERS (ATTACH CLEANLY)
+document.addEventListener('DOMContentLoaded', () => {
+  const aiBtn = document.getElementById('aiSearchBtn');
+  if(aiBtn){
+    aiBtn.addEventListener('click', executeSmartSearch);
+  }
+
+  const helpInput = document.getElementById('helpInput');
+  if(helpInput){
+    helpInput.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') executeSmartSearch();
+    });
+  }
+
+  const closeSol = document.getElementById('closeSolCardBtn');
+  if(closeSol){
+    closeSol.addEventListener('click', () => {
+      const card = document.getElementById('smartSolutionCard');
+      if(card) card.style.display = 'none';
+    });
+  }
+
+  const trackTrigger = document.getElementById('trackBtnModalTrigger');
+  if(trackTrigger){
+    trackTrigger.addEventListener('click', openAutoTrackerModal);
+  }
+
+  const closeTracker = document.getElementById('closeTrackerModalBtn');
+  if(closeTracker){
+    closeTracker.addEventListener('click', closeTrackerModal);
+  }
+
+  const closeSuccess = document.getElementById('closeSuccessModalBtn');
+  if(closeSuccess){
+    closeSuccess.addEventListener('click', () => {
+      const modal = document.getElementById('successModal');
+      if(modal) modal.style.display = 'none';
+    });
+  }
+});
+
+// 5. GLOBAL HELPERS
 window.toggleAcc = function(headerEl){
   const item = headerEl.closest('.acc-item');
   const isOpen = item.classList.contains('active');
@@ -513,9 +547,9 @@ window.submitTicket = async function(e, topicTitle){
   }
 };
 
-window.openAutoTrackerModal = async function(){
+async function openAutoTrackerModal(){
   const modal = document.getElementById('trackerModal');
-  modal.style.display = 'grid';
+  if(modal) modal.style.display = 'grid';
   const idBox = document.getElementById('identityDetectedBox');
   const resBox = document.getElementById('trackResultList');
 
@@ -523,23 +557,33 @@ window.openAutoTrackerModal = async function(){
   const activePhone = detectedUser.phone;
 
   if(!activePhone){
-    idBox.innerHTML = `<span>Guest Device (No order history)</span>`;
-    resBox.innerHTML = `
-      <div style="text-align:center;padding:20px;">
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Apna mobile number likhein jisse order/request ki thi:</p>
-        <input type="tel" id="manualTrackInput" placeholder="Mobile Number daalein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
-        <button class="submit-btn" onclick="window.fetchTickets(document.getElementById('manualTrackInput').value.trim())">Search My Requests</button>
-      </div>
-    `;
+    if(idBox) idBox.innerHTML = `<span>Guest Device (No order history)</span>`;
+    if(resBox){
+      resBox.innerHTML = `
+        <div style="text-align:center;padding:20px;">
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Apna mobile number likhein jisse order/request ki thi:</p>
+          <input type="tel" id="manualTrackInput" placeholder="Mobile Number daalein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
+          <button class="submit-btn" id="manualSearchBtn">Search My Requests</button>
+        </div>
+      `;
+      const manualBtn = document.getElementById('manualSearchBtn');
+      if(manualBtn){
+        manualBtn.addEventListener('click', () => {
+          const inp = document.getElementById('manualTrackInput');
+          if(inp) fetchTickets(inp.value.trim());
+        });
+      }
+    }
     return;
   }
 
-  idBox.innerHTML = `<span>Customer Mobile: <strong>${activePhone}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
-  await window.fetchTickets(activePhone);
-};
+  if(idBox) idBox.innerHTML = `<span>Customer Mobile: <strong>${activePhone}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
+  await fetchTickets(activePhone);
+}
 
-window.fetchTickets = async function(phone){
+async function fetchTickets(phone){
   const resBox = document.getElementById('trackResultList');
+  if(!resBox) return;
   resBox.innerHTML = `<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Analyzing your requests...</p>`;
 
   try {
@@ -575,13 +619,14 @@ window.fetchTickets = async function(phone){
   } catch(err){
     resBox.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Error: ${err.message}</div>`;
   }
-};
+}
 
-window.closeTrackerModal = function(){
-  document.getElementById('trackerModal').style.display = 'none';
-};
+function closeTrackerModal(){
+  const modal = document.getElementById('trackerModal');
+  if(modal) modal.style.display = 'none';
+}
 
-// INITIAL LOAD
+// 6. INITIAL LOAD
 (async () => {
   await autoDetectUser();
   await loadTopics();
