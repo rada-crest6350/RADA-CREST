@@ -1,3 +1,304 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help & Resolutions Desk — RADA CREST</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg-deep:#060608;
+  --panel-card:rgba(24, 24, 30, 0.65);
+  --border:rgba(255, 255, 255, 0.08);
+  --text:#ffffff;
+  --text-muted:#9da0b0;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.35);
+  --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+  --green:#3dd598;
+  --blue:#38bdf8;
+  --red:#f87171;
+}
+
+body{
+  background:var(--bg-deep);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+  padding-bottom:60px;
+}
+
+.ambient-glow{
+  position:fixed;
+  width:380px;height:380px;
+  background:radial-gradient(circle, rgba(255,122,0,0.12) 0%, rgba(0,0,0,0) 70%);
+  top:-80px;left:50%;
+  transform:translateX(-50%);
+  z-index:0;
+  pointer-events:none;
+}
+
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8, 8, 10, 0.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.back-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;color:#fff;
+  text-decoration:none;font-size:16px;
+}
+.header-title h1{font-size:16px;font-weight:800;}
+.header-title span{
+  font-size:11px;color:var(--brand);font-weight:600;
+  display:flex;align-items:center;gap:5px;
+}
+.header-title span::before{
+  content:'';width:6px;height:6px;background:var(--green);border-radius:50%;
+  box-shadow:0 0 8px var(--green);
+}
+
+.track-pill-btn{
+  background:rgba(255, 122, 0, 0.12);
+  border:1px solid var(--brand);
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  padding:8px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 0 12px var(--brand-glow);
+  transition:0.2s;
+}
+.track-pill-btn:hover{background:var(--brand);color:#000;}
+
+.container{max-width:640px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
+
+.hero{text-align:center;margin-bottom:24px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,122,0,0.12);border:1px solid rgba(255,122,0,0.3);
+  padding:5px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;color:var(--brand);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
+}
+.hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+
+.smart-search-box{
+  background:rgba(22, 22, 28, 0.85);
+  border:1.5px solid rgba(255, 122, 0, 0.4);
+  box-shadow:0 0 25px rgba(255, 122, 0, 0.12);
+  border-radius:20px;
+  padding:8px 10px 8px 18px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;
+}
+.smart-search-box input{flex:1;background:transparent;border:none;color:#fff;font-size:14.5px;outline:none;font-family:inherit;}
+.search-action-btn{
+  background:var(--brand-gradient);color:#000;border:none;
+  font-weight:800;font-size:13px;padding:12px 18px;border-radius:14px;
+  cursor:pointer;
+}
+
+#smartSolutionCard{
+  display:none;
+  background:linear-gradient(145deg, rgba(28, 20, 15, 0.98) 0%, rgba(18, 18, 24, 0.98) 100%);
+  border:1.5px solid var(--brand);
+  border-radius:20px;padding:22px;margin-bottom:28px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6), 0 0 25px rgba(255,122,0,0.25);
+  animation:fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
+.sol-badge{font-size:12px;color:var(--brand);font-weight:800;display:flex;align-items:center;gap:6px;}
+.sol-body{font-size:14px;line-height:1.75;color:#f0f0f5;white-space:pre-wrap;}
+.sol-action-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--brand-gradient);color:#000;font-weight:800;
+  padding:10px 18px;border-radius:10px;text-decoration:none;font-size:13px;
+  margin-top:14px;box-shadow:0 4px 14px var(--brand-glow);
+}
+
+.cat-heading{
+  font-size:12px;font-weight:800;color:var(--brand);
+  text-transform:uppercase;letter-spacing:1.2px;margin:24px 4px 12px;
+}
+
+.acc-item{
+  background:var(--panel-card);backdrop-filter:blur(16px);
+  border:1px solid var(--border);border-radius:18px;
+  margin-bottom:12px;overflow:hidden;transition:0.3s;
+}
+.acc-trigger{padding:18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+.acc-trigger-left{display:flex;align-items:center;gap:14px;}
+.icon-box{
+  width:40px;height:40px;border-radius:12px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  display:grid;place-items:center;font-size:18px;
+}
+.acc-trigger-left h3{font-size:14.5px;font-weight:700;color:#fff;}
+.chevron{font-size:11px;color:var(--text-muted);transition:0.3s;}
+.acc-item.active .chevron{transform:rotate(180deg);color:var(--brand);}
+.acc-body{
+  max-height:0;overflow:hidden;
+  transition:max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  background:rgba(12, 12, 15, 0.5);
+}
+.acc-item.active .acc-body{max-height:1400px;border-top:1px solid var(--border);}
+.acc-content{padding:20px;font-size:13.5px;color:var(--text-muted);line-height:1.7;}
+
+.explanation-text{white-space:pre-wrap;color:#e4e4eb;margin-bottom:16px;}
+
+.fallback-box{
+  margin-top:18px;background:#131318;border:1px dashed #343440;
+  border-radius:12px;padding:14px 16px;
+}
+.open-ticket-link{
+  background:transparent;color:var(--brand);border:1px solid var(--brand);
+  border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;
+  margin-top:8px;
+}
+
+.ticket-form{
+  display:none;margin-top:14px;background:rgba(20, 20, 25, 0.95);
+  border:1px solid rgba(255,122,0,0.3);border-radius:14px;padding:16px;
+}
+.ticket-form input, .ticket-form textarea{
+  width:100%;background:#0d0d10;border:1px solid #292933;color:#fff;
+  border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;margin-bottom:10px;
+}
+.submit-btn{
+  width:100%;background:var(--brand-gradient);color:#000;font-weight:800;
+  border:none;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;
+}
+
+.modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;place-items:center;padding:20px;z-index:999;
+}
+.modal-box{
+  background:#141418;border:1px solid rgba(255,122,0,0.4);border-radius:24px;
+  padding:26px;max-width:460px;width:100%;
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.modal-head h3{font-size:17px;color:#fff;}
+.modal-close{cursor:pointer;color:var(--text-muted);font-size:18px;}
+
+.auto-identity-box{
+  background:rgba(255,255,255,0.03);border:1px solid #24242c;
+  padding:10px 14px;border-radius:12px;margin-bottom:14px;font-size:12px;
+  color:#a1a1aa;display:flex;align-items:center;justify-content:space-between;
+}
+.auto-identity-box strong{color:#fff;}
+
+.ticket-status-card{background:#1a1a22;border:1px solid #2a2a36;border-radius:14px;padding:14px;margin-bottom:12px;}
+.status-pill{
+  display:inline-block;padding:3px 8px;border-radius:6px;
+  font-size:11px;font-weight:800;text-transform:uppercase;margin-bottom:8px;
+}
+.status-pill.pending{background:rgba(255,122,0,0.2);color:var(--brand);}
+.status-pill.proceeding{background:rgba(56,189,248,0.2);color:var(--blue);}
+.status-pill.confirmed{background:rgba(61,213,152,0.2);color:var(--green);}
+.status-pill.rejected{background:rgba(248,113,113,0.2);color:var(--red);}
+
+.reject-reason-box{
+  background:rgba(248,113,113,0.1);border-left:3px solid var(--red);
+  padding:10px;border-radius:6px;margin-top:8px;font-size:12.5px;color:#ffcaca;
+}
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<header class="header">
+  <div class="header-left">
+    <a href="index.html" class="back-btn">←</a>
+    <div class="header-title">
+      <h1>Help & Resolutions</h1>
+      <span>Smart Support Active</span>
+    </div>
+  </div>
+  <button class="track-pill-btn" id="trackBtnModalTrigger">
+    <span>🔔</span> Track My Requests
+  </button>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">💡 Smart Resolutions</div>
+    <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
+  </div>
+
+  <div class="smart-search-box">
+    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. pricing sahi nahi hai, order kaise kare)...">
+    <button class="search-action-btn" id="aiSearchBtn">🔍 Analyze</button>
+  </div>
+
+  <div id="smartSolutionCard">
+    <div class="sol-head">
+      <span class="sol-badge" id="solBadgeTitle">🤝 RADA CREST Personal Guide</span>
+      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" id="closeSolCardBtn">✕ Band Karein</span>
+    </div>
+    <div class="sol-body" id="smartSolText"></div>
+  </div>
+
+  <div class="cat-heading">📋 Solutions & Troubleshooting</div>
+  
+  <div id="dynamicTopicsContainer">
+    <div style="color:var(--text-muted);text-align:center;padding:30px;">Loading resolutions...</div>
+  </div>
+
+  <a href="terms.html" style="display:flex;justify-content:space-between;align-items:center;background:var(--panel-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:#fff;margin-top:24px;">
+    <div><strong>Terms & Policies</strong><small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Service, return aur warranty terms padhein</small></div>
+    <div style="color:var(--brand);font-weight:bold;">➔</div>
+  </a>
+
+</div>
+
+<div id="trackerModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Live Requests & Status</h3>
+      <span class="modal-close" id="closeTrackerModalBtn">✕</span>
+    </div>
+    <div class="auto-identity-box" id="identityDetectedBox">
+      <span>Auto Analyzing Customer Identity...</span>
+    </div>
+    <div id="trackResultList" style="max-height:350px;overflow-y:auto;">
+      <p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Fetching your past requests...</p>
+    </div>
+  </div>
+</div>
+
+<div id="successModal" class="modal-overlay">
+  <div class="modal-box" style="text-align:center;">
+    <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
+    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track My Requests'</strong> se live status dekh sakte hain.</p>
+    <button class="submit-btn" style="margin-top:16px;" id="closeSuccessModalBtn">Theek Hai</button>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -24,25 +325,8 @@ async function autoDetectUser(){
   }
 }
 
+// 1. SUPABASE SE ADMIN TOPICS LOAD HONGE
 async function loadTopics(){
-  const defaultGuides = [
-    {
-      id: 'def-1',
-      title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
-      explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
-    },
-    {
-      id: 'def-2',
-      title: 'Delivery Address Kaise Badlein ya Add Karein?',
-      explanation: 'Order karte waqt address.html page par aap naya address save kar sakte hain ya purane address ko select kar sakte hain.'
-    },
-    {
-      id: 'def-3',
-      title: 'Product Kharab / Damage Hone par 7 Days Free Replacement',
-      explanation: 'Agar koi item kharab ya toota hua mile toh 7 din tak 100% Free replacement milta hai. Delivery partner naya piece laakar purana collect karega.'
-    }
-  ];
-
   try {
     const { data, error } = await supabase
       .from('help_topics')
@@ -53,10 +337,32 @@ async function loadTopics(){
     if(!error && data && data.length > 0){
       liveTopics = data;
     } else {
-      liveTopics = defaultGuides;
+      liveTopics = [
+        {
+          id: 'def-1',
+          title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
+          explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
+        },
+        {
+          id: 'def-2',
+          title: 'Delivery Address Kaise Badlein ya Add Karein?',
+          explanation: 'Order karte waqt address.html page par aap naya address save kar sakte hain ya purane address ko select kar sakte hain.'
+        },
+        {
+          id: 'def-3',
+          title: 'Product Kharab / Damage Hone par 7 Days Free Replacement',
+          explanation: 'Agar koi item kharab ya toota hua mile toh 7 din tak 100% Free replacement milta hai. Delivery partner naya piece laakar purana collect karega.'
+        }
+      ];
     }
   } catch(err){
-    liveTopics = defaultGuides;
+    liveTopics = [
+      {
+        id: 'def-1',
+        title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
+        explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
+      }
+    ];
   }
   renderTopics();
 }
@@ -95,7 +401,7 @@ function renderTopics(){
   `).join('');
 }
 
-// ASLI LIVE AI SEARCH ENGINE (HAR SAWAL PAR NYA, SANTUSHTIMAK JWAB)
+// 2. AI LIVE ENGINE / API CALL
 window.executeSmartSearch = async function(){
   const input = document.getElementById('helpInput');
   const rawQ = input ? input.value.trim() : '';
@@ -111,8 +417,8 @@ window.executeSmartSearch = async function(){
     btn.textContent = 'Analyzing...';
   }
   if(card) card.style.display = 'block';
-  if(badge) badge.textContent = '🤖 RADA CREST AI Smart Assistant';
-  if(solText) solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapke sawal ko gehraai se analyze kiya ja raha hai...</span>';
+  if(badge) badge.textContent = '🤖 RADA CREST AI Assistant';
+  if(solText) solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapke sawal ko analyze kiya ja raha hai...</span>';
 
   try {
     const res = await fetch('/api/ask', {
@@ -122,7 +428,7 @@ window.executeSmartSearch = async function(){
     });
 
     const data = await res.json();
-    if(!res.ok || !data.answer) throw new Error(data.error || "AI server busy");
+    if(!res.ok || !data.answer) throw new Error(data.error || "API server error");
 
     if(badge) badge.textContent = "💡 RADA CREST AI Solution";
     if(solText){
@@ -139,8 +445,8 @@ window.executeSmartSearch = async function(){
     if(solText){
       solText.innerHTML = `
         <strong>Dost, aapke is sawal ke liye hamari salah:</strong><br><br>
-        • Agar aapko naya saman dekhna hai toh <strong>Store</strong> par jayein.<br>
-        • Kisi bhi tarah ki discount ya special request ke liye niche diye gaye ticket form se humein message bhej dein.<br><br>
+        • Naya saman dekhne ke liye <strong>Store</strong> par jayein.<br>
+        • Kisi bhi tarah ke discount ya special requirement ke liye niche diye gaye ticket form se humein message bhej dein.<br><br>
         <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
       `;
     }
