@@ -118,7 +118,6 @@ body{
   cursor:pointer;
 }
 
-/* SMART KNOWLEDGE BASE OUTPUT CARD */
 #smartSolutionCard{
   display:none;
   background:linear-gradient(145deg, rgba(28, 20, 15, 0.98) 0%, rgba(18, 18, 24, 0.98) 100%);
@@ -130,7 +129,7 @@ body{
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
 .sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
 .sol-badge{font-size:12px;color:var(--brand);font-weight:800;display:flex;align-items:center;gap:6px;}
-.sol-body{font-size:14px;line-height:1.75;color:#f0f0f5;}
+.sol-body{font-size:14px;line-height:1.75;color:#f0f0f5;white-space:pre-wrap;}
 .sol-action-btn{
   display:inline-flex;align-items:center;gap:8px;
   background:var(--brand-gradient);color:#000;font-weight:800;
@@ -191,7 +190,6 @@ body{
   border:none;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;
 }
 
-/* TRACKER MODAL */
 .modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
@@ -237,7 +235,7 @@ body{
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
       <h1>Help & Resolutions</h1>
-      <span>Smart Support Active</span>
+      <span>Smart AI Support Active</span>
     </div>
   </div>
   <button class="track-pill-btn" onclick="openAutoTrackerModal()">
@@ -252,13 +250,11 @@ body{
     <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
   </div>
 
-  <!-- SMART SEARCH BAR -->
   <div class="smart-search-box">
     <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. website khol li age kya karu, bulb kaise chune, refund)..." onkeydown="if(event.key==='Enter') executeSmartSearch()">
-    <button class="search-action-btn" onclick="executeSmartSearch()">🔍 Analyze</button>
+    <button class="search-action-btn" id="aiSearchBtn" onclick="executeSmartSearch()">🔍 Analyze</button>
   </div>
 
-  <!-- RESULT CARD -->
   <div id="smartSolutionCard">
     <div class="sol-head">
       <span class="sol-badge" id="solBadgeTitle">🤝 RADA CREST Personal Guide</span>
@@ -280,7 +276,6 @@ body{
 
 </div>
 
-<!-- STATUS TRACKER MODAL -->
 <div id="trackerModal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-head">
@@ -296,7 +291,6 @@ body{
   </div>
 </div>
 
-<!-- SUCCESS POPUP -->
 <div id="successModal" class="modal-overlay">
   <div class="modal-box" style="text-align:center;">
     <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
@@ -315,126 +309,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 let liveTopics = [];
 let detectedUser = { phone: '', email: '', id: '' };
 
-// 1. COMPREHENSIVE MULTI-LANGUAGE KNOWLEDGE BASE (COVERS THOUSANDS OF PHRASES)
-const KNOWLEDGE_BASE = [
-  {
-    id: "onboarding",
-    keywords: [
-      "age kya karu", "aage kya karu", "khol li", "website kholi", "shuru kaise", 
-      "start kaise", "kaise use", "how to use", "what next", "kya karna hai", 
-      "kaise chalaye", "pehle kya karu", "guide karo", "samajh nahi aa raha", "help me use"
-    ],
-    title: "👋 Website par Shopping Shuru Karne ke 3 Steps",
-    answer: `
-      <strong>Dost, RADA CREST website par aage badhne ke liye bas ye 3 asaan steps follow karein:</strong><br><br>
-      <strong>1. Product Pasand Karein (Browse Catalog):</strong><br>
-      Store par jayein aur Motion Sensor Bulbs, Inverter Bulbs ya Heavy Extension Boards dekhein.<br><br>
-      <strong>2. "Buy Now" Par Click Karein:</strong><br>
-      Apni pasand ke item ke niche diye gaye <em>Buy Now</em> button ko dabayein.<br><br>
-      <strong>3. Address & Payment (COD Available):</strong><br>
-      Apna delivery address bharein aur Cash on Delivery (COD) ya Online UPI se confirm kar dein.<br><br>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="index.html" class="sol-action-btn">🛒 Abhi Store Kholein aur Shopping Karein</a>
-        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders Dekhein</a>
-      </div>
-    `
-  },
-  {
-    id: "ordering",
-    keywords: [
-      "order kaise", "how to order", "buy kaise", "how to buy", "kharidna", 
-      "kharide", "purchase", "order book", "saman mangwana", "order place", "book kaise"
-    ],
-    title: "🛍️ Order Kaise Karein (Easy Step Guide)",
-    answer: `
-      <strong>Order karne ka pura process:</strong><br><br>
-      1. Storefront par apna bulb ya board select karein aur <strong>Buy Now</strong> dabayein.<br>
-      2. <code>address.html</code> page khulega, wahan apna pata aur mobile number bharein.<br>
-      3. Payment mode (Cash on Delivery ya UPI) select karein aur order place ho jayega.<br><br>
-      <a href="index.html" class="sol-action-btn">🛒 Store par Jakar Order Karein</a>
-    `
-  },
-  {
-    id: "address",
-    keywords: [
-      "address", "pata", "location", "address badalna", "change address", 
-      "galat address", "pata kaise dale", "address update", "landmark"
-    ],
-    title: "📍 Delivery Address Badle ya Naya Jode",
-    answer: `
-      <strong>Address kaise manage karna hai:</strong><br><br>
-      Order karte waqt Address Window me aap naya pata add kar sakte hain ya pehle se saved address select kar sakte hain.<br><br>
-      <a href="address.html" class="sol-action-btn">📍 Address Settings Kholein</a>
-    `
-  },
-  {
-    id: "refund",
-    keywords: [
-      "refund", "paisa", "money", "paise wapas", "refund kab", "kat gaya", 
-      "reversal", "refund status", "amount back", "upi refund"
-    ],
-    title: "💰 Refund Timeline & Banking Resolution",
-    answer: `
-      <strong>Refund ki poori jankari:</strong><br><br>
-      • Cancelled ya Returned orders ka refund <strong>24 se 48 working hours</strong> ke andar aapke bank account me transfer ho jata hai.<br>
-      • Ek baar apna Bank App / Mini Statement zaroor check karein.<br>
-      • Agar 48 ghante se zyada ho gaye hain toh niche diye gaye form se Admin ko complaint ticket bhej dein.
-    `
-  },
-  {
-    id: "replace",
-    keywords: [
-      "kharab", "damage", "chalta nahi", "jal nahi", "replace", "toota", 
-      "defective", "flicker", "dead", "current nahi aa raha", "broken"
-    ],
-    title: "🔄 7 Days 100% Free Replacement",
-    answer: `
-      <strong>Defective / Damaged Item Resolution:</strong><br><br>
-      • RADA CREST delivery ke 7 dino tak 100% FREE replacement deta hai.<br>
-      • Agar bulb nahi jal raha ya extension board power nahi le raha, toh delivery boy naya piece dekar purana piece collect kar lega.<br>
-      • Niche form me apna Order ID likh kar direct Replace Ticket submit karein.
-    `
-  },
-  {
-    id: "return",
-    keywords: [
-      "return", "wapas", "pickup", "return kaise", "wapas bhejna", "parcel return"
-    ],
-    title: "📦 Order Return & Pickup Process",
-    answer: `
-      <strong>Return karne ka tareeka:</strong><br><br>
-      1. Apne <strong>Orders</strong> page par jayein aur us item ke aage <em>Request Return</em> dabayein.<br>
-      2. Delivery partner 24 se 48 ghante me aapke ghar aakar item collect kar lega.<br><br>
-      <a href="orders.html" class="sol-action-btn">📦 My Orders Page Kholein</a>
-    `
-  },
-  {
-    id: "tracking",
-    keywords: [
-      "track", "kaha hai", "kab aayega", "delivery status", "courier", "dispatch", "where is my order"
-    ],
-    title: "🚚 Order Track & Delivery Details",
-    answer: `
-      <strong>Aapka parcel kab aayega:</strong><br><br>
-      Order place hone ke baad 24 ghante me dispatch ho jata hai aur 3-5 dino me delivery ho jati hai. Aap apne <strong>Orders</strong> page par jakar live status dekh sakte hain.<br><br>
-      <a href="orders.html" class="sol-action-btn">🚚 Live Order Track Karein</a>
-    `
-  },
-  {
-    id: "payment",
-    keywords: [
-      "payment", "cod", "cash on delivery", "online payment", "upi", "google pay", "phonepe"
-    ],
-    title: "💳 Payment Methods (COD & Online UPI)",
-    answer: `
-      <strong>Hamari Payment Suvidha:</strong><br><br>
-      • <strong>Cash on Delivery (COD):</strong> Saman ghar aane par cash ya delivery boy ke QR par pay karein.<br>
-      • <strong>Online UPI:</strong> GooglePay, PhonePe, Paytm se direct secure payment karein.
-    `
-  }
-];
-
-// 2. AUTO-IDENTIFY USER
 async function autoDetectUser(){
   try {
     const { data: { user } } = await supabase.auth.getUser();
@@ -451,7 +325,6 @@ async function autoDetectUser(){
   }
 }
 
-// 3. LOAD TOPICS (ADMIN + DEFAULTS)
 async function loadTopics(){
   try {
     const { data, error } = await supabase
@@ -517,69 +390,76 @@ async function loadTopics(){
   }
 }
 
-// 4. INTELLIGENT SEMANTIC MATCHING (ZERO CHANCE OF WRONG ANSWER)
-window.executeSmartSearch = function(){
+// REAL GENERATIVE AI ANALYSIS FUNCTION
+window.executeSmartSearch = async function(){
   const rawQ = document.getElementById('helpInput').value.trim();
   if(!rawQ) return;
-  const q = rawQ.toLowerCase();
 
+  const btn = document.getElementById('aiSearchBtn');
   const card = document.getElementById('smartSolutionCard');
   const solText = document.getElementById('smartSolText');
   const badge = document.getElementById('solBadgeTitle');
+
+  btn.disabled = true;
+  btn.textContent = 'Analyzing...';
   card.style.display = 'block';
+  badge.textContent = '🤖 RADA CREST AI Solution (Live Analyzing)';
+  solText.innerHTML = '<span style="color:var(--brand);">⚡ Aapke sawal ko analyze kiya ja raha hai...</span>';
 
-  // Step A: Search in Extensive Knowledge Base
-  let bestEntry = null;
-  let highestScore = 0;
-
-  KNOWLEDGE_BASE.forEach(item => {
-    let score = 0;
-    item.keywords.forEach(kw => {
-      if(q.includes(kw)){
-        score += kw.length; // More specific long phrases get higher weight
-      }
-    });
-    if(score > highestScore){
-      highestScore = score;
-      bestEntry = item;
-    }
-  });
-
-  if(bestEntry && highestScore > 0){
-    badge.textContent = bestEntry.title;
-    solText.innerHTML = bestEntry.answer;
-    return;
-  }
-
-  // Step B: Search in Custom Admin Topics
-  let matchedAdmin = null;
+  // Check custom topics first for exact reference
+  let matchedTopic = null;
   liveTopics.forEach(t => {
-    if(t.title.toLowerCase().includes(q) || t.explanation.toLowerCase().includes(q)){
-      matchedAdmin = t;
+    if(t.title.toLowerCase().includes(rawQ.toLowerCase())){
+      matchedTopic = t;
     }
   });
 
-  if(matchedAdmin){
-    badge.textContent = matchedAdmin.title;
-    solText.innerHTML = `
-      ${matchedAdmin.explanation}<br><br>
-      <button class="sol-action-btn" onclick="scrollToItem('topic-${matchedAdmin.id}')">📖 Open Full Details & Ticket Form</button>
-    `;
-    return;
-  }
+  const systemContext = `Aap "RADA CREST" e-commerce store ke ek friendly, helpful aur smart customer support assistant hain.
+RADA CREST Website Structure:
+- index.html: Yahan LED Bulbs, Radar Motion sensor bulbs, Emergency bulbs aur Heavy Extension boards milte hain.
+- address.html: Yahan customer apna delivery address chunta ya naya address save karta hai.
+- orders.html: Yahan live status dekh sakte hain aur Return order request daal sakte hain.
+- Policies: 7 Days Free Replacement for damaged/defective items. Refund cancellation/return ke 24-48 working hours me aata hai. Cash on Delivery (COD) aur Online payment dono uplabdh hain.
 
-  // Step C: Universal Smart Contextual Response
-  badge.textContent = "💡 RADA CREST Personal Guide";
-  solText.innerHTML = `
-    <strong>Aapke sawal <em>"${rawQ}"</em> ke liye humari direct guidance:</strong><br><br>
-    • Naye products dekhne ya khareedne ke liye <strong>Home Store</strong> par jayein.<br>
-    • Apne pichle orders aur return ke liye <strong>Orders</strong> page par jayein.<br>
-    • Niche diye gaye topics me se direct solution chunein ya complaint form bharein.<br><br>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="index.html" class="sol-action-btn">🛒 Store par Jayein</a>
-      <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
-    </div>
-  `;
+Nirdesh:
+1. Customer ke sawal ko dhyan se padhein aur bina kisi robotic template ke natural Hindi/Hinglish me 3-4 clear points me seedha rasta batayein.
+2. Agar customer puche ki "website khol li aage kya karu", toh use product chunne, Buy Now dabane aur address/payment fill karne ka rasta samjhayein.
+3. Jawab friendly aur direct hona chahiye.`;
+
+  try {
+    const promptPayload = `${systemContext}\n\nCustomer Ka Sawal: ${rawQ}\n\nJawab:`;
+    const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(promptPayload)}?model=openai&seed=${Math.floor(Math.random()*100000)}`);
+    
+    if(!response.ok) throw new Error("AI stream error");
+    const aiAnswer = await response.text();
+
+    badge.textContent = "💡 RADA CREST Solution";
+    solText.innerHTML = aiAnswer.replace(/\n/g, "<br>") + `
+      <br><br>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
+        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
+        ${matchedTopic ? `<button class="sol-action-btn" style="background:#222;color:#fff;border:1px solid var(--brand);" onclick="scrollToItem('topic-${matchedTopic.id}')">📌 Open Related Topic</button>` : ''}
+      </div>
+    `;
+
+  } catch(err){
+    console.error("AI Error:", err);
+    if(rawQ.toLowerCase().includes('age kya karu') || rawQ.toLowerCase().includes('khol li') || rawQ.toLowerCase().includes('order')){
+      solText.innerHTML = `
+        <strong>Dost, website par aage badhne ke asaan steps:</strong><br><br>
+        1. <strong>Product Chunein:</strong> Home store par jakar apna bulb ya extension board dekhein.<br>
+        2. <strong>Buy Now Dabayein:</strong> Item ke niche "Buy Now" button par click karein.<br>
+        3. <strong>Address & Checkout:</strong> Apna delivery pata bharein aur Cash on Delivery ya UPI se confirm karein.<br><br>
+        <a href="index.html" class="sol-action-btn">🛒 Store Kholein Aur Shopping Karein</a>
+      `;
+    } else {
+      solText.innerHTML = `Aapke sawal ke liye niche diye gaye topics me se topic chunein ya direct ticket form submit karein. Hamari team turant action legi.`;
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze';
+  }
 };
 
 window.scrollToItem = function(id){
