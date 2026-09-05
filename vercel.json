@@ -1,15 +1,5 @@
 {
   "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/admin-referrals",
-      "destination": "/admin-referrals.html"
-    },
-    {
-      "source": "/admin-referral",
-      "destination": "/admin-referral.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
