@@ -35,14 +35,20 @@ body{
   padding-bottom:60px;
 }
 
+/* Premium Background Glow Animation */
 .ambient-glow{
   position:fixed;
-  width:400px;height:400px;
-  background:radial-gradient(circle, rgba(255,122,0,0.12) 0%, rgba(0,0,0,0) 70%);
+  width:450px;height:450px;
+  background:radial-gradient(circle, rgba(255,122,0,0.15) 0%, rgba(0,0,0,0) 70%);
   top:-100px;left:50%;
   transform:translateX(-50%);
   z-index:0;
   pointer-events:none;
+  animation: pulseGlow 6s ease-in-out infinite alternate;
+}
+@keyframes pulseGlow {
+  0%{transform:translateX(-50%) scale(1);opacity:0.8;}
+  100%{transform:translateX(-50%) scale(1.15);opacity:1;}
 }
 
 .header{
@@ -61,20 +67,22 @@ body{
   width:38px;height:38px;border-radius:12px;
   display:grid;place-items:center;color:#fff;
   text-decoration:none;font-size:16px;
-  transition:0.2s;
+  transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.back-btn:hover{background:rgba(255,255,255,0.12);}
+.back-btn:hover{background:rgba(255,122,0,0.2);border-color:var(--brand);transform:translateX(-3px);}
 .header-title h1{font-size:16px;font-weight:800;}
 .header-title span{font-size:11px;color:var(--brand);font-weight:600;}
 
 .container{max-width:680px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
 
-.hero{text-align:center;margin-bottom:24px;}
+.hero{text-align:center;margin-bottom:24px;animation: fadeInDown 0.6s ease;}
+@keyframes fadeInDown {from{opacity:0;transform:translateY(-15px);}to{opacity:1;transform:translateY(0);}}
 .hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
 .hero p{font-size:13.5px;color:var(--text-muted);}
 
 .wishlist-grid{display:grid;gap:16px;}
 
+/* Ultra Smooth Unique Card Animation & Hover Glow */
 .wish-card{
   background:var(--panel-card);
   backdrop-filter:blur(16px);
@@ -83,16 +91,22 @@ body{
   padding:18px;
   display:flex;gap:16px;align-items:center;
   position:relative;
-  animation:fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  transition:0.3s;
+  animation: fadeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.wish-card:hover{border-color:rgba(255,122,0,0.3);box-shadow:0 8px 30px rgba(0,0,0,0.4);}
-@keyframes fadeSlideIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.wish-card:hover{
+  border-color:rgba(255,122,0,0.5);
+  box-shadow:0 10px 35px rgba(255, 122, 0, 0.15);
+  transform:translateY(-3px);
+}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
 .wish-img{
   width:90px;height:90px;border-radius:14px;background:#131318;
   object-fit:cover;border:1px solid var(--border);flex-shrink:0;
+  transition:transform 0.3s ease;
 }
+.wish-card:hover .wish-img{transform:scale(1.05);}
 
 .wish-info{flex:1;}
 .discount-badge{
@@ -109,21 +123,25 @@ body{
 .wish-actions{display:flex;gap:10px;}
 .action-btn{
   background:var(--brand-gradient);color:#000;font-weight:800;
-  border:none;padding:8px 16px;border-radius:10px;font-size:12.5px;
-  cursor:pointer;text-decoration:none;box-shadow:0 4px 12px var(--brand-glow);
-  transition:0.2s;display:inline-flex;align-items:center;gap:6px;
+  border:none;padding:9px 18px;border-radius:12px;font-size:12.5px;
+  cursor:pointer;text-decoration:none;box-shadow:0 4px 15px var(--brand-glow);
+  transition:all 0.25s ease;display:inline-flex;align-items:center;gap:6px;
 }
-.action-btn:hover{transform:scale(1.02);opacity:0.95;}
+.action-btn:hover{transform:scale(1.03);opacity:0.95;box-shadow:0 6px 20px rgba(255,122,0,0.4);}
 .remove-btn{
   background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.3);
-  font-weight:700;padding:8px 12px;border-radius:10px;font-size:12.5px;cursor:pointer;transition:0.2s;
+  font-weight:700;padding:9px 14px;border-radius:12px;font-size:12.5px;cursor:pointer;
+  transition:all 0.25s ease;
 }
-.remove-btn:hover{background:rgba(248,113,113,0.2);}
+.remove-btn:hover{background:rgba(248,113,113,0.25);transform:scale(1.03);}
 
 .empty-state{
   text-align:center;padding:60px 20px;color:var(--text-muted);
+  animation: fadeIn 0.5s ease;
 }
-.empty-state span{font-size:48px;display:block;margin-bottom:14px;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.empty-state span{font-size:48px;display:block;margin-bottom:14px;animation: bounce 2s infinite;}
+@keyframes bounce{0%, 100%{transform:translateY(0);} 50%{transform:translateY(-8px);}}
 .empty-state h3{font-size:18px;color:#fff;margin-bottom:6px;}
 </style>
 </head>
@@ -158,7 +176,6 @@ body{
 </div>
 
 <script>
-// Wishlist Data Load aur Automatic Discount Logic
 function loadWishlist(){
   const container = document.getElementById('wishlistContainer');
   let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
@@ -175,7 +192,6 @@ function loadWishlist(){
     return;
   }
 
-  // Maan lete hain admin control se default 15% discount wishlist items par mil raha hai
   const discountPercent = 15; 
 
   container.innerHTML = wishlist.map((item, index) => {
@@ -183,7 +199,7 @@ function loadWishlist(){
     const discountedPrice = Math.round(originalPrice * (1 - discountPercent / 100));
 
     return `
-      <div class="wish-card" id="wish-item-${index}">
+      <div class="wish-card" id="wish-item-${index}" style="animation-delay: ${index * 0.08}s;">
         <img src="${item.image || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
         <div class="wish-info">
           <div class="discount-badge">🔥 Wishlist Special: ${discountPercent}% OFF</div>
@@ -204,15 +220,27 @@ function loadWishlist(){
 
 window.removeItem = function(index){
   let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
-  wishlist.splice(index, 1);
-  localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
-  loadWishlist();
+  const card = document.getElementById(`wish-item-${index}`);
+  if(card){
+    card.style.transform = 'scale(0.9)';
+    card.style.opacity = '0';
+    card.style.transition = 'all 0.3s ease';
+    setTimeout(() => {
+      wishlist.splice(index, 1);
+      localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
+      loadWishlist();
+    }, 300);
+  } else {
+    wishlist.splice(index, 1);
+    localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
+    loadWishlist();
+  }
 };
 
 window.moveToCheckout = function(name, finalPrice){
-  // Discounted price ko checkout/address ke liye save karke address page par bhej rahe hain
   localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice }));
-  window.location.href = 'addresses.html';
+  // SMART RETURN FLOW: Address select hone ke baad seedha wishlist par wapas aayega
+  window.location.href = 'address.html?return=wishlist.html';
 };
 
 document.addEventListener('DOMContentLoaded', loadWishlist);
