@@ -192,21 +192,25 @@ body{
 }
 .modal-box{
   background:#141418;border:1px solid rgba(255,122,0,0.4);border-radius:24px;
-  padding:26px;max-width:440px;width:100%;
+  padding:26px;max-width:460px;width:100%;
 }
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .modal-head h3{font-size:17px;color:#fff;}
 .modal-close{cursor:pointer;color:var(--text-muted);font-size:18px;}
 
-.track-input-grp{display:flex;gap:8px;margin-bottom:16px;}
-.track-input-grp input{
-  flex:1;background:#0d0d10;border:1px solid #292933;color:#fff;
-  border-radius:10px;padding:10px 12px;font-size:13px;
+.auto-identity-box{
+  background:rgba(255,255,255,0.03);
+  border:1px solid #24242c;
+  padding:10px 14px;
+  border-radius:12px;
+  margin-bottom:14px;
+  font-size:12px;
+  color:#a1a1aa;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 }
-.track-btn{
-  background:var(--brand);color:#000;border:none;font-weight:800;
-  padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;
-}
+.auto-identity-box strong{color:#fff;}
 
 .ticket-status-card{
   background:#1a1a22;border:1px solid #2a2a36;border-radius:14px;
@@ -239,9 +243,9 @@ body{
       <span>Support Desk Active</span>
     </div>
   </div>
-  <!-- TOP RIGHT TRACKER BADGE -->
-  <button class="track-pill-btn" onclick="openTrackerModal()">
-    <span>🔔</span> Track Request
+  <!-- TOP RIGHT TRACKER BADGE (NOW FULLY AUTOMATED) -->
+  <button class="track-pill-btn" onclick="openAutoTrackerModal()">
+    <span>🔔</span> Track My Requests
   </button>
 </header>
 
@@ -253,7 +257,7 @@ body{
   </div>
 
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apni dikkat yahan likhein (e.g. extension board socket, refund)..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
+    <input type="text" id="helpInput" placeholder="Apni dikkat yahan likhein..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
     <button class="search-action-btn" onclick="runAutoAnalysis()">🔍 Analyze</button>
   </div>
 
@@ -277,28 +281,31 @@ body{
 
 </div>
 
-<!-- STATUS TRACKER MODAL -->
+<!-- AUTOMATED STATUS TRACKER MODAL (NO MANUAL NUMBER INPUT NEEDED) -->
 <div id="trackerModal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-head">
-      <h3>Track Your Request Status</h3>
+      <h3>Live Requests & Status</h3>
       <span class="modal-close" onclick="closeTrackerModal()">✕</span>
     </div>
-    <div class="track-input-grp">
-      <input type="tel" id="trackPhone" placeholder="Apna Mobile Number ya Ticket ID daalein">
-      <button class="track-btn" onclick="checkStatus()">Search</button>
+    
+    <!-- AUTOMATIC IDENTITY DETECTOR -->
+    <div class="auto-identity-box" id="identityDetectedBox">
+      <span>Auto Analyzing Customer Identity...</span>
     </div>
-    <div id="trackResultList" style="max-height:300px;overflow-y:auto;">
-      <p style="color:var(--text-muted);font-size:12.5px;text-align:center;">Apna registered phone number daal kar check karein.</p>
+
+    <!-- LIVE STATUS LIST FETCHED AUTOMATICALLY -->
+    <div id="trackResultList" style="max-height:350px;overflow-y:auto;">
+      <p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Fetching your past requests...</p>
     </div>
   </div>
 </div>
 
-<!-- TICKET CREATED SUCCESS POPUP -->
+<!-- SUCCESS POPUP -->
 <div id="successModal" class="modal-overlay">
   <div class="modal-box" style="text-align:center;">
     <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
-    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID hai: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track Request'</strong> se status check kar sakte hain.</p>
+    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID hai: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track My Requests'</strong> se kabhi bhi live status dekh sakte hain.</p>
     <button class="submit-btn" style="margin-top:16px;" onclick="document.getElementById('successModal').style.display='none'">Theek Hai</button>
   </div>
 </div>
@@ -311,7 +318,39 @@ const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let liveTopics = [];
+let detectedUser = { phone: '', email: '', id: '' };
 
+// 1. AUTOMATICALLY DETECT / ANALYZE USER IDENTITY ON LOAD
+async function autoDetectUser(){
+  try {
+    // Check Supabase session
+    const { data: { user } } = await supabase.auth.getUser();
+    if(user){
+      detectedUser.email = user.email || '';
+      detectedUser.phone = user.phone || user.user_metadata?.phone || '';
+      detectedUser.id = user.id || '';
+    }
+
+    // Fallback: check localStorage for past orders / addresses
+    if(!detectedUser.phone){
+      const localPhone = localStorage.getItem('rc_user_phone') || 
+                         localStorage.getItem('customer_phone') || 
+                         localStorage.getItem('phone');
+      if(localPhone) detectedUser.phone = localPhone;
+    }
+
+    if(!detectedUser.email){
+      const localEmail = localStorage.getItem('rc_user_email') || 
+                         localStorage.getItem('customer_email') || 
+                         localStorage.getItem('email');
+      if(localEmail) detectedUser.email = localEmail;
+    }
+  } catch(e){
+    console.warn("Auto-detect failed:", e);
+  }
+}
+
+// 2. LOAD TOPICS
 async function loadTopics(){
   try {
     const { data, error } = await supabase
@@ -348,7 +387,7 @@ async function loadTopics(){
               
               <form class="ticket-form" id="form-${t.id}" onsubmit="submitTicket(event, '${t.title.replace(/'/g, "\\'")}')">
                 <input type="text" placeholder="Order ID (Optional)">
-                <input type="tel" placeholder="Aapka Mobile Number" required>
+                <input type="tel" placeholder="Aapka Mobile Number" value="${detectedUser.phone || ''}" required>
                 <textarea placeholder="Apni problem detail me likhein..." required></textarea>
                 <button type="submit" class="submit-btn">Send to Admin Desk ➔</button>
               </form>
@@ -364,44 +403,141 @@ async function loadTopics(){
   }
 }
 
-window.runAutoAnalysis = function(){
-  const query = document.getElementById('helpInput').value.trim().toLowerCase();
-  if(!query || !liveTopics.length) return;
+// 3. FULLY AUTOMATED STATUS TRACKER (ZERO MANUAL INPUT)
+window.openAutoTrackerModal = async function(){
+  const modal = document.getElementById('trackerModal');
+  modal.style.display = 'grid';
 
-  const card = document.getElementById('smartSolutionCard');
-  const solText = document.getElementById('smartSolText');
+  const idBox = document.getElementById('identityDetectedBox');
+  const resBox = document.getElementById('trackResultList');
 
-  const words = query.split(/\s+/);
-  let bestTopic = null;
-  let maxMatches = 0;
+  // Refresh user detection
+  await autoDetectUser();
 
-  liveTopics.forEach(topic => {
-    const combinedText = (topic.title + " " + topic.explanation).toLowerCase();
-    let score = 0;
-    words.forEach(w => {
-      if(w.length > 2 && combinedText.includes(w)) score++;
-    });
-    if(score > maxMatches){
-      maxMatches = score;
-      bestTopic = topic;
+  const activeIdentifier = detectedUser.phone || detectedUser.email;
+
+  if(!activeIdentifier){
+    idBox.innerHTML = `<span>Guest Device (No order history detected)</span>`;
+    resBox.innerHTML = `
+      <div style="text-align:center;padding:20px;">
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Aapka koi active session ya order record auto-detect nahi hua.</p>
+        <input type="tel" id="manualTrackInput" placeholder="Apna Phone Number likhein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
+        <button class="submit-btn" onclick="fetchTicketsByIdentifier(document.getElementById('manualTrackInput').value.trim())">Search My Tickets</button>
+      </div>
+    `;
+    return;
+  }
+
+  idBox.innerHTML = `<span>Identified as: <strong>${activeIdentifier}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
+  resBox.innerHTML = `<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Analyzing all your requests...</p>`;
+
+  await fetchTicketsByIdentifier(activeIdentifier);
+};
+
+window.fetchTicketsByIdentifier = async function(val){
+  const resBox = document.getElementById('trackResultList');
+  if(!val){
+    resBox.innerHTML = `<p style="color:var(--red);text-align:center;">Koi number nahi mila.</p>`;
+    return;
+  }
+
+  try {
+    // Search tickets by phone OR customer_phone
+    const { data: tickets, error } = await supabase
+      .from('help_tickets')
+      .select('*')
+      .eq('customer_phone', val)
+      .order('id', { ascending: false });
+
+    if(error) throw error;
+
+    if(!tickets || !tickets.length){
+      resBox.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:30px;">Is number/account ke liye abhi koi active request nahi mili.</div>`;
+      return;
     }
-  });
 
-  if(bestTopic && maxMatches > 0){
-    card.style.display = 'block';
-    solText.innerHTML = `<strong>${bestTopic.title}:</strong><br><br>${bestTopic.explanation.substring(0, 200)}...<br><br><button class="submit-btn" onclick="scrollToItem('topic-${bestTopic.id}')">📖 Open Full Guidance & Form</button>`;
-  } else {
-    card.style.display = 'block';
-    solText.innerHTML = `Aapki query ke liye exact match nahi mila. Niche diye gaye topics se help lein ya ticket submit karein.`;
+    resBox.innerHTML = tickets.map(tk => `
+      <div class="ticket-status-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="status-pill ${tk.status}">${tk.status}</span>
+          <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
+        ${tk.order_id ? `<div style="font-size:11px;color:#888;margin-top:4px;">Order ID: <code>${tk.order_id}</code></div>` : ''}
+
+        ${tk.status === 'rejected' && tk.rejection_reason ? `
+          <div class="reject-reason-box">
+            <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
+          </div>
+        ` : ''}
+        ${tk.status === 'confirmed' ? `
+          <div style="color:var(--green);font-size:12px;margin-top:6px;">
+            ✓ Request Approved & Confirmed by Admin.
+          </div>
+        ` : ''}
+        ${tk.status === 'proceeding' ? `
+          <div style="color:var(--blue);font-size:12px;margin-top:6px;">
+            ⚙️ Request in progress (Resolution underway).
+          </div>
+        ` : ''}
+        ${tk.status === 'pending' ? `
+          <div style="color:var(--brand);font-size:12px;margin-top:6px;">
+            ⏳ Under Review by Support Team.
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+
+  } catch(err){
+    resBox.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Fetch error: ${err.message}</div>`;
   }
 };
 
-window.scrollToItem = function(id){
-  const el = document.getElementById(id);
-  if(el){
-    document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
-    el.classList.add('active');
-    el.scrollIntoView({ behavior: 'smooth' });
+window.closeTrackerModal = function(){
+  document.getElementById('trackerModal').style.display = 'none';
+};
+
+// 4. SUBMIT TICKET AND SAVE IDENTITY LOCALLY
+window.submitTicket = async function(e, topicTitle){
+  e.preventDefault();
+  const form = e.target;
+  const inputs = form.querySelectorAll('input, textarea');
+  const btn = form.querySelector('.submit-btn');
+
+  const orderId = inputs[0].value.trim() || null;
+  const phone = inputs[1].value.trim();
+  const desc = inputs[2].value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const { data, error } = await supabase.from('help_tickets').insert([{
+      issue_type: topicTitle,
+      order_id: orderId,
+      customer_phone: phone,
+      description: desc,
+      status: 'pending'
+    }]).select();
+
+    if(error) throw error;
+
+    // Cache phone locally so customer never needs to enter it again!
+    localStorage.setItem('rc_user_phone', phone);
+    detectedUser.phone = phone;
+
+    form.reset();
+    form.style.display = 'none';
+    if(data && data[0]){
+      document.getElementById('createdTicketId').textContent = '#' + data[0].id;
+    }
+    document.getElementById('successModal').style.display = 'grid';
+  } catch(err){
+    alert('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send to Admin Desk ➔';
   }
 };
 
@@ -417,99 +553,11 @@ window.toggleForm = function(formId){
   if(f) f.style.display = (f.style.display === 'block') ? 'none' : 'block';
 };
 
-window.submitTicket = async function(e, topicTitle){
-  e.preventDefault();
-  const form = e.target;
-  const inputs = form.querySelectorAll('input, textarea');
-  const btn = form.querySelector('.submit-btn');
-
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-
-  try {
-    const { data, error } = await supabase.from('help_tickets').insert([{
-      issue_type: topicTitle,
-      order_id: inputs[0].value.trim() || null,
-      customer_phone: inputs[1].value.trim(),
-      description: inputs[2].value.trim(),
-      status: 'pending'
-    }]).select();
-
-    if(error) throw error;
-    
-    form.reset();
-    form.style.display = 'none';
-    if(data && data[0]){
-      document.getElementById('createdTicketId').textContent = '#' + data[0].id;
-    }
-    document.getElementById('successModal').style.display = 'grid';
-  } catch(err){
-    alert('Error: ' + err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Send to Admin Desk ➔';
-  }
-};
-
-// LIVE STATUS TRACKING LOGIC
-window.openTrackerModal = function(){
-  document.getElementById('trackerModal').style.display = 'grid';
-};
-window.closeTrackerModal = function(){
-  document.getElementById('trackerModal').style.display = 'none';
-};
-
-window.checkStatus = async function(){
-  const val = document.getElementById('trackPhone').value.trim();
-  const resBox = document.getElementById('trackResultList');
-  if(!val){
-    resBox.innerHTML = '<p style="color:var(--red);text-align:center;">Kripya phone number ya Ticket ID likhein.</p>';
-    return;
-  }
-
-  resBox.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Checking status...</p>';
-
-  let query = supabase.from('help_tickets').select('*');
-  if(!isNaN(val) && val.length < 7){
-    query = query.eq('id', parseInt(val, 10));
-  } else {
-    query = query.eq('customer_phone', val);
-  }
-
-  const { data: tickets, error } = await query.order('id', { ascending: false });
-  if(error || !tickets || !tickets.length){
-    resBox.innerHTML = '<p style="color:var(--red);text-align:center;">Koi ticket nahi mili. Kripya sahi number/ID daalein.</p>';
-    return;
-  }
-
-  resBox.innerHTML = tickets.map(tk => `
-    <div class="ticket-status-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="status-pill ${tk.status}">${tk.status}</span>
-        <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
-      </div>
-      <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
-      <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
-      ${tk.status === 'rejected' && tk.rejection_reason ? `
-        <div class="reject-reason-box">
-          <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
-        </div>
-      ` : ''}
-      ${tk.status === 'confirmed' ? `
-        <div style="color:var(--green);font-size:12px;margin-top:6px;">
-          ✓ Admin team has approved & confirmed this request.
-        </div>
-      ` : ''}
-      ${tk.status === 'proceeding' ? `
-        <div style="color:var(--blue);font-size:12px;margin-top:6px;">
-          ⚙️ Request is in progress (Courier/Resolution underway).
-        </div>
-      ` : ''}
-    </div>
-  `).join('');
-};
-
-loadTopics();
+// INITIALIZE
+(async () => {
+  await autoDetectUser();
+  await loadTopics();
+})();
 </script>
 
 </body>
