@@ -1,142 +1,386 @@
-// RADA CREST Pan-India Multi-Language Manager
-const translations = {
-  en: {
-    store_title: "RADA CREST Store",
-    help_title: "Help & Support",
-    notif_title: "Activity Center",
-    orders_title: "My Orders",
-    buy_now: "Buy Now",
-    track_req: "Track My Requests",
-    notifications: "Notifications",
-    wishlist: "Wishlist",
-    address_title: "Delivery Address"
-  },
-  hi: { // Hindi
-    store_title: "राडा क्रెస్ట్ स्टोर",
-    help_title: "सहायता और समर्थन",
-    notif_title: "गतिविधि केंद्र",
-    orders_title: "मेरे ऑर्डर",
-    buy_now: "अभी खरीदें",
-    track_req: "मेरे अनुरोध को ट्रैक करें",
-    notifications: "सूचनाएं",
-    wishlist: "विशलिस्ट",
-    address_title: "डिलीवरी का पता"
-  },
-  te: { // Telugu
-    store_title: "రాడా క్రెస్ట్ స్టోర్",
-    help_title: "సహాయం & మద్దతు",
-    notif_title: "యాక్టివిటీ సెంటర్",
-    orders_title: "నా ఆర్డర్లు",
-    buy_now: "ఇప్పుడే కొనండి",
-    track_req: "నా అభ్యర్థనలను ట్రాక్ చేయండి",
-    notifications: "నోటిఫికేషన్‌లు",
-    wishlist: "విష్‌లిస్ట్",
-    address_title: "డెలివరీ చిరునామా"
-  },
-  ta: { // Tamil
-    store_title: "ராடா கிரெஸ்ட் ஸ்டோர்",
-    help_title: "உதவி & ஆதரவு",
-    notif_title: "செயல்பாட்டு மையம்",
-    orders_title: "எனது ஆர்டர்கள்",
-    buy_now: "இப்போது வாங்கு",
-    track_req: "எனது கோரிக்கையை கண்காணிக்கவும்",
-    notifications: "அறிவிப்புகள்",
-    wishlist: "விருப்பப் பட்டியல்",
-    address_title: "டெலிவரி முகவரி"
-  },
-  kn: { // Kannada
-    store_title: "ರಾಡಾ ಕ್ರೆಸ್ಟ್ ಸ್ಟೋರ್",
-    help_title: "ಸಹಾಯ ಮತ್ತು ಬೆಂಬಲ",
-    notif_title: "ಚಟುವಟಿಕೆ ಕೇಂದ್ರ",
-    orders_title: "ನನ್ನ ಆರ್ಡರ್‌ಗಳು",
-    buy_now: "ಈಗ ಖರೀದಿಸಿ",
-    track_req: "ನನ್ನ ವಿನಂತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
-    notifications: "ಅಧಿಸೂಚನೆಗಳು",
-    wishlist: "ವಿಶ್‌ಲಿಸ್ಟ್",
-    address_title: "ವಿಳಾಸ"
-  },
-  ml: { // Malayalam
-    store_title: "രാഡ ക്രെസ്റ്റ് സ്റ്റോർ",
-    help_title: "സഹായം & പിന്തുണ",
-    notif_title: "ആക്ടിവിറ്റി സെന്റർ",
-    orders_title: "എന്റെ ഓർഡറുകൾ",
-    buy_now: "ഇപ്പോൾ വാങ്ങുക",
-    track_req: "അഭ്യർത്ഥന ട്രാക്ക് ചെയ്യുക",
-    notifications: "അറിയിപ്പുകൾ",
-    wishlist: "വിഷ്‌ലിസ്റ്റ്",
-    address_title: "വിലാസം"
-  },
-  mr: { // Marathi
-    store_title: "राडा क्रेस्ट स्टोअर",
-    help_title: "मदत आणि समर्थन",
-    notif_title: "ॲक्टिव्हिटी सेंटर",
-    orders_title: "माझ्या ऑर्डर्स",
-    buy_now: "आता खरेदी करा",
-    track_req: "विनंती ट्रॅक करा",
-    notifications: "सूचना",
-    wishlist: "विशलिस्ट",
-    address_title: "पत्ता"
-  },
-  gu: { // Gujarati
-    store_title: "રાડા ક્રસ્ટ સ્ટોર",
-    help_title: "મદદ અને સપોર્ટ",
-    notif_title: "એક્ટિવિટી સેન્ટર",
-    orders_title: "મારા ઓર્ડર",
-    buy_now: "હમણાં ખરીદો",
-    track_req: "વિનંતી ટ્રેક કરો",
-    notifications: "સૂચનાઓ",
-    wishlist: "વિશલિસ્ટ",
-    address_title: "સરનામું"
-  },
-  bn: { // Bengali
-    store_title: "রাডা ক্রুস্ট স্টোর",
-    help_title: "সহায়তা এবং সমর্থন",
-    notif_title: "অ্যাক্টিভিটি সেন্টার",
-    orders_title: "আমার অর্ডার",
-    buy_now: "এখনই কিনুন",
-    track_req: "অনুরোধ ট্র্যাক করুন",
-    notifications: "বিজ্ঞপ্তি",
-    wishlist: "উইশলিস্ট",
-    address_title: "ঠিকানা"
-  },
-  pa: { // Punjabi
-    store_title: "ਰਾਡਾ ਕਰੈਸਟ ਸਟੋਰ",
-    help_title: "ਮਦਦ ਅਤੇ ਸਹਾਇਤਾ",
-    notif_title: "ਸਰਗਰਮੀ ਕੇਂਦਰ",
-    orders_title: "ਮੇਰੇ ਆਰਡਰ",
-    buy_now: "ਹੁਣੇ ਖਰੀਦੋ",
-    track_req: "ਬੇਨਤੀ ਟ੍ਰੈਕ ਕਰੋ",
-    notifications: "ਸੂਚਨਾਵਾਂ",
-    wishlist: "ਵਿਸ਼ਲਿਸਟ",
-    address_title: "ਪਤਾ"
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications & Updates — RADA CREST</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg-deep:#060608;
+  --panel-card:rgba(24, 24, 32, 0.75);
+  --border:rgba(255, 255, 255, 0.08);
+  --text:#ffffff;
+  --text-muted:#9da0b0;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.35);
+  --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+  --green:#3dd598;
+  --blue:#38bdf8;
+  --red:#f87171;
+}
+
+body{
+  background:var(--bg-deep);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+  padding-bottom:70px;
+}
+
+/* Ambient Background Glow Animation */
+.ambient-glow{
+  position:fixed;
+  width:420px;height:420px;
+  background:radial-gradient(circle, rgba(255,122,0,0.14) 0%, rgba(0,0,0,0) 70%);
+  top:-100px;left:50%;
+  transform:translateX(-50%);
+  z-index:0;
+  pointer-events:none;
+  animation: pulseGlow 6s ease-in-out infinite alternate;
+}
+@keyframes pulseGlow{
+  0%{transform:translateX(-50%) scale(1);opacity:0.8;}
+  100%{transform:translateX(-50%) scale(1.15);opacity:1;}
+}
+
+/* Header */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8, 8, 12, 0.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.header-left{display:flex;align-items:center;gap:12px;}
+.back-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  width:38px;height:38px;border-radius:12px;
+  display:grid;place-items:center;color:#fff;
+  text-decoration:none;font-size:16px;
+  transition:0.2s;
+}
+.back-btn:hover{background:rgba(255,122,0,0.2);border-color:var(--brand);}
+.header-title h1{font-size:16px;font-weight:800;letter-spacing:-0.3px;}
+.header-title span{
+  font-size:11px;color:var(--brand);font-weight:600;
+  display:flex;align-items:center;gap:5px;
+}
+.header-title span::before{
+  content:'';width:6px;height:6px;background:var(--green);border-radius:50%;
+  box-shadow:0 0 8px var(--green);
+}
+
+.container{max-width:640px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
+
+/* Hero Section */
+.hero{text-align:center;margin-bottom:24px;}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,122,0,0.12);border:1px solid rgba(255,122,0,0.3);
+  padding:5px 14px;border-radius:20px;
+  font-size:11px;font-weight:700;color:var(--brand);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
+}
+.hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
+.hero p{font-size:13.5px;color:var(--text-muted);}
+
+/* Filter Tabs */
+.filter-tabs{
+  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;
+  scrollbar-width:none;
+}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  color:var(--text-muted);
+  font-size:12.5px;font-weight:700;
+  padding:8px 16px;border-radius:12px;
+  cursor:pointer;white-space:nowrap;transition:0.25s;
+}
+.tab-btn.active, .tab-btn:hover{
+  background:var(--brand-gradient);
+  color:#000;
+  border-color:transparent;
+  box-shadow:0 4px 14px var(--brand-glow);
+}
+
+/* Notification Cards Container */
+#notifContainer{display:flex;flex-direction:column;gap:12px;}
+
+.notif-card{
+  background:var(--panel-card);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  position:relative;
+  overflow:hidden;
+  animation:slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition:0.3s;
+}
+.notif-card:hover{
+  border-color:rgba(255,122,0,0.3);
+  transform:translateY(-2px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+@keyframes slideUpFade{
+  from{opacity:0;transform:translateY(15px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.notif-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.notif-badge{
+  font-size:11px;font-weight:800;padding:3px 10px;border-radius:6px;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.notif-badge.pending{background:rgba(255,122,0,0.15);color:var(--brand);border:1px solid rgba(255,122,0,0.3);}
+.notif-badge.confirmed{background:rgba(61,213,152,0.15);color:var(--green);border:1px solid rgba(61,213,152,0.3);}
+.notif-badge.proceeding{background:rgba(56,189,248,0.15);color:var(--blue);border:1px solid rgba(56,189,248,0.3);}
+.notif-badge.rejected{background:rgba(248,113,113,0.15);color:var(--red);border:1px solid rgba(248,113,113,0.3);}
+
+.notif-time{font-size:11.5px;color:var(--text-muted);}
+
+.notif-title{font-size:14.5px;font-weight:700;color:#fff;margin-bottom:6px;}
+.notif-desc{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:12px;}
+
+.reject-box{
+  background:rgba(248,113,113,0.08);
+  border-left:3px solid var(--red);
+  padding:10px 12px;border-radius:8px;
+  font-size:12.5px;color:#ffcaca;margin-bottom:12px;
+}
+
+.notif-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(255,255,255,0.05);padding-top:10px;margin-top:4px;
+}
+.notif-id{font-size:11.5px;color:var(--text-muted);font-family:monospace;}
+.action-link{
+  font-size:12px;font-weight:700;color:var(--brand);text-decoration:none;
+  display:inline-flex;align-items:center;gap:4px;transition:0.2s;
+}
+.action-link:hover{color:#fff;}
+
+.empty-state{
+  text-align:center;padding:50px 20px;
+  background:var(--panel-card);border:1px solid var(--border);border-radius:20px;
+}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty-state h3{font-size:16px;font-weight:700;margin-bottom:6px;color:#fff;}
+.empty-state p{font-size:13px;color:var(--text-muted);}
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<header class="header">
+  <div class="header-left">
+    <a href="index.html" class="back-btn">←</a>
+    <div class="header-title">
+      <h1>Activity Center</h1>
+      <span>Live Updates Active</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">🔔 Live Notifications</div>
+    <h2>Aapke Orders, Returns & Requests</h2>
+    <p>Yahan aapko sabhi issues, replacements aur admin updates ka live status milega.</p>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="tab-btn active" onclick="filterNotifs('all', this)">All Updates</button>
+    <button class="tab-btn" onclick="filterNotifs('returns', this)">Returns & Exchange</button>
+    <button class="tab-btn" onclick="filterNotifs('orders', this)">Orders & Shipping</button>
+    <button class="tab-btn" onclick="filterNotifs('offers', this)">Wishlist & Offers</button>
+  </div>
+
+  <div id="notifContainer">
+    <div class="empty-state">
+      <div class="empty-icon">⏳</div>
+      <h3>Notifications Load Ho Rahi Hain...</h3>
+      <p>Kripya thoda intezaar karein.</p>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let allNotifications = [];
+let currentFilter = 'all';
+
+async function fetchUserNotifications(){
+  const container = document.getElementById('notifContainer');
+  
+  // Get user phone from local storage or auth
+  let phone = localStorage.getItem('rc_user_phone') || localStorage.getItem('customer_phone') || '';
+  
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if(user && !phone){
+      phone = user.phone || user.user_metadata?.phone || '';
+    }
+  } catch(e){
+    console.warn("Auth check:", e);
   }
+
+  if(!phone){
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📱</div>
+        <h3>Mobile Number Required</h3>
+        <p>Apne orders aur return status dekhne ke liye pehle kisi product par order ya help request dalein.</p>
+        <a href="index.html" style="display:inline-block;margin-top:14px;background:var(--brand-gradient);color:#000;padding:10px 20px;border-radius:12px;font-weight:800;text-decoration:none;font-size:13px;">🛒 Store Par Jayein</a>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    // Fetch help_tickets (Returns, replacements, complaints)
+    const { data: tickets, error: ticketErr } = await supabase
+      .from('help_tickets')
+      .select('*')
+      .eq('customer_phone', phone)
+      .order('id', { ascending: false });
+
+    if(ticketErr) throw ticketErr;
+
+    // Build notifications array
+    allNotifications = [];
+
+    if(tickets && tickets.length > 0){
+      tickets.forEach(tk => {
+        let type = 'returns';
+        let descTitle = tk.issue_type;
+        let categoryLabel = 'Support Ticket';
+        
+        if(tk.issue_type.toLowerCase().includes('return') || tk.issue_type.toLowerCase().includes('replacement') || tk.issue_type.toLowerCase().includes('kharab')){
+          type = 'returns';
+          categoryLabel = 'Return / Exchange';
+        } else if(tk.issue_type.toLowerCase().includes('order') || tk.issue_type.toLowerCase().includes('shipping')){
+          type = 'orders';
+          categoryLabel = 'Order Status';
+        }
+
+        allNotifications.push({
+          id: `TK-${tk.id}`,
+          type: type,
+          status: tk.status, // pending, proceeding, confirmed, rejected
+          title: descTitle,
+          description: tk.description || 'Aapki request par admin team kaam kar rahi hai.',
+          rejectionReason: tk.rejection_reason || null,
+          category: categoryLabel,
+          time: 'Recent Update'
+        });
+      });
+    }
+
+    // Add sample Wishlist / Offer notification
+    allNotifications.push({
+      id: 'OFFER-101',
+      type: 'offers',
+      status: 'confirmed',
+      title: '🔥 Wishlist Special: 15% OFF Activated!',
+      description: 'Aapki wishlist me save kiye gaye products par automatic discount apply ho gaya hai. Abhi order complete karein!',
+      rejectionReason: null,
+      category: 'Wishlist Offer',
+      time: 'Special Deal'
+    });
+
+    renderNotifications();
+
+  } catch(err){
+    console.error("Error fetching notifications:", err);
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <h3>Kuch Takneki Dikat Hai</h3>
+        <p>Notifications load karne me samasya aayi. Kripya dobara koshish karein.</p>
+      </div>
+    `;
+  }
+}
+
+window.filterNotifs = function(type, btnEl){
+  currentFilter = type;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if(btnEl) btnEl.classList.add('active');
+  renderNotifications();
 };
 
-function setLanguage(lang) {
-  localStorage.setItem('rc_lang', lang);
-  applyTranslations();
+function renderNotifications(){
+  const container = document.getElementById('notifContainer');
+  if(!container) return;
+
+  let filtered = allNotifications;
+  if(currentFilter !== 'all'){
+    filtered = allNotifications.filter(n => n.type === currentFilter);
+  }
+
+  if(filtered.length === 0){
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>Koi Notification Nahi Mili</h3>
+        <p>Is category me abhi koi update uplabdh nahi hai.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(n => `
+    <div class="notif-card">
+      <div class="notif-top">
+        <span class="notif-badge ${n.status}">${n.status}</span>
+        <span class="notif-time">${n.time}</span>
+      </div>
+      <div class="notif-title">${n.title}</div>
+      <div class="notif-desc">${n.description}</div>
+
+      ${n.status === 'rejected' && n.rejectionReason ? `
+        <div class="reject-box">
+          <strong>❌ Rejection Reason:</strong> ${n.rejectionReason}
+        </div>
+      ` : ''}
+
+      <div class="notif-footer">
+        <span class="notif-id">${n.category} • #${n.id}</span>
+        <a href="orders.html" class="action-link">View Details ➔</a>
+      </div>
+    </div>
+  `).join('');
 }
 
-function getLanguage() {
-  return localStorage.getItem('rc_lang') || 'en';
-}
-
-function applyTranslations() {
-  const lang = getLanguage();
-  const elements = document.querySelectorAll('[data-i18n]');
-  
-  elements.forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (translations[lang] && translations[lang][key]) {
-      if (el.tagName === 'INPUT' && el.hasAttribute('placeholder')) {
-        el.placeholder = translations[lang][key];
-      } else {
-        el.innerText = translations[lang][key];
-      }
-    }
-  });
-}
-
+// Auto load on start
 document.addEventListener('DOMContentLoaded', () => {
-  applyTranslations();
+  fetchUserNotifications();
 });
+</script>
+
+</body>
+</html>
