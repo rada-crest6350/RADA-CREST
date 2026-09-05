@@ -240,7 +240,7 @@ window.removeItem = function(index){
 window.moveToCheckout = function(name, finalPrice){
   localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice }));
   // SMART RETURN FLOW: Address select hone ke baad seedha wishlist par wapas aayega
-  window.location.href = 'address.html?return=wishlist.html';
+  window.location.href = 'addresses.html?return=wishlist.html';
 };
 
 document.addEventListener('DOMContentLoaded', loadWishlist);
