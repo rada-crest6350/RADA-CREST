@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Help & Ticket Desk — RADA CREST</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --bg:#090909;
+  --panel:#121212;
+  --border:#242424;
+  --text:#ffffff;
+  --muted:#8e8e93;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.15);
+  --green:#7dff9b;
+  --red:#ff6b6b;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+button,input,textarea{font:inherit;}
+button{cursor:pointer;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{
+  width:260px;
+  background:#0d0d0d;
+  border-right:1px solid var(--border);
+  padding:22px 14px;
+  position:fixed;left:0;top:0;bottom:0;
+  display:flex;flex-direction:column;
+}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.logo{
+  width:40px;height:40px;border:2px solid var(--brand);background:#141414;color:var(--brand);
+  border-radius:12px;display:grid;place-items:center;font-weight:900;
+}
+.back-btn{
+  margin-top:auto;padding:12px;background:#141414;border:1px solid #282828;
+  color:#fff;border-radius:10px;text-align:center;text-decoration:none;font-weight:700;font-size:13px;
+}
+
+.main{margin-left:260px;width:calc(100% - 260px);padding:28px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.cards{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px;margin-bottom:24px;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.card h2{margin:6px 0 0;font-size:26px;}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:24px;}
+.panel h2{margin:0 0 16px;font-size:18px;}
+
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;}
+.form-group input, .form-group textarea{
+  width:100%;background:#171717;border:1px solid var(--border);color:#fff;
+  padding:10px 12px;border-radius:8px;font-size:13.5px;
+}
+.form-group textarea{resize:vertical;min-height:90px;}
+
+.submit-btn{
+  background:var(--brand);color:#000;font-weight:800;border:none;
+  padding:11px 20px;border-radius:8px;font-size:13.5px;
+}
+
+table{width:100%;border-collapse:collapse;text-align:left;font-size:13px;}
+th{padding:12px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;font-size:11px;}
+td{padding:12px;border-bottom:1px solid #1c1c1c;vertical-align:top;}
+
+.badge{padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700;}
+.badge.pending{background:rgba(255,122,0,0.2);color:var(--brand);}
+.badge.resolved{background:rgba(125,255,155,0.2);color:var(--green);}
+
+.action-btn{
+  background:#1c1c1c;border:1px solid var(--border);color:#fff;
+  padding:6px 10px;border-radius:6px;font-size:12px;margin-right:4px;
+}
+.action-btn.del{color:var(--red);}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">RC</div>
+      <div><strong>RADA CREST</strong><br><small style="color:var(--muted);">Help & Desk</small></div>
+    </div>
+    <a href="admin-dashboard.html" class="back-btn">⬅ Back to Dashboard</a>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>Help Desk & Topic Manager</h1>
+      <span style="color:var(--green);font-size:13px;">● Live Connected</span>
+    </div>
+
+    <div class="cards">
+      <div class="card"><small style="color:var(--muted);">Total Help Topics</small><h2 id="metricTopics">0</h2></div>
+      <div class="card"><small style="color:var(--muted);">Pending Customer Tickets</small><h2 id="metricTickets">0</h2></div>
+    </div>
+
+    <!-- ADD HELP TOPIC -->
+    <div class="panel">
+      <h2>➕ Add New Help Topic (Heading & Explanation)</h2>
+      <form id="addTopicForm">
+        <div class="form-group">
+          <label>Topic Heading / Problem Name</label>
+          <input type="text" id="tTitle" placeholder="e.g. Heavy Extension Board Sockets Not Working" required>
+        </div>
+        <div class="form-group">
+          <label>Explanation / Resolution Steps (Customer will read this)</label>
+          <textarea id="tExplanation" placeholder="Step 1: Check master switch indicator.&#10;Step 2: Plug in a simple charger..." required></textarea>
+        </div>
+        <button type="submit" class="submit-btn" id="saveTopicBtn">Save Help Topic</button>
+      </form>
+    </div>
+
+    <!-- TOPICS LIST -->
+    <div class="panel">
+      <h2>Configured Help Topics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Heading</th>
+            <th>Explanation Preview</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="topicsTableBody">
+          <tr><td colspan="4" style="text-align:center;color:var(--muted);">Loading topics...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- INCOMING TICKETS -->
+    <div class="panel">
+      <h2>📩 Customer Complaints / Requests Desk</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Issue Type</th>
+            <th>Order ID</th>
+            <th>Phone</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="ticketsTableBody">
+          <tr><td colspan="7" style="text-align:center;color:var(--muted);">Loading tickets...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadAll(){
+  // 1. Topics
+  const { data: topics } = await supabase.from('help_topics').select('*').order('id', { ascending: false });
+  document.getElementById('metricTopics').textContent = topics ? topics.length : 0;
+  
+  const tBody = document.getElementById('topicsTableBody');
+  if(topics && topics.length){
+    tBody.innerHTML = topics.map(t => `
+      <tr>
+        <td>#${t.id}</td>
+        <td><strong>${t.title}</strong></td>
+        <td style="max-width:300px;color:#a0a0ab;">${t.explanation.substring(0, 100)}...</td>
+        <td><button class="action-btn del" onclick="deleteTopic(${t.id})">Delete</button></td>
+      </tr>
+    `).join('');
+  } else {
+    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);">No topics added yet.</td></tr>`;
+  }
+
+  // 2. Tickets
+  const { data: tickets } = await supabase.from('help_tickets').select('*').order('id', { ascending: false });
+  const pendingCount = tickets ? tickets.filter(tk => tk.status === 'pending').length : 0;
+  document.getElementById('metricTickets').textContent = pendingCount;
+
+  const tkBody = document.getElementById('ticketsTableBody');
+  if(tickets && tickets.length){
+    tkBody.innerHTML = tickets.map(tk => `
+      <tr>
+        <td><small>${new Date(tk.created_at).toLocaleDateString()}</small></td>
+        <td><strong>${tk.issue_type}</strong></td>
+        <td><code>${tk.order_id || 'N/A'}</code></td>
+        <td><a href="tel:${tk.customer_phone}" style="color:var(--brand);">${tk.customer_phone}</a></td>
+        <td style="max-width:250px;">${tk.description}</td>
+        <td><span class="badge ${tk.status}">${tk.status}</span></td>
+        <td>
+          <a href="https://wa.me/91${tk.customer_phone.replace(/\D/g,'')}?text=Hello%20RADA%20CREST%20Support%20here" target="_blank" class="action-btn">WhatsApp</a>
+          ${tk.status === 'pending' ? `<button class="action-btn" onclick="resolveTicket(${tk.id})">Resolve</button>` : ''}
+        </td>
+      </tr>
+    `).join('');
+  } else {
+    tkBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);">No requests received yet.</td></tr>`;
+  }
+}
+
+// ADD TOPIC
+document.getElementById('addTopicForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('saveTopicBtn');
+  btn.disabled = true;
+
+  try {
+    const { error } = await supabase.from('help_topics').insert([{
+      title: document.getElementById('tTitle').value.trim(),
+      explanation: document.getElementById('tExplanation').value.trim()
+    }]);
+    if(error) throw error;
+    document.getElementById('addTopicForm').reset();
+    loadAll();
+  } catch(err){
+    alert('Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+window.deleteTopic = async (id) => {
+  if(!confirm("Is topic ko delete karein?")) return;
+  await supabase.from('help_topics').delete().eq('id', id);
+  loadAll();
+};
+
+window.resolveTicket = async (id) => {
+  await supabase.from('help_tickets').update({ status: 'resolved' }).eq('id', id);
+  loadAll();
+};
+
+loadAll();
+</script>
+
+</body>
+</html>
