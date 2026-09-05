@@ -35,7 +35,6 @@ body{
   padding-bottom:60px;
 }
 
-/* Premium Background Glow Animation */
 .ambient-glow{
   position:fixed;
   width:450px;height:450px;
@@ -44,11 +43,6 @@ body{
   transform:translateX(-50%);
   z-index:0;
   pointer-events:none;
-  animation: pulseGlow 6s ease-in-out infinite alternate;
-}
-@keyframes pulseGlow {
-  0%{transform:translateX(-50%) scale(1);opacity:0.8;}
-  100%{transform:translateX(-50%) scale(1.15);opacity:1;}
 }
 
 .header{
@@ -75,14 +69,12 @@ body{
 
 .container{max-width:680px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
 
-.hero{text-align:center;margin-bottom:24px;animation: fadeInDown 0.6s ease;}
-@keyframes fadeInDown {from{opacity:0;transform:translateY(-15px);}to{opacity:1;transform:translateY(0);}}
+.hero{text-align:center;margin-bottom:24px;}
 .hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
 .hero p{font-size:13.5px;color:var(--text-muted);}
 
 .wishlist-grid{display:grid;gap:16px;}
 
-/* Ultra Smooth Unique Card Animation & Hover Glow */
 .wish-card{
   background:var(--panel-card);
   backdrop-filter:blur(16px);
@@ -91,7 +83,6 @@ body{
   padding:18px;
   display:flex;gap:16px;align-items:center;
   position:relative;
-  animation: fadeSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .wish-card:hover{
@@ -99,12 +90,13 @@ body{
   box-shadow:0 10px 35px rgba(255, 122, 0, 0.15);
   transform:translateY(-3px);
 }
-@keyframes fadeSlideIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
+.wish-img-link{flex-shrink:0;}
 .wish-img{
   width:90px;height:90px;border-radius:14px;background:#131318;
-  object-fit:cover;border:1px solid var(--border);flex-shrink:0;
+  object-fit:cover;border:1px solid var(--border);
   transition:transform 0.3s ease;
+  display:block;
 }
 .wish-card:hover .wish-img{transform:scale(1.05);}
 
@@ -115,7 +107,12 @@ body{
   color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;
   border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;
 }
-.wish-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;}
+.wish-title{
+  font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;
+  text-decoration:none;display:block;transition:0.2s;
+}
+.wish-title:hover{color:var(--brand);}
+
 .price-box{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .old-price{font-size:13px;color:var(--text-muted);text-decoration:line-through;}
 .new-price{font-size:16px;font-weight:800;color:var(--brand);}
@@ -127,21 +124,16 @@ body{
   cursor:pointer;text-decoration:none;box-shadow:0 4px 15px var(--brand-glow);
   transition:all 0.25s ease;display:inline-flex;align-items:center;gap:6px;
 }
-.action-btn:hover{transform:scale(1.03);opacity:0.95;box-shadow:0 6px 20px rgba(255,122,0,0.4);}
+.action-btn:hover{transform:scale(1.03);opacity:0.95;}
 .remove-btn{
   background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.3);
   font-weight:700;padding:9px 14px;border-radius:12px;font-size:12.5px;cursor:pointer;
   transition:all 0.25s ease;
 }
-.remove-btn:hover{background:rgba(248,113,113,0.25);transform:scale(1.03);}
+.remove-btn:hover{background:rgba(248,113,113,0.25);}
 
-.empty-state{
-  text-align:center;padding:60px 20px;color:var(--text-muted);
-  animation: fadeIn 0.5s ease;
-}
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.empty-state span{font-size:48px;display:block;margin-bottom:14px;animation: bounce 2s infinite;}
-@keyframes bounce{0%, 100%{transform:translateY(0);} 50%{transform:translateY(-8px);}}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-state span{font-size:48px;display:block;margin-bottom:14px;}
 .empty-state h3{font-size:18px;color:#fff;margin-bottom:6px;}
 </style>
 </head>
@@ -176,6 +168,23 @@ body{
 </div>
 
 <script>
+function getActiveUserSuffix() {
+    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+    if (user) {
+        const uid = user.email || user.phone || user.id;
+        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
+    }
+    return 'guest_user';
+}
+
+function getUserKeys() {
+    const suffix = getActiveUserSuffix();
+    return {
+        selectedKey: `rc_selected_address_${suffix}`,
+        activeKey: `rc_address_${suffix}`
+    };
+}
+
 function loadWishlist(){
   const container = document.getElementById('wishlistContainer');
   let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
@@ -197,19 +206,23 @@ function loadWishlist(){
   container.innerHTML = wishlist.map((item, index) => {
     const originalPrice = parseFloat(item.price) || 500;
     const discountedPrice = Math.round(originalPrice * (1 - discountPercent / 100));
+    // Product page link (agar item me id ya link hai toh wo use karega, nahi toh default product.html)
+    const productLink = item.link || item.url || `product.html?name=${encodeURIComponent(item.name || '')}`;
 
     return `
-      <div class="wish-card" id="wish-item-${index}" style="animation-delay: ${index * 0.08}s;">
-        <img src="${item.image || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
+      <div class="wish-card" id="wish-item-${index}">
+        <a href="${productLink}" class="wish-img-link">
+          <img src="${item.image || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
+        </a>
         <div class="wish-info">
           <div class="discount-badge">🔥 Wishlist Special: ${discountPercent}% OFF</div>
-          <div class="wish-title">${item.name || 'RADA CREST LED Bulb'}</div>
+          <a href="${productLink}" class="wish-title">${item.name || 'RADA CREST LED Bulb'}</a>
           <div class="price-box">
             <span class="old-price">₹${originalPrice}</span>
             <span class="new-price">₹${discountedPrice}</span>
           </div>
           <div class="wish-actions">
-            <button class="action-btn" onclick="moveToCheckout('${item.name}', ${discountedPrice})">⚡ Buy at ₹${discountedPrice}</button>
+            <button class="action-btn" onclick="proceedToBuy('${item.name}', ${discountedPrice}, '${item.image || ''}')">⚡ Buy Now</button>
             <button class="remove-btn" onclick="removeItem(${index})">✕ Remove</button>
           </div>
         </div>
@@ -220,27 +233,26 @@ function loadWishlist(){
 
 window.removeItem = function(index){
   let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
-  const card = document.getElementById(`wish-item-${index}`);
-  if(card){
-    card.style.transform = 'scale(0.9)';
-    card.style.opacity = '0';
-    card.style.transition = 'all 0.3s ease';
-    setTimeout(() => {
-      wishlist.splice(index, 1);
-      localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
-      loadWishlist();
-    }, 300);
-  } else {
-    wishlist.splice(index, 1);
-    localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
-    loadWishlist();
-  }
+  wishlist.splice(index, 1);
+  localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
+  loadWishlist();
 };
 
-window.moveToCheckout = function(name, finalPrice){
-  localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice }));
-  // SMART RETURN FLOW: Address select hone ke baad seedha wishlist par wapas aayega
-  window.location.href = 'addresses.html?return=wishlist.html';
+window.proceedToBuy = function(name, finalPrice, image){
+  // Checkout item save kar rahe hain
+  localStorage.setItem('rc_checkout_item', JSON.stringify({ name: name, price: finalPrice, image: image }));
+  
+  // Check karenge ki user ka koi address already selected hai ya nahi
+  const keys = getUserKeys();
+  const selectedAddr = localStorage.getItem(keys.selectedKey) || localStorage.getItem(keys.activeKey);
+
+  if (selectedAddr) {
+    // Agar address pehle se hai, toh seedha buy.html par chale jayenge
+    window.location.href = 'buy.html';
+  } else {
+    // Agar address nahi hai, toh address.html par bhejenge aur wapas buy.html par lane ke liye return set karenge
+    window.location.href = 'addresses.html?return=buy.html';
+  }
 };
 
 document.addEventListener('DOMContentLoaded', loadWishlist);
