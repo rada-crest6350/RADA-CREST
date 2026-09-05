@@ -283,7 +283,7 @@ body{
 
   <!-- AUTOMATED SEARCH -->
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apni problem likhein (e.g. bulb jal nahi raha, refund check, return)..." onkeydown="if(event.key==='Enter') analyzeProblem()">
+    <input type="text" id="helpInput" placeholder="Apni problem likhein (e.g. item kaam nahi kar raha, board check, refund)..." onkeydown="if(event.key==='Enter') analyzeProblem()">
     <button class="search-action-btn" onclick="analyzeProblem()">🔍 Solve</button>
   </div>
 
@@ -341,41 +341,41 @@ body{
     </div>
   </div>
 
-  <!-- B. Replace Issue -->
+  <!-- B. Replace Issue (UNIVERSAL ELECTRICAL & ELECTRONIC TESTING) -->
   <div class="acc-item" id="acc-replace">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">🔄</div>
-        <div><h3>Product Replace Kaise Karein? (Kharab / Damage)</h3><small>Testing steps & 7-day replacement</small></div>
+        <div><h3>Product Replace Kaise Karein? (Kharab / Damage Check)</h3><small>Testing guide & 7-day free replacement</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Agar LED bulb nahi jal raha ya sensor kaam nahi kar raha, toh replacement lene se pehle yeh 2 test zaroor karein:</p>
+        <p>Agar deliver hua koi bhi electrical ya electronic item kaam nahi kar raha, toh replacement request daalne se pehle yeh basic checks zaroor karein:</p>
         
         <div class="solve-step">
-          <strong>1. Holder & Wiring Check</strong>
-          Bulb ko ghar ke kisi doosre holder me laga kar check karein taaki holder ki loose wiring verify ho sake.
+          <strong>1. Lighting / Bulbs Check</strong>
+          Bulb ya tube ko kisi doosre holder/room me laga kar check karein taaki holder ki loose wiring verify ho sake. Agar motion sensor bulb hai, toh daylight me sensor band rehta hai—use andhere me test karein.
         </div>
         <div class="solve-step">
-          <strong>2. Radar Motion Light Test</strong>
-          Radar motion bulb daylight me auto-off rehta hai. Isko andhere kamre me movement karke test karein.
+          <strong>2. Extension Boards, Plugs & Sockets Check</strong>
+          Extension board ko main wall switch par lagayein, Master Switch/Indicator on karein, aur kisi simple device (jaise mobile charger) se har socket alag-alag test karein.
         </div>
         <div class="solve-step">
-          <strong>3. 7 Days Free Replacement</strong>
-          Delivery ke 7 dino ke andar defective/damaged piece par 100% free replacement milta hai.
+          <strong>3. Physical Damage Inspection</strong>
+          Agar box kholne par product break/damage ya wire kata hua mila hai, toh delivery ke 7 dino ke andar 100% Free Replacement milta hai. Delivery boy naya piece dekar purana pickup karega.
         </div>
 
         <div class="fallback-box">
-          <p>Bulb check karne ke baad bhi nahi chala aur replace karwana hai?</p>
+          <p>Product check karne ke baad bhi bilkul kaam nahi kar raha aur replace karwana hai?</p>
           <button class="open-ticket-link" onclick="toggleTicketForm('form-replace')">🔄 Request Replacement From Admin</button>
           
           <form class="ticket-form" id="form-replace" onsubmit="submitTicket(event, 'Replace Request')">
             <h4>Request Replacement to Admin:</h4>
             <div class="form-field"><input type="text" placeholder="Order ID" required></div>
             <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-            <div class="form-field"><textarea placeholder="Bulb me kya dikkat hai (flicker ho raha hai, bilkul dead hai)?" required></textarea></div>
+            <div class="form-field"><textarea placeholder="Item ka naam aur usme kya dikkat aa rahi hai (damage hai ya power nahi le raha)?" required></textarea></div>
             <button type="submit" class="submit-btn">Submit Replacement Request ➔</button>
           </form>
         </div>
@@ -430,17 +430,17 @@ body{
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">⚠️</div>
-        <div><h3>Galat Product Deliver Ho Gaya?</h3><small>Wrong wattage / item resolution</small></div>
+        <div><h3>Galat Product Deliver Ho Gaya?</h3><small>Wrong item / model resolution</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Agar box ke andar alag wattage (jaise 9W ki jagah kuch aur) ya dusra item nikal gaya hai:</p>
+        <p>Agar parcel box ke andar ordered item ki jagah koi dusra model ya item nikal gaya hai:</p>
         
         <div class="solve-step">
           <strong>1. Box Label & Bill Match</strong>
-          Box par laga shipping label aur bill check karein ki kya ordered item se match karta hai.
+          Box par laga shipping label aur invoice check karein ki kya ordered item se match karta hai.
         </div>
         <div class="solve-step">
           <strong>2. 100% Free Exchange</strong>
@@ -455,7 +455,7 @@ body{
             <h4>Report Wrong Item:</h4>
             <div class="form-field"><input type="text" placeholder="Order ID" required></div>
             <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-            <div class="form-field"><textarea placeholder="Aapko kya deliver hua aur kya order tha?" required></textarea></div>
+            <div class="form-field"><textarea placeholder="Aapko kya deliver hua aur aapka order kya tha?" required></textarea></div>
             <button type="submit" class="submit-btn">Submit Report ➔</button>
           </form>
         </div>
@@ -480,7 +480,7 @@ body{
           <div class="guide-badge">1</div>
           <div class="guide-text">
             <strong>Product Select Karein</strong>
-            Website par jakar apna bulb (Radar Motion LED ya Normal Bulb) select karein aur <em>Buy Now</em> dabayein.
+            Website par jakar apna pasandeeda product (LED Lighting, Extension Board, ya koi bhi electronic accessory) chunein aur <em>Buy Now</em> dabayein.
           </div>
         </div>
         <div class="guide-step">
@@ -539,7 +539,7 @@ const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// SMART PROBLEM RESOLUTION ANALYZER
+// SMART PROBLEM RESOLUTION ANALYZER (UNIVERSAL PRODUCTS)
 window.analyzeProblem = function(){
   const q = document.getElementById('helpInput').value.trim().toLowerCase();
   if(!q) return;
@@ -548,11 +548,12 @@ window.analyzeProblem = function(){
   const body = document.getElementById('smartSolText');
   card.style.display = 'block';
 
-  if(q.includes('bulb') || q.includes('chalta') || q.includes('jal') || q.includes('kharab') || q.includes('damage') || q.includes('replace')){
-    body.innerHTML = `<strong>💡 Bulb Testing Guidance:</strong><br>
-    1. Bulb ko pehle kisi doosre holder me test karein.<br>
-    2. Radar sensor bulb daylight me band rehta hai, andhere me check karein.<br>
-    3. Agar phir bhi nahi chala, toh 7 din ki free replacement ke liye niche diye gaye <strong>Replace Guide</strong> par click karein.`;
+  // Electrical / Electronic Items Testing
+  if(q.includes('bulb') || q.includes('board') || q.includes('switch') || q.includes('chalta') || q.includes('jal') || q.includes('kharab') || q.includes('damage') || q.includes('replace') || q.includes('power') || q.includes('socket')){
+    body.innerHTML = `<strong>⚡ Product Testing & Replacement Guidance:</strong><br>
+    1. <strong>Bulb/Lighting:</strong> Kisi doosre holder me check karein. Sensor model hai toh andhere me test karein.<br>
+    2. <strong>Extension Boards:</strong> Master switch on karein aur kisi simple charger se sockets test karein.<br>
+    3. Agar phir bhi product defective ya damage hai, toh 7 din ki free replacement ke liye niche diye gaye <strong>Replace Guide</strong> par click karein.`;
     scrollToAcc('acc-replace');
   } else if(q.includes('refund') || q.includes('paisa') || q.includes('money') || q.includes('kat gaya')){
     body.innerHTML = `<strong>💰 Refund Guidance:</strong><br>
