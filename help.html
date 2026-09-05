@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>24x7 Help Center & Auto Resolutions — RADA CREST</title>
+<title>24x7 Help Center & Resolutions — RADA CREST</title>
 
-<!-- Fonts -->
+<!-- Google Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -212,7 +212,7 @@ body{
   margin-bottom:14px;
 }
 
-/* ACCORDIONS */
+/* CATEGORY HEADINGS */
 .cat-heading{
   font-size:12px;
   font-weight:800;
@@ -221,6 +221,8 @@ body{
   letter-spacing:1.2px;
   margin:24px 4px 12px;
 }
+
+/* ACCORDIONS (CARDS) */
 .acc-item{
   background:var(--panel-card);
   backdrop-filter:blur(16px);
@@ -286,7 +288,68 @@ body{
   border:none;padding:12px;border-radius:10px;font-size:13.5px;cursor:pointer;
 }
 
-/* MODAL */
+/* SHOPPING STEP GUIDES */
+.guide-step{
+  display:flex;
+  gap:14px;
+  margin-bottom:14px;
+}
+.guide-badge{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:var(--brand-glow);
+  border:1px solid var(--brand);
+  color:var(--brand);
+  font-weight:800;
+  font-size:12px;
+  display:grid;
+  place-items:center;
+  flex-shrink:0;
+}
+.guide-text strong{color:#fff;display:block;margin-bottom:2px;}
+.guide-text{font-size:13px;color:var(--text-muted);}
+
+/* LIVE WHATSAPP BAR */
+.support-card{
+  background:linear-gradient(135deg, #092015 0%, #0d1218 100%);
+  border:1px solid rgba(37,211,102,0.3);
+  border-radius:18px;
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:24px;
+  gap:12px;
+}
+.support-card h4{font-size:14px;font-weight:700;color:#fff;}
+.support-card p{font-size:12px;color:#7ee4a7;margin-top:2px;}
+.wa-link{
+  background:#25D366;
+  color:#000;
+  font-weight:800;
+  text-decoration:none;
+  font-size:12.5px;
+  padding:10px 16px;
+  border-radius:10px;
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  box-shadow:0 4px 14px rgba(37,211,102,0.3);
+}
+
+/* TERMS LINK */
+.terms-card{
+  background:var(--panel-card);border:1px solid var(--border);
+  border-radius:16px;padding:16px 20px;display:flex;align-items:center;
+  justify-content:space-between;text-decoration:none;color:#fff;margin-top:14px;
+  transition:0.25s;
+}
+.terms-card:hover{border-color:var(--brand);background:rgba(255,255,255,0.04);}
+.terms-arrow{color:var(--brand);font-weight:800;font-size:16px;}
+
+/* SUCCESS MODAL */
 .modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
   display:none;place-items:center;padding:20px;z-index:999;
@@ -299,19 +362,13 @@ body{
   background:var(--brand);color:#000;font-weight:800;border:none;
   padding:12px 24px;border-radius:12px;cursor:pointer;width:100%;margin-top:16px;
 }
-
-/* TERMS */
-.terms-card{
-  background:var(--panel-card);border:1px solid var(--border);
-  border-radius:16px;padding:16px 20px;display:flex;align-items:center;
-  justify-content:space-between;text-decoration:none;color:#fff;margin-top:20px;
-}
 </style>
 </head>
 <body>
 
 <div class="ambient-glow-1"></div>
 
+<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <a href="index.html" class="back-btn">←</a>
@@ -324,12 +381,13 @@ body{
 
 <div class="container">
 
+  <!-- HERO -->
   <div class="hero">
     <div class="hero-badge">⚡ Instant Automated Resolution</div>
     <h2>Hum Aapki Kya Madad Kar Sakte Hain?</h2>
   </div>
 
-  <!-- AUTOMATED SEARCH -->
+  <!-- AUTOMATED SEARCH BOX -->
   <div class="smart-search-box">
     <input type="text" id="helpInput" placeholder="Apni problem likhein (e.g. bulb kharab hai, refund kab aayega, replace)..." onkeydown="if(event.key==='Enter') runSmartAnalysis()">
     <button class="search-action-btn" onclick="runSmartAnalysis()">🔍 Analyze</button>
@@ -345,72 +403,72 @@ body{
     <div id="smartActionBox"></div>
   </div>
 
-  <!-- ORDER ISSUES -->
+  <!-- 1. ORDER RELATED ISSUES -->
   <div class="cat-heading">📦 Order & Product Problems</div>
 
-  <!-- Refund -->
+  <!-- Refund Issue -->
   <div class="acc-item" id="acc-refund">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">💰</div>
-        <div><h3>Refund nahi mila / Pending</h3><small>Bank account transfer details</small></div>
+        <div><h3>Refund nahi mila / Pending</h3><small>Cancelled ya Returned item ka refund</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Return ya Cancelled order ka refund 24 se 48 ghante ke andar aapke account me bhej diya jata hai.</p>
+        <p>Order cancel ya return hone ke baad refund amount <strong>24 se 48 ghante</strong> ke andar aapke original bank/UPI account me bhej diya jata hai.</p>
         <form class="ticket-form" onsubmit="submitTicket(event, 'Refund Issue')">
           <h4>Raise Refund Ticket to Admin</h4>
           <div class="form-field"><input type="text" placeholder="Order ID (e.g. RC-102)" required></div>
-          <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Refund ki problem likhein..." required></textarea></div>
+          <div class="form-field"><input type="tel" placeholder="Aapka Mobile Number" required></div>
+          <div class="form-field"><textarea placeholder="Apni refund se judi samasya likhein..." required></textarea></div>
           <button type="submit" class="submit-btn">Send to Admin Desk ➔</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Replace -->
+  <!-- Replace Issue -->
   <div class="acc-item" id="acc-replace">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">🔄</div>
-        <div><h3>Product Replace kaise karein?</h3><small>Damage ya defective item replacement</small></div>
+        <div><h3>Product Replace kaise karein?</h3><small>Damage ya defective LED replacement</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Defective ya damaged bulb delivery ke 7 dino ke andar 100% free replace kar diya jata hai.</p>
+        <p>Agar aapko koi kharab ya toota hua product mila hai, toh delivery ke <strong>7 dino ke andar</strong> 100% Free Replacement milta hai.</p>
         <form class="ticket-form" onsubmit="submitTicket(event, 'Replace Request')">
-          <h4>Request Replacement</h4>
+          <h4>Request Replacement to Admin</h4>
           <div class="form-field"><input type="text" placeholder="Order ID" required></div>
-          <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Product me kya dikkat aa rahi hai?" required></textarea></div>
-          <button type="submit" class="submit-btn">Submit Replacement ➔</button>
+          <div class="form-field"><input type="tel" placeholder="Aapka Mobile Number" required></div>
+          <div class="form-field"><textarea placeholder="Product me kya dikkat aa rahi hai (bulb jal nahi raha ya damaged hai)?" required></textarea></div>
+          <button type="submit" class="submit-btn">Send Replacement Request ➔</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Return -->
+  <!-- Return Issue -->
   <div class="acc-item" id="acc-return">
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">📦</div>
-        <div><h3>Order Return kaise karein?</h3><small>Pickup process aur policy</small></div>
+        <div><h3>Order Return kaise karein?</h3><small>Pickup aur return policy help</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Aap apne 'Orders' page par jakar bhi Return Request daal sakte hain. Agar wahan dikkat ho toh yahan form bharein:</p>
+        <p>Aap apne <strong>Orders</strong> page se bhi Return request daal sakte hain. Agar wahan dikkat aa rahi hai toh yahan se direct request raise karein:</p>
         <form class="ticket-form" onsubmit="submitTicket(event, 'Return Request')">
           <h4>Submit Return Request</h4>
           <div class="form-field"><input type="text" placeholder="Order ID" required></div>
           <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Return ka reason batayein..." required></textarea></div>
+          <div class="form-field"><textarea placeholder="Aap order return kyu karna chahte hain?" required></textarea></div>
           <button type="submit" class="submit-btn">Send Return Request ➔</button>
         </form>
       </div>
@@ -422,37 +480,89 @@ body{
     <div class="acc-trigger" onclick="toggleAcc(this)">
       <div class="acc-trigger-left">
         <div class="icon-box">⚠️</div>
-        <div><h3>Galat Product mila hai?</h3><small>Different wattage ya alag model deliver hua</small></div>
+        <div><h3>Galat Product deliver ho gaya?</h3><small>Dusra item ya different wattage deliver hua</small></div>
       </div>
       <div class="chevron">▼</div>
     </div>
     <div class="acc-body">
       <div class="acc-content">
-        <p>Hume khed hai! Agar aapko galat product mil gaya hai, toh hum turant sahi item dispatch karwayenge.</p>
+        <p>Hume khed hai! Agar galti se galat item deliver ho gaya hai toh admin team 2 ghante me aapse contact karke sahi item dispatch karwayegi.</p>
         <form class="ticket-form" onsubmit="submitTicket(event, 'Wrong Product Delivered')">
-          <h4>Report Wrong Product</h4>
+          <h4>Report Wrong Product to Admin</h4>
           <div class="form-field"><input type="text" placeholder="Order ID" required></div>
           <div class="form-field"><input type="tel" placeholder="Mobile Number" required></div>
-          <div class="form-field"><textarea placeholder="Aapko kya deliver hua aur kya order tha?" required></textarea></div>
-          <button type="submit" class="submit-btn">Report to Admin Desk ➔</button>
+          <div class="form-field"><textarea placeholder="Aapne kya order kiya tha aur box me kya nikla?" required></textarea></div>
+          <button type="submit" class="submit-btn">Send Report Now ➔</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Terms -->
+  <!-- 2. SHOPPING GUIDANCE -->
+  <div class="cat-heading">📱 Shopping & Website Guidance</div>
+
+  <div class="acc-item" id="acc-shopping">
+    <div class="acc-trigger" onclick="toggleAcc(this)">
+      <div class="acc-trigger-left">
+        <div class="icon-box">💡</div>
+        <div><h3>Website par Order kaise karein?</h3><small>Step-by-step complete purchasing guide</small></div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="acc-content">
+        <div class="guide-step">
+          <div class="guide-badge">1</div>
+          <div class="guide-text">
+            <strong>Product Select Karein</strong>
+            Store par jakar apna bulb (jaise Radar Bulb, Emergency LED) select karein aur <em>Buy Now</em> dabayein.
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-badge">2</div>
+          <div class="guide-text">
+            <strong>Address Fill Karein</strong>
+            Apna poora delivery address, landmark aur mobile number dhyan se bharein.
+          </div>
+        </div>
+        <div class="guide-step">
+          <div class="guide-badge">3</div>
+          <div class="guide-text">
+            <strong>Payment & Confirm</strong>
+            Online UPI ya Cash on Delivery (COD) select karein aur order successfully book ho jayega.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE WHATSAPP BAR -->
+  <div class="support-card">
+    <div>
+      <h4>Live WhatsApp Desk</h4>
+      <p>Direct support team se message par baat karein</p>
+    </div>
+    <a href="https://wa.me/919509204090?text=Hello%20RADA%20CREST,%20mujhe%20support%20chahiye." target="_blank" class="wa-link">
+      <span>💬</span> WhatsApp Now
+    </a>
+  </div>
+
+  <!-- TERMS AND CONDITIONS BUTTON -->
   <a href="terms.html" class="terms-card">
-    <div><strong>Terms & Policies</strong><small>Warranty aur service policy dekhein</small></div>
-    <div style="color:var(--brand)">➔</div>
+    <div>
+      <strong>Terms & Conditions</strong>
+      <small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Hamari warranty, replacement aur shopping terms padhein</small>
+    </div>
+    <div class="terms-arrow">➔</div>
   </a>
 
 </div>
 
-<!-- SUCCESS MODAL -->
+<!-- SUCCESS MODAL POPUP -->
 <div id="successModal" class="modal-overlay">
   <div class="modal-box">
-    <h3 style="color:#fff;margin-bottom:8px;">Complaint Sent!</h3>
-    <p style="color:var(--text-muted);font-size:13px;">Aapki complaint seedha Admin Desk par notification bankar chali gayi hai. Hum jald resolve karenge.</p>
+    <h3 style="color:#fff;margin-bottom:8px;font-size:20px;">Ticket Sent Successfully!</h3>
+    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapki complaint seedha Admin Desk par pahunch gayi hai. Hamari team jald resolve karegi.</p>
     <button class="modal-close-btn" onclick="document.getElementById('successModal').style.display='none'">Theek Hai</button>
   </div>
 </div>
@@ -464,7 +574,7 @@ const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 const SUPABASE_KEY = "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// SMART NLP AUTOMATED SEARCH ENGINE (NO API KEY NEEDED)
+// SMART NLP AUTOMATED SEARCH ENGINE
 window.runSmartAnalysis = function(){
   const query = document.getElementById('helpInput').value.trim().toLowerCase();
   if(!query) return;
@@ -507,7 +617,7 @@ window.runSmartAnalysis = function(){
     1. Home/Product page par jakar apna bulb chunein.<br>
     2. 'Buy Now' par click karein.<br>
     3. Delivery Address bharein aur Cash on Delivery ya Online payment chunein.`;
-    actionBox.innerHTML = `<a href="index.html" class="submit-btn" style="text-decoration:none;text-align:center;">🛒 Go to Products Store</a>`;
+    actionBox.innerHTML = `<button class="submit-btn" onclick="scrollToSection('acc-shopping')">📖 Read Full Ordering Guide</button>`;
   }
   // Default general
   else {
@@ -534,7 +644,7 @@ window.toggleAcc = function(el){
   if(!isOpen) item.classList.add('active');
 };
 
-// SUBMIT TICKET TO SUPABASE (DIRECT NOTIFICATION FOR ADMIN)
+// SUBMIT TICKET TO SUPABASE
 window.submitTicket = async function(e, type){
   e.preventDefault();
   const form = e.target;
