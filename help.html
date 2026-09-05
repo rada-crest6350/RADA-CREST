@@ -73,7 +73,6 @@ body{
   box-shadow:0 0 8px var(--green);
 }
 
-/* TRACK STATUS BADGE IN HEADER CORNER */
 .track-pill-btn{
   background:rgba(255, 122, 0, 0.12);
   border:1px solid var(--brand);
@@ -119,16 +118,25 @@ body{
   cursor:pointer;
 }
 
+/* SMART FRIENDLY RESOLUTION CARD */
 #smartSolutionCard{
   display:none;
-  background:linear-gradient(145deg, rgba(28, 20, 15, 0.95) 0%, rgba(18, 18, 24, 0.95) 100%);
+  background:linear-gradient(145deg, rgba(28, 20, 15, 0.98) 0%, rgba(18, 18, 24, 0.98) 100%);
   border:1.5px solid var(--brand);
-  border-radius:20px;padding:20px;margin-bottom:28px;
+  border-radius:20px;padding:22px;margin-bottom:28px;
   box-shadow:0 10px 30px rgba(0,0,0,0.6), 0 0 25px rgba(255,122,0,0.25);
+  animation:fadeSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
-.sol-badge{font-size:12px;color:var(--brand);font-weight:800;}
-.sol-body{font-size:13.5px;line-height:1.7;color:#f0f0f5;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.sol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:10px;}
+.sol-badge{font-size:12px;color:var(--brand);font-weight:800;display:flex;align-items:center;gap:6px;}
+.sol-body{font-size:14px;line-height:1.75;color:#f0f0f5;}
+.sol-action-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--brand-gradient);color:#000;font-weight:800;
+  padding:10px 18px;border-radius:10px;text-decoration:none;font-size:13px;
+  margin-top:14px;box-shadow:0 4px 14px var(--brand-glow);
+}
 
 .cat-heading{
   font-size:12px;font-weight:800;color:var(--brand);
@@ -137,7 +145,6 @@ body{
 
 .acc-item{
   background:var(--panel-card);backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
   border:1px solid var(--border);border-radius:18px;
   margin-bottom:12px;overflow:hidden;transition:0.3s;
 }
@@ -184,7 +191,7 @@ body{
   border:none;padding:12px;border-radius:10px;font-size:13px;cursor:pointer;
 }
 
-/* STATUS TRACKER MODAL */
+/* TRACKER MODAL */
 .modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
@@ -199,23 +206,13 @@ body{
 .modal-close{cursor:pointer;color:var(--text-muted);font-size:18px;}
 
 .auto-identity-box{
-  background:rgba(255,255,255,0.03);
-  border:1px solid #24242c;
-  padding:10px 14px;
-  border-radius:12px;
-  margin-bottom:14px;
-  font-size:12px;
-  color:#a1a1aa;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  background:rgba(255,255,255,0.03);border:1px solid #24242c;
+  padding:10px 14px;border-radius:12px;margin-bottom:14px;font-size:12px;
+  color:#a1a1aa;display:flex;align-items:center;justify-content:space-between;
 }
 .auto-identity-box strong{color:#fff;}
 
-.ticket-status-card{
-  background:#1a1a22;border:1px solid #2a2a36;border-radius:14px;
-  padding:14px;margin-bottom:12px;
-}
+.ticket-status-card{background:#1a1a22;border:1px solid #2a2a36;border-radius:14px;padding:14px;margin-bottom:12px;}
 .status-pill{
   display:inline-block;padding:3px 8px;border-radius:6px;
   font-size:11px;font-weight:800;text-transform:uppercase;margin-bottom:8px;
@@ -240,10 +237,9 @@ body{
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
       <h1>Help & Resolutions</h1>
-      <span>Support Desk Active</span>
+      <span>Smart Support Active</span>
     </div>
   </div>
-  <!-- TOP RIGHT TRACKER BADGE (NOW FULLY AUTOMATED) -->
   <button class="track-pill-btn" onclick="openAutoTrackerModal()">
     <span>🔔</span> Track My Requests
   </button>
@@ -256,24 +252,29 @@ body{
     <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
   </div>
 
+  <!-- AUTO SEARCH BAR -->
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apni dikkat yahan likhein..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
+    <input type="text" id="helpInput" placeholder="Bataiye kya help chahiye (e.g. order kaise kare, return, bulb nahi chal raha)..." onkeydown="if(event.key==='Enter') runAutoAnalysis()">
     <button class="search-action-btn" onclick="runAutoAnalysis()">🔍 Analyze</button>
   </div>
 
+  <!-- FRIENDLY AUTO-GUIDE CARD (ANALYSIS OUTPUT) -->
   <div id="smartSolutionCard">
     <div class="sol-head">
-      <span class="sol-badge">⚡ Auto Matched Solution</span>
+      <span class="sol-badge">🤝 RADA CREST Personal Guide</span>
       <span style="font-size:12px;color:var(--text-muted);cursor:pointer;" onclick="document.getElementById('smartSolutionCard').style.display='none'">✕ Band Karein</span>
     </div>
     <div class="sol-body" id="smartSolText"></div>
   </div>
 
   <div class="cat-heading">📋 Solutions & Troubleshooting</div>
+  
+  <!-- DYNAMIC TOPICS LIST (ADMIN + PRE-BUILT ESSENTIALS) -->
   <div id="dynamicTopicsContainer">
     <div style="color:var(--text-muted);text-align:center;padding:30px;">Loading resolutions...</div>
   </div>
 
+  <!-- TERMS AND CONDITIONS -->
   <a href="terms.html" style="display:flex;justify-content:space-between;align-items:center;background:var(--panel-card);border:1px solid var(--border);border-radius:16px;padding:16px 20px;text-decoration:none;color:#fff;margin-top:24px;">
     <div><strong>Terms & Policies</strong><small style="color:var(--text-muted);display:block;font-size:12px;margin-top:2px;">Service, return aur warranty terms padhein</small></div>
     <div style="color:var(--brand);font-weight:bold;">➔</div>
@@ -281,20 +282,16 @@ body{
 
 </div>
 
-<!-- AUTOMATED STATUS TRACKER MODAL (NO MANUAL NUMBER INPUT NEEDED) -->
+<!-- AUTOMATED STATUS TRACKER MODAL -->
 <div id="trackerModal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-head">
       <h3>Live Requests & Status</h3>
       <span class="modal-close" onclick="closeTrackerModal()">✕</span>
     </div>
-    
-    <!-- AUTOMATIC IDENTITY DETECTOR -->
     <div class="auto-identity-box" id="identityDetectedBox">
       <span>Auto Analyzing Customer Identity...</span>
     </div>
-
-    <!-- LIVE STATUS LIST FETCHED AUTOMATICALLY -->
     <div id="trackResultList" style="max-height:350px;overflow-y:auto;">
       <p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Fetching your past requests...</p>
     </div>
@@ -305,7 +302,7 @@ body{
 <div id="successModal" class="modal-overlay">
   <div class="modal-box" style="text-align:center;">
     <h3 style="color:#fff;margin-bottom:8px;">Request Sent to Admin Desk!</h3>
-    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID hai: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track My Requests'</strong> se kabhi bhi live status dekh sakte hain.</p>
+    <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Aapka Ticket ID: <strong id="createdTicketId" style="color:var(--brand);">#0</strong><br>Aap upar <strong>'Track My Requests'</strong> se live status dekh sakte hain.</p>
     <button class="submit-btn" style="margin-top:16px;" onclick="document.getElementById('successModal').style.display='none'">Theek Hai</button>
   </div>
 </div>
@@ -320,37 +317,24 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 let liveTopics = [];
 let detectedUser = { phone: '', email: '', id: '' };
 
-// 1. AUTOMATICALLY DETECT / ANALYZE USER IDENTITY ON LOAD
+// 1. AUTO DETECT CUSTOMER
 async function autoDetectUser(){
   try {
-    // Check Supabase session
     const { data: { user } } = await supabase.auth.getUser();
     if(user){
       detectedUser.email = user.email || '';
       detectedUser.phone = user.phone || user.user_metadata?.phone || '';
       detectedUser.id = user.id || '';
     }
-
-    // Fallback: check localStorage for past orders / addresses
     if(!detectedUser.phone){
-      const localPhone = localStorage.getItem('rc_user_phone') || 
-                         localStorage.getItem('customer_phone') || 
-                         localStorage.getItem('phone');
-      if(localPhone) detectedUser.phone = localPhone;
-    }
-
-    if(!detectedUser.email){
-      const localEmail = localStorage.getItem('rc_user_email') || 
-                         localStorage.getItem('customer_email') || 
-                         localStorage.getItem('email');
-      if(localEmail) detectedUser.email = localEmail;
+      detectedUser.phone = localStorage.getItem('rc_user_phone') || localStorage.getItem('customer_phone') || '';
     }
   } catch(e){
-    console.warn("Auto-detect failed:", e);
+    console.warn("Auto-detect:", e);
   }
 }
 
-// 2. LOAD TOPICS
+// 2. LOAD TOPICS (ADMIN TOPICS + FALLBACK PRE-BUILT GUIDES SO IT'S NEVER EMPTY)
 async function loadTopics(){
   try {
     const { data, error } = await supabase
@@ -359,15 +343,30 @@ async function loadTopics(){
       .eq('is_active', true)
       .order('id', { ascending: false });
 
-    if(error) throw error;
-    liveTopics = data || [];
-
-    const container = document.getElementById('dynamicTopicsContainer');
-    if(!liveTopics.length){
-      container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:30px;">Abhi tak koi help topic add nahi kiya gaya hai.</div>`;
-      return;
+    if(!error && data && data.length > 0){
+      liveTopics = data;
+    } else {
+      // Pre-built default guides if admin hasn't added any yet
+      liveTopics = [
+        {
+          id: 'def-1',
+          title: 'Website par Naya Order Kaise Karein? (Step-by-Step Guide)',
+          explanation: 'Dost, order karna behad aasan hai:\n1. Home page par jakar jo item pasand ho uska "Buy Now" button dabayein.\n2. Address page khulega, apna pata aur phone number bharein.\n3. Cash on Delivery ya Online payment chunein aur "Place Order" karein.'
+        },
+        {
+          id: 'def-2',
+          title: 'Delivery Address Kaise Badlein ya Add Karein?',
+          explanation: 'Order karte waqt address.html page par aap naya address save kar sakte hain ya purane address ko select kar sakte hain.'
+        },
+        {
+          id: 'def-3',
+          title: 'Product Kharab / Damage Hone par 7 Days Free Replacement',
+          explanation: 'Agar koi item kharab ya toota hua mile toh 7 din tak 100% Free replacement milta hai. Delivery partner naya piece laakar purana collect karega.'
+        }
+      ];
     }
 
+    const container = document.getElementById('dynamicTopicsContainer');
     container.innerHTML = liveTopics.map(t => `
       <div class="acc-item" id="topic-${t.id}">
         <div class="acc-trigger" onclick="toggleAcc(this)">
@@ -382,8 +381,8 @@ async function loadTopics(){
             <div class="explanation-text">${t.explanation}</div>
             
             <div class="fallback-box">
-              <p style="color:#a0a0ab;font-size:12.5px;">Problem solve nahi hui? Admin desk ko request bhejein:</p>
-              <button class="open-ticket-link" onclick="toggleForm('form-${t.id}')">📩 Submit Request for this Issue</button>
+              <p style="color:#a0a0ab;font-size:12.5px;">Problem solve nahi hui? Admin desk ko direct request bhejein:</p>
+              <button class="open-ticket-link" onclick="toggleForm('form-${t.id}')">📩 Submit Request to Admin</button>
               
               <form class="ticket-form" id="form-${t.id}" onsubmit="submitTicket(event, '${t.title.replace(/'/g, "\\'")}')">
                 <input type="text" placeholder="Order ID (Optional)">
@@ -399,106 +398,99 @@ async function loadTopics(){
 
   } catch(err){
     console.error(err);
-    document.getElementById('dynamicTopicsContainer').innerHTML = `<div style="color:#ff6b6b;text-align:center;">Topics load karne me error: ${err.message}</div>`;
   }
 }
 
-// 3. FULLY AUTOMATED STATUS TRACKER (ZERO MANUAL INPUT)
-window.openAutoTrackerModal = async function(){
-  const modal = document.getElementById('trackerModal');
-  modal.style.display = 'grid';
+// 3. SMART FRIEND-GUIDE NLP ANALYZING ENGINE (ANSWERS EVERYTHING NATURALLY)
+window.runAutoAnalysis = function(){
+  const q = document.getElementById('helpInput').value.trim().toLowerCase();
+  if(!q) return;
 
-  const idBox = document.getElementById('identityDetectedBox');
-  const resBox = document.getElementById('trackResultList');
+  const card = document.getElementById('smartSolutionCard');
+  const solText = document.getElementById('smartSolText');
+  card.style.display = 'block';
 
-  // Refresh user detection
-  await autoDetectUser();
-
-  const activeIdentifier = detectedUser.phone || detectedUser.email;
-
-  if(!activeIdentifier){
-    idBox.innerHTML = `<span>Guest Device (No order history detected)</span>`;
-    resBox.innerHTML = `
-      <div style="text-align:center;padding:20px;">
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Aapka koi active session ya order record auto-detect nahi hua.</p>
-        <input type="tel" id="manualTrackInput" placeholder="Apna Phone Number likhein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
-        <button class="submit-btn" onclick="fetchTicketsByIdentifier(document.getElementById('manualTrackInput').value.trim())">Search My Tickets</button>
-      </div>
+  // SCENARIO 1: ORDER KAISE KARE / DIKKAT AA RAHI HAI
+  if(q.includes('order') || q.includes('kharid') || q.includes('buy') || q.includes('dikat') || q.includes('problem')){
+    solText.innerHTML = `
+      <strong>Arre dost, fikar mat karo! Order karne me bilkul aasan step hain:</strong><br><br>
+      1. Sabse pehle Store par jakar apna bulb ya extension board dekhein.<br>
+      2. Product ke niche <strong>"Buy Now"</strong> button par click karein.<br>
+      3. Agle page par apna <strong>Delivery Address</strong> aur mobile number bharein.<br>
+      4. <strong>Cash on Delivery (COD)</strong> ya Online UPI select karke confirm karein.<br><br>
+      <a href="index.html" class="sol-action-btn">🛒 Abhi Store par jayein aur Order karein</a>
     `;
-    return;
   }
-
-  idBox.innerHTML = `<span>Identified as: <strong>${activeIdentifier}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
-  resBox.innerHTML = `<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Analyzing all your requests...</p>`;
-
-  await fetchTicketsByIdentifier(activeIdentifier);
-};
-
-window.fetchTicketsByIdentifier = async function(val){
-  const resBox = document.getElementById('trackResultList');
-  if(!val){
-    resBox.innerHTML = `<p style="color:var(--red);text-align:center;">Koi number nahi mila.</p>`;
-    return;
+  // SCENARIO 2: ADDRESS / LOCATION / PATA
+  else if(q.includes('address') || q.includes('pata') || q.includes('location') || q.includes('jagah')){
+    solText.innerHTML = `
+      <strong>Address kaise badalna ya chuna hai:</strong><br><br>
+      Jab aap product par <em>Buy Now</em> dabate hain, toh aap seedha <strong>Address Page</strong> par pahunch jaate hain. Wahan aap naya address jod sakte hain ya jo address pehle se hai use select kar sakte hain.<br><br>
+      <a href="address.html" class="sol-action-btn">📍 Address Settings Kholein</a>
+    `;
   }
+  // SCENARIO 3: REFUND / PAISA / CANCEL
+  else if(q.includes('refund') || q.includes('paisa') || q.includes('money') || q.includes('cancel')){
+    solText.innerHTML = `
+      <strong>Refund aur Payment ki jankari:</strong><br><br>
+      Cancel ya Return hone ke <strong>24 se 48 working ghante</strong> ke andar paisa aapke account me wapas transfer kar diya jata hai. Bank statement zaroor check karein. Agar 48 ghante se zyada ho gaye hain toh niche diye gaye form se admin desk par report karein.
+    `;
+    scrollToFirstTopic();
+  }
+  // SCENARIO 4: RETURN / PICKUP
+  else if(q.includes('return') || q.includes('wapas') || q.includes('pickup')){
+    solText.innerHTML = `
+      <strong>Return kaise karna hai:</strong><br><br>
+      Aap apne <strong>Orders</strong> page par jakar us product ke aage "Request Return" par click karein. Delivery partner 24-48 ghante me aapke ghar aakar item collect kar lega.
+    `;
+  }
+  // SCENARIO 5: KHARAB / DAMAGE / REPLACEMENT
+  else if(q.includes('kharab') || q.includes('damage') || q.includes('chalta') || q.includes('replace') || q.includes('toota')){
+    solText.innerHTML = `
+      <strong>Defective / Damaged Item Resolution:</strong><br><br>
+      RADA CREST sabhi items par <strong>7 Din ki 100% Free Replacement</strong> deta hai. Agar item power nahi le raha ya damage hai, toh form bhar dijiye, delivery boy naya piece dekar purana le jayega.
+    `;
+    scrollToFirstTopic();
+  }
+  // GENERAL MATCH FROM ADMIN TOPICS
+  else {
+    let matched = null;
+    liveTopics.forEach(t => {
+      if(t.title.toLowerCase().includes(q) || t.explanation.toLowerCase().includes(q)){
+        matched = t;
+      }
+    });
 
-  try {
-    // Search tickets by phone OR customer_phone
-    const { data: tickets, error } = await supabase
-      .from('help_tickets')
-      .select('*')
-      .eq('customer_phone', val)
-      .order('id', { ascending: false });
-
-    if(error) throw error;
-
-    if(!tickets || !tickets.length){
-      resBox.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:30px;">Is number/account ke liye abhi koi active request nahi mili.</div>`;
-      return;
+    if(matched){
+      solText.innerHTML = `<strong>${matched.title}:</strong><br><br>${matched.explanation}`;
+    } else {
+      solText.innerHTML = `
+        <strong>Maine aapka sawal analyze kiya hai:</strong><br><br>
+        Aapko website par kisi bhi tarah ki dikkat hai toh aap niche topic dekh sakte hain ya direct hamari support team se WhatsApp par baat kar sakte hain.<br><br>
+        <a href="https://wa.me/919509204090?text=Hello%20RADA%20CREST,%20mujhe%20order%20karne%20me%20help%20chahiye." target="_blank" class="sol-action-btn" style="background:#25D366;color:#000;">💬 Direct WhatsApp Help</a>
+      `;
     }
-
-    resBox.innerHTML = tickets.map(tk => `
-      <div class="ticket-status-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span class="status-pill ${tk.status}">${tk.status}</span>
-          <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
-        </div>
-        <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
-        <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
-        ${tk.order_id ? `<div style="font-size:11px;color:#888;margin-top:4px;">Order ID: <code>${tk.order_id}</code></div>` : ''}
-
-        ${tk.status === 'rejected' && tk.rejection_reason ? `
-          <div class="reject-reason-box">
-            <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
-          </div>
-        ` : ''}
-        ${tk.status === 'confirmed' ? `
-          <div style="color:var(--green);font-size:12px;margin-top:6px;">
-            ✓ Request Approved & Confirmed by Admin.
-          </div>
-        ` : ''}
-        ${tk.status === 'proceeding' ? `
-          <div style="color:var(--blue);font-size:12px;margin-top:6px;">
-            ⚙️ Request in progress (Resolution underway).
-          </div>
-        ` : ''}
-        ${tk.status === 'pending' ? `
-          <div style="color:var(--brand);font-size:12px;margin-top:6px;">
-            ⏳ Under Review by Support Team.
-          </div>
-        ` : ''}
-      </div>
-    `).join('');
-
-  } catch(err){
-    resBox.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Fetch error: ${err.message}</div>`;
   }
 };
 
-window.closeTrackerModal = function(){
-  document.getElementById('trackerModal').style.display = 'none';
+function scrollToFirstTopic(){
+  const el = document.getElementById('dynamicTopicsContainer');
+  if(el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+window.toggleAcc = function(headerEl){
+  const item = headerEl.closest('.acc-item');
+  const isOpen = item.classList.contains('active');
+  document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
+  if(!isOpen) item.classList.add('active');
 };
 
-// 4. SUBMIT TICKET AND SAVE IDENTITY LOCALLY
+window.toggleForm = function(formId){
+  const f = document.getElementById(formId);
+  if(f) f.style.display = (f.style.display === 'block') ? 'none' : 'block';
+};
+
+// SUBMIT TICKET
 window.submitTicket = async function(e, topicTitle){
   e.preventDefault();
   const form = e.target;
@@ -523,7 +515,6 @@ window.submitTicket = async function(e, topicTitle){
 
     if(error) throw error;
 
-    // Cache phone locally so customer never needs to enter it again!
     localStorage.setItem('rc_user_phone', phone);
     detectedUser.phone = phone;
 
@@ -541,19 +532,75 @@ window.submitTicket = async function(e, topicTitle){
   }
 };
 
-window.toggleAcc = function(headerEl){
-  const item = headerEl.closest('.acc-item');
-  const isOpen = item.classList.contains('active');
-  document.querySelectorAll('.acc-item').forEach(i => i.classList.remove('active'));
-  if(!isOpen) item.classList.add('active');
+// TRACKER MODAL LOGIC
+window.openAutoTrackerModal = async function(){
+  const modal = document.getElementById('trackerModal');
+  modal.style.display = 'grid';
+  const idBox = document.getElementById('identityDetectedBox');
+  const resBox = document.getElementById('trackResultList');
+
+  await autoDetectUser();
+  const activePhone = detectedUser.phone;
+
+  if(!activePhone){
+    idBox.innerHTML = `<span>Guest Device (No order history)</span>`;
+    resBox.innerHTML = `
+      <div style="text-align:center;padding:20px;">
+        <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">Apna mobile number likhein jisse order/request ki thi:</p>
+        <input type="tel" id="manualTrackInput" placeholder="Mobile Number daalein" style="width:100%;padding:10px;background:#0d0d10;border:1px solid #333;color:#fff;border-radius:8px;font-size:13px;margin-bottom:8px;">
+        <button class="submit-btn" onclick="fetchTickets(document.getElementById('manualTrackInput').value.trim())">Search My Requests</button>
+      </div>
+    `;
+    return;
+  }
+
+  idBox.innerHTML = `<span>Customer Mobile: <strong>${activePhone}</strong></span> <span style="color:var(--green);font-size:11px;">● Auto Synced</span>`;
+  await fetchTickets(activePhone);
 };
 
-window.toggleForm = function(formId){
-  const f = document.getElementById(formId);
-  if(f) f.style.display = (f.style.display === 'block') ? 'none' : 'block';
+window.fetchTickets = async function(phone){
+  const resBox = document.getElementById('trackResultList');
+  resBox.innerHTML = `<p style="color:var(--text-muted);font-size:12.5px;text-align:center;padding:20px;">Analyzing your requests...</p>`;
+
+  try {
+    const { data: tickets, error } = await supabase
+      .from('help_tickets')
+      .select('*')
+      .eq('customer_phone', phone)
+      .order('id', { ascending: false });
+
+    if(error) throw error;
+    if(!tickets || !tickets.length){
+      resBox.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:30px;">Is number par abhi koi active request nahi mili.</div>`;
+      return;
+    }
+
+    resBox.innerHTML = tickets.map(tk => `
+      <div class="ticket-status-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="status-pill ${tk.status}">${tk.status}</span>
+          <small style="color:var(--text-muted);">Ticket #${tk.id}</small>
+        </div>
+        <div style="font-size:13.5px;font-weight:700;color:#fff;margin-bottom:4px;">${tk.issue_type}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${tk.description}</div>
+        ${tk.status === 'rejected' && tk.rejection_reason ? `
+          <div class="reject-reason-box">
+            <strong>❌ Rejection Reason:</strong> ${tk.rejection_reason}
+          </div>
+        ` : ''}
+        ${tk.status === 'confirmed' ? `<div style="color:var(--green);font-size:12px;margin-top:6px;">✓ Admin team has approved & confirmed this request.</div>` : ''}
+        ${tk.status === 'proceeding' ? `<div style="color:var(--blue);font-size:12px;margin-top:6px;">⚙️ Request in progress (Action underway).</div>` : ''}
+      </div>
+    `).join('');
+  } catch(err){
+    resBox.innerHTML = `<div style="color:var(--red);text-align:center;padding:20px;">Error: ${err.message}</div>`;
+  }
 };
 
-// INITIALIZE
+window.closeTrackerModal = function(){
+  document.getElementById('trackerModal').style.display = 'none';
+};
+
 (async () => {
   await autoDetectUser();
   await loadTopics();
