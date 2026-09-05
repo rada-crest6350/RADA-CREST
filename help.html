@@ -235,7 +235,7 @@ body{
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
       <h1>Help & Resolutions</h1>
-      <span>Smart Support Active</span>
+      <span>Support Desk Active</span>
     </div>
   </div>
   <button class="track-pill-btn" id="trackBtnModalTrigger">
@@ -246,12 +246,12 @@ body{
 <div class="container">
 
   <div class="hero">
-    <div class="hero-badge">💡 Smart Resolutions</div>
+    <div class="hero-badge">💡 Smart Support</div>
     <h2>Pehle Solution Dekhein, Samasya Solve Karein</h2>
   </div>
 
   <div class="smart-search-box">
-    <input type="text" id="helpInput" placeholder="Apna sawal likhein (e.g. pricing sahi nahi hai, order kaise kare)...">
+    <input type="text" id="helpInput" placeholder="Apna sawal likhein (jaise: pricing sahi nahi hai, order kaise kare)...">
     <button class="search-action-btn" id="aiSearchBtn">🔍 Analyze</button>
   </div>
 
@@ -400,7 +400,7 @@ function renderTopics(){
   `).join('');
 }
 
-// 100% ROBUST & ERROR-FREE BROWSER-BASED SMART ENGINE
+// 100% EXACT & ACCURATE MATCHING ENGINE (NO MORE REPEATING ANSWERS)
 window.executeSmartSearch = function(){
   const input = document.getElementById('helpInput');
   const rawQ = input ? input.value.trim().toLowerCase() : '';
@@ -412,26 +412,31 @@ window.executeSmartSearch = function(){
 
   if(card) card.style.display = 'block';
 
-  let title = "💡 RADA CREST Smart Assistant";
+  let title = "💡 RADA CREST Support Guide";
   let answerHTML = "";
 
+  // Pricing / Discount Intent
   if(rawQ.includes('pric') || rawQ.includes('rate') || rawQ.includes('daam') || rawQ.includes('sahi nahi') || rawQ.includes('mehenga') || rawQ.includes('discount') || rawQ.includes('offer') || rawQ.includes('kam karo') || rawQ.includes('paisa')){
-    title = "🏷️ Pricing & Discount Assistance";
+    title = "🏷️ Pricing & Discount Support";
     answerHTML = `
-      <strong>RADA CREST Pricing Policy:</strong><br><br>
+      <strong>RADA CREST Pricing Assistance:</strong><br><br>
       • Hamare LED bulbs aur extension boards ki pricing sabse behtareen wholesale aur retail rates par set hai.<br>
       • Agar aapko bulk order ya kisi specific product ke daam me help chahiye, toh aap niche diye gaye ticket form ke zariye apni baat hum tak pahuncha sakte hain.<br><br>
       <button class="sol-action-btn" style="background:var(--brand);color:#000;" onclick="window.scrollTo({top: 500, behavior: 'smooth'});">💬 Niche Ticket Form Bharein</button>
     `;
-  } else if(rawQ.includes('quality') || rawQ.includes('warranty') || rawQ.includes('guarantee') || rawQ.includes('chalega') || rawQ.includes('light') || rawQ.includes('bulb')){
-    title = "💡 Product Quality & Warranty Guide";
+  } 
+  // Quality / Bulb check
+  else if(rawQ.includes('quality') || rawQ.includes('warranty') || rawQ.includes('guarantee') || rawQ.includes('chalega') || rawQ.includes('light') || rawQ.includes('bulb')){
+    title = "💡 Product Quality & Warranty";
     answerHTML = `
       <strong>RADA CREST Quality Assurance:</strong><br><br>
-      • Hamare sabhi LED Bulbs (Radar Motion Sensor & Emergency Inverter Bulbs) aur Heavy Extension Boards high-grade materials se bane hain.<br>
+      • Hamare sabhi LED Bulbs aur Extension Boards high-grade materials se bane hain.<br>
       • Har product par 7 din ki free replacement warranty milti hai.<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
     `;
-  } else if(rawQ.includes('age kya') || rawQ.includes('aage kya') || rawQ.includes('khol li') || rawQ.includes('start') || rawQ.includes('shuru') || rawQ.includes('kya karu') || rawQ.includes('order') || rawQ.includes('buy')){
+  } 
+  // Order Process Intent
+  else if(rawQ.includes('order') || rawQ.includes('buy') || rawQ.includes('kharid') || rawQ.includes('age kya') || rawQ.includes('khol li') || rawQ.includes('kya karu')){
     title = "🚀 Order Kaise Karein (Step-by-Step)";
     answerHTML = `
       <strong>Website par order karne ka tarika:</strong><br><br>
@@ -441,7 +446,9 @@ window.executeSmartSearch = function(){
       4. COD ya UPI chun kar order place kar dein!<br><br>
       <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
     `;
-  } else if(rawQ.includes('delivery') || rawQ.includes('time') || rawQ.includes('kab') || rawQ.includes('din') || rawQ.includes('track') || rawQ.includes('kaha hai')){
+  } 
+  // Delivery & Tracking Intent
+  else if(rawQ.includes('delivery') || rawQ.includes('time') || rawQ.includes('kab') || rawQ.includes('din') || rawQ.includes('track') || rawQ.includes('kaha hai')){
     title = "📦 Delivery & Order Tracking";
     answerHTML = `
       <strong>Delivery ki jankari:</strong><br><br>
@@ -449,7 +456,9 @@ window.executeSmartSearch = function(){
       • Aap apne pichle orders ka status live track kar sakte hain.<br><br>
       <a href="orders.html" class="sol-action-btn">📦 Track My Orders</a>
     `;
-  } else if(rawQ.includes('refund') || rawQ.includes('return') || rawQ.includes('paisa wapas') || rawQ.includes('replace') || rawQ.includes('damage')){
+  } 
+  // Return & Refund Intent
+  else if(rawQ.includes('refund') || rawQ.includes('return') || rawQ.includes('wapas') || rawQ.includes('replace') || rawQ.includes('damage') || rawQ.includes('kharab')){
     title = "🔄 Return & Refund Policy";
     answerHTML = `
       <strong>7 Days Free Replacement:</strong><br><br>
@@ -457,13 +466,17 @@ window.executeSmartSearch = function(){
       • Refund cancellation ke 24-48 working hours me bank/UPI me transfer hota hai.<br><br>
       <a href="orders.html" class="sol-action-btn">📦 Request Return</a>
     `;
-  } else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
+  } 
+  // Greetings Intent
+  else if(rawQ.includes('hii') || rawQ.includes('hello') || rawQ.includes('hey') || rawQ.includes('namaste')){
     title = "👋 Namaste! RADA CREST Support";
     answerHTML = `
       <strong>Hello dost! Main aapki kya sahayata kar sakta hoon?</strong><br><br>
       Aapko pricing, order, ya replacement se judi jo bhi jankari chahiye, yahan type karke pooch sakte hain!
     `;
-  } else {
+  } 
+  // Default fallback for other queries
+  else {
     title = `💡 RADA CREST Guide for: "${input.value}"`;
     answerHTML = `
       <strong>Aapke is sawal ke liye hamari salah:</strong><br><br>
