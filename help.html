@@ -401,47 +401,64 @@ function renderTopics(){
 }
 
 // 3. AI SEARCH (LIVE DIRECT CALL TO /api/ask)
-window.executeSmartSearch = async function(){
-  const rawQ = document.getElementById('helpInput').value.trim();
-  if(!rawQ) return;
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  const btn = document.getElementById('aiSearchBtn');
-  const card = document.getElementById('smartSolutionCard');
-  const solText = document.getElementById('smartSolText');
-  const badge = document.getElementById('solBadgeTitle');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Only POST allowed' });
 
-  btn.disabled = true;
-  btn.textContent = 'Analyzing...';
-  card.style.display = 'block';
-  badge.textContent = '🤖 RADA CREST AI Solution (Live)';
-  solText.innerHTML = '<span style="color:var(--brand);">⚡ RADA CREST AI live soch raha hai...</span>';
+  const { query } = req.body || {};
+  if (!query) return res.status(400).json({ error: 'Query is empty' });
+
+  const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
+
+  const systemContext = `Aap RADA CREST brand ke ultra-intelligent aur friendly customer support assistant hain.
+RADA CREST Store details:
+- Products: High-quality LED Bulbs (Radar Motion Sensor lights, Emergency Inverter Bulbs) aur Heavy Extension Boards.
+- Website flow:
+  * index.html: Storefront jahan customer item dekh kar 'Buy Now' dabata hai.
+  * address.html: Jahan customer apna delivery address aur mobile number set karta hai.
+  * orders.html: Jahan customer live tracking aur 7 dino ke andar 'Request Return' kar sakta hai.
+- Policies: 7 din ki free replacement policy agar bulb/board me koi problem ya physical damage ho. Refund cancellation/return ke 24-48 working hours me bank/UPI account me wapas aata hai. Cash on Delivery (COD) aur Online UPI dono uplabdh hain.
+
+Nirdesh:
+1. Customer ke sawal ko deeply analyze karein, chahe Hindi, Hinglish ya aam bolchaal me ho (jaise: 'hii', 'me age kya karu', 'order kaise book karu').
+2. Ek friendly guide ki tarah seedha aur clear step-by-step rasta samjhayein ki website par aage kahan jana hai aur kya karna hai.
+3. Chhota ya robotic jawab na dein, conversational aur genuinely helpful guide karein.`;
 
   try {
-    const res = await fetch('/api/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: rawQ })
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant", // 100% Active & Free Groq Production Model
+        messages: [
+          { role: "system", content: systemContext },
+          { role: "user", content: query }
+        ],
+        temperature: 0.6,
+        max_tokens: 800
+      })
     });
 
-    const data = await res.json();
-    if(!res.ok || !data.answer) throw new Error(data.error || "API error status: " + res.status);
+    const data = await response.json();
 
-    badge.textContent = "💡 RADA CREST Personal Guide";
-    solText.innerHTML = data.answer.replace(/\n/g, "<br>") + `
-      <br><br>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="index.html" class="sol-action-btn">🛒 Store Par Jayein</a>
-        <a href="orders.html" class="sol-action-btn" style="background:#1f1f26;color:#fff;border:1px solid #333;">📦 My Orders</a>
-      </div>
-    `;
-  } catch(err){
-    console.error("AI fetch fail:", err);
-    solText.innerHTML = `<span style="color:var(--red);">⚠️ Error: ${err.message}</span><br><br><small style="color:var(--text-muted);">Groq API connect nahi hui ya key check karein.</small>`;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '🔍 Analyze';
+    if (data.choices && data.choices[0]) {
+      return res.status(200).json({ answer: data.choices[0].message.content });
+    } else {
+      console.error("Groq API Error:", data);
+      return res.status(500).json({ error: data.error?.message || "Groq request failed" });
+    }
+  } catch (err) {
+    console.error("Server Exception:", err);
+    return res.status(500).json({ error: err.message });
   }
-};
+}
 
 window.toggleAcc = function(headerEl){
   const item = headerEl.closest('.acc-item');
