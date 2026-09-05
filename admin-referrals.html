@@ -74,23 +74,6 @@ button{cursor:pointer;}
 
 .brand-details h2{margin:2px 0 0;font-size:18px;color:#fff;}
 
-.menu{flex:1;display:flex;flex-direction:column;gap:4px;}
-.menu button{
-  width:100%;background:transparent;
-  color:#a1a1aa;border:1px solid transparent;
-  padding:10px 12px;text-align:left;
-  border-radius:10px;font-weight:600;font-size:13.5px;
-  display:flex;align-items:center;gap:10px;
-  transition:all 0.2s ease;
-}
-.menu button:hover{background:#171717;color:#fff;}
-.menu button.active{
-  background:var(--brand-glow);
-  color:#fff;
-  border-color:rgba(255,122,0,0.4);
-  font-weight:700;
-}
-
 .back-btn{
   margin-top:auto;
   padding:11px;
@@ -101,6 +84,9 @@ button{cursor:pointer;}
   font-weight:700;
   font-size:13px;
   transition:0.2s;
+  text-align:center;
+  text-decoration:none;
+  display:block;
 }
 .back-btn:hover{background:#1f1f1f;color:#fff;}
 
@@ -340,7 +326,7 @@ td{
 
 <div class="app">
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (NO EXTRA BUTTONS) -->
   <aside class="sidebar">
     <div class="brand">
       <div class="logo">RC</div>
@@ -349,14 +335,8 @@ td{
         <h2>Admin Panel</h2>
       </div>
     </div>
-    <div class="menu">
-      <button onclick="window.location.href='admin-dashboard.html'"><span>⚡</span> Dashboard</button>
-      <button class="active"><span>🎁</span> Gifts & Rewards</button>
-      <button onclick="window.location.href='admin-products.html'"><span>📦</span> Products</button>
-      <button onclick="window.location.href='admin-orders.html'"><span>🛍️</span> Orders</button>
-      <button onclick="window.location.href='admin-customers.html'"><span>👥</span> Customers</button>
-    </div>
-    <button class="back-btn" onclick="window.location.href='admin-dashboard.html'">⬅ Back to Dashboard</button>
+    
+    <a href="admin-dashboard.html" class="back-btn">⬅ Back to Dashboard</a>
   </aside>
 
   <!-- MAIN CONTENT -->
