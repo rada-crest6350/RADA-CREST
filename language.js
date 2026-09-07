@@ -1,7 +1,8 @@
-// RADA CREST Global Multi-Language Engine for All Pages
+// RADA CREST Ultimate Text-Node Translator
 const siteDictionary = {
   hi: {
-    "RADA CREST Store": "राडा क्रस्ट स्टोर",
+    "RADA CREST": "राडा क्रस्ट",
+    "Store": "स्टोर",
     "Buy Now": "अभी खरीदें",
     "Help & Support": "सहायता और समर्थन",
     "Activity Center": "गतिविधि केंद्र",
@@ -10,10 +11,13 @@ const siteDictionary = {
     "Delivery Address": "डिलीवरी का पता",
     "Track My Requests": "मेरे अनुरोध को ट्रैक करें",
     "Notifications": "सूचनाएं",
-    "Account": "खाता"
+    "Account": "खाता",
+    "Cart": "कार्ट",
+    "Refer & Earn": "रेफर करें और कमाएं"
   },
   te: {
-    "RADA CREST Store": "రాడా క్రెస్ట్ స్టోర్",
+    "RADA CREST": "రాడా క్రెస్ట్",
+    "Store": "స్టోర్",
     "Buy Now": "ఇప్పుడే కొనండి",
     "Help & Support": "సహాయం & మద్దతు",
     "Activity Center": "యాక్టివిటీ సెంటర్",
@@ -22,10 +26,13 @@ const siteDictionary = {
     "Delivery Address": "డెలివరీ చిరునామా",
     "Track My Requests": "నా అభ్యర్థనలను ట్రాక్ చేయండి",
     "Notifications": "నోటిఫికేషన్‌లు",
-    "Account": "ఖాతా"
+    "Account": "ఖాతా",
+    "Cart": "కార్ట్",
+    "Refer & Earn": "ఫರ್ & సంపాదಿಸಿ"
   },
   ta: {
-    "RADA CREST Store": "ராடா கிரெஸ்ட் ஸ்டோர்",
+    "RADA CREST": "ராடா கிரெஸ்ட்",
+    "Store": "ஸ்டோர்",
     "Buy Now": "இப்போது வாங்கு",
     "Help & Support": "உதவி & ஆதரவு",
     "Activity Center": "செயல்பாட்டு மையம்",
@@ -34,10 +41,12 @@ const siteDictionary = {
     "Delivery Address": "டெலிவரி முகவரி",
     "Track My Requests": "எனது கோரிக்கையை கண்காணிக்கவும்",
     "Notifications": "அறிவிப்புகள்",
-    "Account": "கணக்கு"
+    "Account": "கணக்கு",
+    "Cart": "கூடை"
   },
   kn: {
-    "RADA CREST Store": "ರಾಡಾ ಕ್ರೆಸ್ಟ್ ಸ್ಟೋರ್",
+    "RADA CREST": "ರಾಡಾ ಕ್ರೆಸ್ಟ್",
+    "Store": "ಸ್ಟೋರ್",
     "Buy Now": "ಈಗ ಖರೀದಿಸಿ",
     "Help & Support": "ಸಹಾಯ ಮತ್ತು ಬೆಂಬಲ",
     "Activity Center": "ಚಟುವಟಿಕೆ ಕೇಂದ್ರ",
@@ -46,10 +55,12 @@ const siteDictionary = {
     "Delivery Address": "ವಿಳಾಸ",
     "Track My Requests": "ನನ್ನ ವಿನಂತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
     "Notifications": "ಅಧಿಸೂಚನೆಗಳು",
-    "Account": "ಖಾತೆ"
+    "Account": "ಖಾತೆ",
+    "Cart": "ಕಾರ್ಟ್"
   },
   mr: {
-    "RADA CREST Store": "राडा क्रेस्ट स्टोअर",
+    "RADA CREST": "राडा क्रेस्ट",
+    "Store": "स्टोअर",
     "Buy Now": "आता खरेदी करा",
     "Help & Support": "मदत आणि समर्थन",
     "Activity Center": "ॲक्टिव्हिटी सेंटर",
@@ -58,7 +69,8 @@ const siteDictionary = {
     "Delivery Address": "पत्ता",
     "Track My Requests": "विनंती ट्रॅक करा",
     "Notifications": "सूचना",
-    "Account": "खाते"
+    "Account": "खाते",
+    "Cart": "कार्ट"
   }
 };
 
