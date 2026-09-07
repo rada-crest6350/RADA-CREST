@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Tap/Click action to open specific category file/page (passing category name in URL)
             card.onclick = () => {
-              window.location.href = `category-products.html?category=${encodeURIComponent(cat.name)}`;
+              window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
             };
 
             let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
