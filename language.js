@@ -1,4 +1,4 @@
-// RADA CREST Ultimate Text-Node Translator
+// RADA CREST Instant Global Translator Engine
 const siteDictionary = {
   hi: {
     "RADA CREST": "राडा क्रस्ट",
@@ -74,7 +74,7 @@ const siteDictionary = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+function applyTranslations() {
   const currentLang = localStorage.getItem('rc_lang') || 'en';
   if (currentLang === 'en' || !siteDictionary[currentLang]) return;
 
@@ -88,4 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
       node.nodeValue = node.nodeValue.replace(text, dict[text]);
     }
   }
-});
+}
+
+// Turant ya DOM load hone par chalane ke liye
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', applyTranslations);
+} else {
+  applyTranslations();
+}
