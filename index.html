@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <script src="home.js?v=3.0"></script>
   
-  <!-- Supabase Live Categories Loader & Click Handler Script -->
+  <!-- Supabase Live Categories Loader & Page Redirection Script -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       try {
@@ -276,16 +276,13 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'cat-card';
             card.style.cssText = "background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.2s;";
             
-            // Hover animation & click action
+            // Hover animation
             card.onmouseover = () => { card.style.borderColor = "#FF7A00"; card.style.transform = "translateY(-2px)"; };
             card.onmouseout = () => { card.style.borderColor = "rgba(255,255,255,0.08)"; card.style.transform = "translateY(0)"; };
             
+            // Tap/Click action to open specific category file/page (passing category name in URL)
             card.onclick = () => {
-              if(categoryFilter) {
-                categoryFilter.value = cat.name;
-                categoryFilter.dispatchEvent(new Event('change'));
-                document.getElementById('allProductsGrid').scrollIntoView({ behavior: 'smooth' });
-              }
+              window.location.href = `category-products.html?category=${encodeURIComponent(cat.name)}`;
             };
 
             let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
@@ -316,5 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   </script>
+  
 </body>
 </html>
