@@ -1,1 +1,387 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Categories — RADA CREST</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg-deep:#060608;
+  --panel-card:rgba(24, 24, 32, 0.85);
+  --border:rgba(255, 255, 255, 0.08);
+  --text:#ffffff;
+  --text-muted:#9da0b0;
+  --brand:#FF7A00;
+  --brand-glow:rgba(255, 122, 0, 0.35);
+  --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+  --danger:#ff4d4d;
+}
+
+body{
+  background:var(--bg-deep);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
+  min-height:100vh;
+  padding:20px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+.ambient-glow{
+  position:fixed;
+  width:400px;height:400px;
+  background:radial-gradient(circle, rgba(255,122,0,0.15) 0%, rgba(0,0,0,0) 70%);
+  top:20%;left:50%;
+  transform:translate(-50%, -50%);
+  z-index:0;
+  pointer-events:none;
+}
+
+.admin-container{
+  max-width:800px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+  animation:fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.header-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--panel-card);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px 24px;
+  margin-bottom:24px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.header-title h1{
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-0.5px;
+}
+.header-title p{
+  font-size:12.5px;
+  color:var(--text-muted);
+  margin-top:2px;
+}
+
+.back-btn{
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  width:38px;height:38px;
+  border-radius:10px;
+  display:grid;place-items:center;
+  color:#fff;text-decoration:none;
+  transition:0.2s;
+}
+.back-btn:hover{background:var(--brand);border-color:var(--brand);color:#000;}
+
+.card-panel{
+  background:var(--panel-card);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:24px;
+  margin-bottom:24px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
+}
+
+.card-panel h2{
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.card-panel h2 i{color:var(--brand);}
+
+.form-group{
+  margin-bottom:16px;
+}
+.form-group label{
+  display:block;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--text-muted);
+  margin-bottom:6px;
+}
+
+.form-input{
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:12px 16px;
+  color:#fff;
+  font-family:inherit;
+  font-size:14px;
+  transition:0.2s;
+}
+.form-input:focus{
+  outline:none;
+  border-color:var(--brand);
+  background:rgba(255,122,0,0.05);
+  box-shadow:0 0 15px var(--brand-glow);
+}
+
+.file-upload-box{
+  border:2px dashed var(--border);
+  border-radius:12px;
+  padding:20px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.2s;
+  background:rgba(255,255,255,0.02);
+}
+.file-upload-box:hover{
+  border-color:var(--brand);
+  background:rgba(255,122,0,0.04);
+}
+.file-upload-box i{
+  font-size:24px;
+  color:var(--brand);
+  margin-bottom:8px;
+}
+.file-upload-box p{
+  font-size:12.5px;
+  color:var(--text-muted);
+}
+
+.btn-primary{
+  background:var(--brand-gradient);
+  color:#000;
+  font-weight:800;
+  border:none;
+  border-radius:12px;
+  padding:14px 20px;
+  width:100%;
+  cursor:pointer;
+  font-size:14px;
+  transition:0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:0 6px 20px var(--brand-glow);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 25px var(--brand-glow);
+}
+
+.categories-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+  gap:16px;
+}
+
+.cat-card{
+  background:rgba(255,255,255,0.03);
+  border:1.5px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  position:relative;
+  transition:0.25s;
+}
+.cat-card:hover{
+  border-color:var(--brand);
+  background:rgba(255,122,0,0.05);
+  transform:translateY(-2px);
+}
+
+.cat-thumb{
+  width:50px;height:50px;
+  border-radius:12px;
+  object-fit:cover;
+  background:rgba(255,255,255,0.08);
+  display:grid;place-items:center;
+  font-size:20px;
+  color:var(--brand);
+  flex-shrink:0;
+}
+.cat-thumb img{
+  width:100%;height:100%;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.cat-info h3{
+  font-size:14px;
+  font-weight:700;
+  color:#fff;
+}
+.cat-info p{
+  font-size:11.5px;
+  color:var(--text-muted);
+  margin-top:2px;
+}
+
+.delete-cat-btn{
+  position:absolute;
+  top:10px;right:10px;
+  background:rgba(255,77,77,0.1);
+  border:none;color:var(--danger);
+  width:26px;height:26px;
+  border-radius:8px;
+  cursor:pointer;
+  display:grid;place-items:center;
+  font-size:12px;
+  transition:0.2s;
+}
+.delete-cat-btn:hover{
+  background:var(--danger);
+  color:#fff;
+}
+</style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<div class="admin-container">
+  
+  <!-- Header -->
+  <div class="header-bar">
+    <div class="header-title">
+      <h1>Category Management</h1>
+      <p>Rada Crest Admin Dashboard</p>
+    </div>
+    <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+  </div>
+
+  <!-- Add Category Form -->
+  <div class="card-panel">
+    <h2><i class="fa-solid fa-folder-plus"></i> Add New Category</h2>
+    <form id="categoryForm" onsubmit="saveCategory(event)">
+      <div class="form-group">
+        <label>Category Name</label>
+        <input type="text" id="catName" class="form-input" placeholder="e.g. LED Smart Bulbs" required>
+      </div>
+
+      <div class="form-group">
+        <label>Category Photo / Image</label>
+        <div class="file-upload-box" onclick="document.getElementById('catFile').click()">
+          <i class="fa-solid fa-cloud-arrow-up" id="uploadIcon"></i>
+          <p id="uploadText">Tap to select image or photo</p>
+          <input type="file" id="catFile" accept="image/*" style="display:none" onchange="previewImage(event)">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">
+        <i class="fa-solid fa-plus"></i> Create Category
+      </button>
+    </form>
+  </div>
+
+  <!-- Existing Categories List -->
+  <div class="card-panel">
+    <h2><i class="fa-solid fa-list"></i> Active Categories</h2>
+    <div class="categories-grid" id="categoriesGrid">
+      <!-- Dynamically injected items will appear here -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+let selectedImageBase64 = "";
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  if(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      selectedImageBase64 = e.target.result;
+      document.getElementById('uploadText').innerText = file.name;
+      document.getElementById('uploadIcon').className = "fa-solid fa-check-circle";
+      document.getElementById('uploadIcon').style.color = "#3dd598";
+    }
+    reader.readAsDataURL(file);
+  }
+}
+
+function loadCategories() {
+  const grid = document.getElementById('categoriesGrid');
+  const categories = JSON.parse(localStorage.getItem('rc_categories')) || [];
+  
+  grid.innerHTML = "";
+  if(categories.length === 0) {
+    grid.innerHTML = `<p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;">No categories added yet.</p>`;
+    return;
+  }
+
+  categories.forEach((cat, index) => {
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    
+    let thumbContent = `<i class="fa-solid fa-layer-group"></i>`;
+    if(cat.image) {
+      thumbContent = `<img src="${cat.image}" alt="${cat.name}">`;
+    }
+
+    card.innerHTML = `
+      <div class="cat-thumb">${thumbContent}</div>
+      <div class="cat-info">
+        <h3>${cat.name}</h3>
+        <p>Active Category</p>
+      </div>
+      <button class="delete-cat-btn" onclick="deleteCategory(${index})"><i class="fa-solid fa-trash"></i></button>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function saveCategory(event) {
+  event.preventDefault();
+  const name = document.getElementById('catName').value.trim();
+  if(!name) return;
+
+  const categories = JSON.parse(localStorage.getItem('rc_categories')) || [];
+  categories.push({
+    name: name,
+    image: selectedImageBase64 || ""
+  });
+
+  localStorage.setItem('rc_categories', JSON.stringify(categories));
+  
+  // Reset form
+  document.getElementById('categoryForm').reset();
+  selectedImageBase64 = "";
+  document.getElementById('uploadText').innerText = "Tap to select image or photo";
+  document.getElementById('uploadIcon').className = "fa-solid fa-cloud-arrow-up";
+  document.getElementById('uploadIcon').style.color = "var(--brand)";
+
+  loadCategories();
+}
+
+function deleteCategory(index) {
+  const categories = JSON.parse(localStorage.getItem('rc_categories')) || [];
+  categories.splice(index, 1);
+  localStorage.setItem('rc_categories', JSON.stringify(categories));
+  loadCategories();
+}
+
+// Load on page start
+document.addEventListener('DOMContentLoaded', loadCategories);
+</script>
+
+</body>
+</html>
