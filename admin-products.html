@@ -178,6 +178,22 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+    // Load categories dynamically into the category dropdown on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const pCategorySelect = document.getElementById('pCategory');
+      const localCats = JSON.parse(localStorage.getItem('rc_categories')) || [];
+      
+      if(localCats.length > 0) {
+        pCategorySelect.innerHTML = '';
+        localCats.forEach(cat => {
+          const opt = document.createElement('option');
+          opt.value = cat.name;
+          opt.textContent = cat.name;
+          pCategorySelect.appendChild(opt);
+        });
+      }
+    });
+
     document.getElementById('addProductForm').onsubmit = async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
