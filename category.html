@@ -321,15 +321,32 @@
 
   <!-- Script for Dynamic Products Render with Hi-Tech UI -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const categoryName = urlParams.get('category') || "All Products";
+      const categoryName = decodeURIComponent(urlParams.get('category') || "All Products").trim();
       
       document.getElementById('categoryHeading').textContent = categoryName;
-
       const productsGrid = document.getElementById('categoryProductsGrid');
-      const allProducts = JSON.parse(localStorage.getItem('rc_products')) || [];
-      const filteredProducts = categoryName === "all" ? allProducts : allProducts.filter(p => p.category === categoryName);
+
+      let allProducts = [];
+
+      // 1. Pehle localStorage se check karein (rc_products ya products)
+      allProducts = JSON.parse(localStorage.getItem('rc_products')) || JSON.parse(localStorage.getItem('products')) || [];
+
+      // 2. Agar Supabase se data aana hai toh yahan fetch kar sakte hain
+      if (allProducts.length === 0 && window.supabaseClient) {
+        try {
+          const { data, error } = await window.supabaseClient.from('products').select('*');
+          if (!error && data) allProducts = data;
+        } catch (err) {
+          console.log("Supabase fetch fallback error");
+        }
+      }
+
+      // Case-insensitive aur trim karke filter karna taaki mismatch na ho
+      const filteredProducts = (categoryName.toLowerCase() === "all" || categoryName.toLowerCase() === "all products") 
+        ? allProducts 
+        : allProducts.filter(p => p.category && p.category.trim().toLowerCase() === categoryName.toLowerCase());
 
       if(filteredProducts.length === 0) {
         productsGrid.innerHTML = `
@@ -347,14 +364,14 @@
         const itemCard = document.createElement('div');
         itemCard.className = 'product-card-item';
         
-        // Mocking premium discount calculation if original price isn't explicitly set
         const price = Number(product.price) || 999;
-        const originalPrice = Math.round(price * 1.3); // 30% higher for striking discount look
+        const originalPrice = Number(product.old_price) || Math.round(price * 1.3);
+        const imageUrl = product.image || (product.images && product.images[0]) || 'assets/logo.png';
         
         itemCard.innerHTML = `
           <div class="product-img-wrap">
             <span class="discount-badge">30% OFF</span>
-            <img src="${product.image || 'assets/logo.png'}" onerror="this.src='assets/logo.png'">
+            <img src="${imageUrl}" onerror="this.src='assets/logo.png'">
           </div>
           <div class="product-info">
             <h3>${product.name || 'Smart LED Fixture'}</h3>
@@ -370,14 +387,15 @@
           </div>
         `;
         
-        // Click action to product details if required
         itemCard.onclick = () => {
-          // Can hook up product detail view navigation here
+          // Product detail page par bhej sakte hain agar ID ho
+          if(product.id) {
+            window.location.href = `product-detail.html?id=${product.id}`;
+          }
         };
 
         productsGrid.appendChild(itemCard);
       });
     });
   </script>
-</body>
 </html>
