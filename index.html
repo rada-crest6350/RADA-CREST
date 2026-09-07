@@ -45,7 +45,7 @@ const siteDictionary = {
     "Search products...": "ఉత్పత్తులను శోధించండి..."
   },
   ta: {
-    "RADA CREST Store": "ராடா கிரெஸ்ட் ஸ்டோர்",
+    "RADA CREST Store": "ராரா கிரெஸ்ட் ஸ்டோர்",
     "Buy Now": "இப்போது வாங்கு",
     "Help & Support": "உதவி & ஆதரவு",
     "Activity Center": "செயல்பாட்டு மையம்",
@@ -58,7 +58,7 @@ const siteDictionary = {
     "View Cart": "கூடையைக் காண்க",
     "Checkout": "செக் அவுட்",
     "Account": "கணக்கு",
-    "Search products...": "தயாரிப்புகளைத் தேടുക..."
+    "Search products...": "தயாரிப்புகளைத் தேடുക..."
   },
   kn: {
     "RADA CREST Store": "ರಾಡಾ ಕ್ರೆಸ್ಟ್ ಸ್ಟೋರ್",
@@ -70,9 +70,6 @@ const siteDictionary = {
     "Delivery Address": "ವಿಳಾಸ",
     "Track My Requests": "ನನ್ನ ವಿನಂತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
     "Notifications": "ಅಧಿಸೂಚನೆಗಳು",
-    "Add to Cart": "ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ",
-    "View Cart": "ಕಾರ್ಟ್ ವೀಕ್ಷಿಸಿ",
-    "Checkout": "ಚೆಕ್‌ಔಟ್",
     "Account": "ಖಾತೆ",
     "Search products...": "ಉತ್ಪನ್ನಗಳನ್ನು ಹುಡುಕಿ..."
   },
@@ -86,9 +83,6 @@ const siteDictionary = {
     "Delivery Address": "पत्ता",
     "Track My Requests": "विनंती ट्रॅक करा",
     "Notifications": "सूचना",
-    "Add to Cart": "कार्टमध्ये टाка",
-    "View Cart": "कार्ट पहा",
-    "Checkout": "चेकआउट",
     "Account": "खाते",
     "Search products...": "उत्पादने शोधा..."
   }
@@ -264,5 +258,53 @@ document.addEventListener('DOMContentLoaded', () => {
   </footer>
 
   <script src="home.js?v=3.0"></script>
+  
+  <!-- Supabase Live Categories Loader Script -->
+  <script>
+    // Supabase credentials will link automatically via home.js or direct fetch if available
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const categoriesGrid = document.getElementById('categoriesGrid');
+        const categoryFilter = document.getElementById('categoryFilter');
+        
+        // Localstorage fallback / Direct check or integration
+        const localCats = JSON.parse(localStorage.getItem('rc_categories')) || [];
+        
+        if(localCats.length > 0) {
+          categoriesGrid.innerHTML = '';
+          localCats.forEach(cat => {
+            // Render grid card
+            const card = document.createElement('div');
+            card.className = 'cat-card';
+            card.style.cssText = "background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;";
+            
+            let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
+            if(cat.image) {
+              thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${cat.image}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+            }
+
+            card.innerHTML = `
+              ${thumb}
+              <div>
+                <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
+                <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Explore Collection</p>
+              </div>
+            `;
+            categoriesGrid.appendChild(card);
+
+            // Add to Filter dropdown
+            if(categoryFilter) {
+              const opt = document.createElement('option');
+              opt.value = cat.name;
+              opt.textContent = cat.name;
+              categoryFilter.appendChild(opt);
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Category load error:", err);
+      }
+    });
+  </script>
 </body>
 </html>
