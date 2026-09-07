@@ -239,12 +239,11 @@ body{
 <div class="toast" id="successToast">Language Updated Successfully!</div>
 
 <script>
+<script>
 function selectLang(code) {
   localStorage.setItem('rc_lang', code);
-  window.location.href = 'index.html';
-}
   
-  // Visual click effect ke liye selected card highlight karna
+  // Visual click effect
   document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
   const activeCard = document.querySelector(`[data-code="${code}"]`);
   if(activeCard) activeCard.classList.add('selected');
@@ -252,10 +251,10 @@ function selectLang(code) {
   // Turant main store page par bhejna
   setTimeout(() => {
     window.location.href = 'index.html';
-  }, 200);
+  }, 150);
 }
 
-// Page khulte hi jo bhasha pehle se saved hai use highlight karna
+// Page load hone par saved language highlight karna
 document.addEventListener('DOMContentLoaded', () => {
   const currentLang = localStorage.getItem('rc_lang') || 'en';
   const activeCard = document.querySelector(`[data-code="${currentLang}"]`);
