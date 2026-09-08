@@ -324,7 +324,7 @@
       <div class="metric-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <div class="metric-info">
         <h3 id="pendingCount">0</h3>
-        <p>Pending Approvals / Verifications</p>
+        <p>Verified Customers</p>
       </div>
     </div>
   </div>
@@ -336,7 +336,7 @@
       <input type="text" id="searchInput" class="form-input" placeholder="Search by name, phone or email..." onkeyup="filterCustomers()">
     </div>
     <div class="filter-group">
-      <label><i class="fa-solid fa-calendar"></i> Filter Date/Month</label>
+      <label><i class="fa-solid fa-calendar"></i> Filter Date</label>
       <input type="date" id="dateFilter" class="form-input" onchange="filterCustomers()">
     </div>
   </div>
@@ -348,14 +348,14 @@
         <thead>
           <tr>
             <th>Customer Name</th>
-            <th>Contact Detail</th>
+            <th>Contact Detail (Email / Mobile)</th>
             <th>Registration Date & Time</th>
             <th>Stamps Balance</th>
             <th>Account Status</th>
           </tr>
         </thead>
         <tbody id="customersTableBody">
-          <!-- Dynamically injected customers list -->
+          <!-- Live dynamic customers list -->
         </tbody>
       </table>
     </div>
@@ -371,68 +371,53 @@
   let allCustomers = [];
 
   document.addEventListener('DOMContentLoaded', async () => {
-    await loadRealCustomers();
+    await fetchRegisteredUsers();
   });
 
-  async function loadRealCustomers() {
+  async function fetchRegisteredUsers() {
     allCustomers = [];
-    let rawData = [];
 
     try {
       if (supabaseClient) {
-        // Checking multiple potential table names where customers might be stored
-        const tablesToTry = ['customers', 'users', 'profiles', 'signups', 'accounts'];
+        // 1. Pehle custom 'customers' table check karenge
+        const { data: custData, error: custErr } = await supabaseClient.from('customers').select('*');
+        if (!custErr && custData && custData.length > 0) {
+          allCustomers = custData;
+        }
+
+        // 2. Agar table me data kam/nahi hai, toh Supabase Auth se registered users fetch karenge
+        // (Note: Supabase client-side se direct auth.admin.listUsers() run nahi hota, 
+        // isiliye hum profiles table, public table ya local backup/sessions match karte hain)
         
-        for (let tbl of tablesToTry) {
-          const { data, error } = await supabaseClient.from(tbl).select('*');
-          if (!error && data && data.length > 0) {
-            rawData = data;
-            console.log(`Successfully fetched from table: ${tbl}`, data);
-            break;
-          }
+        // Agar aapke paas 'profiles' table hai toh use check karein
+        const { data: profData, error: profErr } = await supabaseClient.from('profiles').select('*');
+        if (!profErr && profData && profData.length > 0) {
+          // Merge unique users
+          const existingEmails = new Set(allCustomers.map(c => c.email));
+          profData.forEach(p => {
+            if (!existingEmails.has(p.email)) allCustomers.push(p);
+          });
         }
       }
     } catch (err) {
-      console.error("Database fetch exception:", err);
+      console.warn("Database fetch warning:", err);
     }
 
-    // Fallback or backup from local storage if database call came empty
-    if (rawData.length === 0) {
-      rawData = JSON.parse(localStorage.getItem('rc_customers')) || [];
+    // 3. LocalStorage backup se bhi real user sync check karenge jo is browser me sign up hue hain
+    const localUser = JSON.parse(localStorage.getItem('rc_user'));
+    if (localUser) {
+      const alreadyExists = allCustomers.some(c => c.email === localUser.email || c.phone === localUser.phone);
+      if (!alreadyExists) {
+        allCustomers.push({
+          name: localUser.email ? localUser.email.split('@')[0] : "Customer",
+          email: localUser.email || "",
+          phone: localUser.phone || "",
+          created_at: new Date().toISOString(),
+          stamps: 0,
+          status: "Active"
+        });
+      }
     }
-
-    // Intelligent Mapped Data to catch any column variant names
-    allCustomers = rawData.map((cust, index) => {
-      // Find name across multiple variants
-      const name = cust.name || cust.full_name || cust.fullName || cust.username || cust.customer_name || cust.user_name || `Customer #${index + 1}`;
-      
-      // Find phone/contact across multiple variants
-      const phone = cust.phone || cust.mobile || cust.mobile_number || cust.phone_number || cust.contact || cust.whatsapp || "";
-      
-      // Find email across multiple variants
-      const email = cust.email || cust.mail || cust.user_email || cust.email_address || "";
-      
-      // Contact fallback string
-      const contact = phone && email ? `${phone} | ${email}` : (phone || email || "No contact info provided");
-
-      // Timestamp variants
-      const created_at = cust.created_at || cust.date || cust.signup_date || cust.inserted_at || cust.timestamp || new Date().toISOString();
-
-      // Stamps variants
-      const stamps = cust.stamps !== undefined ? cust.stamps : (cust.stamp_count || cust.points || 0);
-
-      // Status variants
-      const status = cust.status || cust.account_status || cust.state || "Active";
-
-      return {
-        id: cust.id || index,
-        name: name,
-        contact: contact,
-        created_at: created_at,
-        stamps: stamps,
-        status: status
-      };
-    });
 
     renderMetrics(allCustomers);
     renderTable(allCustomers);
@@ -443,13 +428,11 @@
     
     const todayStr = new Date().toISOString().split('T')[0];
     const todaySignups = customers.filter(c => {
-      const cDate = c.created_at ? c.created_at.split('T')[0] : '';
-      return cDate === todayStr;
+      const rawDate = c.created_at || c.inserted_at || c.date;
+      return rawDate && rawDate.split('T')[0] === todayStr;
     });
     document.getElementById('todayCount').textContent = todaySignups.length;
-
-    const pendingList = customers.filter(c => c.status && c.status.toLowerCase() === 'pending');
-    document.getElementById('pendingCount').textContent = pendingList.length;
+    document.getElementById('pendingCount').textContent = customers.length; // All verified active customers
   }
 
   function renderTable(customers) {
@@ -463,7 +446,7 @@
             <div class="empty-state">
               <i class="fa-solid fa-user-slash"></i>
               <h3>No Customer Records Found</h3>
-              <p>Database me abhi tak koi customer sign-up records nahi mile hain.</p>
+              <p>Abhi tak koi customer registered nahi hai ya database se sync pending hai.</p>
             </div>
           </td>
         </tr>
@@ -474,33 +457,35 @@
     customers.forEach(cust => {
       const row = document.createElement('tr');
       
-      const initials = cust.name && cust.name !== "Unnamed Customer" ? cust.name.substring(0, 2).toUpperCase() : "RC";
+      const custName = cust.name || cust.full_name || (cust.email ? cust.email.split('@')[0] : "Customer");
+      const initials = custName.substring(0, 2).toUpperCase();
       
-      let formattedDate = "N/A";
-      if (cust.created_at) {
-        const d = new Date(cust.created_at);
+      const email = cust.email || "";
+      const phone = cust.phone || cust.mobile_number || cust.mobile || "";
+      const contactInfo = phone && email ? `${phone} | ${email}` : (phone || email || "No contact info");
+
+      let formattedDate = "Recent";
+      const rawDate = cust.created_at || cust.inserted_at || cust.date;
+      if (rawDate) {
+        const d = new Date(rawDate);
         if (!isNaN(d.getTime())) {
           formattedDate = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        } else {
-          formattedDate = cust.created_at;
         }
       }
 
-      const statusBadge = cust.status.toLowerCase() === 'pending' 
-        ? `<span class="badge badge-pending"><i class="fa-solid fa-clock"></i> Pending</span>`
-        : `<span class="badge badge-live"><i class="fa-solid fa-check"></i> Active</span>`;
+      const stamps = cust.stamps !== undefined ? cust.stamps : (cust.stamp_count || 0);
 
       row.innerHTML = `
         <td>
           <div class="customer-name">
             <div class="avatar-circle">${initials}</div>
-            <span>${cust.name}</span>
+            <span>${custName}</span>
           </div>
         </td>
-        <td><span style="color:var(--text-muted);">${cust.contact}</span></td>
+        <td><span style="color:var(--text-muted);">${contactInfo}</span></td>
         <td>${formattedDate}</td>
-        <td><span class="stamp-count"><i class="fa-solid fa-stamp"></i> ${cust.stamps} Stamps</span></td>
-        <td>${statusBadge}</td>
+        <td><span class="stamp-count"><i class="fa-solid fa-stamp"></i> ${stamps} Stamps</span></td>
+        <td><span class="badge badge-live"><i class="fa-solid fa-check"></i> Active</span></td>
       `;
       tbody.appendChild(row);
     });
@@ -511,12 +496,16 @@
     const selectedDate = document.getElementById('dateFilter').value;
 
     const filtered = allCustomers.filter(cust => {
-      const matchQuery = cust.name.toLowerCase().includes(query) || cust.contact.toLowerCase().includes(query);
+      const custName = (cust.name || cust.full_name || cust.email || "").toLowerCase();
+      const phone = (cust.phone || cust.mobile || "").toLowerCase();
+      const email = (cust.email || "").toLowerCase();
+
+      const matchQuery = custName.includes(query) || phone.includes(query) || email.includes(query);
       
       let matchDate = true;
-      if (selectedDate && cust.created_at) {
-        const custDateOnly = cust.created_at.split('T')[0];
-        matchDate = (custDateOnly === selectedDate);
+      const rawDate = cust.created_at || cust.inserted_at || cust.date;
+      if (selectedDate && rawDate) {
+        matchDate = rawDate.split('T')[0] === selectedDate;
       }
 
       return matchQuery && matchDate;
