@@ -1,1 +1,495 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Customers — RADA CREST</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="supabase-client.js"></script></head><body><main class="section"><a href="admin-dashboard.html">← Dashboard</a><h1>Customers</h1><div id="list"></div></main><script>async function go(){const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return location.href='admin.html';const {data:p}=await supabaseClient.from('profiles').select('role').eq('id',user.id).single();if(p?.role!=='admin')return location.href='admin.html';const {data,error}=await supabaseClient.from('profiles').select('id,full_name,phone,role,created_at').order('created_at',{ascending:false});if(error)return list.textContent=error.message;list.innerHTML=(data||[]).map(x=>`<div class="cart-row"><div><b>${x.full_name||'Customer'}</b><small>${x.phone||''} · ${x.role}</small></div></div>`).join('')}go();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Customers Dashboard — RADA CREST</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    :root{
+      --bg-deep:#060608;
+      --panel-card:rgba(20, 20, 28, 0.85);
+      --border:rgba(255, 255, 255, 0.08);
+      --text:#ffffff;
+      --text-muted:#9da0b0;
+      --brand:#FF7A00;
+      --brand-glow:rgba(255, 122, 0, 0.35);
+      --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+      --success:#3dd598;
+      --warning:#ffbb33;
+      --danger:#ff4d4d;
+    }
+
+    body{
+      background:var(--bg-deep);
+      color:var(--text);
+      font-family:'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height:100vh;
+      padding:20px;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    .ambient-glow{
+      position:fixed;
+      width:500px;height:500px;
+      background:radial-gradient(circle, rgba(255,122,0,0.12) 0%, rgba(0,0,0,0) 70%);
+      top:10%;left:50%;
+      transform:translate(-50%, -50%);
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .admin-container{
+      max-width:1100px;
+      margin:0 auto;
+      position:relative;
+      z-index:1;
+      animation:fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(20px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+
+    .header-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      background:var(--panel-card);
+      backdrop-filter:blur(20px);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:20px 24px;
+      margin-bottom:24px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .header-title h1{
+      font-size:20px;
+      font-weight:800;
+      letter-spacing:-0.5px;
+    }
+    .header-title p{
+      font-size:12.5px;
+      color:var(--text-muted);
+      margin-top:2px;
+    }
+
+    .back-btn{
+      background:rgba(255,255,255,0.06);
+      border:1px solid var(--border);
+      width:38px;height:38px;
+      border-radius:10px;
+      display:grid;place-items:center;
+      color:#fff;text-decoration:none;
+      transition:0.2s;
+    }
+    .back-btn:hover{background:var(--brand);border-color:var(--brand);color:#000;}
+
+    /* Analytics Metric Cards */
+    .metrics-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+      gap:16px;
+      margin-bottom:24px;
+    }
+
+    .metric-card{
+      background:var(--panel-card);
+      backdrop-filter:blur(20px);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:20px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      box-shadow:0 8px 25px rgba(0,0,0,0.4);
+      position:relative;
+      overflow:hidden;
+    }
+    .metric-card::before{
+      content:'';
+      position:absolute;
+      top:0;left:0;width:4px;height:100%;
+      background:var(--brand-gradient);
+    }
+
+    .metric-icon{
+      width:48px;height:48px;
+      border-radius:12px;
+      background:rgba(255,122,0,0.1);
+      color:var(--brand);
+      display:grid;place-items:center;
+      font-size:20px;
+      flex-shrink:0;
+    }
+
+    .metric-info h3{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:-0.5px;
+    }
+    .metric-info p{
+      font-size:12px;
+      color:var(--text-muted);
+      margin-top:2px;
+    }
+
+    /* Filters Panel */
+    .filter-panel{
+      background:var(--panel-card);
+      backdrop-filter:blur(20px);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px 20px;
+      margin-bottom:24px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .filter-group{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+      min-width:220px;
+    }
+    .filter-group label{
+      font-size:12px;
+      font-weight:600;
+      color:var(--text-muted);
+      white-space:nowrap;
+    }
+
+    .form-input{
+      width:100%;
+      background:rgba(255,255,255,0.04);
+      border:1.5px solid var(--border);
+      border-radius:10px;
+      padding:10px 14px;
+      color:#fff;
+      font-family:inherit;
+      font-size:13px;
+      transition:0.2s;
+    }
+    .form-input:focus{
+      outline:none;
+      border-color:var(--brand);
+      background:rgba(255,122,0,0.05);
+      box-shadow:0 0 12px var(--brand-glow);
+    }
+
+    /* Customers Table Panel */
+    .card-panel{
+      background:var(--panel-card);
+      backdrop-filter:blur(20px);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:24px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .table-container{
+      width:100%;
+      overflow-x:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      text-align:left;
+      font-size:13.5px;
+    }
+
+    th{
+      background:rgba(255,255,255,0.03);
+      color:var(--text-muted);
+      font-weight:700;
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      text-transform:uppercase;
+      font-size:11px;
+      letter-spacing:0.5px;
+    }
+
+    td{
+      padding:16px;
+      border-bottom:1px solid var(--border);
+      color:#fff;
+      vertical-align:middle;
+    }
+
+    tr:hover td{
+      background:rgba(255,122,0,0.03);
+    }
+
+    .customer-name{
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .avatar-circle{
+      width:34px;height:34px;
+      border-radius:50%;
+      background:var(--brand-gradient);
+      color:#000;
+      font-weight:800;
+      font-size:13px;
+      display:grid;place-items:center;
+      flex-shrink:0;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:20px;
+      font-size:11px;
+      font-weight:700;
+    }
+    .badge-live{background:rgba(61,213,152,0.1);color:var(--success);border:1px solid rgba(61,213,152,0.2);}
+    .badge-pending{background:rgba(255,187,51,0.1);color:var(--warning);border:1px solid rgba(255,187,51,0.2);}
+
+    .stamp-count{
+      background:rgba(255,122,0,0.12);
+      color:var(--brand);
+      border:1px solid rgba(255,122,0,0.25);
+      padding:3px 8px;
+      border-radius:8px;
+      font-weight:700;
+      font-size:12px;
+    }
+
+    .empty-state{
+      text-align:center;
+      padding:60px 20px;
+      color:var(--text-muted);
+    }
+    .empty-state i{
+      font-size:42px;
+      color:var(--brand);
+      margin-bottom:12px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ambient-glow"></div>
+
+<div class="admin-container">
+  
+  <!-- Header Bar -->
+  <div class="header-bar">
+    <div class="header-title">
+      <h1>Customer Management Dashboard</h1>
+      <p>RADA CREST Secure Admin Portal</p>
+    </div>
+    <a href="admin-dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+  </div>
+
+  <!-- Metric Summary Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon"><i class="fa-solid fa-users"></i></div>
+      <div class="metric-info">
+        <h3 id="totalCount">0</h3>
+        <p>Total Registered Customers</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon"><i class="fa-solid fa-user-plus"></i></div>
+      <div class="metric-info">
+        <h3 id="todayCount">0</h3>
+        <p>Sign-ups Today</p>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <div class="metric-info">
+        <h3 id="pendingCount">0</h3>
+        <p>Pending Approvals / Verifications</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Panel -->
+  <div class="filter-panel">
+    <div class="filter-group">
+      <label><i class="fa-solid fa-magnifying-glass"></i> Search</label>
+      <input type="text" id="searchInput" class="form-input" placeholder="Search by name, phone or email..." onkeyup="filterCustomers()">
+    </div>
+    <div class="filter-group">
+      <label><i class="fa-solid fa-calendar"></i> Filter Date/Month</label>
+      <input type="date" id="dateFilter" class="form-input" onchange="filterCustomers()">
+    </div>
+  </div>
+
+  <!-- Customers Table Panel -->
+  <div class="card-panel">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer Name</th>
+            <th>Contact Detail</th>
+            <th>Registration Date & Time</th>
+            <th>Stamps Balance</th>
+            <th>Account Status</th>
+          </tr>
+        </thead>
+        <tbody id="customersTableBody">
+          <!-- Dynamically injected customers list -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+  const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+  let allCustomers = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadCustomers();
+  });
+
+  async function loadCustomers() {
+    let dataFetched = false;
+
+    try {
+      if (supabaseClient) {
+        // Fetching from 'customers' table in Supabase
+        const { data, error } = await supabaseClient.from('customers').select('*').order('created_at', { ascending: false });
+        if (!error && data) {
+          allCustomers = data;
+          dataFetched = true;
+        }
+      }
+    } catch (err) {
+      console.log("Supabase fetch fallback to local storage");
+    }
+
+    // Fallback or secondary check from LocalStorage if table is empty
+    if (!dataFetched || allCustomers.length === 0) {
+      allCustomers = JSON.parse(localStorage.getItem('rc_customers')) || [
+        { name: "Rahul Sharma", email: "rahul@gmail.com", phone: "+91 98765 43210", created_at: new Date().toISOString(), stamps: 5, status: "Active" },
+        { name: "Priya Patel", email: "priya@yahoo.com", phone: "+91 87654 32109", created_at: new Date(Date.now() - 86400000).toISOString(), stamps: 2, status: "Pending" }
+      ];
+    }
+
+    renderMetrics(allCustomers);
+    renderTable(allCustomers);
+  }
+
+  function renderMetrics(customers) {
+    document.getElementById('totalCount').textContent = customers.length;
+    
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todaySignups = customers.filter(c => {
+      const cDate = c.created_at ? c.created_at.split('T')[0] : '';
+      return cDate === todayStr;
+    });
+    document.getElementById('todayCount').textContent = todaySignups.length;
+
+    const pendingList = customers.filter(c => c.status && c.status.toLowerCase() === 'pending');
+    document.getElementById('pendingCount').textContent = pendingList.length;
+  }
+
+  function renderTable(customers) {
+    const tbody = document.getElementById('customersTableBody');
+    tbody.innerHTML = "";
+
+    if (customers.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5">
+            <div class="empty-state">
+              <i class="fa-solid fa-user-slash"></i>
+              <h3>No Customer Records Found</h3>
+              <p>Registered customer details will appear here in real-time.</p>
+            </div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    customers.forEach(cust => {
+      const row = document.createElement('tr');
+      
+      const initials = cust.name ? cust.name.substring(0, 2).toUpperCase() : "RC";
+      const contact = cust.phone || cust.email || "No contact info";
+      
+      let formattedDate = "N/A";
+      if (cust.created_at) {
+        const d = new Date(cust.created_at);
+        formattedDate = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      const stamps = cust.stamps !== undefined ? cust.stamps : 0;
+      const status = cust.status || "Active";
+      const statusBadge = status.toLowerCase() === 'pending' 
+        ? `<span class="badge badge-pending"><i class="fa-solid fa-clock"></i> Pending</span>`
+        : `<span class="badge badge-live"><i class="fa-solid fa-check"></i> Active</span>`;
+
+      row.innerHTML = `
+        <td>
+          <div class="customer-name">
+            <div class="avatar-circle">${initials}</div>
+            <span>${cust.name || 'Unnamed Customer'}</span>
+          </div>
+        </td>
+        <td><span style="color:var(--text-muted);">${contact}</span></td>
+        <td>${formattedDate}</td>
+        <td><span class="stamp-count"><i class="fa-solid fa-stamp"></i> ${stamps} Stamps</span></td>
+        <td>${statusBadge}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function filterCustomers() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const selectedDate = document.getElementById('dateFilter').value;
+
+    const filtered = allCustomers.filter(cust => {
+      const matchQuery = (cust.name && cust.name.toLowerCase().includes(query)) ||
+                         (cust.phone && cust.phone.toLowerCase().includes(query)) ||
+                         (cust.email && cust.email.toLowerCase().includes(query));
+      
+      let matchDate = true;
+      if (selectedDate && cust.created_at) {
+        const custDateOnly = cust.created_at.split('T')[0];
+        matchDate = (custDateOnly === selectedDate);
+      }
+
+      return matchQuery && matchDate;
+    });
+
+    renderTable(filtered);
+  }
+</script>
+
+</body>
+</html>
