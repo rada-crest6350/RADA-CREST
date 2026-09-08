@@ -27,48 +27,61 @@
   box-sizing:border-box;
 }
 
+:root {
+  --brand-orange: #FF7A00;
+  --brand-glow: rgba(255, 122, 0, 0.35);
+}
+
 body{
   margin:0;
   font-family:'Plus Jakarta Sans',sans-serif;
-  color:#171717;
-  background:
-    radial-gradient(circle at 10% 0%,rgba(0,0,0,.035),transparent 28%),
-    radial-gradient(circle at 90% 10%,rgba(0,0,0,.025),transparent 30%),
-    #f8f7f4;
+  color:#f3f4f6;
+  background: radial-gradient(circle at 10% 0%, rgba(255,122,0,0.08), transparent 35%),
+              radial-gradient(circle at 90% 90%, rgba(255,122,0,0.05), transparent 40%),
+              linear-gradient(135deg, #090b0e 0%, #12161f 50%, #07090c 100%);
+  min-height:100vh;
+}
+
+.ambient-glow {
+  position: fixed;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.15) 0%, rgba(0,0,0,0) 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .glass-header{
-  background:rgba(255,255,255,.84);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
-  border-bottom:1px solid rgba(0,0,0,.07);
+  background: rgba(9, 12, 16, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .page-shell{
   width:min(920px,calc(100% - 24px));
   margin:auto;
+  position:relative;
+  z-index:1;
 }
 
 .order-card{
   position:relative;
-  background:rgba(255,255,255,.96);
-  border:1px solid rgba(0,0,0,.07);
-  border-radius:26px;
+  background: rgba(18, 22, 31, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius:24px;
   overflow:hidden;
-  box-shadow:
-    0 10px 35px rgba(0,0,0,.045),
-    0 2px 8px rgba(0,0,0,.025);
-  transition:
-    transform .25s ease,
-    box-shadow .25s ease,
-    border-color .25s ease;
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
 
 .order-card:hover{
-  transform:translateY(-2px);
-  box-shadow:
-    0 20px 48px rgba(0,0,0,.075),
-    0 3px 10px rgba(0,0,0,.035);
+  transform:translateY(-3px);
+  border-color: rgba(255, 122, 0, 0.4);
+  box-shadow: 0 20px 40px -10px rgba(255, 122, 0, 0.18);
 }
 
 .order-card:active{
@@ -76,17 +89,17 @@ body{
 }
 
 .order-top{
-  border-bottom:1px solid #eeeeee;
+  border-bottom:1px solid rgba(255, 255, 255, 0.06);
 }
 
 .product-box{
-  width:108px;
-  height:108px;
-  min-width:108px;
-  border-radius:22px;
+  width:100px;
+  height:100px;
+  min-width:100px;
+  border-radius:18px;
   overflow:hidden;
-  background:#f5f5f5;
-  border:1px solid #eeeeee;
+  background: rgba(10, 13, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -103,10 +116,10 @@ body{
   display:inline-flex;
   align-items:center;
   gap:6px;
-  padding:7px 10px;
+  padding:6px 12px;
   border-radius:999px;
-  font-size:10px;
-  font-weight:800;
+  font-size:10.5px;
+  font-weight:700;
   letter-spacing:.04em;
   text-transform:uppercase;
 }
@@ -119,61 +132,99 @@ body{
 }
 
 .status-delivered{
-  color:#087443;
-  background:#ecfdf3;
+  color:#3dd598;
+  background:rgba(61, 213, 152, 0.12);
+  border:1px solid rgba(61, 213, 152, 0.25);
 }
 
 .status-cancelled{
-  color:#b42318;
-  background:#fff1f0;
+  color:#ff4d4d;
+  background:rgba(255, 77, 77, 0.12);
+  border:1px solid rgba(255, 77, 77, 0.25);
 }
 
 .status-pending{
-  color:#9a6700;
-  background:#fff8df;
+  color:#ffbb33;
+  background:rgba(255, 187, 51, 0.12);
+  border:1px solid rgba(255, 187, 51, 0.25);
 }
 
 .status-processing{
-  color:#175cd3;
-  background:#eff8ff;
+  color:#FF7A00;
+  background:rgba(255, 122, 0, 0.12);
+  border:1px solid rgba(255, 122, 0, 0.3);
 }
 
 .status-default{
-  color:#525252;
-  background:#f4f4f5;
+  color:#9da0b0;
+  background:rgba(255, 255, 255, 0.05);
+  border:1px solid rgba(255, 255, 255, 0.08);
 }
 
 .view-button{
-  background:#111;
-  color:white;
-  transition:.2s ease;
+  background: linear-gradient(135deg, #FF7A00 0%, #E06000 100%);
+  color: #000;
+  font-weight:800;
+  transition: all .25s ease;
+  box-shadow: 0 4px 15px var(--brand-glow);
 }
 
 .view-button:hover{
-  background:#292929;
+  background: linear-gradient(135deg, #FF8A1C 0%, #FF7A00 100%);
   transform:translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 122, 0, 0.5);
 }
 
 .empty-icon{
   width:82px;
   height:82px;
   margin:auto;
-  border-radius:27px;
-  background:#111;
-  color:#fff;
+  border-radius:24px;
+  background: rgba(255, 122, 0, 0.1);
+  border: 1px solid rgba(255, 122, 0, 0.3);
+  color: var(--brand-orange);
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:0 18px 40px rgba(0,0,0,.14);
+  box-shadow: 0 10px 25px rgba(255, 122, 0, 0.15);
 }
 
-.skeleton{
-  animation:pulse 1.5s ease-in-out infinite;
+/* Fluid Shimmer Wave Animation */
+.shimmer-box {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
 }
 
-@keyframes pulse{
-  0%,100%{opacity:.55}
-  50%{opacity:1}
+.shimmer-box::after {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 122, 0, 0.12) 40%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 122, 0, 0.12) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.8s infinite;
+  content: '';
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.fade-in-content {
+  animation: contentFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes contentFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .toast{
@@ -181,26 +232,13 @@ body{
 }
 
 @keyframes toastIn{
-  from{
-    opacity:0;
-    transform:translateY(-10px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
+  from{ opacity:0; transform:translateY(-10px); }
+  to{ opacity:1; transform:translateY(0); }
 }
 
 @media(max-width:640px){
-
-  .page-shell{
-    width:calc(100% - 18px);
-  }
-
-  .order-card{
-    border-radius:22px;
-  }
-
+  .page-shell{ width:calc(100% - 18px); }
+  .order-card{ border-radius:20px; }
 }
 
 </style>
@@ -208,81 +246,65 @@ body{
 
 <body>
 
+<div class="ambient-glow top-0 left-1/2 -translate-x-1/2"></div>
+<div class="ambient-glow bottom-10 right-[-100px]"></div>
+
 <!-- HEADER -->
 <header class="glass-header sticky top-0 z-50">
-
   <div class="page-shell h-[72px] flex items-center justify-between">
-
     <div class="flex items-center gap-3">
-
       <a
         href="account.html"
-        class="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center hover:bg-neutral-100 transition"
+        class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-neutral-300 hover:text-white hover:border-[#FF7A00] transition"
       >
         <i class="fa-solid fa-arrow-left text-sm"></i>
       </a>
 
       <div>
-
-        <div class="font-extrabold tracking-[.18em] text-[15px]">
-          RADA CREST
+        <div class="font-extrabold tracking-[.18em] text-[15px] text-white flex items-center gap-2">
+          <span class="text-[#FF7A00]">RC</span> RADA CREST
         </div>
-
         <div class="text-[10px] text-neutral-400 uppercase tracking-wider">
           Order Centre
         </div>
-
       </div>
-
     </div>
 
     <a
       href="cart.html"
-      class="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center hover:bg-neutral-100 transition"
+      class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-neutral-300 hover:text-white hover:border-[#FF7A00] transition"
       aria-label="Cart"
     >
       <i class="fa-solid fa-bag-shopping text-sm"></i>
     </a>
-
   </div>
-
 </header>
-
 
 <main class="page-shell py-8 sm:py-10">
 
   <!-- INTRO -->
   <section class="mb-7">
-
     <div class="flex items-end justify-between gap-4">
-
       <div>
-
-        <p class="text-[10px] uppercase tracking-[.23em] font-bold text-neutral-400 mb-2">
+        <p class="text-[10px] uppercase tracking-[.23em] font-bold text-[#FF7A00] mb-2">
           Your Shopping History
         </p>
-
-        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
           My Orders
         </h1>
-
-        <p class="text-sm text-neutral-500 mt-2 leading-6">
+        <p class="text-sm text-neutral-400 mt-2 leading-6">
           Track and manage every order placed from your RADA CREST account.
         </p>
-
       </div>
 
       <div
         id="orderCount"
-        class="hidden sm:flex px-3 py-2 rounded-full bg-white border border-neutral-200 text-xs font-semibold text-neutral-500"
+        class="hidden sm:flex px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-[#FF7A00]"
       >
         0 Orders
       </div>
-
     </div>
-
   </section>
-
 
   <!-- ALERT -->
   <div
@@ -290,65 +312,58 @@ body{
     class="hidden mb-5 px-4 py-3 rounded-2xl text-sm"
   ></div>
 
-
-  <!-- LOADING -->
+  <!-- ULTRA-PREMIUM FLOWING WAVE SKELETON LOADER -->
   <section id="loadingState" class="space-y-4">
-
-    <div class="order-card p-5 skeleton">
-
-      <div class="flex justify-between gap-4">
-
-        <div class="space-y-3">
-
-          <div class="h-4 bg-neutral-200 rounded w-32"></div>
-
-          <div class="h-3 bg-neutral-200 rounded w-44"></div>
-
+    <!-- Card 1 -->
+    <div class="order-card p-5 border border-white/10">
+      <div class="flex justify-between items-center gap-4">
+        <div class="space-y-2.5">
+          <div class="h-3.5 shimmer-box rounded-md w-28"></div>
+          <div class="h-4 shimmer-box rounded-md w-44"></div>
         </div>
-
-        <div class="h-7 bg-neutral-200 rounded-full w-24"></div>
-
+        <div class="h-7 shimmer-box rounded-full w-24"></div>
       </div>
 
-      <div class="flex gap-4 mt-6">
-
-        <div class="product-box bg-neutral-200"></div>
-
-        <div class="flex-1 space-y-3">
-
-          <div class="h-4 bg-neutral-200 rounded w-48"></div>
-
-          <div class="h-3 bg-neutral-200 rounded w-28"></div>
-
+      <div class="flex gap-4 mt-6 pt-5 border-t border-white/5">
+        <div class="product-box shimmer-box"></div>
+        <div class="flex-1 space-y-3 pt-1">
+          <div class="h-4 shimmer-box rounded-md w-3/4"></div>
+          <div class="h-3 shimmer-box rounded-md w-24"></div>
+          <div class="h-3 shimmer-box rounded-md w-36"></div>
         </div>
-
       </div>
 
+      <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/5">
+        <div class="h-5 shimmer-box rounded-md w-20"></div>
+        <div class="h-9 shimmer-box rounded-xl w-28"></div>
+      </div>
     </div>
 
-
-    <div class="order-card p-5 skeleton">
-
-      <div class="h-4 bg-neutral-200 rounded w-36"></div>
-
-      <div class="h-3 bg-neutral-200 rounded w-44 mt-3"></div>
-
-      <div class="flex gap-4 mt-6">
-
-        <div class="product-box bg-neutral-200"></div>
-
-        <div class="flex-1">
-
-          <div class="h-4 bg-neutral-200 rounded w-44"></div>
-
+    <!-- Card 2 -->
+    <div class="order-card p-5 border border-white/10">
+      <div class="flex justify-between items-center gap-4">
+        <div class="space-y-2.5">
+          <div class="h-3.5 shimmer-box rounded-md w-32"></div>
+          <div class="h-4 shimmer-box rounded-md w-40"></div>
         </div>
-
+        <div class="h-7 shimmer-box rounded-full w-24"></div>
       </div>
 
-    </div>
+      <div class="flex gap-4 mt-6 pt-5 border-t border-white/5">
+        <div class="product-box shimmer-box"></div>
+        <div class="flex-1 space-y-3 pt-1">
+          <div class="h-4 shimmer-box rounded-md w-2/3"></div>
+          <div class="h-3 shimmer-box rounded-md w-20"></div>
+          <div class="h-3 shimmer-box rounded-md w-32"></div>
+        </div>
+      </div>
 
+      <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/5">
+        <div class="h-5 shimmer-box rounded-md w-24"></div>
+        <div class="h-9 shimmer-box rounded-xl w-28"></div>
+      </div>
+    </div>
   </section>
-
 
   <!-- ORDERS -->
   <section
@@ -356,129 +371,87 @@ body{
     class="hidden space-y-4"
   ></section>
 
-
   <!-- EMPTY -->
   <section
     id="emptyState"
     class="hidden order-card text-center px-6 py-16"
   >
-
     <div class="empty-icon">
-
       <i class="fa-solid fa-box-open text-3xl"></i>
-
     </div>
 
-    <h2 class="font-extrabold text-xl mt-6">
+    <h2 class="font-extrabold text-xl mt-6 text-white">
       No orders yet
     </h2>
 
-    <p class="text-sm text-neutral-500 max-w-sm mx-auto mt-2 leading-6">
+    <p class="text-sm text-neutral-400 max-w-sm mx-auto mt-2 leading-6">
       Your completed and active orders will appear here once you place your
       first RADA CREST order.
     </p>
 
     <a
       href="index.html"
-      class="inline-flex items-center justify-center mt-6 px-5 py-3 rounded-xl bg-black text-white text-sm font-semibold"
+      class="inline-flex items-center justify-center mt-6 px-6 py-3 rounded-xl view-button text-xs uppercase tracking-wider"
     >
       <i class="fa-solid fa-arrow-left mr-2"></i>
       Continue Shopping
     </a>
-
   </section>
 
-
-  <div class="text-center mt-8 text-[11px] text-neutral-400">
-    <i class="fa-solid fa-shield-halved mr-1"></i>
+  <div class="text-center mt-8 text-[11px] text-neutral-500">
+    <i class="fa-solid fa-shield-halved mr-1 text-[#FF7A00]"></i>
     Your order information is protected by your account.
   </div>
 
 </main>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script src="supabase-client.js"></script>
-
 
 <script>
 
 let currentUser = null;
 let orders = [];
 
-
-/* =========================================================
-   ALERT
-========================================================= */
-
 function showAlert(message){
-
   const el = document.getElementById('alert');
-
-  el.className =
-    'mb-5 px-4 py-3 rounded-2xl text-sm toast bg-red-50 text-red-700 border border-red-200';
-
+  el.className = 'mb-5 px-4 py-3 rounded-2xl text-sm toast bg-red-950/60 text-red-300 border border-red-800/60';
   el.textContent = message;
-
   el.classList.remove('hidden');
-
 }
 
-
-/* =========================================================
-   AUTH
-========================================================= */
-
 async function loadAccount(){
-
   try{
+    const client = window.supabaseClient || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+    if(!client){
+      throw new Error('Database connection initializing...');
+    }
 
-    const {
-      data,
-      error
-    } = await supabaseClient.auth.getUser();
-
+    const { data, error } = await client.auth.getUser();
     if(error) throw error;
 
     if(!data.user){
-
       window.location.href = 'account.html';
-
       return;
     }
 
     currentUser = data.user;
-
     await loadOrders();
 
   }catch(error){
-
     console.error(error);
-
-    document
-      .getElementById('loadingState')
-      .classList.add('hidden');
-
-    showAlert(
-      error.message || 'Unable to load your account.'
-    );
-
+    document.getElementById('loadingState').classList.add('hidden');
+    showAlert(error.message || 'Unable to load your account.');
   }
-
 }
 
-  
-/* =========================================================
-   LOAD ORDERS
-========================================================= */
-
 async function loadOrders(){
-
+  const client = window.supabaseClient || supabaseClient;
   let allOrders = [];
 
-  // 1. Fetch from order_summary using both email and user_id if possible
-  const { data: summaryData, error: summaryError } = await supabaseClient
+  // 1. Fetch from order_summary
+  const { data: summaryData, error: summaryError } = await client
     .from('order_summary')
     .select('*')
     .or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`)
@@ -488,15 +461,14 @@ async function loadOrders(){
     allOrders = [...summaryData];
   }
 
-  // 2. Fetch from orders table as well
-  const { data: ordersData, error: ordersError } = await supabaseClient
+  // 2. Fetch from orders table
+  const { data: ordersData, error: ordersError } = await client
     .from('orders')
     .select('*')
     .or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`)
     .order('created_at', {ascending:false});
 
   if(!ordersError && ordersData){
-    // Merge both and avoid duplicate IDs
     const existingIds = new Set(allOrders.map(o => o.id || o.order_id));
     for(let ord of ordersData){
       const oid = ord.id || ord.order_id;
@@ -507,18 +479,13 @@ async function loadOrders(){
     }
   }
 
-  // Sort by created_at descending
   allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-  document
-    .getElementById('loadingState')
-    .classList.add('hidden');
-
+  document.getElementById('loadingState').classList.add('hidden');
   orders = allOrders;
 
-  // Har order ke liye order_items aur products fetch karke photo ensure karo
   for(let ord of orders){
-    const { data: items } = await supabaseClient
+    const { data: items } = await client
       .from('order_items')
       .select('*')
       .eq('order_id', ord.id || ord.order_id);
@@ -532,7 +499,7 @@ async function loadOrders(){
       ord.product_image = items[0].image_url || items[0].image || items[0].product_image || '';
 
       if(!ord.product_image && items[0].product_id){
-        const { data: prod } = await supabaseClient
+        const { data: prod } = await client
           .from('products')
           .select('*')
           .eq('id', items[0].product_id)
@@ -547,417 +514,166 @@ async function loadOrders(){
 
   renderOrders();
 }
-  
-
-/* =========================================================
-   RENDER ORDERS
-========================================================= */
 
 function renderOrders(){
+  const list = document.getElementById('ordersList');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('orderCount');
 
-  const list =
-    document.getElementById('ordersList');
-
-  const empty =
-    document.getElementById('emptyState');
-
-  const count =
-    document.getElementById('orderCount');
-
-
-  count.textContent =
-    `${orders.length} ${orders.length === 1 ? 'Order' : 'Orders'}`;
-
+  count.textContent = `${orders.length} ${orders.length === 1 ? 'Order' : 'Orders'}`;
   count.classList.remove('hidden');
 
-
   if(!orders.length){
-
     list.classList.add('hidden');
-
     empty.classList.remove('hidden');
-
     return;
   }
 
-
   empty.classList.add('hidden');
-
   list.classList.remove('hidden');
+  list.classList.add('fade-in-content');
 
+  list.innerHTML = orders.map(order => {
+    const id = order.id || order.order_id;
+    const status = order.status || 'Pending';
+    const payment = order.payment_status || 'Pending';
+    const total = Number(order.total_amount ?? order.total ?? 0);
+    const date = formatDate(order.created_at);
+    const statusClass = getStatusClass(status);
+    const statusIcon = getStatusIcon(status);
 
-  list.innerHTML =
-    orders.map(order => {
+    const productImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || order.product?.img || (Array.isArray(order.items) && order.items[0]?.image_url) || (Array.isArray(order.items) && order.items[0]?.image) || '';
+    const productName = order.product_name || order.product_title || 'Order Items';
+    const quantity = order.quantity || order.item_count || '';
 
-      const id =
-        order.id || order.order_id;
-
-      const status =
-        order.status || 'Pending';
-
-      const payment =
-        order.payment_status || 'Pending';
-
-      const total =
-        Number(
-          order.total_amount ??
-          order.total ??
-          0
-        );
-
-
-      const date =
-        formatDate(order.created_at);
-
-
-      const statusClass =
-        getStatusClass(status);
-
-
-      const statusIcon =
-        getStatusIcon(status);
-
-
-      const productImage =
-        order.product_image ||
-        order.image_url ||
-        order.image ||
-        order.img ||
-        order.product?.image_url ||
-        order.product?.image ||
-        order.product?.img ||
-        (Array.isArray(order.items) && order.items[0]?.image_url) ||
-        (Array.isArray(order.items) && order.items[0]?.image) ||
-        '';
-
-
-      const productName =
-        order.product_name ||
-        order.product_title ||
-        'Order Items';
-
-
-      const quantity =
-        order.quantity ||
-        order.item_count ||
-        '';
-
-
-      return `
-
-        <article
-          class="order-card cursor-pointer"
-          onclick="openOrder('${escapeAttr(id)}')"
-        >
-
-          <!-- TOP -->
-          <div class="order-top px-5 sm:px-6 py-5">
-
-            <div class="flex items-start justify-between gap-4">
-
-              <div>
-
-                <p class="text-[10px] uppercase tracking-[.15em] text-neutral-400 font-bold">
-                  Order
-                </p>
-
-                <h2 class="font-extrabold text-sm mt-1 break-all">
-                  #${escapeHtml(String(id))}
-                </h2>
-
-                <p class="text-xs text-neutral-400 mt-1">
-                  ${date}
-                </p>
-
-              </div>
-
-
-              <span class="status ${statusClass}">
-                <span class="status-dot"></span>
-                <i class="${statusIcon} text-[9px]"></i>
-                ${escapeHtml(status)}
-              </span>
-
+    return `
+      <article
+        class="order-card cursor-pointer"
+        onclick="openOrder('${escapeAttr(id)}')"
+      >
+        <div class="order-top px-5 sm:px-6 py-5">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] uppercase tracking-[.15em] text-[#FF7A00] font-bold">
+                Order
+              </p>
+              <h2 class="font-extrabold text-sm mt-1 break-all text-white">
+                #${escapeHtml(String(id))}
+              </h2>
+              <p class="text-xs text-neutral-400 mt-1">
+                ${date}
+              </p>
             </div>
 
+            <span class="status ${statusClass}">
+              <span class="status-dot"></span>
+              <i class="${statusIcon} text-[9px]"></i>
+              ${escapeHtml(status)}
+            </span>
+          </div>
+        </div>
+
+        <div class="px-5 sm:px-6 py-5">
+          <div class="flex items-center gap-4">
+            <div class="product-box">
+              ${
+                productImage
+                ? `<img src="${escapeAttr(productImage)}" alt="Product" onerror="this.style.display='none'">`
+                : `<div class="w-full h-full flex items-center justify-center text-neutral-500"><i class="fa-solid fa-box"></i></div>`
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-sm truncate text-neutral-100">
+                ${escapeHtml(productName)}
+              </h3>
+
+              ${
+                quantity
+                ? `<p class="text-xs text-neutral-400 mt-1">${escapeHtml(String(quantity))} item(s)</p>`
+                : `<p class="text-xs text-neutral-400 mt-1">View complete order</p>`
+              }
+
+              <p class="text-xs text-neutral-400 mt-2">
+                Payment: <span class="font-semibold text-neutral-200">${escapeHtml(payment)}</span>
+              </p>
+            </div>
           </div>
 
-
-          <!-- PRODUCT / SUMMARY -->
-          <div class="px-5 sm:px-6 py-5">
-
-            <div class="flex items-center gap-4">
-
-              <div class="product-box">
-
-                ${
-                  productImage
-                  ?
-                  `
-                    <img
-                      src="${escapeAttr(productImage)}"
-                      alt="Product"
-                      onerror="this.style.display='none'"
-                    >
-                  `
-                  :
-                  `
-                    <div class="w-full h-full flex items-center justify-center text-neutral-400">
-                      <i class="fa-solid fa-box"></i>
-                    </div>
-                  `
-                }
-
-              </div>
-
-
-              <div class="flex-1 min-w-0">
-
-                <h3 class="font-bold text-sm truncate">
-                  ${escapeHtml(productName)}
-                </h3>
-
-                ${
-                  quantity
-                  ?
-                  `
-                    <p class="text-xs text-neutral-400 mt-1">
-                      ${escapeHtml(String(quantity))} item(s)
-                    </p>
-                  `
-                  :
-                  `
-                    <p class="text-xs text-neutral-400 mt-1">
-                      View complete order
-                    </p>
-                  `
-                }
-
-                <p class="text-xs text-neutral-500 mt-2">
-                  Payment:
-                  <span class="font-semibold">
-                    ${escapeHtml(payment)}
-                  </span>
-                </p>
-
-              </div>
-
+          <div class="flex items-center justify-between gap-4 mt-5 pt-5 border-t border-white/5">
+            <div>
+              <p class="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">
+                Order Total
+              </p>
+              <p class="text-lg font-extrabold mt-1 text-[#FF7A00]">
+                ₹${formatMoney(total)}
+              </p>
             </div>
 
-
-            <!-- BOTTOM -->
-            <div class="flex items-center justify-between gap-4 mt-5 pt-5 border-t border-neutral-100">
-
-              <div>
-
-                <p class="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">
-                  Order Total
-                </p>
-
-                <p class="text-lg font-extrabold mt-1">
-                  ₹${formatMoney(total)}
-                </p>
-
-              </div>
-
-
-              <button
-                type="button"
-                onclick="event.stopPropagation(); openOrder('${escapeAttr(id)}')"
-                class="view-button px-4 py-3 rounded-xl text-xs font-bold flex items-center gap-2"
-              >
-                View Order
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-              </button>
-
-            </div>
-
+            <button
+              type="button"
+              onclick="event.stopPropagation(); openOrder('${escapeAttr(id)}')"
+              class="view-button px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2"
+            >
+              View Order
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
           </div>
-
-        </article>
-
-      `;
-      
-
-
-    }).join('');
-
+        </div>
+      </article>
+    `;
+  }).join('');
 }
-
-
-/* =========================================================
-   OPEN ORDER
-========================================================= */
 
 function openOrder(id){
-
   if(!id) return;
-
-  window.location.href =
-    `order-view.html?id=${encodeURIComponent(id)}`;
-
+  window.location.href = `order-view.html?id=${encodeURIComponent(id)}`;
 }
-
-
-/* =========================================================
-   STATUS STYLE
-========================================================= */
 
 function getStatusClass(status){
-
-  const s =
-    String(status || '').toLowerCase();
-
-
-  if(
-    s.includes('deliver') ||
-    s.includes('complete')
-  ){
-
-    return 'status-delivered';
-
-  }
-
-
-  if(
-    s.includes('cancel') ||
-    s.includes('reject')
-  ){
-
-    return 'status-cancelled';
-
-  }
-
-
-  if(
-    s.includes('pending') ||
-    s.includes('new')
-  ){
-
-    return 'status-pending';
-
-  }
-
-
-  if(
-    s.includes('confirm') ||
-    s.includes('pack') ||
-    s.includes('ship') ||
-    s.includes('process')
-  ){
-
-    return 'status-processing';
-
-  }
-
-
+  const s = String(status || '').toLowerCase();
+  if(s.includes('deliver') || s.includes('complete')) return 'status-delivered';
+  if(s.includes('cancel') || s.includes('reject')) return 'status-cancelled';
+  if(s.includes('pending') || s.includes('new')) return 'status-pending';
+  if(s.includes('confirm') || s.includes('pack') || s.includes('ship') || s.includes('process')) return 'status-processing';
   return 'status-default';
-
 }
-
-
-/* =========================================================
-   STATUS ICON
-========================================================= */
 
 function getStatusIcon(status){
-
-  const s =
-    String(status || '').toLowerCase();
-
-
-  if(s.includes('deliver'))
-    return 'fa-solid fa-check';
-
-  if(s.includes('cancel'))
-    return 'fa-solid fa-xmark';
-
-  if(s.includes('ship'))
-    name = 'fa-solid fa-truck';
-
-  if(s.includes('pack'))
-    return 'fa-solid fa-box';
-
-  if(s.includes('confirm'))
-    return 'fa-solid fa-check';
-
+  const s = String(status || '').toLowerCase();
+  if(s.includes('deliver')) return 'fa-solid fa-check';
+  if(s.includes('cancel')) return 'fa-solid fa-xmark';
+  if(s.includes('ship')) return 'fa-solid fa-truck';
+  if(s.includes('pack')) return 'fa-solid fa-box';
+  if(s.includes('confirm')) return 'fa-solid fa-check';
   return 'fa-solid fa-clock';
-
 }
-
-
-/* =========================================================
-   DATE
-========================================================= */
 
 function formatDate(value){
-
   if(!value) return '';
-
-  const date =
-    new Date(value);
-
-  if(isNaN(date.getTime()))
-    return '';
-
-  return date.toLocaleDateString(
-    'en-IN',
-    {
-      day:'2-digit',
-      month:'short',
-      year:'numeric'
-    }
-  );
-
+  const date = new Date(value);
+  if(isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
 }
-
-
-/* =========================================================
-   MONEY
-========================================================= */
 
 function formatMoney(value){
-
-  return Number(value || 0)
-    .toLocaleString('en-IN',{
-      maximumFractionDigits:2
-    });
-
+  return Number(value || 0).toLocaleString('en-IN', { maximumFractionDigits:2 });
 }
 
-
-/* =========================================================
-   SECURITY
-========================================================= */
-
 function escapeHtml(value){
-
   return String(value ?? '')
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#039;');
-
 }
-
 
 function escapeAttr(value){
-
   return escapeHtml(value);
-
 }
 
-
-/* =========================================================
-   START
-========================================================= */
-
-document.addEventListener(
-  'DOMContentLoaded',
-  loadAccount
-);
-
+document.addEventListener('DOMContentLoaded', loadAccount);
 </script>
 
 </body>
