@@ -371,27 +371,47 @@
   let allCustomers = [];
 
   document.addEventListener('DOMContentLoaded', async () => {
-    await loadCustomers();
+    await loadCustomersFromDatabase();
   });
 
-  async function loadCustomers() {
+  async function loadCustomersFromDatabase() {
     allCustomers = [];
 
     try {
       if (supabaseClient) {
-        // Fetching real data from 'customers' table in Supabase
-        const { data, error } = await supabaseClient.from('customers').select('*').order('created_at', { ascending: false });
-        if (!error && data) {
-          allCustomers = data;
+        // Sabhi possible table names check kiye ja rahe hain taaki data miss na ho
+        let response = await supabaseClient.from('customers').select('*');
+        
+        if (response.error || !response.data || response.data.length === 0) {
+          // Agar 'customers' table khali ya na mile, toh 'users' ya 'profiles' check karega
+          response = await supabaseClient.from('users').select('*');
+        }
+        
+        if (response.error || !response.data || response.data.length === 0) {
+          response = await supabaseClient.from('profiles').select('*');
+        }
+
+        if (!response.error && response.data) {
+          allCustomers = response.data;
+        } else {
+          console.warn("Supabase Warning:", response.error);
         }
       }
     } catch (err) {
-      console.log("Supabase fetch error, checking local storage");
+      console.error("Database connection error:", err);
     }
 
-    // Fallback to local storage ONLY if available, otherwise remains empty (no fake data)
-    if (allCustomers.length === 0) {
-      allCustomers = JSON.parse(localStorage.getItem('rc_customers')) || [];
+    // Agar Database ke alawa LocalStorage me bhi koi purana signup data save ho, toh use bhi jod lenge
+    const localData = JSON.parse(localStorage.getItem('rc_customers')) || [];
+    if (localData.length > 0) {
+      // Duplicate entries se bachne ke liye merge karte hain
+      const existingIds = new Set(allCustomers.map(c => c.id || c.email || c.phone));
+      localData.forEach(item => {
+        const identifier = item.id || item.email || item.phone;
+        if (!identifier || !existingIds.has(identifier)) {
+          allCustomers.push(item);
+        }
+      });
     }
 
     renderMetrics(allCustomers);
@@ -403,7 +423,8 @@
     
     const todayStr = new Date().toISOString().split('T')[0];
     const todaySignups = customers.filter(c => {
-      const cDate = c.created_at ? c.created_at.split('T')[0] : '';
+      const rawDate = c.created_at || c.date || c.signup_date;
+      const cDate = rawDate ? rawDate.split('T')[0] : '';
       return cDate === todayStr;
     });
     document.getElementById('todayCount').textContent = todaySignups.length;
@@ -422,8 +443,8 @@
           <td colspan="5">
             <div class="empty-state">
               <i class="fa-solid fa-user-slash"></i>
-              <h3>No Customer Records Found</h3>
-              <p>Abhi tak koi naya customer register nahi hua hai.</p>
+              <h3>No Customer Records Found in Database</h3>
+              <p>Supabase database me abhi koi customer table ya record nahi mila. Kripya table name check karein.</p>
             </div>
           </td>
         </tr>
@@ -434,16 +455,22 @@
     customers.forEach(cust => {
       const row = document.createElement('tr');
       
-      const initials = cust.name ? cust.name.substring(0, 2).toUpperCase() : "RC";
-      const contact = cust.phone || cust.email || "No contact info";
+      const custName = cust.name || cust.fullName || cust.username || "Unnamed Customer";
+      const initials = custName.substring(0, 2).toUpperCase();
+      const contact = cust.phone || cust.mobile || cust.email || "No contact info";
       
       let formattedDate = "N/A";
-      if (cust.created_at) {
-        const d = new Date(cust.created_at);
-        formattedDate = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const rawDate = cust.created_at || cust.date || cust.signup_date;
+      if (rawDate) {
+        const d = new Date(rawDate);
+        if (!isNaN(d.getTime())) {
+          formattedDate = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else {
+          formattedDate = rawDate;
+        }
       }
 
-      const stamps = cust.stamps !== undefined ? cust.stamps : 0;
+      const stamps = cust.stamps !== undefined ? cust.stamps : (cust.stamp_count || 0);
       const status = cust.status || "Active";
       const statusBadge = status.toLowerCase() === 'pending' 
         ? `<span class="badge badge-pending"><i class="fa-solid fa-clock"></i> Pending</span>`
@@ -453,7 +480,7 @@
         <td>
           <div class="customer-name">
             <div class="avatar-circle">${initials}</div>
-            <span>${cust.name || 'Unnamed Customer'}</span>
+            <span>${custName}</span>
           </div>
         </td>
         <td><span style="color:var(--text-muted);">${contact}</span></td>
@@ -470,13 +497,16 @@
     const selectedDate = document.getElementById('dateFilter').value;
 
     const filtered = allCustomers.filter(cust => {
-      const matchQuery = (cust.name && cust.name.toLowerCase().includes(query)) ||
-                         (cust.phone && cust.phone.toLowerCase().includes(query)) ||
-                         (cust.email && cust.email.toLowerCase().includes(query));
+      const custName = (cust.name || cust.fullName || cust.username || "").toLowerCase();
+      const phone = (cust.phone || cust.mobile || "").toLowerCase();
+      const email = (cust.email || "").toLowerCase();
+
+      const matchQuery = custName.includes(query) || phone.includes(query) || email.includes(query);
       
       let matchDate = true;
-      if (selectedDate && cust.created_at) {
-        const custDateOnly = cust.created_at.split('T')[0];
+      const rawDate = cust.created_at || cust.date || cust.signup_date;
+      if (selectedDate && rawDate) {
+        const custDateOnly = rawDate.split('T')[0];
         matchDate = (custDateOnly === selectedDate);
       }
 
