@@ -386,9 +386,14 @@
           </div>
         `;
         
-        // Safely redirecting to index.html with product name to avoid 404 errors
+        // Correctly redirecting to product.html with product id or name
         itemCard.onclick = () => {
-          window.location.href = `index.html?product=${encodeURIComponent(product.name)}`;
+          const productId = product.id || product.productId;
+          if (productId) {
+            window.location.href = `product.html?id=${productId}`;
+          } else {
+            window.location.href = `product.html?name=${encodeURIComponent(product.name)}`;
+          }
         };
 
         productsGrid.appendChild(itemCard);
