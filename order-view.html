@@ -161,7 +161,7 @@
   .status-pending{background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid var(--border);}
 
   /* TRACKING */
-  .tracking{margin-top:24px;}
+  .tracking{margin-top:24px;border-top:1px solid var(--border);padding-top:20px;}
   .tracking h2, .card h2{margin-top:0;font-size:17px;font-weight:800;margin-bottom:16px;}
 
   .steps{
@@ -218,30 +218,38 @@
   .step:last-child .step-line{display:none;}
   .step.done .step-line{background:var(--success);}
 
-  /* ITEMS */
-  .items{display:grid;gap:14px;}
+  /* ITEMS (Clickable to product.html) */
+  .items{display:grid;gap:12px;}
 
   .item{
     display:flex;
     justify-content:space-between;
     gap:15px;
-    padding:12px 0;
-    border-bottom:1px solid var(--border);
+    padding:12px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid var(--border);
+    border-radius:14px;
     align-items:center;
+    cursor:pointer;
+    transition:0.3s;
   }
-  .item:last-child{border-bottom:0;}
+  .item:hover{
+    border-color:var(--brand);
+    background:rgba(255,122,0,0.04);
+    transform:translateY(-2px);
+  }
 
   .item-left{display:flex;gap:14px;align-items:center;}
 
   .item-image{
     width:60px;height:60px;
-    border-radius:12px;
+    border-radius:10px;
     background:rgba(255,255,255,0.03);
     border:1px solid var(--border);
     object-fit:cover;
   }
 
-  .item-name{font-weight:800;font-size:14px;}
+  .item-name{font-weight:800;font-size:14px;color:#fff;}
   .item-qty{color:var(--text-muted);font-size:12px;margin-top:3px;}
   .item-price{font-weight:900;font-size:15px;color:var(--brand);}
 
@@ -315,15 +323,16 @@
 
   /* REVIEW BUTTON & MODAL */
   .review-btn{
-    margin-top:8px;
-    padding:6px 12px;
+    margin-top:6px;
+    padding:4px 10px;
     border:1px solid var(--brand);
-    border-radius:8px;
+    border-radius:6px;
     background:rgba(255,122,0,0.1);
     color:var(--brand);
     font-weight:700;
     cursor:pointer;
-    font-size:11.5px;
+    font-size:11px;
+    display:inline-block;
     transition:0.2s;
   }
   .review-btn:hover{background:var(--brand);color:#000;}
@@ -692,20 +701,24 @@ async function loadOrder(){
   const status = String(order.status || "pending").toLowerCase();
   const isPending = (status === "pending" || status === "unconfirmed");
 
+  // Items HTML with click redirection to product.html
   const itemsHtml = orderItems.length ? orderItems.map(item => {
     const prod = productMap.get(String(item.product_id));
     const image = cleanImage(item.image_url || item.image || prod?.image_url || prod?.image || "");
     const qty = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
+    const pId = item.product_id;
 
     const reviewBtn = status === "delivered" && item.product_id ? `
-      <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${esc(item.product_name || "Product").replace(/'/g,"&#039;")}')">
-        <i class="fa-solid fa-star"></i> Rate & Review
-      </button>
+      <div onclick="event.stopPropagation()">
+        <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${esc(item.product_name || "Product").replace(/'/g,"&#039;")}')">
+          <i class="fa-solid fa-star"></i> Rate & Review
+        </button>
+      </div>
     ` : "";
 
     return `
-      <div class="item">
+      <div class="item" onclick="window.location.href='product.html?id=${pId}'">
         <div class="item-left">
           ${image ? `<img class="item-image" src="${esc(image)}" alt="Product">` : `<div class="item-image"></div>`}
           <div>
@@ -729,12 +742,14 @@ async function loadOrder(){
         </div>
         <div class="total">${money(total)}</div>
       </div>
-      ${renderTracking(status)}
-    </div>
+      
+      <!-- Ordered Products Displayed Right Above Tracking -->
+      <div style="margin-top:22px;">
+        <h2 style="font-size:15px;margin-bottom:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Ordered Products</h2>
+        <div class="items">${itemsHtml}</div>
+      </div>
 
-    <div class="card">
-      <h2>Ordered Items</h2>
-      <div class="items">${itemsHtml}</div>
+      ${renderTracking(status)}
     </div>
 
     <div class="card">
