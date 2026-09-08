@@ -713,14 +713,25 @@ async function loadOrder(){
   const status = String(order.status || "pending").toLowerCase();
   const isPending = (status === "pending" || status === "unconfirmed");
 
-  // Items HTML with Strict Availability Check & Click Prevention
+  // Items HTML with Name-Fallback Matching & Availability Check
   const itemsHtml = orderItems.length ? orderItems.map(item => {
-    const prod = productMap.get(String(item.product_id));
+    let prod = productMap.get(String(item.product_id));
+    
+    // Fallback: Agar ID se match na ho toh naam se check karo
+    if(!prod && item.product_name) {
+      for(let [k, p] of productMap.entries()) {
+        if(p.name && p.name.trim().toLowerCase() === item.product_name.trim().toLowerCase()) {
+          prod = p;
+          break;
+        }
+      }
+    }
+
     const image = cleanImage(item.image_url || item.image || prod?.image_url || prod?.image || "");
     const qty = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
-    const pId = item.product_id;
-    const pName = esc(item.product_name || "Product");
+    const pId = prod?.id || item.product_id;
+    const pName = esc(item.product_name || prod?.name || "Product");
 
     const reviewBtn = status === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
@@ -730,7 +741,6 @@ async function loadOrder(){
       </div>
     ` : "";
 
-    // Check if product is available in the catalog database
     const isAvailable = Boolean(prod);
     const itemClass = isAvailable ? "item" : "item unavailable-item";
     const clickAction = isAvailable ? `window.location.href='product.html?id=${pId}'` : `event.preventDefault();`;
