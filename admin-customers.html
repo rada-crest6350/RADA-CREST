@@ -375,27 +375,23 @@
   });
 
   async function loadCustomers() {
-    let dataFetched = false;
+    allCustomers = [];
 
     try {
       if (supabaseClient) {
-        // Fetching from 'customers' table in Supabase
+        // Fetching real data from 'customers' table in Supabase
         const { data, error } = await supabaseClient.from('customers').select('*').order('created_at', { ascending: false });
         if (!error && data) {
           allCustomers = data;
-          dataFetched = true;
         }
       }
     } catch (err) {
-      console.log("Supabase fetch fallback to local storage");
+      console.log("Supabase fetch error, checking local storage");
     }
 
-    // Fallback or secondary check from LocalStorage if table is empty
-    if (!dataFetched || allCustomers.length === 0) {
-      allCustomers = JSON.parse(localStorage.getItem('rc_customers')) || [
-        { name: "Rahul Sharma", email: "rahul@gmail.com", phone: "+91 98765 43210", created_at: new Date().toISOString(), stamps: 5, status: "Active" },
-        { name: "Priya Patel", email: "priya@yahoo.com", phone: "+91 87654 32109", created_at: new Date(Date.now() - 86400000).toISOString(), stamps: 2, status: "Pending" }
-      ];
+    // Fallback to local storage ONLY if available, otherwise remains empty (no fake data)
+    if (allCustomers.length === 0) {
+      allCustomers = JSON.parse(localStorage.getItem('rc_customers')) || [];
     }
 
     renderMetrics(allCustomers);
@@ -427,7 +423,7 @@
             <div class="empty-state">
               <i class="fa-solid fa-user-slash"></i>
               <h3>No Customer Records Found</h3>
-              <p>Registered customer details will appear here in real-time.</p>
+              <p>Abhi tak koi naya customer register nahi hua hai.</p>
             </div>
           </td>
         </tr>
