@@ -218,7 +218,7 @@
   .step:last-child .step-line{display:none;}
   .step.done .step-line{background:var(--success);}
 
-  /* ITEMS (Clickable to product.html) */
+  /* ITEMS */
   .items{display:grid;gap:12px;}
 
   .item{
@@ -460,6 +460,22 @@
   </div>
 </div>
 
+<!-- PRODUCT UNAVAILABLE SAFETY MODAL -->
+<div id="unavailableModal" class="review-modal">
+  <div class="review-box" style="text-align:center;">
+    <div class="review-head">
+      <h3 style="margin:0;font-size:18px;color:var(--warning);">Product Notice</h3>
+      <button class="review-close" onclick="closeUnavailableModal()">✕</button>
+    </div>
+    <div style="margin:20px 0;">
+      <img id="unavImage" src="" style="width:90px;height:90px;border-radius:12px;object-fit:cover;border:1px solid var(--border);margin-bottom:12px;">
+      <h4 id="unavName" style="font-size:16px;color:#fff;margin-bottom:6px;"></h4>
+      <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Yeh product abhi current stock ya catalog me active nahi hai, lekin aapke order me yeh secure hai!</p>
+    </div>
+    <button class="btn primary" style="width:100%;" onclick="closeUnavailableModal()">Okay, Got it</button>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
@@ -576,6 +592,17 @@ async function saveNewAddress(){
 
   msgBox.textContent = "Address updated successfully!";
   setTimeout(() => { closeAddressModal(); location.reload(); }, 1000);
+}
+
+// Safety Modal for Unavailable Products
+function showProductUnavailableModal(name, img, price, qty){
+  document.getElementById("unavName").textContent = name;
+  const imgEl = document.getElementById("unavImage");
+  if(img) { imgEl.src = img; imgEl.style.display = "inline-block"; } else { imgEl.style.display = "none"; }
+  document.getElementById("unavailableModal").classList.add("show");
+}
+function closeUnavailableModal(){
+  document.getElementById("unavailableModal").classList.remove("show");
 }
 
 let reviewProductId = null;
@@ -701,28 +728,32 @@ async function loadOrder(){
   const status = String(order.status || "pending").toLowerCase();
   const isPending = (status === "pending" || status === "unconfirmed");
 
-  // Items HTML with click redirection to product.html
+  // Items HTML with availability check and safety fallback modal
   const itemsHtml = orderItems.length ? orderItems.map(item => {
     const prod = productMap.get(String(item.product_id));
     const image = cleanImage(item.image_url || item.image || prod?.image_url || prod?.image || "");
     const qty = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
     const pId = item.product_id;
+    const pName = esc(item.product_name || "Product");
 
     const reviewBtn = status === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
-        <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${esc(item.product_name || "Product").replace(/'/g,"&#039;")}')">
+        <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${pName.replace(/'/g,"&#039;")}')">
           <i class="fa-solid fa-star"></i> Rate & Review
         </button>
       </div>
     ` : "";
 
+    // Smart Click Action: Check if product exists in database catalog
+    const clickAction = prod ? `window.location.href='product.html?id=${pId}'` : `showProductUnavailableModal('${pName}', '${image}', ${price}, ${qty})`;
+
     return `
-      <div class="item" onclick="window.location.href='product.html?id=${pId}'">
+      <div class="item" onclick="${clickAction}">
         <div class="item-left">
           ${image ? `<img class="item-image" src="${esc(image)}" alt="Product">` : `<div class="item-image"></div>`}
           <div>
-            <div class="item-name">${esc(item.product_name || "Product")}</div>
+            <div class="item-name">${pName}</div>
             <div class="item-qty">Qty: ${qty} × ${money(price)}</div>
             ${reviewBtn}
           </div>
