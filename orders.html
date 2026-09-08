@@ -29,7 +29,7 @@
 
 :root {
   --brand-orange: #FF7A00;
-  --brand-glow: rgba(255, 122, 0, 0.35);
+  --brand-glow: rgba(255, 122, 0, 0.4);
 }
 
 body{
@@ -82,10 +82,6 @@ body{
   transform:translateY(-3px);
   border-color: rgba(255, 122, 0, 0.4);
   box-shadow: 0 20px 40px -10px rgba(255, 122, 0, 0.18);
-}
-
-.order-card:active{
-  transform:scale(.995);
 }
 
 .order-top{
@@ -189,33 +185,63 @@ body{
   box-shadow: 0 10px 25px rgba(255, 122, 0, 0.15);
 }
 
-/* Fluid Shimmer Wave Animation */
-.shimmer-box {
+/* =========================================================
+   LUXURY CYBER-FUTURISTIC LOADER ANIMATION
+========================================================= */
+.cyber-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.cyber-loader-ring {
   position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.04);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 122, 0, 0.1);
+  border-top-color: #FF7A00;
+  animation: cyberSpin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 0 0 25px rgba(255, 122, 0, 0.25);
 }
 
-.shimmer-box::after {
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  transform: translateX(-100%);
-  background-image: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 122, 0, 0.12) 40%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 122, 0, 0.12) 60%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: shimmer 1.8s infinite;
+.cyber-loader-ring::before {
   content: '';
+  position: absolute;
+  top: 6px; left: 6px; right: 6px; bottom: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  border-bottom-color: #FF9433;
+  animation: cyberSpinReverse 1.5s linear infinite;
 }
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+.cyber-loader-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px; height: 24px;
+  background: #FF7A00;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #FF7A00;
+  animation: corePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes cyberSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes cyberSpinReverse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes corePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; box-shadow: 0 0 30px #FF7A00; }
 }
 
 .fade-in-content {
@@ -312,57 +338,14 @@ body{
     class="hidden mb-5 px-4 py-3 rounded-2xl text-sm"
   ></div>
 
-  <!-- ULTRA-PREMIUM FLOWING WAVE SKELETON LOADER -->
-  <section id="loadingState" class="space-y-4">
-    <!-- Card 1 -->
-    <div class="order-card p-5 border border-white/10">
-      <div class="flex justify-between items-center gap-4">
-        <div class="space-y-2.5">
-          <div class="h-3.5 shimmer-box rounded-md w-28"></div>
-          <div class="h-4 shimmer-box rounded-md w-44"></div>
-        </div>
-        <div class="h-7 shimmer-box rounded-full w-24"></div>
-      </div>
-
-      <div class="flex gap-4 mt-6 pt-5 border-t border-white/5">
-        <div class="product-box shimmer-box"></div>
-        <div class="flex-1 space-y-3 pt-1">
-          <div class="h-4 shimmer-box rounded-md w-3/4"></div>
-          <div class="h-3 shimmer-box rounded-md w-24"></div>
-          <div class="h-3 shimmer-box rounded-md w-36"></div>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/5">
-        <div class="h-5 shimmer-box rounded-md w-20"></div>
-        <div class="h-9 shimmer-box rounded-xl w-28"></div>
-      </div>
+  <!-- LUXURY CYBER-FUTURISTIC LOADER -->
+  <section id="loadingState" class="cyber-loader-container">
+    <div class="cyber-loader-ring">
+      <div class="cyber-loader-core"></div>
     </div>
-
-    <!-- Card 2 -->
-    <div class="order-card p-5 border border-white/10">
-      <div class="flex justify-between items-center gap-4">
-        <div class="space-y-2.5">
-          <div class="h-3.5 shimmer-box rounded-md w-32"></div>
-          <div class="h-4 shimmer-box rounded-md w-40"></div>
-        </div>
-        <div class="h-7 shimmer-box rounded-full w-24"></div>
-      </div>
-
-      <div class="flex gap-4 mt-6 pt-5 border-t border-white/5">
-        <div class="product-box shimmer-box"></div>
-        <div class="flex-1 space-y-3 pt-1">
-          <div class="h-4 shimmer-box rounded-md w-2/3"></div>
-          <div class="h-3 shimmer-box rounded-md w-20"></div>
-          <div class="h-3 shimmer-box rounded-md w-32"></div>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/5">
-        <div class="h-5 shimmer-box rounded-md w-24"></div>
-        <div class="h-9 shimmer-box rounded-xl w-28"></div>
-      </div>
-    </div>
+    <p class="text-xs text-neutral-400 uppercase tracking-[0.2em] font-bold mt-5 animate-pulse">
+      Syncing Secure Orders...
+    </p>
   </section>
 
   <!-- ORDERS -->
@@ -450,68 +433,58 @@ async function loadOrders(){
   const client = window.supabaseClient || supabaseClient;
   let allOrders = [];
 
-  // 1. Fetch from order_summary
-  const { data: summaryData, error: summaryError } = await client
-    .from('order_summary')
-    .select('*')
-    .or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`)
-    .order('created_at', {ascending:false});
+  try {
+    // Ultra-Fast Parallel Optimized Fetching
+    const [summaryRes, ordersRes] = await Promise.all([
+      client.from('order_summary').select('*').or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`).order('created_at', {ascending:false}),
+      client.from('orders').select('*').or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`).order('created_at', {ascending:false})
+    ]);
 
-  if(!summaryError && summaryData){
-    allOrders = [...summaryData];
-  }
-
-  // 2. Fetch from orders table
-  const { data: ordersData, error: ordersError } = await client
-    .from('orders')
-    .select('*')
-    .or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`)
-    .order('created_at', {ascending:false});
-
-  if(!ordersError && ordersData){
-    const existingIds = new Set(allOrders.map(o => o.id || o.order_id));
-    for(let ord of ordersData){
-      const oid = ord.id || ord.order_id;
-      if(!existingIds.has(oid)){
-        allOrders.push(ord);
-        existingIds.add(oid);
-      }
+    if (!summaryRes.error && summaryRes.data) {
+      allOrders = [...summaryRes.data];
     }
-  }
 
-  allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-  document.getElementById('loadingState').classList.add('hidden');
-  orders = allOrders;
-
-  for(let ord of orders){
-    const { data: items } = await client
-      .from('order_items')
-      .select('*')
-      .eq('order_id', ord.id || ord.order_id);
-
-    if(items && items.length > 0){
-      ord.item_count = items.length;
-      if(!ord.product_name && items[0].product_name) {
-        ord.product_name = items[0].product_name;
-      }
-
-      ord.product_image = items[0].image_url || items[0].image || items[0].product_image || '';
-
-      if(!ord.product_image && items[0].product_id){
-        const { data: prod } = await client
-          .from('products')
-          .select('*')
-          .eq('id', items[0].product_id)
-          .maybeSingle();
-
-        if(prod){
-          ord.product_image = prod.image_url || prod.image || prod.img || prod.photo || '';
+    if (!ordersRes.error && ordersRes.data) {
+      const existingIds = new Set(allOrders.map(o => o.id || o.order_id));
+      for(let ord of ordersRes.data){
+        const oid = ord.id || ord.order_id;
+        if(!existingIds.has(oid)){
+          allOrders.push(ord);
+          existingIds.add(oid);
         }
       }
     }
+
+    allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Instant Batch Items Resolution
+    if (allOrders.length > 0) {
+      const orderIds = allOrders.map(o => o.id || o.order_id);
+      const { data: allItems } = await client
+        .from('order_items')
+        .select('*')
+        .in('order_id', orderIds);
+
+      if (allItems && allItems.length > 0) {
+        for (let ord of allOrders) {
+          const oid = ord.id || ord.order_id;
+          const matchItems = allItems.filter(i => i.order_id === oid);
+          if (matchItems.length > 0) {
+            ord.item_count = matchItems.length;
+            if (!ord.product_name && matchItems[0].product_name) {
+              ord.product_name = matchItems[0].product_name;
+            }
+            ord.product_image = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || '';
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Fast load note:", err);
   }
 
+  document.getElementById('loadingState').classList.add('hidden');
+  orders = allOrders;
   renderOrders();
 }
 
@@ -542,7 +515,7 @@ function renderOrders(){
     const statusClass = getStatusClass(status);
     const statusIcon = getStatusIcon(status);
 
-    const productImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || order.product?.img || (Array.isArray(order.items) && order.items[0]?.image_url) || (Array.isArray(order.items) && order.items[0]?.image) || '';
+    const productImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || order.product?.img || '';
     const productName = order.product_name || order.product_title || 'Order Items';
     const quantity = order.quantity || order.item_count || '';
 
