@@ -239,18 +239,6 @@
     transform:translateY(-2px);
   }
 
-  /* UNAVAILABLE ITEM STYLING (Tap Disabled & Faded) */
-  .item.unavailable-item {
-    opacity: 0.6;
-    cursor: not-allowed;
-    border-style: dashed;
-  }
-  .item.unavailable-item:hover {
-    border-color: var(--border);
-    background: rgba(255,255,255,0.02);
-    transform: none;
-  }
-
   .item-left{display:flex;gap:14px;align-items:center;}
 
   .item-image{
@@ -701,37 +689,18 @@ async function loadOrder(){
   const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
   const orderItems = items || [];
 
-  const productIds = orderItems.map(i => i.product_id).filter(Boolean);
-  let productMap = new Map();
-  if(productIds.length){
-    const { data: prods } = await supabaseClient.from("products").select("*").in("id", productIds);
-    (prods || []).forEach(p => productMap.set(String(p.id), p));
-  }
-
   const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0), 0);
   const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
   const status = String(order.status || "pending").toLowerCase();
   const isPending = (status === "pending" || status === "unconfirmed");
 
-  // Items HTML with Name-Fallback Matching & Availability Check
+  // Items HTML directly using order_items data (No strict dependency on products table lookup)
   const itemsHtml = orderItems.length ? orderItems.map(item => {
-    let prod = productMap.get(String(item.product_id));
-    
-    // Fallback: Agar ID se match na ho toh naam se check karo
-    if(!prod && item.product_name) {
-      for(let [k, p] of productMap.entries()) {
-        if(p.name && p.name.trim().toLowerCase() === item.product_name.trim().toLowerCase()) {
-          prod = p;
-          break;
-        }
-      }
-    }
-
-    const image = cleanImage(item.image_url || item.image || prod?.image_url || prod?.image || "");
+    const image = cleanImage(item.image_url || item.image || "");
     const qty = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
-    const pId = prod?.id || item.product_id;
-    const pName = esc(item.product_name || prod?.name || "Product");
+    const pId = item.product_id;
+    const pName = esc(item.product_name || "Product");
 
     const reviewBtn = status === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
@@ -741,19 +710,16 @@ async function loadOrder(){
       </div>
     ` : "";
 
-    const isAvailable = Boolean(prod);
-    const itemClass = isAvailable ? "item" : "item unavailable-item";
-    const clickAction = isAvailable ? `window.location.href='product.html?id=${pId}'` : `event.preventDefault();`;
-    const stockBadge = isAvailable ? `` : `<span style="display:inline-block;margin-top:4px;font-size:10px;background:rgba(255,77,77,0.15);color:var(--danger);padding:2px 8px;border-radius:6px;border:1px solid rgba(255,77,77,0.3);font-weight:700;">Not Available</span>`;
+    // Direct click redirection to product page if product ID exists
+    const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : ``;
 
     return `
-      <div class="${itemClass}" onclick="${clickAction}">
+      <div class="item" onclick="${clickAction}">
         <div class="item-left">
           ${image ? `<img class="item-image" src="${esc(image)}" alt="Product">` : `<div class="item-image"></div>`}
           <div>
             <div class="item-name">${pName}</div>
             <div class="item-qty">Qty: ${qty} × ${money(price)}</div>
-            ${stockBadge}
             ${reviewBtn}
           </div>
         </div>
