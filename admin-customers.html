@@ -379,20 +379,15 @@
 
     try {
       if (supabaseClient) {
-        // 1. Pehle custom 'customers' table check karenge
-        const { data: custData, error: custErr } = await supabaseClient.from('customers').select('*');
+        // 1. Fetching from 'customers' table in Supabase
+        const { data: custData, error: custErr } = await supabaseClient.from('customers').select('*').order('created_at', { ascending: false });
         if (!custErr && custData && custData.length > 0) {
           allCustomers = custData;
         }
 
-        // 2. Agar table me data kam/nahi hai, toh Supabase Auth se registered users fetch karenge
-        // (Note: Supabase client-side se direct auth.admin.listUsers() run nahi hota, 
-        // isiliye hum profiles table, public table ya local backup/sessions match karte hain)
-        
-        // Agar aapke paas 'profiles' table hai toh use check karein
+        // 2. Fetching from 'profiles' table if exists
         const { data: profData, error: profErr } = await supabaseClient.from('profiles').select('*');
         if (!profErr && profData && profData.length > 0) {
-          // Merge unique users
           const existingEmails = new Set(allCustomers.map(c => c.email));
           profData.forEach(p => {
             if (!existingEmails.has(p.email)) allCustomers.push(p);
@@ -403,7 +398,7 @@
       console.warn("Database fetch warning:", err);
     }
 
-    // 3. LocalStorage backup se bhi real user sync check karenge jo is browser me sign up hue hain
+    // 3. Syncing current user session/local accounts to ensure records are never missed
     const localUser = JSON.parse(localStorage.getItem('rc_user'));
     if (localUser) {
       const alreadyExists = allCustomers.some(c => c.email === localUser.email || c.phone === localUser.phone);
@@ -432,7 +427,7 @@
       return rawDate && rawDate.split('T')[0] === todayStr;
     });
     document.getElementById('todayCount').textContent = todaySignups.length;
-    document.getElementById('pendingCount').textContent = customers.length; // All verified active customers
+    document.getElementById('pendingCount').textContent = customers.length;
   }
 
   function renderTable(customers) {
