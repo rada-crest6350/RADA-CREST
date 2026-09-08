@@ -414,7 +414,7 @@
         <h3 style="margin:0;font-size:18px;">Rate & Review</h3>
         <div id="reviewProductName" style="color:var(--brand);font-size:12px;margin-top:3px;font-weight:600;"></div>
       </div>
-      <button class="review-close" onclick="closeReview()"><i class="fa-solid xmark fa-xmark"></i>✕</button>
+      <button class="review-close" onclick="closeReview()">✕</button>
     </div>
     <div style="margin-top:16px;font-size:12.5px;font-weight:700;">Select Rating</div>
     <div class="review-stars">
@@ -424,7 +424,7 @@
       <button type="button" class="review-star" data-rating="4">★</button>
       <button type="button" class="review-star" data-rating="5">★</button>
     </div>
-    <textarea id="reviewText" class="review-text" placeholder="Share your experience with this high-tech product..."></textarea>
+    <textarea id="reviewText" class="review-text" placeholder="Share your experience..."></textarea>
     <div class="review-upload" style="margin-top:12px;">
       <strong style="font-size:12px;color:var(--text-muted);">Upload Photos / Videos (Max 5)</strong>
       <input id="reviewPhotos" type="file" accept="image/*,video/*" multiple>
@@ -435,9 +435,30 @@
   </div>
 </div>
 
+<!-- EDIT ADDRESS MODAL -->
+<div id="addressModal" class="review-modal">
+  <div class="review-box">
+    <div class="review-head">
+      <h3 style="margin:0;font-size:18px;">Edit Delivery Address</h3>
+      <button class="review-close" onclick="closeAddressModal()">✕</button>
+    </div>
+    <div style="margin-top:16px;">
+      <label style="font-size:12px;color:var(--text-muted);font-weight:700;">New Address</label>
+      <textarea id="newAddressText" class="review-text" placeholder="Enter updated delivery address..."></textarea>
+    </div>
+    <div id="addressMessage" style="margin-top:10px;font-size:12px;color:var(--brand);"></div>
+    <button class="btn primary" style="width:100%;margin-top:16px;" onclick="saveNewAddress()">Update Address</button>
+  </div>
+</div>
+
 <script>
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const box = document.getElementById("orderContent");
 const message = document.getElementById("pageMessage");
+let currentOrderId = null;
 
 function esc(value){
   return String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
@@ -510,6 +531,44 @@ function renderTracking(status){
   `;
 }
 
+// Address short formatting helper
+function shortAddress(addr){
+  if(!addr) return "N/A";
+  let clean = String(addr).trim();
+  return clean.length > 55 ? clean.substring(0, 52) + "..." : clean;
+}
+
+function openAddressModal(currentAddr){
+  document.getElementById("newAddressText").value = currentAddr || "";
+  document.getElementById("addressMessage").textContent = "";
+  document.getElementById("addressModal").classList.add("show");
+}
+
+function closeAddressModal(){
+  document.getElementById("addressModal").classList.remove("show");
+}
+
+async function saveNewAddress(){
+  const newAddr = document.getElementById("newAddressText").value.trim();
+  const msgBox = document.getElementById("addressMessage");
+  if(!newAddr){ msgBox.textContent = "Please enter a valid address."; return; }
+  if(!currentOrderId){ msgBox.textContent = "Order ID missing."; return; }
+
+  msgBox.textContent = "Updating address...";
+  const { error } = await supabaseClient
+    .from("orders")
+    .update({ shipping_address: newAddr })
+    .eq("id", currentOrderId);
+
+  if(error){
+    msgBox.textContent = "Error: " + error.message;
+    return;
+  }
+
+  msgBox.textContent = "Address updated successfully!";
+  setTimeout(() => { closeAddressModal(); location.reload(); }, 1000);
+}
+
 let reviewProductId = null;
 let reviewRating = 0;
 
@@ -563,10 +622,6 @@ async function submitReview(){
 
   messageBox.textContent = "Uploading review & media...";
   try {
-    const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const { data: { user } } = await supabaseClient.auth.getUser();
     if(!user){ messageBox.textContent = "Please login first."; return; }
 
@@ -601,12 +656,9 @@ async function submitReview(){
 }
 
 async function loadOrder(){
-  const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
   const params = new URLSearchParams(location.search);
   const orderId = params.get("id");
+  currentOrderId = orderId;
 
   if(!orderId){
     message.innerHTML = `<div class="card error">Order ID is missing in URL.</div>`;
@@ -638,6 +690,7 @@ async function loadOrder(){
   const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0), 0);
   const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
   const status = String(order.status || "pending").toLowerCase();
+  const isPending = (status === "pending" || status === "unconfirmed");
 
   const itemsHtml = orderItems.length ? orderItems.map(item => {
     const prod = productMap.get(String(item.product_id));
@@ -685,7 +738,10 @@ async function loadOrder(){
     </div>
 
     <div class="card">
-      <h2>Delivery & Payment Information</h2>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="margin:0;">Delivery & Payment Info</h2>
+        ${isPending ? `<button class="btn secondary" style="padding:6px 12px;font-size:11.5px;" onclick="openAddressModal('${esc(order.shipping_address || "").replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Edit Address</button>` : ''}
+      </div>
       <div class="info-grid">
         <div class="info-box">
           <strong>Customer Name</strong>
@@ -704,7 +760,7 @@ async function loadOrder(){
           <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
         </div>
       </div>
-      ${order.shipping_address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(order.shipping_address)}</span></div>` : ""}
+      ${order.shipping_address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address))}</span></div>` : ""}
     </div>
 
     <div class="card">
@@ -716,7 +772,7 @@ async function loadOrder(){
         </a>
         <a class="btn secondary" href="index.html">Continue Shopping</a>
         ${status === 'delivered' ? `<a href="return.html?id=${esc(order.id)}" class="btn secondary">Return / Replace</a>` : ''}
-        ${status === 'pending' || status === 'confirmed' ? `<a href="cancel-order.html?id=${encodeURIComponent(order.id)}" class="btn danger-btn">Cancel Order</a>` : ''}
+        ${isPending ? `<a href="cancel-order.html?id=${encodeURIComponent(order.id)}" class="btn danger-btn">Cancel Order</a>` : ''}
       </div>
     </div>
   `;
