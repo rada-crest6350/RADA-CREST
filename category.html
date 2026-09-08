@@ -10,6 +10,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="home.css">
 
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --bg-deep: #060608;
@@ -33,7 +36,6 @@
       overflow-x: hidden;
     }
 
-    /* Hi-Tech Cyber Ambient Lighting */
     .cyber-grid-glow {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -44,7 +46,6 @@
       pointer-events: none;
     }
 
-    /* Sticky Glass Header */
     .category-header {
       background: rgba(6, 6, 8, 0.85);
       backdrop-filter: blur(20px);
@@ -100,7 +101,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* Main Container with Entrance Animation */
     .category-main-content {
       max-width: 1200px;
       margin: 0 auto;
@@ -121,7 +121,6 @@
       gap: 24px;
     }
 
-    /* Ultra-Premium Product Card */
     .product-card-item {
       background: var(--panel-card);
       backdrop-filter: blur(16px);
@@ -137,7 +136,6 @@
       overflow: hidden;
     }
 
-    /* Neon Pulse Border Effect on Hover */
     .product-card-item::before {
       content: '';
       position: absolute;
@@ -159,7 +157,6 @@
       opacity: 1;
     }
 
-    /* Product Image Container with Zoom Animation */
     .product-img-wrap {
       width: 100%;
       height: 180px;
@@ -179,7 +176,6 @@
       transform: scale(1.08);
     }
 
-    /* Floating Discount Badge */
     .discount-badge {
       position: absolute;
       top: 10px; left: 10px;
@@ -195,7 +191,6 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
 
-    /* Product Details Info */
     .product-info {
       display: flex;
       flex-direction: column;
@@ -246,7 +241,6 @@
       text-decoration: line-through;
     }
 
-    /* Tap Action CTA Button */
     .tap-action-btn {
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
@@ -271,7 +265,6 @@
       box-shadow: 0 0 15px var(--brand-glow);
     }
 
-    /* Empty State Styling */
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -319,32 +312,38 @@
     </div>
   </main>
 
-  <!-- Script for Dynamic Products Render with Hi-Tech UI -->
   <script>
+    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+    const supabaseCategoryClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
     document.addEventListener("DOMContentLoaded", async () => {
       const urlParams = new URLSearchParams(window.location.search);
-      const categoryName = decodeURIComponent(urlParams.get('category') || "All Products").trim();
+      const categoryName = decodeURIComponent(urlParams.get('category') || "").trim();
       
-      document.getElementById('categoryHeading').textContent = categoryName;
+      document.getElementById('categoryHeading').textContent = categoryName || "All Products";
       const productsGrid = document.getElementById('categoryProductsGrid');
 
       let allProducts = [];
 
-      // 1. Pehle localStorage se check karein (rc_products ya products)
-      allProducts = JSON.parse(localStorage.getItem('rc_products')) || JSON.parse(localStorage.getItem('products')) || [];
-
-      // 2. Agar Supabase se data aana hai toh yahan fetch kar sakte hain
-      if (allProducts.length === 0 && window.supabaseClient) {
-        try {
-          const { data, error } = await window.supabaseClient.from('products').select('*');
-          if (!error && data) allProducts = data;
-        } catch (err) {
-          console.log("Supabase fetch fallback error");
+      try {
+        if (supabaseCategoryClient) {
+          const { data, error } = await supabaseCategoryClient.from('products').select('*');
+          if (!error && data) {
+            allProducts = data;
+          }
         }
+      } catch (err) {
+        console.error("Supabase fetch error:", err);
       }
 
-      // Case-insensitive aur trim karke filter karna taaki mismatch na ho
-      const filteredProducts = (categoryName.toLowerCase() === "all" || categoryName.toLowerCase() === "all products") 
+      // Fallback to localStorage if Supabase fails or is empty
+      if (allProducts.length === 0) {
+        allProducts = JSON.parse(localStorage.getItem('rc_products')) || JSON.parse(localStorage.getItem('products')) || [];
+      }
+
+      // Case-insensitive filtering matching category name
+      const filteredProducts = (!categoryName || categoryName.toLowerCase() === "all" || categoryName.toLowerCase() === "all products") 
         ? allProducts 
         : allProducts.filter(p => p.category && p.category.trim().toLowerCase() === categoryName.toLowerCase());
 
@@ -353,7 +352,7 @@
           <div class="empty-state">
             <i class="fa-solid fa-microchip"></i>
             <h3>No products found in '${categoryName}'</h3>
-            <p>Explore other hi-tech categories or check back soon.</p>
+            <p>Admin panel se is category me product add karein.</p>
           </div>
         `;
         return;
@@ -388,7 +387,6 @@
         `;
         
         itemCard.onclick = () => {
-          // Product detail page par bhej sakte hain agar ID ho
           if(product.id) {
             window.location.href = `product-detail.html?id=${product.id}`;
           }
@@ -398,4 +396,5 @@
       });
     });
   </script>
+</body>
 </html>
