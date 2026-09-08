@@ -549,8 +549,7 @@
                 // Referral code check
                 const appliedRef = localStorage.getItem('rc_applied_referral_code');
 
-                // Email se direct signup (Phone disabled error permanently fixed)
-                // Mobile number metadata me hamesha ke liye safe store hoga
+                // Email se direct signup
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
@@ -564,6 +563,20 @@
                 });
 
                 if (error) throw error;
+
+                // Naya sign-up hote hi customers table me data save karne ke liye
+                try {
+                    await supabaseClient.from('customers').insert([{
+                        name: name,
+                        email: email,
+                        phone: mobile,
+                        created_at: new Date().toISOString(),
+                        stamps: 0,
+                        status: 'Active'
+                    }]);
+                } catch(dbErr) {
+                    console.warn("Customer table insert note:", dbErr);
+                }
 
                 // Referral mapping (Count track karne ke liye entry)
                 if (appliedRef && data?.user) {
@@ -664,17 +677,17 @@
             const emailPrefix = email ? email.split('@')[0] : '';
             
             const fullName = user.user_metadata?.full_name || 
-                             user.user_metadata?.name || 
-                             emailPrefix || 
-                             'User';
+                           user.user_metadata?.name || 
+                           emailPrefix || 
+                           'User';
 
             const mobileNumber = user.user_metadata?.mobile_number || 
-                                 user.phone || 
-                                 'Not provided';
+                               user.phone || 
+                               'Not provided';
 
             const avatarUrl = user.user_metadata?.avatar_url || 
-                              user.user_metadata?.picture || 
-                              '';
+                            user.user_metadata?.picture || 
+                            '';
 
             document.getElementById('user-display-name').innerText = fullName;
             document.getElementById('user-display-email').innerText = email || 'No email provided';
