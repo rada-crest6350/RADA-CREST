@@ -386,15 +386,9 @@
           </div>
         `;
         
-        // Fixed click redirection to match product correctly without 404
+        // Safely redirecting to index.html with product name to avoid 404 errors
         itemCard.onclick = () => {
-          const productId = product.id || product.productId;
-          if (productId) {
-            window.location.href = `product-detail.html?id=${productId}`;
-          } else {
-            // Fallback to name-based or home redirection if id is missing
-            window.location.href = `index.html?product=${encodeURIComponent(product.name)}`;
-          }
+          window.location.href = `index.html?product=${encodeURIComponent(product.name)}`;
         };
 
         productsGrid.appendChild(itemCard);
