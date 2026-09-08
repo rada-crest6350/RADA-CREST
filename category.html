@@ -386,9 +386,14 @@
           </div>
         `;
         
+        // Fixed click redirection to match product correctly without 404
         itemCard.onclick = () => {
-          if(product.id) {
-            window.location.href = `product-detail.html?id=${product.id}`;
+          const productId = product.id || product.productId;
+          if (productId) {
+            window.location.href = `product-detail.html?id=${productId}`;
+          } else {
+            // Fallback to name-based or home redirection if id is missing
+            window.location.href = `index.html?product=${encodeURIComponent(product.name)}`;
           }
         };
 
