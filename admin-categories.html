@@ -10,6 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+<!-- Supabase JS Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 
@@ -302,85 +305,133 @@ body{
 </div>
 
 <script>
-let selectedImageBase64 = "";
+  // Supabase Connection Settings
+  const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
+  const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-function previewImage(event) {
-  const file = event.target.files[0];
-  if(file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      selectedImageBase64 = e.target.result;
-      document.getElementById('uploadText').innerText = file.name;
-      document.getElementById('uploadIcon').className = "fa-solid fa-check-circle";
-      document.getElementById('uploadIcon').style.color = "#3dd598";
+  let selectedImageBase64 = "";
+
+  function previewImage(event) {
+    const file = event.target.files[0];
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        selectedImageBase64 = e.target.result;
+        document.getElementById('uploadText').innerText = file.name;
+        document.getElementById('uploadIcon').className = "fa-solid fa-check-circle";
+        document.getElementById('uploadIcon').style.color = "#3dd598";
+      }
+      reader.readAsDataURL(file);
     }
-    reader.readAsDataURL(file);
-  }
-}
-
-function loadCategories() {
-  const grid = document.getElementById('categoriesGrid');
-  const categories = JSON.parse(localStorage.getItem('rc_categories')) || [];
-  
-  grid.innerHTML = "";
-  if(categories.length === 0) {
-    grid.innerHTML = `<p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;">No categories added yet.</p>`;
-    return;
   }
 
-  categories.forEach((cat, index) => {
-    const card = document.createElement('div');
-    card.className = 'cat-card';
+  // Supabase se categories load karne ka function
+  async function loadCategories() {
+    const grid = document.getElementById('categoriesGrid');
+    grid.innerHTML = `<p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;">Loading categories...</p>`;
     
-    let thumbContent = `<i class="fa-solid fa-layer-group"></i>`;
-    if(cat.image) {
-      thumbContent = `<img src="${cat.image}" alt="${cat.name}">`;
+    let categories = [];
+
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('categories').select('*').order('name');
+        if (!error && data) {
+          categories = data;
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
     }
 
-    card.innerHTML = `
-      <div class="cat-thumb">${thumbContent}</div>
-      <div class="cat-info">
-        <h3>${cat.name}</h3>
-        <p>Active Category</p>
-      </div>
-      <button class="delete-cat-btn" onclick="deleteCategory(${index})"><i class="fa-solid fa-trash"></i></button>
-    `;
-    grid.appendChild(card);
-  });
-}
+    grid.innerHTML = "";
+    if(categories.length === 0) {
+      grid.innerHTML = `<p style="color:var(--text-muted);font-size:13px;grid-column:1/-1;">No categories added yet.</p>`;
+      return;
+    }
 
-function saveCategory(event) {
-  event.preventDefault();
-  const name = document.getElementById('catName').value.trim();
-  if(!name) return;
+    categories.forEach((cat) => {
+      const card = document.createElement('div');
+      card.className = 'cat-card';
+      
+      let thumbContent = `<i class="fa-solid fa-layer-group"></i>`;
+      const imgUrl = cat.image || cat.image_url;
+      if(imgUrl) {
+        thumbContent = `<img src="${imgUrl}" alt="${cat.name}">`;
+      }
 
-  const categories = JSON.parse(localStorage.getItem('rc_categories')) || [];
-  categories.push({
-    name: name,
-    image: selectedImageBase64 || ""
-  });
+      card.innerHTML = `
+        <div class="cat-thumb">${thumbContent}</div>
+        <div class="cat-info">
+          <h3>${cat.name}</h3>
+          <p>Live Category</p>
+        </div>
+        <button class="delete-cat-btn" onclick="deleteCategory('${cat.id}')"><i class="fa-solid fa-trash"></i></button>
+      `;
+      grid.appendChild(card);
+    });
+  }
 
-  localStorage.setItem('rc_categories', JSON.stringify(categories));
-  
-  // Reset form
-  document.getElementById('categoryForm').reset();
-  selectedImageBase64 = "";
-  document.getElementById('uploadText').innerText = "Tap to select image or photo";
-  document.getElementById('uploadIcon').className = "fa-solid fa-cloud-arrow-up";
-  document.getElementById('uploadIcon').style.color = "var(--brand)";
+  // Supabase database me category save karne ka function
+  async function saveCategory(event) {
+    event.preventDefault();
+    const name = document.getElementById('catName').value.trim();
+    if(!name) return;
 
-  loadCategories();
-}
+    if (supabaseClient) {
+      try {
+        const { error } = await supabaseClient
+          .from('categories')
+          .insert([
+            { 
+              name: name, 
+              slug: name.toLowerCase().replace(/[^a-z0-9]/g, '-'), 
+              image_url: selectedImageBase64 || "" 
+            }
+          ]);
 
-function deleteCategory(index) {
-  const categories = JSON.parse(localStorage.getItem('rc_categories')) || [];
-  categories.splice(index, 1);
-  localStorage.setItem('rc_categories', JSON.stringify(categories));
-  loadCategories();
-}
+        if (error) {
+          alert("Error saving: " + error.message);
+        }
+      } catch (err) {
+        console.error("Save error:", err);
+      }
+    }
 
-// Load on page start
-document.addEventListener('DOMContentLoaded', loadCategories);
+    // Form reset
+    document.getElementById('categoryForm').reset();
+    selectedImageBase64 = "";
+    document.getElementById('uploadText').innerText = "Tap to select image or photo";
+    document.getElementById('uploadIcon').className = "fa-solid fa-cloud-arrow-up";
+    document.getElementById('uploadIcon').style.color = "var(--brand)";
+
+    loadCategories();
+  }
+
+  // Supabase se category delete karne ka function
+  async function deleteCategory(id) {
+    if(!confirm("Kya aap is category ko delete karna chahte hain?")) return;
+
+    if (supabaseClient) {
+      try {
+        const { error } = await supabaseClient
+          .from('categories')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          alert("Delete error: " + error.message);
+        }
+      } catch (err) {
+        console.error("Delete error:", err);
+      }
+    }
+
+    loadCategories();
+  }
+
+  // Page start hote hi load hoga
+  document.addEventListener('DOMContentLoaded', loadCategories);
 </script>
 
 </body>
