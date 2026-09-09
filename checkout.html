@@ -936,6 +936,7 @@ async function placeOrder(e){
    SUCCESS SCREEN
 ===================================== */
 
+
 function showSuccess(
   order,
   customerName,
@@ -998,6 +999,12 @@ Thank you,
 RADA CREST Customer`;
 
 
+  // Copy full formatted message to clipboard so nothing gets cut off
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(whatsappMessage).catch(err => console.log('Clipboard err:', err));
+  }
+
+
   const whatsappUrl = 
     "https://wa.me/" + 
     whatsappNumber + 
@@ -1037,8 +1044,8 @@ RADA CREST Customer`;
       </div>
 
 
-      <p>
-        Your order has been submitted successfully.
+      <p style="color:#25D366; font-weight:bold; margin-bottom:10px;">
+        📋 Poora message copy ho gaya hai! WhatsApp khulte hi bas Paste kar dein.
       </p>
 
 
@@ -1049,7 +1056,7 @@ RADA CREST Customer`;
           href="${whatsappUrl}" 
           target="_blank"
         >
-          📲 Send Order on WhatsApp
+          📲 Open WhatsApp & Send
         </a>
 
 
@@ -1069,15 +1076,11 @@ RADA CREST Customer`;
 
   /* =====================================
      AUTO OPEN WHATSAPP
-     Order is already saved in Supabase.
   ===================================== */
 
   setTimeout(() => {
-
-    window.location.href = 
-      whatsappUrl;
-
-  }, 500);
+    window.location.href = whatsappUrl;
+  }, 600);
 
 }
 
