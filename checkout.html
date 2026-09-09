@@ -578,7 +578,7 @@ function renderCheckout(){
           </div>
 
 
-          <div class="field.full">
+          <div class="field full">
 
             <label>
               Full Address *
@@ -963,20 +963,39 @@ function showSuccess(
 
 
   const whatsappMessage = 
-`RADA CREST Order
+`🛍️ *RADA CREST — NEW ORDER*
 
-Order ID: #${orderId}
+━━━━━━━━━━━━━━━━━━
 
+*Order ID:* ${orderId}
+
+*PRODUCT DETAILS*
 Product: ${product.name}
 Quantity: ${quantity}
+Price: ₹${Number(product.price || 0).toLocaleString("en-IN")}
 Total: ₹${totalAmount.toLocaleString("en-IN")}
 
-Customer: ${customerName}
-Phone: ${phone}
+━━━━━━━━━━━━━━━━━━
 
-Address:
+*CUSTOMER DETAILS*
+Name: ${customerName}
+Mobile: ${phone}
+
+
+*DELIVERY ADDRESS*
 ${address}
-${city}, ${state} - ${pincode}`;
+${city}, ${state}
+PIN Code: ${pincode}
+
+━━━━━━━━━━━━━━━━━━
+
+*ORDER STATUS*
+Order Placed
+
+Please confirm my order.
+
+Thank you,
+RADA CREST Customer`;
 
 
   const whatsappUrl = 
