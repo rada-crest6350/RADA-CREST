@@ -304,7 +304,7 @@
     return data;
   }
 
-  // Helper function to format items list safely
+  // Format Items
   function formatOrderItems(order) {
     let itemsList = order.items || order.cart_items || order.products;
     if (typeof itemsList === 'string') {
@@ -327,6 +327,21 @@
     return "• General Order / Details Not Specified";
   }
 
+  // Format Payment Info nicely
+  function formatPaymentInfo(order) {
+    const payMethod = (order.payment_method || order.payment_type || "").toLowerCase();
+    const payStatus = (order.payment_status || order.payment || "pending").toLowerCase();
+
+    if (payMethod.includes('cod') || payMethod.includes('cash') || payMethod === 'cash on delivery') {
+      return `<span style="color: #ffa500; font-weight:750;">💵 Cash on Delivery (COD)</span>`;
+    } else if (payMethod.includes('online') || payMethod.includes('upi') || payMethod.includes('netbanking') || payMethod.includes('card') || payStatus === 'success' || payStatus === 'paid') {
+      const methodLabel = payMethod ? payMethod.toUpperCase() : 'ONLINE (UPI/NETBANKING)';
+      return `<span style="color: var(--success); font-weight:750;">✅ Online Payment (${methodLabel}) — SUCCESS</span>`;
+    } else {
+      return `<span style="color: #9da0b0;">Payment Status: <b>${escapeHtml(payStatus)}</b></span>`;
+    }
+  }
+
   function renderOrders(data){
     const list = document.getElementById("list");
 
@@ -338,9 +353,9 @@
     list.innerHTML = data.map(order => {
       const date = order.created_at ? new Date(order.created_at).toLocaleString("en-IN") : "";
       const status = (order.status || "pending").toLowerCase();
-      const payment = order.payment_status || "pending";
       const orderIdStr = escapeHtml(order.order_number || String(order.id));
       const itemsHtml = formatOrderItems(order);
+      const paymentHtml = formatPaymentInfo(order);
 
       let badgeClass = "badge-pending";
       if(status === 'delivered') badgeClass = "badge-delivered";
@@ -369,6 +384,7 @@
               </span>
             </div>
 
+            <!-- Full Delivery Address Box -->
             <div style="grid-column: 1/-1; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-top: 2px;">
               <i class="fa-solid fa-location-dot" style="color: var(--brand);"></i> <b>Full Delivery Address:</b><br>
               <span style="color: #fff; line-height: 1.5; display: inline-block; margin-top: 4px;">
@@ -384,8 +400,8 @@
           </div>
           
           <div class="order-footer">
-            <div style="display:flex; align-items:center; gap:15px;">
-              <small>Payment: <b>${escapeHtml(payment)}</b></small>
+            <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+              <div style="font-size:13px;">Payment: ${paymentHtml}</div>
               <button class="print-btn" onclick="printShippingLabel('${order.id}')"><i class="fa-solid fa-print"></i> Print Slip</button>
             </div>
             <div>
@@ -428,6 +444,15 @@
       printItemsHtml = "• RADA CREST Electrical Product Items";
     }
 
+    // Print Payment Text
+    const payMethod = (order.payment_method || order.payment_type || "").toLowerCase();
+    let printPaymentText = "";
+    if (payMethod.includes('cod') || payMethod.includes('cash') || payMethod === 'cash on delivery') {
+      printPaymentText = "CASH ON DELIVERY (COD)";
+    } else {
+      printPaymentText = `ONLINE PAYMENT SUCCESS (${payMethod.toUpperCase() || 'UPI/NETBANKING'})`;
+    }
+
     container.innerHTML = `
       <div style="border: 3px solid #000; padding: 20px; font-family: sans-serif; max-width: 400px; margin: 0 auto;">
         <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 12px;">
@@ -456,9 +481,12 @@
           </div>
         </div>
 
-        <div style="border-top: 2px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 15px;">
-          <div><b>Payment:</b> ${escapeHtml(order.payment_status || "Prepaid")}</div>
-          <div style="font-size: 18px; font-weight: bold;">₹${Number(order.total_amount || 0).toLocaleString("en-IN")}</div>
+        <div style="border-top: 2px solid #000; padding-top: 10px; font-size: 14px;">
+          <div style="margin-bottom: 4px;"><b>Payment Mode:</b> ${printPaymentText}</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+            <span style="font-size: 13px; color: #555;">Total Amount:</span>
+            <span style="font-size: 18px; font-weight: bold;">₹${Number(order.total_amount || 0).toLocaleString("en-IN")}</span>
+          </div>
         </div>
       </div>
     `;
