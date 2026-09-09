@@ -7,16 +7,16 @@
 <title>Checkout — RADA CREST</title>
 
 <script type="module">
-import { createClient }
+import { createClient } 
 from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const SUPABASE_URL =
+const SUPABASE_URL = 
 "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 
-const SUPABASE_KEY =
+const SUPABASE_KEY = 
 "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 
-const supabase =
+const supabase = 
 createClient(SUPABASE_URL, SUPABASE_KEY);
 
 window.supabase = supabase;
@@ -288,7 +288,7 @@ textarea{
 
 <script type="module">
 
-import { createClient }
+import { createClient } 
 from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 
@@ -296,15 +296,15 @@ from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
    SUPABASE
 ===================================== */
 
-const SUPABASE_URL =
+const SUPABASE_URL = 
 "https://ynpsnkvrjhaxdynmurzj.supabase.co";
 
-const SUPABASE_KEY =
+const SUPABASE_KEY = 
 "sb_publishable_De-FpQeLF8L5g-7_nu_mvQ_VihQGfjL";
 
-const supabase =
+const supabase = 
 createClient(
-  SUPABASE_URL,
+  SUPABASE_URL, 
   SUPABASE_KEY
 );
 
@@ -313,12 +313,12 @@ createClient(
    URL PARAMETER
 ===================================== */
 
-const params =
+const params = 
 new URLSearchParams(
   window.location.search
 );
 
-const buyNow =
+const buyNow = 
 params.get("buy_now");
 
 // Buy Now stores the real product id + quantity in localStorage.
@@ -332,13 +332,13 @@ if(buyNow === "1"){
   }
 }
 
-const productId =
-params.get("product_id") ||
-params.get("id") ||
-buyNowData?.id ||
+const productId = 
+params.get("product_id") || 
+params.get("id") || 
+buyNowData?.id || 
 "";
 
-const initialQuantity =
+const initialQuantity = 
 Math.max(1, Number(buyNowData?.qty || 1));
 
 
@@ -355,7 +355,7 @@ let product = null;
 
 async function loadProduct(){
 
-  const area =
+  const area = 
     document.getElementById(
       "checkoutArea"
     );
@@ -380,7 +380,7 @@ async function loadProduct(){
 
   if(/^\d+$/.test(productId)){
 
-    query =
+    query = 
       supabase
         .from("products")
         .select("*")
@@ -393,7 +393,7 @@ async function loadProduct(){
 
   else{
 
-    query =
+    query = 
       supabase
         .from("products")
         .select("*")
@@ -405,7 +405,7 @@ async function loadProduct(){
   }
 
 
-  const result =
+  const result = 
     await query;
 
 
@@ -426,13 +426,13 @@ async function loadProduct(){
 
   if(Array.isArray(result.data)){
 
-    product =
+    product = 
       result.data[0];
 
   }
   else{
 
-    product =
+    product = 
       result.data;
 
   }
@@ -462,18 +462,18 @@ async function loadProduct(){
 
 function renderCheckout(){
 
-  const area =
+  const area = 
     document.getElementById(
       "checkoutArea"
     );
 
 
-  const image =
-    product.image_url ||
+  const image = 
+    product.image_url || 
     "https://via.placeholder.com/300";
 
 
-  const price =
+  const price = 
     Number(product.price || 0);
 
 
@@ -485,8 +485,8 @@ function renderCheckout(){
 
       <div class="product">
 
-        <img
-          src="${escapeHtml(image)}"
+        <img 
+          src="${escapeHtml(image)}" 
           alt="${escapeHtml(product.name || "")}"
         >
 
@@ -501,12 +501,12 @@ function renderCheckout(){
           </div>
 
           ${
-            product.warranty
-            ?
+            product.warranty 
+            ? 
             `<div style="margin-top:6px;color:#666;">
               Warranty: ${escapeHtml(product.warranty)}
-            </div>`
-            :
+            </div>` 
+            : 
             ""
           }
 
@@ -516,10 +516,10 @@ function renderCheckout(){
               Quantity
             </label>
 
-            <input
-              id="quantity"
-              type="number"
-              min="1"
+            <input 
+              id="quantity" 
+              type="number" 
+              min="1" 
               max="${Math.max(1, Number(product.stock || 0))}"
               value="${Math.min(initialQuantity, Math.max(1, Number(product.stock || 0)))}"
             >
@@ -556,9 +556,9 @@ function renderCheckout(){
               Full Name *
             </label>
 
-            <input
-              id="customerName"
-              required
+            <input 
+              id="customerName" 
+              required 
               placeholder="Enter your name"
             >
           </div>
@@ -569,24 +569,24 @@ function renderCheckout(){
               Phone Number *
             </label>
 
-            <input
-              id="phone"
-              type="tel"
-              required
+            <input 
+              id="phone" 
+              type="tel" 
+              required 
               placeholder="Enter mobile number"
             >
           </div>
 
 
-          <div class="field full">
+          <div class="field.full">
 
             <label>
               Full Address *
             </label>
 
-            <textarea
-              id="address"
-              required
+            <textarea 
+              id="address" 
+              required 
               placeholder="House no., street, village / area"
             ></textarea>
 
@@ -599,9 +599,9 @@ function renderCheckout(){
               City *
             </label>
 
-            <input
-              id="city"
-              required
+            <input 
+              id="city" 
+              required 
               placeholder="City"
             >
 
@@ -614,9 +614,9 @@ function renderCheckout(){
               State *
             </label>
 
-            <input
-              id="state"
-              required
+            <input 
+              id="state" 
+              required 
               placeholder="State"
             >
 
@@ -629,9 +629,9 @@ function renderCheckout(){
               Pincode *
             </label>
 
-            <input
-              id="pincode"
-              required
+            <input 
+              id="pincode" 
+              required 
               inputmode="numeric"
               maxlength="6"
               placeholder="6 digit pincode"
@@ -642,17 +642,17 @@ function renderCheckout(){
         </div>
 
 
-        <div
-          id="orderMessage"
+        <div 
+          id="orderMessage" 
           class="message"
         ></div>
 
 
         <div style="margin-top:20px;">
 
-          <button
-            id="placeOrderBtn"
-            class="place"
+          <button 
+            id="placeOrderBtn" 
+            class="place" 
             type="submit"
           >
             Place Order
@@ -691,9 +691,9 @@ function renderCheckout(){
 
 function updateTotal(){
 
-  const quantity =
+  const quantity = 
     Math.max(
-      1,
+      1, 
       Number(
         document.getElementById(
           "quantity"
@@ -702,16 +702,16 @@ function updateTotal(){
     );
 
 
-  const total =
-    Number(product.price || 0)
-    *
+  const total = 
+    Number(product.price || 0) 
+    * 
     quantity;
 
 
   document.getElementById(
     "totalAmount"
-  ).textContent =
-    "₹" +
+  ).textContent = 
+    "₹" + 
     total.toLocaleString("en-IN");
 
 }
@@ -722,7 +722,7 @@ function updateTotal(){
 ===================================== */
 
 async function getLoggedInCustomer(){
-  const { data, error } =
+  const { data, error } = 
     await supabase.auth.getUser();
 
   if(error){
@@ -738,13 +738,13 @@ async function placeOrder(e){
 
   e.preventDefault();
 
-  const customer =
+  const customer = 
     await getLoggedInCustomer();
 
   if(!customer){
 
-    window.location.href =
-      "account.html?redirect=" +
+    window.location.href = 
+      "account.html?redirect=" + 
       encodeURIComponent(
         window.location.href
       );
@@ -753,56 +753,56 @@ async function placeOrder(e){
   }
 
 
-  const button =
+  const button = 
     document.getElementById(
       "placeOrderBtn"
     );
 
-  const message =
+  const message = 
     document.getElementById(
       "orderMessage"
     );
 
 
-  const customerName =
+  const customerName = 
     document.getElementById(
       "customerName"
     ).value.trim();
 
 
-  const phone =
+  const phone = 
     document.getElementById(
       "phone"
     ).value.trim();
 
 
-  const address =
+  const address = 
     document.getElementById(
       "address"
     ).value.trim();
 
 
-  const city =
+  const city = 
     document.getElementById(
       "city"
     ).value.trim();
 
 
-  const state =
+  const state = 
     document.getElementById(
       "state"
     ).value.trim();
 
 
-  const pincode =
+  const pincode = 
     document.getElementById(
       "pincode"
     ).value.trim();
 
 
-  const quantity =
+  const quantity = 
     Math.max(
-      1,
+      1, 
       Number(
         document.getElementById(
           "quantity"
@@ -817,9 +817,9 @@ async function placeOrder(e){
   }
 
 
-  const totalAmount =
-    Number(product.price || 0)
-    *
+  const totalAmount = 
+    Number(product.price || 0) 
+    * 
     quantity;
 
 
@@ -827,10 +827,10 @@ async function placeOrder(e){
     phone.replace(/\D/g,"")
   )){
 
-    message.style.color =
+    message.style.color = 
       "#d33";
 
-    message.textContent =
+    message.textContent = 
       "Please enter a valid 10-digit phone number.";
 
     return;
@@ -840,10 +840,10 @@ async function placeOrder(e){
 
   if(!/^\d{6}$/.test(pincode)){
 
-    message.style.color =
+    message.style.color = 
       "#d33";
 
-    message.textContent =
+    message.textContent = 
       "Please enter a valid 6-digit pincode.";
 
     return;
@@ -853,13 +853,13 @@ async function placeOrder(e){
 
   button.disabled = true;
 
-  button.textContent =
+  button.textContent = 
     "Placing Order...";
 
-  message.style.color =
+  message.style.color = 
     "#777";
 
-  message.textContent =
+  message.textContent = 
     "Please wait...";
 
 
@@ -870,10 +870,10 @@ async function placeOrder(e){
      and keeps account/order history consistent.
   ===================================== */
 
-  const fullShippingAddress =
+  const fullShippingAddress = 
     `${address}, ${city}, ${state} - ${pincode}`;
 
-  const { data: result, error } =
+  const { data: result, error } = 
     await supabase.rpc("place_order",{
       p_items: [
         {
@@ -948,21 +948,21 @@ function showSuccess(
   totalAmount
 ){
 
-  const area =
+  const area = 
     document.getElementById(
       "checkoutArea"
     );
 
 
-  const orderId =
+  const orderId = 
     order.id;
 
 
-  const whatsappNumber =
+  const whatsappNumber = 
     "919079714767";
 
 
-  const whatsappMessage =
+  const whatsappMessage = 
 `RADA CREST Order
 
 Order ID: #${orderId}
@@ -979,10 +979,10 @@ ${address}
 ${city}, ${state} - ${pincode}`;
 
 
-  const whatsappUrl =
-    "https://wa.me/" +
-    whatsappNumber +
-    "?text=" +
+  const whatsappUrl = 
+    "https://wa.me/" + 
+    whatsappNumber + 
+    "?text=" + 
     encodeURIComponent(
       whatsappMessage
     );
@@ -1025,17 +1025,17 @@ ${city}, ${state} - ${pincode}`;
 
       <div style="margin-top:25px;">
 
-        <a
-          class="whatsapp"
-          href="${whatsappUrl}"
+        <a 
+          class="whatsapp" 
+          href="${whatsappUrl}" 
           target="_blank"
         >
           📲 Send Order on WhatsApp
         </a>
 
 
-        <a
-          class="continue"
+        <a 
+          class="continue" 
           href="products.html"
         >
           Continue Shopping
@@ -1055,7 +1055,7 @@ ${city}, ${state} - ${pincode}`;
 
   setTimeout(() => {
 
-    window.location.href =
+    window.location.href = 
       whatsappUrl;
 
   }, 500);
