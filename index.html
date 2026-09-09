@@ -8,9 +8,6 @@
   <link rel="stylesheet" href="home.css" />
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Supabase Client Global Initializer Script -->
-  <script src="config.js"></script>
-  <script src="supabase-client.js"></script>
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
 // RADA CREST Pure Native Multi-Language Dictionary
@@ -72,7 +69,7 @@ const siteDictionary = {
     "My Orders": "ನನ್ನ ಆರ್ಡರ್‌ಗಳು",
     "Delivery Address": "ವಿಳಾಸ",
     "Track My Requests": "ನನ್ನ ವಿನಂತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
-    "Notifications": "ಅಧಿಸೂಚನೆಗಳು",
+    "Notifications": "ಅಧಿಸूಚನೆಗಳು",
     "Account": "ಖಾತೆ",
     "Search products...": "ಉತ್ಪನ್ನಗಳನ್ನು ಹುಡುಕಿ..."
   },
@@ -108,67 +105,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <style>
-  /* Responsive Cyber Category Grid & Flowing Animations */
+  /* Clean Responsive Grid & Flowing Animations for Categories */
   .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
-    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+    gap: 16px !important;
+    width: 100% !important;
   }
 
   @media (max-width: 600px) {
     .categories-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 12px !important;
     }
   }
 
   .cat-card {
-    background: rgba(20, 20, 28, 0.75);
-    backdrop-filter: blur(16px);
-    border: 1.5px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
-
-  @keyframes cardEntrance {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .cat-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 122, 0, 0.15), transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 1;
-    pointer-events: none;
-  }
-
   .cat-card:hover {
-    border-color: #FF7A00;
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 15px 35px rgba(255, 122, 0, 0.25);
-  }
-
-  .cat-card:hover::before {
-    opacity: 1;
-  }
-
-  .cat-card > * {
-    position: relative;
-    z-index: 2;
+    transform: translateY(-3px) scale(1.02) !important;
+    border-color: #FF7A00 !important;
+    box-shadow: 0 10px 25px rgba(255, 122, 0, 0.2) !important;
   }
 </style>
 </head>
@@ -325,66 +283,5 @@ document.addEventListener('DOMContentLoaded', () => {
   </footer>
 
   <script src="home.js?v=3.0"></script>
-  
-  <!-- Safe Category Synchronization Script (Without touching home.js logic) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      setTimeout(async () => {
-        const categoriesGrid = document.getElementById('categoriesGrid');
-        const categoryFilter = document.getElementById('categoryFilter');
-
-        if (!categoriesGrid) return;
-
-        // Agar home.js ne render nahi kiya ya khali hai, toh yeh render karega
-        if (categoriesGrid.innerHTML.trim() === "") {
-          let categoriesList = JSON.parse(localStorage.getItem('rc_categories')) || [];
-
-          if (categoriesList.length === 0 && window.supabaseClient) {
-            const { data } = await window.supabaseClient.from('categories').select('*').order('name');
-            if (data && data.length > 0) categoriesList = data;
-          }
-
-          if (categoriesList.length > 0) {
-            categoriesGrid.innerHTML = '';
-            if (categoryFilter && categoryFilter.options.length <= 1) {
-              categoryFilter.innerHTML = '<option value="all">All Categories</option>';
-            }
-
-            categoriesList.forEach((cat, index) => {
-              const card = document.createElement('div');
-              card.className = 'cat-card';
-              card.style.animationDelay = `${index * 0.06}s`;
-              
-              card.onclick = () => {
-                window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
-              };
-
-              const imgUrl = cat.image || cat.image_url || "";
-              let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
-              if (imgUrl) {
-                thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-              }
-
-              card.innerHTML = `
-                ${thumb}
-                <div>
-                  <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
-                  <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Tap to View</p>
-                </div>
-              `;
-              categoriesGrid.appendChild(card);
-
-              if (categoryFilter) {
-                const opt = document.createElement('option');
-                opt.value = cat.name;
-                opt.textContent = cat.name;
-                categoryFilter.appendChild(opt);
-              }
-            });
-          }
-        }
-      }, 400); // Thoda sa delay diya hai taaki home.js apna kaam pehle kar sake
-    });
-  </script>
 </body>
 </html>
