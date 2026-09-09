@@ -223,7 +223,7 @@
   <div class="modal-box">
     <h3 id="modalTitle">Status Update Reason</h3>
     <p style="font-size:12px;color:var(--text-muted);">Please enter a note/reason for this status change:</p>
-    <textarea id="statusReasonText" placeholder="e.g. Delivered successfully to customer / Customer cancelled call..."></textarea>
+    <textarea id="statusReasonText" placeholder="e.g. Out of stock / Customer requested cancellation..."></textarea>
     <div class="modal-actions">
       <button class="modal-btn btn-cancel" onclick="closeReasonModal()">Cancel</button>
       <button class="modal-btn btn-confirm" onclick="confirmStatusUpdate()">Confirm Update</button>
@@ -411,6 +411,7 @@
                 <option value="confirmed" ${status === "confirmed" ? "selected" : ""}>Confirmed</option>
                 <option value="processing" ${status === "processing" ? "selected" : ""}>Processing</option>
                 <option value="shipped" ${status === "shipped" ? "selected" : ""}>Shipped</option>
+                <option value="delayed" ${status === "delayed" ? "selected" : ""}>Delayed</option>
                 <option value="delivered" ${status === "delivered" ? "selected" : ""}>Delivered</option>
                 <option value="cancelled" ${status === "cancelled" ? "selected" : ""}>Cancelled</option>
               </select>
@@ -429,7 +430,6 @@
     const orderNo = order.order_number || order.id;
     const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString("en-IN") : "";
     
-    // Format items for print slip
     let itemsList = order.items || order.cart_items || order.products;
     if (typeof itemsList === 'string') {
       try { itemsList = JSON.parse(itemsList); } catch (e) { itemsList = null; }
@@ -444,7 +444,6 @@
       printItemsHtml = "• RADA CREST Electrical Product Items";
     }
 
-    // Print Payment Text
     const payMethod = (order.payment_method || order.payment_type || "").toLowerCase();
     let printPaymentText = "";
     if (payMethod.includes('cod') || payMethod.includes('cash') || payMethod === 'cash on delivery') {
@@ -495,7 +494,8 @@
   }
 
   function handleStatusChange(id, newStatus){
-    if(newStatus === 'delivered' || newStatus === 'cancelled'){
+    // Sirf 'cancelled' ya 'delayed' hone par hi reason puchenge, delivered par seedha update hoga
+    if(newStatus === 'cancelled' || newStatus === 'delayed'){
       pendingUpdateOrderId = id;
       pendingUpdateStatus = newStatus;
       document.getElementById('modalTitle').textContent = `Reason for ${newStatus.toUpperCase()}`;
