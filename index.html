@@ -88,46 +88,74 @@ const siteDictionary = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  const currentLang = localStorage.getItem('rc_lang') || 'en';
-  if (currentLang === 'en' || !siteDictionary[currentLang]) return;
+document.addEventListener("DOMContentLoaded", async () => {
+    const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
+    const dbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-  const dict = siteDictionary[currentLang];
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-  let node;
-  
-  while (node = walker.nextNode()) {
-    let text = node.nodeValue.trim();
-    if (text && dict[text]) {
-      node.nodeValue = node.nodeValue.replace(text, dict[text]);
+    if (!dbClient) return;
+
+    try {
+      const categoriesGrid = document.getElementById('categoriesGrid');
+      const categoryFilter = document.getElementById('categoryFilter');
+
+      // Direct Database se fetch karo (Koi fake fallback nahi)
+      const { data: categories, error } = await dbClient.from('categories').select('*').order('name');
+      
+      if (error) {
+        console.error("Supabase Category Error:", error);
+      }
+
+      if (categoriesGrid && categories && categories.length > 0) {
+        categoriesGrid.innerHTML = '';
+        if (categoryFilter) categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+        categories.forEach((cat, index) => {
+          const card = document.createElement('div');
+          card.className = 'cat-card';
+          card.style.cssText = "background:rgba(20,20,28,0.75);backdrop-filter:blur(16px);border:1.5px solid rgba(255,255,255,0.08);border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.3s;animation:cardEntrance 0.5s ease forwards;";
+          card.style.animationDelay = `${index * 0.05}s`;
+
+          card.onclick = () => {
+            window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
+          };
+
+          const imgUrl = cat.image || cat.image_url;
+          let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
+          if (imgUrl) {
+            thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+          }
+
+          card.innerHTML = `
+            ${thumb}
+            <div>
+              <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
+              <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Tap to View</p>
+            </div>
+          `;
+          categoriesGrid.appendChild(card);
+
+          if (categoryFilter) {
+            const opt = document.createElement('option');
+            opt.value = cat.name;
+            opt.textContent = cat.name;
+            categoryFilter.appendChild(opt);
+          }
+        });
+      } else {
+        if (categoriesGrid) {
+          categoriesGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#9da0b0;padding:15px;">No categories found in database.</div>`;
+        }
+      }
+
+    } catch (err) {
+      console.error("Live Data Load Error:", err);
     }
-  }
-});
+  });
 </script>
 <style>
   /* Clean Responsive Grid & Flowing Animations for Categories */
-  .categories-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
-    gap: 16px !important;
-    width: 100% !important;
-  }
-
-  @media (max-width: 600px) {
-    .categories-grid {
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 12px !important;
-    }
-  }
-
-  .cat-card {
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  }
-  .cat-card:hover {
-    transform: translateY(-3px) scale(1.02) !important;
-    border-color: #FF7A00 !important;
-    box-shadow: 0 10px 25px rgba(255, 122, 0, 0.2) !important;
-  }
+  .
 </style>
 </head>
 <body>
