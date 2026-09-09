@@ -640,21 +640,22 @@
     function sendWhatsAppOrder(finalAmount, giftUnlocked, name, phone, addr, pin) {
       const p = checkoutState.product;
       const giftStr = (giftUnlocked && checkoutState.selectedGift) ? `%0A*Free Gift:* ${checkoutState.selectedGift.name}` : '';
-      const payStr = checkoutState.paymentMode === 'online' ? 'Online Paid' : 'Cash on Delivery';
+      const payStr = checkoutState.paymentMode === 'online' ? 'Online Paid (UPI/Card) - SUCCESS' : 'Cash on Delivery (COD)';
 
       const msg = `*NEW ORDER - RADA CREST*%0A` +
                   `----------------------------%0A` +
                   `*Product:* ${p.name}%0A` +
                   `*Quantity:* ${checkoutState.qty} Pcs%0A` +
-                  `*Payment:* ${payStr}%0A` +
-                  `*Total Price:* ₹${finalAmount}${giftStr}%0A` +
+                  `*Payment Mode:* ${payStr}%0A` +
+                  `*Total Amount:* ₹${finalAmount}${giftStr}%0A` +
                   `----------------------------%0A` +
                   `*Customer Details:*%0A` +
                   `Name: ${name}%0A` +
                   `Phone: ${phone}%0A` +
                   `Address: ${addr} - ${pin}`;
 
-      window.location.href = `https://wa.me/?text=${msg}`;
+      // Directly opens WhatsApp chat with your number: 9079714767
+      window.location.href = `https://wa.me/919079714767?text=${msg}`;
     }
 
     function showError(msg) {
