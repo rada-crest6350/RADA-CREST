@@ -158,32 +158,38 @@
     /* Hidden Printable Shipping Label */
     #printLabelContainer { display: none; }
 
-    /* Strict Single Page Print Settings */
+   /* Strict Single Page Print Settings */
     @media print {
       @page {
         size: auto;
-        margin: 5mm;
+        margin: 0mm;
+      }
+      body, html {
+        background: #fff !important;
+        height: auto !important;
+        overflow: visible !important;
       }
       body * { visibility: hidden; }
       #printLabelContainer, #printLabelContainer * { visibility: visible; }
       #printLabelContainer {
-        display: flex !important;
-        justify-content: center;
-        align-items: flex-start;
-        position: absolute;
-        top: 0; left: 0;
-        width: 100vw;
-        height: 100vh;
+        display: block !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
         background: #fff !important;
         color: #000 !important;
-        padding: 10px;
+        padding: 10px !important;
       }
       .slip-box {
         width: 100% !important;
-        max-width: 550px !important;
-        border: 3px solid #000 !important;
-        padding: 20px !important;
-        background: #fff !important;
+        max-width: 100% !important;
+        border: 2px solid #000 !important;
+        padding: 15px !important;
+        margin: 0 auto !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        page-break-before: avoid !important;
       }
     }
   </style>
