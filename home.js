@@ -185,32 +185,33 @@ async function initCategories() {
   const grid = document.getElementById('categoriesGrid');
   if (!grid) return;
 
-  let dynamicCats = [];
+  // Purane kharab cache ko turant clear karne ke liye
+  localStorage.removeItem('rc_categories');
 
-  // 1. Supabase database se live categories fetch karo
+  let categoriesList = [];
+
+  // Ab seedha Supabase database se fresh live data fetch hoga
   if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient.from('categories').select('*').order('name');
       if (!error && data && data.length > 0) {
-        dynamicCats = data;
+        categoriesList = data;
       }
     } catch (e) {
-      console.warn("Category fetch error:", e);
+      console.warn("Fetch error:", e);
     }
   }
 
-  // 2. Agar database me category mil gayi, toh sirf wahi dikhayo (koi hardcoded 4 categories nahi)
+  // Render categories
   grid.innerHTML = '';
-  
-  if (dynamicCats.length > 0) {
-    dynamicCats.forEach((cat, index) => {
+  if (categoriesList.length > 0) {
+    categoriesList.forEach((cat, index) => {
       const card = document.createElement('a');
       card.className = 'category-card';
       card.href = `category.html?category=${encodeURIComponent(cat.name)}`;
       card.style.animationDelay = `${index * 0.05}s`;
 
       const imgUrl = cat.image || cat.image_url || DEFAULT_CAT_IMG;
-
       card.innerHTML = `
         <div class="cat-img-box">
           <img src="${imgUrl}" alt="${cat.name}" onerror="this.src='${DEFAULT_CAT_IMG}'" />
@@ -220,8 +221,7 @@ async function initCategories() {
       grid.appendChild(card);
     });
   } else {
-    // Agar database khali ho tabhi bas ek default category dikhao, baki 4 fake wali hamesha ke liye gayab
-    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #9da0b0; padding: 15px; font-size: 13px;">No categories found in database.</div>`;
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #9da0b0; padding: 15px;">No categories found.</div>`;
   }
 }
 
