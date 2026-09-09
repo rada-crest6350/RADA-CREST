@@ -40,7 +40,7 @@
     .ambient-glow{
       position:fixed;width:400px;height:400px;
       background:radial-gradient(circle, rgba(255,122,0,0.15) 0%, rgba(0,0,0,0) 70%);
-      top:10%
+      top:10%;
       left:50%;transform:translate(-50%, -50%);
       z-index:0;pointer-events:none;
     }
@@ -109,13 +109,20 @@
     .order-details b{color:#fff;}
 
     .order-footer{
-      display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:12px;flex-wrap:gap;gap:10px;
+      display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:12px;flex-wrap:wrap;gap:10px;
     }
     .status-select{
       background:rgba(255,255,255,0.06);border:1.5px solid var(--border);color:#fff;
       padding:8px 12px;border-radius:10px;font-family:inherit;font-size:13px;outline:none;cursor:pointer;
     }
     .status-select:focus{border-color:var(--brand);}
+
+    .print-btn{
+      background:rgba(255,122,0,0.15);border:1px solid var(--brand);color:var(--brand);
+      padding:8px 14px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;transition:0.2s;
+      display:inline-flex;align-items:center;gap:6px;
+    }
+    .print-btn:hover{background:var(--brand);color:#000;}
 
     .badge{
       padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;display:inline-block;
@@ -147,6 +154,24 @@
     .btn-confirm{background:var(--brand-gradient);color:#000;}
 
     .empty-state{text-align:center;padding:40px;color:var(--text-muted);font-size:14px;}
+
+    /* Hidden Printable Shipping Label (4x6 inch layout) */
+    #printLabelContainer { display: none; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printLabelContainer, #printLabelContainer * { visibility: visible; }
+      #printLabelContainer {
+        display: block !important;
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        background: #fff !important;
+        color: #000 !important;
+        padding: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -205,6 +230,9 @@
     </div>
   </div>
 </div>
+
+<!-- Printable Label Hidden Area -->
+<div id="printLabelContainer"></div>
 
 <script>
   let allOrdersData = [];
@@ -324,7 +352,10 @@
           </div>
           
           <div class="order-footer">
-            <small>Payment: <b>${escapeHtml(payment)}</b></small>
+            <div style="display:flex; align-items:center; gap:15px;">
+              <small>Payment: <b>${escapeHtml(payment)}</b></small>
+              <button class="print-btn" onclick="printShippingLabel('${order.id}')"><i class="fa-solid fa-print"></i> Print Slip</button>
+            </div>
             <div>
               <label style="font-size:12px;color:var(--text-muted);margin-right:6px;">Update Status:</label>
               <select class="status-select" onchange="handleStatusChange(${order.id}, this.value)">
@@ -342,6 +373,47 @@
     }).join("");
   }
 
+  function printShippingLabel(orderId) {
+    const order = allOrdersData.find(o => String(o.id) === String(orderId));
+    if(!order) return alert("Order details nahi mile!");
+
+    const container = document.getElementById('printLabelContainer');
+    const orderNo = order.order_number || order.id;
+    const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString("en-IN") : "";
+
+    container.innerHTML = `
+      <div style="border: 3px solid #000; padding: 20px; font-family: sans-serif; max-width: 400px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
+          <h2 style="font-size: 22px; margin:0;">RADA CREST</h2>
+          <div style="text-align: right;">
+            <b>Order #${orderNo}</b><br>
+            <small>${dateStr}</small>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <h4 style="margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase; color: #555;">Deliver To:</h4>
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 4px;">${escapeHtml(order.customer_name || "N/A")}</div>
+          <div style="font-size: 15px; font-weight: bold; margin-bottom: 6px;">📱 Phone: ${escapeHtml(order.customer_phone || "N/A")}</div>
+          <div style="font-size: 14px; line-height: 1.4; background: #f9f9f9; padding: 10px; border: 1px solid #ddd;">
+            ${escapeHtml(order.shipping_address || order.address || "N/A")}<br>
+            ${order.city ? `City: ${escapeHtml(order.city)}<br>` : ''}
+            ${order.district ? `District: ${escapeHtml(order.district)}<br>` : ''}
+            ${order.state ? `State: ${escapeHtml(order.state)}<br>` : ''}
+            <b style="font-size: 16px;">Pincode: ${escapeHtml(order.pincode || "N/A")}</b>
+          </div>
+        </div>
+
+        <div style="border-top: 2px solid #000; padding-top: 10px; display: flex; justify-content: space-between; font-size: 15px;">
+          <div><b>Payment:</b> ${escapeHtml(order.payment_status || "Prepaid")}</div>
+          <div style="font-size: 18px; font-weight: bold;">₹${Number(order.total_amount || 0).toLocaleString("en-IN")}</div>
+        </div>
+      </div>
+    `;
+
+    window.print();
+  }
+
   function handleStatusChange(id, newStatus){
     if(newStatus === 'delivered' || newStatus === 'cancelled'){
       pendingUpdateOrderId = id;
@@ -356,7 +428,7 @@
 
   function closeReasonModal(){
     document.getElementById('reasonModal').style.display = 'none';
-    loadOrders(); // Reset dropdown view if cancelled
+    loadOrders();
   }
 
   async function confirmStatusUpdate(){
