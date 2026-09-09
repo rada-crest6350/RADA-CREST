@@ -178,16 +178,19 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-   // Live Supabase Database se Categories Load karne ke liye
+ // Sirf Supabase Database se data uthane ke liye (Koi duplicate ya fake category nahi)
   document.addEventListener('DOMContentLoaded', async () => {
     const pCategorySelect = document.getElementById('pCategory');
-    pCategorySelect.innerHTML = '<option value="">Loading categories...</option>';
+    pCategorySelect.innerHTML = '<option value="">Database se load ho raha hai...</option>';
 
     if (supabaseClient) {
       try {
         const { data, error } = await supabaseClient.from('categories').select('*').order('name');
+        
+        pCategorySelect.innerHTML = ''; // Pehle saara purana saaf karo
+
         if (!error && data && data.length > 0) {
-          pCategorySelect.innerHTML = '';
+          // Agar database me categories hain, toh wahi dikhao
           data.forEach(cat => {
             const opt = document.createElement('option');
             opt.value = cat.name;
@@ -195,15 +198,19 @@
             pCategorySelect.appendChild(opt);
           });
         } else {
-          pCategorySelect.innerHTML = '<option value="LED Bulbs">LED Bulbs</option>';
+          // Agar database sach me khali hai, toh dropdown me bhi khali message dikhao
+          const opt = document.createElement('option');
+          opt.value = "";
+          opt.textContent = "Pehle Category Add Karein (Database Khali Hai)";
+          pCategorySelect.appendChild(opt);
         }
       } catch (err) {
         console.error("Category fetch error:", err);
-        pCategorySelect.innerHTML = '<option value="LED Bulbs">LED Bulbs</option>';
+        pCategorySelect.innerHTML = '<option value="">Error loading categories</option>';
       }
     }
   });
-
+    
     document.getElementById('addProductForm').onsubmit = async (e) => {
       e.preventDefault();
       const submitBtn = document.getElementById('submitBtn');
