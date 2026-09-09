@@ -155,21 +155,35 @@
 
     .empty-state{text-align:center;padding:40px;color:var(--text-muted);font-size:14px;}
 
-    /* Hidden Printable Shipping Label (4x6 inch layout) */
+    /* Hidden Printable Shipping Label */
     #printLabelContainer { display: none; }
 
+    /* Strict Single Page Print Settings */
     @media print {
+      @page {
+        size: auto;
+        margin: 5mm;
+      }
       body * { visibility: hidden; }
       #printLabelContainer, #printLabelContainer * { visibility: visible; }
       #printLabelContainer {
-        display: block !important;
+        display: flex !important;
+        justify-content: center;
+        align-items: flex-start;
         position: absolute;
         top: 0; left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         background: #fff !important;
         color: #000 !important;
-        padding: 20px;
+        padding: 10px;
+      }
+      .slip-box {
+        width: 100% !important;
+        max-width: 550px !important;
+        border: 3px solid #000 !important;
+        padding: 20px !important;
+        background: #fff !important;
       }
     }
   </style>
@@ -304,7 +318,6 @@
     return data;
   }
 
-  // Format Items
   function formatOrderItems(order) {
     let itemsList = order.items || order.cart_items || order.products;
     if (typeof itemsList === 'string') {
@@ -327,7 +340,6 @@
     return "• General Order / Details Not Specified";
   }
 
-  // Format Payment Info nicely
   function formatPaymentInfo(order) {
     const payMethod = (order.payment_method || order.payment_type || "").toLowerCase();
     const payStatus = (order.payment_status || order.payment || "pending").toLowerCase();
@@ -376,7 +388,6 @@
             <div><i class="fa-solid fa-phone"></i> ${escapeHtml(order.customer_phone || "N/A")}</div>
             ${order.customer_email ? `<div><i class="fa-solid fa-envelope"></i> ${escapeHtml(order.customer_email)}</div>` : ''}
             
-            <!-- Products & Quantity Details Box -->
             <div style="grid-column: 1/-1; background: rgba(255,122,0,0.06); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,122,0,0.2); margin-top: 2px;">
               <i class="fa-solid fa-box-open" style="color: var(--brand);"></i> <b>Ordered Items & Quantity:</b><br>
               <span style="color: #fff; line-height: 1.6; display: inline-block; margin-top: 4px; font-size: 13.5px;">
@@ -384,7 +395,6 @@
               </span>
             </div>
 
-            <!-- Full Delivery Address Box -->
             <div style="grid-column: 1/-1; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-top: 2px;">
               <i class="fa-solid fa-location-dot" style="color: var(--brand);"></i> <b>Full Delivery Address:</b><br>
               <span style="color: #fff; line-height: 1.5; display: inline-block; margin-top: 4px;">
@@ -453,38 +463,38 @@
     }
 
     container.innerHTML = `
-      <div style="border: 3px solid #000; padding: 20px; font-family: sans-serif; max-width: 400px; margin: 0 auto;">
+      <div class="slip-box" style="font-family: sans-serif;">
         <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 12px;">
-          <h2 style="font-size: 22px; margin:0;">RADA CREST</h2>
-          <div style="text-align: right;">
+          <h2 style="font-size: 24px; margin:0; font-weight:800;">RADA CREST</h2>
+          <div style="text-align: right; font-size: 14px;">
             <b>Order #${orderNo}</b><br>
             <small>${dateStr}</small>
           </div>
         </div>
 
-        <div style="margin-bottom: 12px; border-bottom: 1px dashed #000; padding-bottom: 10px;">
-          <h4 style="margin: 0 0 4px 0; font-size: 13px; text-transform: uppercase; color: #555;">Ordered Items:</h4>
-          <div style="font-size: 14px; font-weight: bold; line-height: 1.4;">${printItemsHtml}</div>
+        <div style="margin-bottom: 14px; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+          <h4 style="margin: 0 0 4px 0; font-size: 13px; text-transform: uppercase; color: #333;">Ordered Items & Qty:</h4>
+          <div style="font-size: 15px; font-weight: bold; line-height: 1.5;">${printItemsHtml}</div>
         </div>
 
-        <div style="margin-bottom: 12px;">
-          <h4 style="margin: 0 0 4px 0; font-size: 13px; text-transform: uppercase; color: #555;">Deliver To:</h4>
-          <div style="font-size: 16px; font-weight: bold; margin-bottom: 2px;">${escapeHtml(order.customer_name || "N/A")}</div>
-          <div style="font-size: 14px; font-weight: bold; margin-bottom: 6px;">📱 Phone: ${escapeHtml(order.customer_phone || "N/A")}</div>
-          <div style="font-size: 13.5px; line-height: 1.4; background: #f9f9f9; padding: 8px; border: 1px solid #ddd;">
+        <div style="margin-bottom: 14px;">
+          <h4 style="margin: 0 0 4px 0; font-size: 13px; text-transform: uppercase; color: #333;">Deliver To:</h4>
+          <div style="font-size: 18px; font-weight: bold; margin-bottom: 2px;">${escapeHtml(order.customer_name || "N/A")}</div>
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 6px;">📱 Phone: ${escapeHtml(order.customer_phone || "N/A")}</div>
+          <div style="font-size: 15px; line-height: 1.5; background: #f2f2f2; padding: 10px; border: 1px solid #ccc;">
             ${escapeHtml(order.shipping_address || order.address || "N/A")}<br>
             ${order.city ? `City: ${escapeHtml(order.city)}<br>` : ''}
             ${order.district ? `District: ${escapeHtml(order.district)}<br>` : ''}
             ${order.state ? `State: ${escapeHtml(order.state)}<br>` : ''}
-            <b style="font-size: 15px;">Pincode: ${escapeHtml(order.pincode || "N/A")}</b>
+            <b style="font-size: 17px;">Pincode: ${escapeHtml(order.pincode || "N/A")}</b>
           </div>
         </div>
 
-        <div style="border-top: 2px solid #000; padding-top: 10px; font-size: 14px;">
-          <div style="margin-bottom: 4px;"><b>Payment Mode:</b> ${printPaymentText}</div>
+        <div style="border-top: 2px solid #000; padding-top: 12px; font-size: 15px;">
+          <div style="margin-bottom: 6px;"><b>Payment Mode:</b> ${printPaymentText}</div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-            <span style="font-size: 13px; color: #555;">Total Amount:</span>
-            <span style="font-size: 18px; font-weight: bold;">₹${Number(order.total_amount || 0).toLocaleString("en-IN")}</span>
+            <span style="font-size: 14px; color: #333;">Total Amount:</span>
+            <span style="font-size: 20px; font-weight: bold;">₹${Number(order.total_amount || 0).toLocaleString("en-IN")}</span>
           </div>
         </div>
       </div>
@@ -494,7 +504,6 @@
   }
 
   function handleStatusChange(id, newStatus){
-    // Sirf 'cancelled' ya 'delayed' hone par hi reason puchenge, delivered par seedha update hoga
     if(newStatus === 'cancelled' || newStatus === 'delayed'){
       pendingUpdateOrderId = id;
       pendingUpdateStatus = newStatus;
