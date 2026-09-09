@@ -308,10 +308,21 @@
             <div><i class="fa-solid fa-user"></i> <b>${escapeHtml(order.customer_name || "N/A")}</b></div>
             <div><i class="fa-solid fa-phone"></i> ${escapeHtml(order.customer_phone || "N/A")}</div>
             ${order.customer_email ? `<div><i class="fa-solid fa-envelope"></i> ${escapeHtml(order.customer_email)}</div>` : ''}
-            <div style="grid-column: 1/-1;"><i class="fa-solid fa-location-dot"></i> <b>Address:</b> ${escapeHtml(order.shipping_address || "N/A")}</div>
+            
+            <div style="grid-column: 1/-1; background: rgba(255,255,255,0.03); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-top: 4px;">
+              <i class="fa-solid fa-location-dot" style="color: var(--brand);"></i> <b>Full Delivery Address:</b><br>
+              <span style="color: #fff; line-height: 1.5; display: inline-block; margin-top: 4px;">
+                ${escapeHtml(order.shipping_address || order.address || "N/A")}
+                ${order.city ? `, City: ${escapeHtml(order.city)}` : ''}
+                ${order.district ? `, District: ${escapeHtml(order.district)}` : ''}
+                ${order.state ? `, State: ${escapeHtml(order.state)}` : ''}
+                ${order.pincode ? ` - <b>Pincode: ${escapeHtml(order.pincode)}</b>` : ''}
+              </span>
+            </div>
+
             ${order.reason ? `<div style="grid-column: 1/-1; color: var(--brand);"><i class="fa-solid fa-note-sticky"></i> <b>Note/Reason:</b> ${escapeHtml(order.reason)}</div>` : ''}
           </div>
-
+          
           <div class="order-footer">
             <small>Payment: <b>${escapeHtml(payment)}</b></small>
             <div>
