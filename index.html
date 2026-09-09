@@ -321,5 +321,18 @@ const siteDictionary = {
   </footer>
 
   <script src="home.js?v=3.0"></script>
+
+  <!-- Safety Cleaner: Faltu categories ko turant hide karne ke liye -->
+  <script>
+    setInterval(() => {
+      const cards = document.querySelectorAll('#categoriesGrid .cat-card, .categories-grid > div');
+      cards.forEach(card => {
+        const text = card.textContent || "";
+        if (text.includes("Extension") || text.includes("T-Bulbs") || text.includes("Accessories")) {
+          card.style.display = 'none';
+        }
+      });
+    }, 100);
+  </script>
 </body>
 </html>
