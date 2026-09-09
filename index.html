@@ -104,6 +104,77 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<style>
+  /* Cyber-Futuristic Responsive Category Grid Enhancements */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .categories-grid {
+      grid-template-columns: repeat(2, 1fr); /* Mobile pe clean 2 columns matrix */
+      gap: 12px;
+    }
+  }
+
+  .cat-card {
+    background: rgba(20, 20, 28, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 122, 0, 0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .cat-card:hover {
+    border-color: #FF7A00;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(255, 122, 0, 0.25);
+  }
+
+  .cat-card:hover::before {
+    opacity: 1;
+  }
+
+  .cat-card > div:first-child {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cat-card > div:last-child {
+    position: relative;
+    z-index: 2;
+  }
+</style>
 </head>
 <body>
 
@@ -268,44 +339,45 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const localCats = JSON.parse(localStorage.getItem('rc_categories')) || [];
         
-        if(localCats.length > 0) {
+        if(categoriesGrid) {
           categoriesGrid.innerHTML = '';
-          localCats.forEach(cat => {
-            const card = document.createElement('div');
-            card.className = 'cat-card';
-            card.style.cssText = "background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.2s;";
-            
-            // Hover animation
-            card.onmouseover = () => { card.style.borderColor = "#FF7A00"; card.style.transform = "translateY(-2px)"; };
-            card.onmouseout = () => { card.style.borderColor = "rgba(255,255,255,0.08)"; card.style.transform = "translateY(0)"; };
-            
-            // Tap/Click action to open specific category file/page (passing category name in URL)
-            card.onclick = () => {
-              window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
-            };
+          
+          if(localCats.length > 0) {
+            localCats.forEach((cat, index) => {
+              const card = document.createElement('div');
+              card.className = 'cat-card';
+              card.style.animationDelay = `${index * 0.06}s`;
+              
+              // Tap/Click action to open specific category page
+              card.onclick = () => {
+                window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
+              };
 
-            let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
-            if(cat.image) {
-              thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${cat.image}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-            }
+              let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
+              if(cat.image) {
+                thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${cat.image}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+              }
 
-            card.innerHTML = `
-              ${thumb}
-              <div>
-                <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
-                <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Tap to View</p>
-              </div>
-            `;
-            categoriesGrid.appendChild(card);
+              card.innerHTML = `
+                ${thumb}
+                <div>
+                  <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
+                  <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Tap to View</p>
+                </div>
+              `;
+              categoriesGrid.appendChild(card);
 
-            // Add to Filter dropdown
-            if(categoryFilter) {
-              const opt = document.createElement('option');
-              opt.value = cat.name;
-              opt.textContent = cat.name;
-              categoryFilter.appendChild(opt);
-            }
-          });
+              // Add to Filter dropdown safely
+              if(categoryFilter) {
+                const opt = document.createElement('option');
+                opt.value = cat.name;
+                opt.textContent = cat.name;
+                categoryFilter.appendChild(opt);
+              }
+            });
+          } else {
+            categoriesGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #9da0b0; padding: 20px;">No categories available matrix.</div>`;
+          }
         }
       } catch (err) {
         console.error("Category load error:", err);
