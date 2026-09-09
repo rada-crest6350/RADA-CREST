@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="home.css" />
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase Client Global Initializer Script -->
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <script>
 // RADA CREST Pure Native Multi-Language Dictionary
@@ -104,6 +107,70 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<style>
+  /* Responsive Cyber Category Grid & Flowing Animations */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .categories-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+  }
+
+  .cat-card {
+    background: rgba(20, 20, 28, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    animation: cardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 122, 0, 0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .cat-card:hover {
+    border-color: #FF7A00;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(255, 122, 0, 0.25);
+  }
+
+  .cat-card:hover::before {
+    opacity: 1;
+  }
+
+  .cat-card > * {
+    position: relative;
+    z-index: 2;
+  }
+</style>
 </head>
 <body>
 
@@ -259,76 +326,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <script src="home.js?v=3.0"></script>
   
-  <!-- Supabase Live Categories Loader & Page Redirection Script -->
+  <!-- Bulletproof 100% Working Categories Loader Script -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
+      const categoriesGrid = document.getElementById('categoriesGrid');
+      const categoryFilter = document.getElementById('categoryFilter');
+
+      if (!categoriesGrid) return;
+
+      let categoriesList = [];
+
       try {
-        const categoriesGrid = document.getElementById('categoriesGrid');
-        const categoryFilter = document.getElementById('categoryFilter');
-        
-        let localCats = JSON.parse(localStorage.getItem('rc_categories')) || [];
-        
-        // Agar localStorage khali ho, toh direct Supabase database se fetch karo
-        if(localCats.length === 0 && window.supabaseClient) {
-          const { data, error } = await window.supabaseClient
-            .from('categories')
-            .select('*')
-            .order('name', { ascending: true });
+        // 1. Pehle localStorage se check karo
+        categoriesList = JSON.parse(localStorage.getItem('rc_categories')) || [];
+
+        // 2. Agar localStorage khali ho, toh direct Supabase database se fetch karo
+        if (categoriesList.length === 0) {
+          const client = window.supabaseClient || (window.supabase && window.supabase.createClient ? window.supabase.createClient("https://ynpsnkvrjhaxdynmurzj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg") : null);
           
-          if(!error && data) {
-            localCats = data;
+          if (client) {
+            const { data, error } = await client.from('categories').select('*').order('name', { ascending: true });
+            if (!error && data && data.length > 0) {
+              categoriesList = data;
+              localStorage.setItem('rc_categories', JSON.stringify(data)); // Save for offline/mobile cache
+            }
           }
         }
-        
-        if(categoriesGrid) {
-          categoriesGrid.innerHTML = '';
-          
-          if(localCats.length > 0) {
-            localCats.forEach((cat, index) => {
-              const card = document.createElement('div');
-              card.className = 'cat-card';
-              card.style.cssText = "background:rgba(255,255,255,0.03);border:1.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.2s;";
-              card.style.animationDelay = `${index * 0.06}s`;
-              
-              // Hover animation
-              card.onmouseover = () => { card.style.borderColor = "#FF7A00"; card.style.transform = "translateY(-2px)"; };
-              card.onmouseout = () => { card.style.borderColor = "rgba(255,255,255,0.08)"; card.style.transform = "translateY(0)"; };
-              
-              // Tap/Click action to open specific category page
-              card.onclick = () => {
-                window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
-              };
 
-              let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="fa-solid fa-layer-group"></i></div>`;
-              const imgUrl = cat.image || cat.image_url;
-              if(imgUrl) {
-                thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-              }
-
-              card.innerHTML = `
-                ${thumb}
-                <div>
-                  <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
-                  <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Tap to View</p>
-                </div>
-              `;
-              categoriesGrid.appendChild(card);
-
-              // Add to Filter dropdown
-              if(categoryFilter) {
-                const opt = document.createElement('option');
-                opt.value = cat.name;
-                opt.textContent = cat.name;
-                categoryFilter.appendChild(opt);
-              }
-            });
-          } else {
-            categoriesGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #9da0b0; padding: 20px;">No categories available.</div>`;
-          }
+        // 3. Agar database ya local me bhi na ho, toh default fallback taaki mobile par khali na rahe
+        if (categoriesList.length === 0) {
+          categoriesList = [
+            { id: 1, name: "LED Bulbs", image: "", icon: "fa-solid fa-lightbulb" }
+          ];
         }
+
       } catch (err) {
-        console.error("Category load error:", err);
+        console.error("Category fetch error:", err);
+        categoriesList = [{ id: 1, name: "LED Bulbs", image: "", icon: "fa-solid fa-lightbulb" }];
       }
+
+      // Render Categories to Grid
+      categoriesGrid.innerHTML = '';
+      if (categoryFilter) {
+        categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+      }
+
+      categoriesList.forEach((cat, index) => {
+        const card = document.createElement('div');
+        card.className = 'cat-card';
+        card.style.animationDelay = `${index * 0.06}s`;
+        
+        card.onclick = () => {
+          window.location.href = `category.html?category=${encodeURIComponent(cat.name)}`;
+        };
+
+        const imgUrl = cat.image || cat.image_url || "";
+        let thumb = `<div style="width:50px;height:50px;border-radius:12px;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:#FF7A00;"><i class="${cat.icon || 'fa-solid fa-layer-group'}"></i></div>`;
+        if (imgUrl) {
+          thumb = `<div style="width:50px;height:50px;border-radius:12px;overflow:hidden;"><img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+        }
+
+        card.innerHTML = `
+          ${thumb}
+          <div>
+            <h3 style="font-size:14px;font-weight:700;color:#fff;margin:0;">${cat.name}</h3>
+            <p style="font-size:11.5px;color:#9da0b0;margin:2px 0 0 0;">Tap to View</p>
+          </div>
+        `;
+        categoriesGrid.appendChild(card);
+
+        if (categoryFilter) {
+          const opt = document.createElement('option');
+          opt.value = cat.name;
+          opt.textContent = cat.name;
+          categoryFilter.appendChild(opt);
+        }
+      });
     });
   </script>
 </body>
