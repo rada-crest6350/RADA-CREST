@@ -588,14 +588,13 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // FIXED DATABASE INSERT (REMOVED 'items' COLUMN ERROR)
+      // FIXED DATABASE INSERT WITH MATCHING COLUMNS
       if (supabaseClient) {
         const { data, error } = await supabaseClient.from('orders').insert([{
           customer_name: name,
           customer_phone: phone,
           address: `${addr} - ${pin}`,
           total_amount: finalAmount,
-          payment_mode: checkoutState.paymentMode,
           status: 'Pending'
         }]).select();
 
