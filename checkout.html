@@ -862,44 +862,48 @@ async function placeOrder(e){
 
 
   /* =====================================
-     DIRECT DATABASE INSERT (FIXED FOR ADMIN PANEL)
+     DIRECT DATABASE INSERT TO "orders" TABLE
+     (Jis table ko admin panel read kar raha hai)
   ===================================== */
 
   const fullShippingAddress = 
     `${address}, ${city}, ${state} - ${pincode}`;
 
-  // 1. Insert into order_summary table so admin-orders.html can read it
+  const orderPayload = {
+    customer_name: customerName,
+    customer_phone: phone,
+    customer_email: customer.email || null,
+    shipping_address: fullShippingAddress,
+    address: address,
+    city: city,
+    state: state,
+    pincode: pincode,
+    total_amount: totalAmount,
+    payment_method: "COD",
+    status: "pending",
+    items: JSON.stringify([
+      {
+        product_id: Number(product.id),
+        name: product.name,
+        quantity: quantity,
+        price: Number(product.price || 0)
+      }
+    ])
+  };
+
   const { data: orderData, error: orderError } = 
-    await supabase.from("order_summary").insert([{
-      customer_name: customerName,
-      customer_phone: phone,
-      shipping_address: fullShippingAddress,
-      total_amount: totalAmount,
-      payment_method: "COD",
-      status: "pending"
-    }]).select().single();
+    await supabase.from("orders").insert([orderPayload]).select().single();
 
   if(orderError){
-    console.error(orderError);
+    console.error("Supabase Insert Error:", orderError);
     button.disabled = false;
     button.textContent = "Place Order";
     message.style.color = "#d33";
-    message.textContent = orderError.message;
+    message.textContent = "DB Error: " + orderError.message;
     return;
   }
 
   const orderId = orderData?.id;
-
-  // 2. Insert into order_items table
-  if(orderId){
-    await supabase.from("order_items").insert([{
-      order_id: orderId,
-      product_id: Number(product.id),
-      product_name: product.name,
-      quantity: quantity,
-      price: Number(product.price || 0)
-    }]);
-  }
 
   if(orderId && buyNow === "1"){
     localStorage.removeItem("rc_buy_now");
