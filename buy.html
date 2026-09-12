@@ -588,7 +588,7 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // FIXED DATABASE INSERT WITH PROPER ERROR ALERTING
+      // FIXED DATABASE INSERT (REMOVED 'items' COLUMN ERROR)
       if (supabaseClient) {
         const { data, error } = await supabaseClient.from('orders').insert([{
           customer_name: name,
@@ -596,14 +596,13 @@
           address: `${addr} - ${pin}`,
           total_amount: finalAmount,
           payment_mode: checkoutState.paymentMode,
-          items: `${checkoutState.qty}x ${checkoutState.product.name}`,
           status: 'Pending'
         }]).select();
 
         if (error) {
           console.error("Database Insert Error:", error);
           alert("Database Error: " + error.message);
-          return; // Stop order progression if database save fails
+          return;
         }
       }
 
