@@ -588,14 +588,17 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // FIXED DATABASE INSERT WITH MATCHING COLUMNS
+      // FIXED DATABASE INSERT WITH USER_ID LINKED TO ACCOUNT ORDERS
       if (supabaseClient) {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+
         const { data, error } = await supabaseClient.from('orders').insert([{
           customer_name: name,
           customer_phone: phone,
           address: `${addr} - ${pin}`,
           total_amount: finalAmount,
-          status: 'Pending'
+          status: 'Pending',
+          user_id: user ? user.id : null
         }]).select();
 
         if (error) {
