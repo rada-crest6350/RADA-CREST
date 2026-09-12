@@ -588,19 +588,22 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
+      // FIXED DATABASE INSERT WITH PROPER ERROR ALERTING
       if (supabaseClient) {
-        try {
-          await supabaseClient.from('orders').insert([{
-            customer_name: name,
-            customer_phone: phone,
-            address: `${addr} - ${pin}`,
-            total_amount: finalAmount,
-            payment_mode: checkoutState.paymentMode,
-            items: `${checkoutState.qty}x ${checkoutState.product.name}`,
-            status: 'Pending'
-          }]);
-        } catch (e) {
-          console.warn("Order table sync warning:", e);
+        const { data, error } = await supabaseClient.from('orders').insert([{
+          customer_name: name,
+          customer_phone: phone,
+          address: `${addr} - ${pin}`,
+          total_amount: finalAmount,
+          payment_mode: checkoutState.paymentMode,
+          items: `${checkoutState.qty}x ${checkoutState.product.name}`,
+          status: 'Pending'
+        }]).select();
+
+        if (error) {
+          console.error("Database Insert Error:", error);
+          alert("Database Error: " + error.message);
+          return; // Stop order progression if database save fails
         }
       }
 
@@ -642,17 +645,24 @@
       const giftStr = (giftUnlocked && checkoutState.selectedGift) ? `%0A*Free Gift:* ${checkoutState.selectedGift.name}` : '';
       const payStr = checkoutState.paymentMode === 'online' ? 'Online Paid (UPI/Card) - SUCCESS' : 'Cash on Delivery (COD)';
 
-      const msg = `*NEW ORDER - RADA CREST*%0A` +
-                  `----------------------------%0A` +
+      const msg = `🛍️ *RADA CREST — NEW ORDER*%0A` +
+                  `━━━━━━━━━━━━━━━━━━%0A` +
                   `*Product:* ${p.name}%0A` +
                   `*Quantity:* ${checkoutState.qty} Pcs%0A` +
                   `*Payment Mode:* ${payStr}%0A` +
                   `*Total Amount:* ₹${finalAmount}${giftStr}%0A` +
-                  `----------------------------%0A` +
+                  `━━━━━━━━━━━━━━━━━━%0A` +
                   `*Customer Details:*%0A` +
                   `Name: ${name}%0A` +
-                  `Phone: ${phone}%0A` +
-                  `Address: ${addr} - ${pin}`;
+                  `Mobile: ${phone}%0A%0A` +
+                  `*Delivery Address:*%0A` +
+                  `${addr}%0A` +
+                  `PIN Code: ${pin}%0A` +
+                  `━━━━━━━━━━━━━━━━━━%0A` +
+                  `*Order Status:*%0AOrder Placed%0A%0A` +
+                  `Please confirm my order.%0A%0A` +
+                  `Thank you,%0A` +
+                  `RADA CREST Customer`;
 
       // Directly opens WhatsApp chat with your number: 9079714767
       window.location.href = `https://wa.me/919079714767?text=${msg}`;
