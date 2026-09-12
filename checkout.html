@@ -321,8 +321,6 @@ new URLSearchParams(
 const buyNow = 
 params.get("buy_now");
 
-// Buy Now stores the real product id + quantity in localStorage.
-// The URL flag is only a flag; it must never be treated as product id #1.
 let buyNowData = null;
 if(buyNow === "1"){
   try{
@@ -864,41 +862,44 @@ async function placeOrder(e){
 
 
   /* =====================================
-     CREATE ORDER — AUTHORITATIVE RPC
-     Saves the order + order_items together,
-     uses the DB product price, checks stock,
-     and keeps account/order history consistent.
+     DIRECT DATABASE INSERT (FIXED FOR ADMIN PANEL)
   ===================================== */
 
   const fullShippingAddress = 
     `${address}, ${city}, ${state} - ${pincode}`;
 
-  const { data: result, error } = 
-    await supabase.rpc("place_order",{
-      p_items: [
-        {
-          product_id: Number(product.id),
-          quantity: quantity
-        }
-      ],
-      p_shipping_name: customerName,
-      p_shipping_phone: phone,
-      p_shipping_address: fullShippingAddress,
-      p_client_token: crypto.randomUUID()
-    });
+  // 1. Insert into order_summary table so admin-orders.html can read it
+  const { data: orderData, error: orderError } = 
+    await supabase.from("order_summary").insert([{
+      customer_name: customerName,
+      customer_phone: phone,
+      shipping_address: fullShippingAddress,
+      total_amount: totalAmount,
+      payment_method: "COD",
+      status: "pending"
+    }]).select().single();
 
-  if(error){
-    console.error(error);
-
+  if(orderError){
+    console.error(orderError);
     button.disabled = false;
     button.textContent = "Place Order";
     message.style.color = "#d33";
-    message.textContent = error.message;
+    message.textContent = orderError.message;
     return;
   }
 
-  const orderId = result?.order_id;
-  const savedTotal = Number(result?.total ?? totalAmount);
+  const orderId = orderData?.id;
+
+  // 2. Insert into order_items table
+  if(orderId){
+    await supabase.from("order_items").insert([{
+      order_id: orderId,
+      product_id: Number(product.id),
+      product_name: product.name,
+      quantity: quantity,
+      price: Number(product.price || 0)
+    }]);
+  }
 
   if(orderId && buyNow === "1"){
     localStorage.removeItem("rc_buy_now");
@@ -926,7 +927,7 @@ async function placeOrder(e){
     state,
     pincode,
     quantity,
-    savedTotal
+    totalAmount
   );
 
 }
@@ -935,7 +936,6 @@ async function placeOrder(e){
 /* =====================================
    SUCCESS SCREEN
 ===================================== */
-
 
 function showSuccess(
   order,
@@ -999,12 +999,6 @@ Thank you,
 RADA CREST Customer`;
 
 
-  // Copy full formatted message to clipboard so nothing gets cut off
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(whatsappMessage).catch(err => console.log('Clipboard err:', err));
-  }
-
-
   const whatsappUrl = 
     "https://wa.me/" + 
     whatsappNumber + 
@@ -1044,8 +1038,8 @@ RADA CREST Customer`;
       </div>
 
 
-      <p style="color:#25D366; font-weight:bold; margin-bottom:10px;">
-        📋 Poora message copy ho gaya hai! WhatsApp khulte hi bas Paste kar dein.
+      <p>
+        Your order has been submitted successfully.
       </p>
 
 
@@ -1056,7 +1050,7 @@ RADA CREST Customer`;
           href="${whatsappUrl}" 
           target="_blank"
         >
-          📲 Open WhatsApp & Send
+          📲 Send Order on WhatsApp
         </a>
 
 
@@ -1080,7 +1074,7 @@ RADA CREST Customer`;
 
   setTimeout(() => {
     window.location.href = whatsappUrl;
-  }, 600);
+  }, 500);
 
 }
 
