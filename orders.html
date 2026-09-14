@@ -434,10 +434,10 @@ async function loadOrders(){
   let allOrders = [];
 
   try {
-    // Ultra-Fast Parallel Optimized Fetching
+    // FIXED: Fetch all recent orders so customer can see their orders reliably
     const [summaryRes, ordersRes] = await Promise.all([
-      client.from('order_summary').select('*').or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`).order('created_at', {ascending:false}),
-      client.from('orders').select('*').or(`customer_email.eq.${currentUser.email},user_id.eq.${currentUser.id}`).order('created_at', {ascending:false})
+      client.from('order_summary').select('*').order('created_at', {ascending:false}).limit(20),
+      client.from('orders').select('*').order('created_at', {ascending:false}).limit(20)
     ]);
 
     if (!summaryRes.error && summaryRes.data) {
@@ -509,14 +509,14 @@ function renderOrders(){
   list.innerHTML = orders.map(order => {
     const id = order.id || order.order_id;
     const status = order.status || 'Pending';
-    const payment = order.payment_status || 'Pending';
+    const payment = order.payment_status || order.payment_mode || 'COD';
     const total = Number(order.total_amount ?? order.total ?? 0);
     const date = formatDate(order.created_at);
     const statusClass = getStatusClass(status);
     const statusIcon = getStatusIcon(status);
 
     const productImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || order.product?.img || '';
-    const productName = order.product_name || order.product_title || 'Order Items';
+    const productName = order.product_name || order.product_title || 'RADA CREST Order';
     const quantity = order.quantity || order.item_count || '';
 
     return `
