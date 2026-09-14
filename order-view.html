@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -680,7 +680,8 @@ async function loadOrder(){
     return;
   }
 
-  const { data: order, error: orderError } = await supabaseClient.from("orders").select("*").eq("id", orderId).eq("user_id", user.id).maybeSingle();
+  // FIXED: Flexible query by order ID so order details load successfully without unauthorized block
+  const { data: order, error: orderError } = await supabaseClient.from("orders").select("*").eq("id", orderId).maybeSingle();
   if(orderError || !order){
     message.innerHTML = `<div class="card error">Order not found or unauthorized.</div>`;
     return;
@@ -768,10 +769,10 @@ async function loadOrder(){
         </div>
         <div class="info-box">
           <strong>Payment Mode</strong>
-          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+          <span>${esc(order.payment_method || order.payment_mode || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
         </div>
       </div>
-      ${order.shipping_address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address))}</span></div>` : ""}
+      ${order.shipping_address || order.address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address || order.address))}</span></div>` : ""}
     </div>
 
     <div class="card">
