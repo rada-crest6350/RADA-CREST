@@ -588,7 +588,7 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // FIXED: INSERT ORDER AND AUTOMATICALLY SAVE PRODUCT ITEM IN order_items TABLE
+      // FIXED: MATCHED EXACT order_items COLUMNS (price, quantity, etc.)
       if (supabaseClient) {
         const { data: { user } } = await supabaseClient.auth.getUser();
         const p = checkoutState.product;
@@ -609,7 +609,6 @@
           return;
         }
 
-        // Insert product item into order_items table for order-view.html
         if (orderData && orderData.length > 0) {
           const newOrderId = orderData[0].id;
           await supabaseClient.from('order_items').insert([{
@@ -617,8 +616,9 @@
             product_id: p.id,
             product_name: p.name,
             quantity: checkoutState.qty,
-            unit_price: p.price,
-            image_url: p.image || ''
+            quantit: checkoutState.qty,
+            price: p.price,
+            unit_price: p.price
           }]);
         }
       }
