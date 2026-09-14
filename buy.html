@@ -588,11 +588,12 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // EXACT ORIGINAL INSERT WITH USER_ID & CUSTOMER_EMAIL ADDED FOR ORDER.HTML
+      // FIXED: INSERT ORDER AND AUTOMATICALLY SAVE PRODUCT ITEM IN order_items TABLE
       if (supabaseClient) {
         const { data: { user } } = await supabaseClient.auth.getUser();
+        const p = checkoutState.product;
 
-        const { data, error } = await supabaseClient.from('orders').insert([{
+        const { data: orderData, error: orderError } = await supabaseClient.from('orders').insert([{
           customer_name: name,
           customer_phone: phone,
           customer_email: user ? user.email : null,
@@ -602,10 +603,23 @@
           user_id: user ? user.id : null
         }]).select();
 
-        if (error) {
-          console.error("Database Insert Error:", error);
-          alert("Database Error: " + error.message);
+        if (orderError) {
+          console.error("Database Insert Error:", orderError);
+          alert("Database Error: " + orderError.message);
           return;
+        }
+
+        // Insert product item into order_items table for order-view.html
+        if (orderData && orderData.length > 0) {
+          const newOrderId = orderData[0].id;
+          await supabaseClient.from('order_items').insert([{
+            order_id: newOrderId,
+            product_id: p.id,
+            product_name: p.name,
+            quantity: checkoutState.qty,
+            unit_price: p.price,
+            image_url: p.image || ''
+          }]);
         }
       }
 
