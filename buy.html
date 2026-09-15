@@ -1,804 +1,654 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Order Details — RADA CREST</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Fonts & Icons -->
+<title>My Orders — RADA CREST</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- Supabase CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+>
 
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
 
-  :root{
-    --bg-deep:#060608;
-    --panel-card:rgba(20, 20, 28, 0.85);
-    --border:rgba(255, 255, 255, 0.08);
-    --border-hover:rgba(255, 122, 0, 0.6);
-    --text:#ffffff;
-    --text-muted:#9da0b0;
-    --brand:#FF7A00;
-    --brand-glow:rgba(255, 122, 0, 0.4);
-    --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
-    --success:#3dd598;
-    --warning:#ffbb33;
-    --danger:#ff4d4d;
-  }
+*{
+  box-sizing:border-box;
+}
 
-  body{
-    background:var(--bg-deep);
-    color:var(--text);
-    font-family:'Plus Jakarta Sans', sans-serif;
-    min-height:100vh;
-    padding:20px;
-    position:relative;
-    overflow-x:hidden;
-  }
+:root {
+  --brand-orange: #FF7A00;
+  --brand-glow: rgba(255, 122, 0, 0.4);
+}
 
-  /* Cyber Ambient Glow */
-  .cyber-grid-glow{
-    position:fixed;
-    top:0;left:0;width:100%;height:100%;
-    background-image: 
-      radial-gradient(circle at 15% 20%, rgba(255, 122, 0, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 85% 80%, rgba(255, 81, 0, 0.06) 0%, transparent 40%);
-    z-index:0;
-    pointer-events:none;
-  }
+body{
+  margin:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  color:#f3f4f6;
+  background: radial-gradient(circle at 10% 0%, rgba(255,122,0,0.08), transparent 35%),
+              radial-gradient(circle at 90% 90%, rgba(255,122,0,0.05), transparent 40%),
+              linear-gradient(135deg, #090b0e 0%, #12161f 50%, #07090c 100%);
+  min-height:100vh;
+}
 
-  .page{
-    max-width:1000px;
-    margin:0 auto;
-    position:relative;
-    z-index:1;
-    animation: pageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
+.ambient-glow {
+  position: fixed;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 122, 0, 0.15) 0%, rgba(0,0,0,0) 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
 
-  @keyframes pageEntrance{
-    from{opacity:0;transform:translateY(20px);}
-    to{opacity:1;transform:translateY(0);}
-  }
+.glass-header{
+  background: rgba(9, 12, 16, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
 
-  .topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
-    margin-bottom:24px;
-    background:var(--panel-card);
-    backdrop-filter:blur(20px);
-    border:1px solid var(--border);
-    border-radius:18px;
-    padding:16px 22px;
-  }
+.page-shell{
+  width:min(920px,calc(100% - 24px));
+  margin:auto;
+  position:relative;
+  z-index:1;
+}
 
-  .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    text-decoration:none;
-    color:#fff;
-    font-weight:800;
-  }
+.order-card{
+  position:relative;
+  background: rgba(18, 22, 31, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
 
-  .brand-mark{
-    width:40px;height:40px;
-    border-radius:10px;
-    background:var(--brand-gradient);
-    color:#000;
-    display:grid;place-items:center;
-    font-weight:900;
-    box-shadow:0 0 15px var(--brand-glow);
-  }
+.order-card:hover{
+  transform:translateY(-3px);
+  border-color: rgba(255, 122, 0, 0.4);
+  box-shadow: 0 20px 40px -10px rgba(255, 122, 0, 0.18);
+}
 
-  .back{
-    text-decoration:none;
-    color:var(--text-muted);
-    font-weight:700;
-    font-size:13px;
-    transition:0.2s;
-  }
-  .back:hover{color:var(--brand);}
+.order-top{
+  border-bottom:1px solid rgba(255, 255, 255, 0.06);
+}
 
-  .card{
-    background:var(--panel-card);
-    backdrop-filter:blur(16px);
-    border:1px solid var(--border);
-    border-radius:20px;
-    padding:24px;
-    margin-bottom:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.5);
-    transition:0.3s;
-  }
-  .card:hover{border-color:rgba(255,122,0,0.3);}
+.product-box{
+  width:100px;
+  height:100px;
+  min-width:100px;
+  border-radius:18px;
+  overflow:hidden;
+  background: rgba(10, 13, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
 
-  .order-head{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    align-items:flex-start;
-  }
+.product-box img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
-  .order-id{
-    font-size:22px;
-    font-weight:900;
-    letter-spacing:-0.5px;
-  }
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
 
-  .date{
-    color:var(--text-muted);
-    font-size:12.5px;
-    margin-top:4px;
-  }
+.status-dot{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:currentColor;
+}
 
-  .total{
-    font-size:24px;
-    font-weight:900;
-    color:var(--brand);
-    text-shadow:0 0 15px var(--brand-glow);
-  }
+.status-delivered{
+  color:#3dd598;
+  background:rgba(61, 213, 152, 0.12);
+  border:1px solid rgba(61, 213, 152, 0.25);
+}
 
-  .status{
-    display:inline-block;
-    margin-top:12px;
-    padding:6px 14px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:800;
-    text-transform:capitalize;
-  }
-  .status-delivered{background:rgba(61,213,152,0.15);color:var(--success);border:1px solid rgba(61,213,152,0.3);}
-  .status-cancelled{background:rgba(255,77,77,0.15);color:var(--danger);border:1px solid rgba(255,77,77,0.3);}
-  .status-shipped{background:rgba(0,210,255,0.15);color:#00d2ff;border:1px solid rgba(0,210,255,0.3);}
-  .status-confirmed, .status-processing, .status-packed{background:rgba(255,187,51,0.15);color:var(--warning);border:1px solid rgba(255,187,51,0.3);}
-  .status-pending{background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid var(--border);}
+.status-cancelled{
+  color:#ff4d4d;
+  background:rgba(255, 77, 77, 0.12);
+  border:1px solid rgba(255, 77, 77, 0.25);
+}
 
-  /* TRACKING */
-  .tracking{margin-top:24px;border-top:1px solid var(--border);padding-top:20px;}
-  .tracking h2, .card h2{margin-top:0;font-size:17px;font-weight:800;margin-bottom:16px;}
+.status-pending{
+  color:#ffbb33;
+  background:rgba(255, 187, 51, 0.12);
+  border:1px solid rgba(255, 187, 51, 0.25);
+}
 
-  .steps{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:8px;
-    margin-top:20px;
-  }
+.status-processing{
+  color:#FF7A00;
+  background:rgba(255, 122, 0, 0.12);
+  border:1px solid rgba(255, 122, 0, 0.3);
+}
 
-  .step{text-align:center;position:relative;}
+.status-default{
+  color:#9da0b0;
+  background:rgba(255, 255, 255, 0.05);
+  border:1px solid rgba(255, 255, 255, 0.08);
+}
 
-  .circle{
-    width:38px;height:38px;
-    margin:auto;
-    border-radius:50%;
-    background:rgba(255,255,255,0.05);
-    border:1px solid var(--border);
-    color:var(--text-muted);
-    display:grid;place-items:center;
-    font-weight:900;
-    font-size:13px;
-    position:relative;
-    z-index:2;
-  }
+.view-button{
+  background: linear-gradient(135deg, #FF7A00 0%, #E06000 100%);
+  color: #000;
+  font-weight:800;
+  transition: all .25s ease;
+  box-shadow: 0 4px 15px var(--brand-glow);
+}
 
-  .step.active .circle{
-    background:var(--brand-gradient);
-    color:#000;
-    border-color:var(--brand);
-    box-shadow:0 0 15px var(--brand-glow);
-  }
+.view-button:hover{
+  background: linear-gradient(135deg, #FF8A1C 0%, #FF7A00 100%);
+  transform:translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 122, 0, 0.5);
+}
 
-  .step.done .circle{
-    background:var(--success);
-    color:#000;
-    border-color:var(--success);
-  }
+.empty-icon{
+  width:82px;
+  height:82px;
+  margin:auto;
+  border-radius:24px;
+  background: rgba(255, 122, 0, 0.1);
+  border: 1px solid rgba(255, 122, 0, 0.3);
+  color: var(--brand-orange);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 10px 25px rgba(255, 122, 0, 0.15);
+}
 
-  .step-label{
-    margin-top:8px;
-    font-size:11px;
-    font-weight:700;
-    color:var(--text-muted);
-  }
-  .step.active .step-label{color:#fff;}
+.cyber-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
 
-  .step-line{
-    position:absolute;
-    top:19px;left:50%;
-    width:100%;height:2px;
-    background:var(--border);
-    z-index:1;
-  }
-  .step:last-child .step-line{display:none;}
-  .step.done .step-line{background:var(--success);}
+.cyber-loader-ring {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 122, 0, 0.1);
+  border-top-color: #FF7A00;
+  animation: cyberSpin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  box-shadow: 0 0 25px rgba(255, 122, 0, 0.25);
+}
 
-  /* ITEMS */
-  .items{display:grid;gap:12px;}
+.cyber-loader-ring::before {
+  content: '';
+  position: absolute;
+  top: 6px; left: 6px; right: 6px; bottom: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+  border-bottom-color: #FF9433;
+  animation: cyberSpinReverse 1.5s linear infinite;
+}
 
-  .item{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    padding:12px;
-    background:rgba(255,255,255,0.02);
-    border:1px solid var(--border);
-    border-radius:14px;
-    align-items:center;
-    cursor:pointer;
-    transition:0.3s;
-  }
-  .item:hover{
-    border-color:var(--brand);
-    background:rgba(255,122,0,0.04);
-    transform:translateY(-2px);
-  }
+.cyber-loader-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px; height: 24px;
+  background: #FF7A00;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #FF7A00;
+  animation: corePulse 1.2s ease-in-out infinite;
+}
 
-  .item-left{display:flex;gap:14px;align-items:center;}
+@keyframes cyberSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  .item-image{
-    width:60px;height:60px;
-    border-radius:10px;
-    background:rgba(255,255,255,0.03);
-    border:1px solid var(--border);
-    object-fit:cover;
-  }
+@keyframes cyberSpinReverse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
 
-  .item-name{font-weight:800;font-size:14px;color:#fff;}
-  .item-qty{color:var(--text-muted);font-size:12px;margin-top:3px;}
-  .item-price{font-weight:900;font-size:15px;color:var(--brand);}
+@keyframes corePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; box-shadow: 0 0 30px #FF7A00; }
+}
 
-  /* INFO GRID */
-  .info-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-  }
+.fade-in-content {
+  animation: contentFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
-  .info-box{
-    background:rgba(255,255,255,0.03);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:14px;
-  }
+@keyframes contentFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-  .info-box strong{
-    display:block;
-    margin-bottom:5px;
-    font-size:12px;
-    color:var(--brand);
-    text-transform:uppercase;
-    letter-spacing:0.5px;
-  }
+.toast{
+  animation:toastIn .25s ease forwards;
+}
 
-  .info-box span{
-    color:var(--text-muted);
-    font-size:13px;
-    line-height:1.5;
-  }
+@keyframes toastIn{
+  from{ opacity:0; transform:translateY(-10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
 
-  /* BUTTONS & ACTIONS */
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+@media(max-width:640px){
+  .page-shell{ width:calc(100% - 18px); }
+  .order-card{ border-radius:20px; }
+}
 
-  .btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    border:0;
-    border-radius:12px;
-    padding:12px 18px;
-    text-decoration:none;
-    font-weight:800;
-    font-size:13px;
-    cursor:pointer;
-    transition:0.3s;
-  }
-
-  .primary{
-    background:var(--brand-gradient);
-    color:#000;
-    box-shadow:0 0 15px var(--brand-glow);
-  }
-  .primary:hover{transform:translateY(-2px);box-shadow:0 0 25px var(--brand);opacity:0.95;}
-
-  .secondary{
-    background:rgba(255,255,255,0.05);
-    color:#fff;
-    border:1px solid var(--border);
-  }
-  .secondary:hover{background:rgba(255,255,255,0.1);border-color:var(--brand);}
-
-  .danger-btn{
-    background:rgba(255,77,77,0.1);
-    color:var(--danger);
-    border:1px solid rgba(255,77,77,0.3);
-  }
-  .danger-btn:hover{background:var(--danger);color:#fff;}
-
-  /* REVIEW BUTTON & MODAL */
-  .review-btn{
-    margin-top:6px;
-    padding:4px 10px;
-    border:1px solid var(--brand);
-    border-radius:6px;
-    background:rgba(255,122,0,0.1);
-    color:var(--brand);
-    font-weight:700;
-    cursor:pointer;
-    font-size:11px;
-    display:inline-block;
-    transition:0.2s;
-  }
-  .review-btn:hover{background:var(--brand);color:#000;}
-
-  .review-modal{
-    position:fixed;inset:0;
-    background:rgba(0,0,0,0.7);
-    backdrop-filter:blur(10px);
-    display:none;align-items:center;justify-content:center;
-    padding:16px;z-index:9999;
-  }
-  .review-modal.show{display:flex;}
-
-  .review-box{
-    width:min(480px,100%);
-    background:#14141c;
-    border:1.5px solid var(--border);
-    border-radius:20px;
-    padding:24px;
-    box-shadow:0 25px 60px rgba(0,0,0,0.8);
-  }
-
-  .review-head{display:flex;justify-content:space-between;align-items:center;}
-  .review-close{
-    border:0;background:rgba(255,255,255,0.06);
-    color:#fff;width:36px;height:36px;border-radius:50%;
-    font-size:18px;cursor:pointer;display:grid;place-items:center;
-  }
-
-  .review-stars{display:flex;gap:6px;margin:12px 0;}
-  .review-star{border:0;background:none;font-size:30px;color:rgba(255,255,255,0.15);cursor:pointer;}
-  .review-star.selected{color:var(--warning);text-shadow:0 0 10px rgba(255,187,51,0.5);}
-
-  .review-text{
-    width:100%;min-height:100px;
-    background:rgba(255,255,255,0.04);
-    border:1.5px solid var(--border);
-    border-radius:12px;padding:12px;
-    color:#fff;font-family:inherit;font-size:13px;resize:vertical;outline:0;
-  }
-  .review-text:focus{border-color:var(--brand);box-shadow:0 0 12px var(--brand-glow);}
-
-  .review-upload input{
-    width:100%;padding:10px;background:rgba(255,255,255,0.04);
-    border:1.5px solid var(--border);border-radius:10px;color:#fff;font-size:12px;margin-top:6px;
-  }
-
-  .review-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-  .review-preview img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
-
-  .empty{text-align:center;padding:40px 15px;color:var(--text-muted);}
-  .error{color:var(--danger);background:rgba(255,77,77,0.1);border:1px solid rgba(255,77,77,0.2);padding:16px;border-radius:12px;text-align:center;}
-
-  @media(max-width:700px){
-    .steps{grid-template-columns:1fr;gap:12px;}
-    .step{display:flex;align-items:center;gap:12px;text-align:left;}
-    .circle{margin:0;flex:none;}
-    .step-line{display:none;}
-    .info-grid{grid-template-columns:1fr;}
-    .order-head{flex-direction:column;gap:10px;}
-  }
 </style>
 </head>
+
 <body>
 
-<div class="cyber-grid-glow"></div>
+<div class="ambient-glow top-0 left-1/2 -translate-x-1/2"></div>
+<div class="ambient-glow bottom-10 right-[-100px]"></div>
 
-<div class="page">
+<!-- HEADER -->
+<header class="glass-header sticky top-0 z-50">
+  <div class="page-shell h-[72px] flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a
+        href="account.html"
+        class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-neutral-300 hover:text-white hover:border-[#FF7A00] transition"
+      >
+        <i class="fa-solid fa-arrow-left text-sm"></i>
+      </a>
 
-  <div class="topbar">
-    <a class="brand" href="index.html">
-      <span class="brand-mark">RC</span>
-      <span>RADA CREST</span>
-    </a>
-    <a class="back" href="account.html"><i class="fa-solid fa-arrow-left"></i> My Account</a>
-  </div>
-
-  <div id="pageMessage"></div>
-  <div id="orderContent"></div>
-
-</div>
-
-<!-- REVIEW MODAL -->
-<div id="reviewModal" class="review-modal">
-  <div class="review-box">
-    <div class="review-head">
       <div>
-        <h3 style="margin:0;font-size:18px;">Rate & Review</h3>
-        <div id="reviewProductName" style="color:var(--brand);font-size:12px;margin-top:3px;font-weight:600;"></div>
+        <div class="font-extrabold tracking-[.18em] text-[15px] text-white flex items-center gap-2">
+          <span class="text-[#FF7A00]">RC</span> RADA CREST
+        </div>
+        <div class="text-[10px] text-neutral-400 uppercase tracking-wider">
+          Order Centre
+        </div>
       </div>
-      <button class="review-close" onclick="closeReview()">✕</button>
     </div>
-    <div style="margin-top:16px;font-size:12.5px;font-weight:700;">Select Rating</div>
-    <div class="review-stars">
-      <button type="button" class="review-star" data-rating="1">★</button>
-      <button type="button" class="review-star" data-rating="2">★</button>
-      <button type="button" class="review-star" data-rating="3">★</button>
-      <button type="button" class="review-star" data-rating="4">★</button>
-      <button type="button" class="review-star" data-rating="5">★</button>
-    </div>
-    <textarea id="reviewText" class="review-text" placeholder="Share your experience..."></textarea>
-    <div class="review-upload" style="margin-top:12px;">
-      <strong style="font-size:12px;color:var(--text-muted);">Upload Photos / Videos (Max 5)</strong>
-      <input id="reviewPhotos" type="file" accept="image/*,video/*" multiple>
-      <div id="reviewPreview" class="review-preview"></div>
-    </div>
-    <div id="reviewMessage" style="margin-top:10px;font-size:12px;color:var(--brand);"></div>
-    <button id="reviewSubmit" class="btn primary" style="width:100%;margin-top:16px;" onclick="submitReview()">Submit Review</button>
-  </div>
-</div>
 
-<!-- EDIT ADDRESS MODAL -->
-<div id="addressModal" class="review-modal">
-  <div class="review-box">
-    <div class="review-head">
-      <h3 style="margin:0;font-size:18px;">Edit Delivery Address</h3>
-      <button class="review-close" onclick="closeAddressModal()">✕</button>
-    </div>
-    <div style="margin-top:16px;">
-      <label style="font-size:12px;color:var(--text-muted);font-weight:700;">New Address</label>
-      <textarea id="newAddressText" class="review-text" placeholder="Enter updated delivery address..."></textarea>
-    </div>
-    <div id="addressMessage" style="margin-top:10px;font-size:12px;color:var(--brand);"></div>
-    <button class="btn primary" style="width:100%;margin-top:16px;" onclick="saveNewAddress()">Update Address</button>
+    <a
+      href="cart.html"
+      class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-neutral-300 hover:text-white hover:border-[#FF7A00] transition"
+      aria-label="Cart"
+    >
+      <i class="fa-solid fa-bag-shopping text-sm"></i>
+    </a>
   </div>
-</div>
+</header>
+
+<main class="page-shell py-8 sm:py-10">
+
+  <!-- INTRO -->
+  <section class="mb-7">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <p class="text-[10px] uppercase tracking-[.23em] font-bold text-[#FF7A00] mb-2">
+          Your Shopping History
+        </p>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+          My Orders
+        </h1>
+        <p class="text-sm text-neutral-400 mt-2 leading-6">
+          Track and manage every order placed from your RADA CREST account.
+        </p>
+      </div>
+
+      <div
+        id="orderCount"
+        class="hidden sm:flex px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-[#FF7A00]"
+      >
+        0 Orders
+      </div>
+    </div>
+  </section>
+
+  <!-- ALERT -->
+  <div
+    id="alert"
+    class="hidden mb-5 px-4 py-3 rounded-2xl text-sm"
+  ></div>
+
+  <!-- LOADER -->
+  <section id="loadingState" class="cyber-loader-container">
+    <div class="cyber-loader-ring">
+      <div class="cyber-loader-core"></div>
+    </div>
+    <p class="text-xs text-neutral-400 uppercase tracking-[0.2em] font-bold mt-5 animate-pulse">
+      Syncing Secure Orders...
+    </p>
+  </section>
+
+  <!-- ORDERS -->
+  <section
+    id="ordersList"
+    class="hidden space-y-4"
+  ></section>
+
+  <!-- EMPTY -->
+  <section
+    id="emptyState"
+    class="hidden order-card text-center px-6 py-16"
+  >
+    <div class="empty-icon">
+      <i class="fa-solid fa-box-open text-3xl"></i>
+    </div>
+
+    <h2 class="font-extrabold text-xl mt-6 text-white">
+      No orders yet
+    </h2>
+
+    <p class="text-sm text-neutral-400 max-w-sm mx-auto mt-2 leading-6">
+      Your completed and active orders will appear here once you place your
+      first RADA CREST order.
+    </p>
+
+    <a
+      href="index.html"
+      class="inline-flex items-center justify-center mt-6 px-6 py-3 rounded-xl view-button text-xs uppercase tracking-wider"
+    >
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Continue Shopping
+    </a>
+  </section>
+
+  <div class="text-center mt-8 text-[11px] text-neutral-500">
+    <i class="fa-solid fa-shield-halved mr-1 text-[#FF7A00]"></i>
+    Your order information is protected by your account.
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="supabase-client.js"></script>
 
 <script>
-const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const box = document.getElementById("orderContent");
-const message = document.getElementById("pageMessage");
-let currentOrderId = null;
+let currentUser = null;
+let orders = [];
 
-function esc(value){
-  return String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+function showAlert(message){
+  const el = document.getElementById('alert');
+  el.className = 'mb-5 px-4 py-3 rounded-2xl text-sm toast bg-red-950/60 text-red-300 border border-red-800/60';
+  el.textContent = message;
+  el.classList.remove('hidden');
 }
 
-function money(value){
-  return "₹" + Number(value || 0).toLocaleString("en-IN");
-}
-
-function formatDate(value){
+async function loadAccount(){
   try{
-    return new Date(value).toLocaleString("en-IN", { day:"2-digit", month:"short", year:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
-  }catch{ return "-"; }
+    const client = window.supabaseClient || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+    if(!client){
+      throw new Error('Database connection initializing...');
+    }
+
+    const { data, error } = await client.auth.getUser();
+    if(error) throw error;
+
+    if(!data.user){
+      window.location.href = 'account.html';
+      return;
+    }
+
+    currentUser = data.user;
+    await loadOrders();
+
+  }catch(error){
+    console.error(error);
+    document.getElementById('loadingState').classList.add('hidden');
+    showAlert(error.message || 'Unable to load your account.');
+  }
 }
 
-function cleanImage(value){
+async function loadOrders(){
+  const client = window.supabaseClient || supabaseClient;
+  let allOrders = [];
+
+  try {
+    const [summaryRes, ordersRes] = await Promise.all([
+      client.from('order_summary').select('*').order('created_at', {ascending:false}).limit(20),
+      client.from('orders').select('*').order('created_at', {ascending:false}).limit(20)
+    ]);
+
+    if (!summaryRes.error && summaryRes.data) {
+      allOrders = [...summaryRes.data];
+    }
+
+    if (!ordersRes.error && ordersRes.data) {
+      const existingIds = new Set(allOrders.map(o => o.id || o.order_id));
+      for(let ord of ordersRes.data){
+        const oid = ord.id || ord.order_id;
+        if(!existingIds.has(oid)){
+          allOrders.push(ord);
+          existingIds.add(oid);
+        }
+      }
+    }
+
+    allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    if (allOrders.length > 0) {
+      const orderIds = allOrders.map(o => o.id || o.order_id);
+      const { data: allItems } = await client
+        .from('order_items')
+        .select('*')
+        .in('order_id', orderIds);
+
+      if (allItems && allItems.length > 0) {
+        for (let ord of allOrders) {
+          const oid = ord.id || ord.order_id;
+          const matchItems = allItems.filter(i => i.order_id === oid);
+          if (matchItems.length > 0) {
+            ord.item_count = matchItems.length;
+            if (!ord.product_name && matchItems[0].product_name) {
+              ord.product_name = matchItems[0].product_name;
+            }
+            ord.product_image = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || '';
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Fast load note:", err);
+  }
+
+  document.getElementById('loadingState').classList.add('hidden');
+  orders = allOrders;
+  renderOrders();
+}
+
+function cleanImageUrl(value){
   if(!value) return "";
   let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
   return /^https?:\/\/\S+$/i.test(url) ? url : "";
 }
 
-function statusClass(status){
-  return String(status || "pending").toLowerCase().replace(/[^a-z]/g,"");
-}
+function renderOrders(){
+  const list = document.getElementById('ordersList');
+  const empty = document.getElementById('emptyState');
+  const count = document.getElementById('orderCount');
 
-function getTrackingSteps(status){
-  const current = String(status || "pending").toLowerCase().trim();
-  if(current === "cancelled") return { cancelled: true, index: -1 };
-  const steps = ["pending", "confirmed", "packed", "shipped", "delivered"];
-  let index = steps.indexOf(current);
-  if(current === "processing") index = 2;
-  if(index < 0) index = 0;
-  return { cancelled: false, index: index };
-}
+  count.textContent = `${orders.length} ${orders.length === 1 ? 'Order' : 'Orders'}`;
+  count.classList.remove('hidden');
 
-function renderTracking(status){
-  const tracking = getTrackingSteps(status);
-  if(tracking.cancelled){
-    return `
-      <div class="tracking">
-        <h2>Order Tracking</h2>
-        <div class="status status-cancelled">Order Cancelled</div>
-      </div>
-    `;
+  if(!orders.length){
+    list.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
   }
-  const labels = [
-    ["pending","Placed"],
-    ["confirmed","Confirmed"],
-    ["packed","Packed"],
-    ["shipped","Shipped"],
-    ["delivered","Delivered"]
-  ];
-  return `
-    <div class="tracking">
-      <h2>Order Tracking</h2>
-      <div class="steps">
-        ${labels.map((item, index) => {
-          const done = index < tracking.index;
-          const active = index === tracking.index;
-          return `
-            <div class="step ${done ? "done" : ""} ${active ? "active" : ""}">
-              <div class="circle">${done ? "✓" : index + 1}</div>
-              <div class="step-label">${item[1]}</div>
-              ${index < labels.length - 1 ? `<div class="step-line"></div>` : ""}
+
+  empty.classList.add('hidden');
+  list.classList.remove('hidden');
+  list.classList.add('fade-in-content');
+
+  list.innerHTML = orders.map(order => {
+    const id = order.id || order.order_id;
+    const status = order.status || 'Pending';
+    const payment = order.payment_status || order.payment_mode || 'COD';
+    const total = Number(order.total_amount ?? order.total ?? 0);
+    const date = formatDate(order.created_at);
+    const statusClass = getStatusClass(status);
+    const statusIcon = getStatusIcon(status);
+
+    const rawImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || '';
+    const productImage = cleanImageUrl(rawImage);
+    const productName = order.product_name || order.product_title || 'RADA CREST Order';
+    const quantity = order.quantity || order.item_count || '';
+
+    return `
+      <article
+        class="order-card cursor-pointer"
+        onclick="openOrder('${escapeAttr(id)}')"
+      >
+        <div class="order-top px-5 sm:px-6 py-5">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-[10px] uppercase tracking-[.15em] text-[#FF7A00] font-bold">
+                Order
+              </p>
+              <h2 class="font-extrabold text-sm mt-1 break-all text-white">
+                #${escapeHtml(String(id))}
+              </h2>
+              <p class="text-xs text-neutral-400 mt-1">
+                ${date}
+              </p>
             </div>
-          `;
-        }).join("")}
-      </div>
-    </div>
-  `;
-}
 
-// Address short formatting helper
-function shortAddress(addr){
-  if(!addr) return "N/A";
-  let clean = String(addr).trim();
-  return clean.length > 55 ? clean.substring(0, 52) + "..." : clean;
-}
-
-function openAddressModal(currentAddr){
-  document.getElementById("newAddressText").value = currentAddr || "";
-  document.getElementById("addressMessage").textContent = "";
-  document.getElementById("addressModal").classList.add("show");
-}
-
-function closeAddressModal(){
-  document.getElementById("addressModal").classList.remove("show");
-}
-
-async function saveNewAddress(){
-  const newAddr = document.getElementById("newAddressText").value.trim();
-  const msgBox = document.getElementById("addressMessage");
-  if(!newAddr){ msgBox.textContent = "Please enter a valid address."; return; }
-  if(!currentOrderId){ msgBox.textContent = "Order ID missing."; return; }
-
-  msgBox.textContent = "Updating address...";
-  const { error } = await supabaseClient
-    .from("orders")
-    .update({ shipping_address: newAddr })
-    .eq("id", currentOrderId);
-
-  if(error){
-    msgBox.textContent = "Error: " + error.message;
-    return;
-  }
-
-  msgBox.textContent = "Address updated successfully!";
-  setTimeout(() => { closeAddressModal(); location.reload(); }, 1000);
-}
-
-let reviewProductId = null;
-let reviewRating = 0;
-
-document.addEventListener("DOMContentLoaded", () => {
-  const reviewStars = document.querySelectorAll(".review-star");
-  reviewStars.forEach(star => {
-    star.addEventListener("click", () => {
-      reviewRating = Number(star.dataset.rating);
-      reviewStars.forEach(s => s.classList.toggle("selected", Number(s.dataset.rating) <= reviewRating));
-    });
-  });
-
-  const reviewPhotos = document.getElementById("reviewPhotos");
-  if(reviewPhotos){
-    reviewPhotos.addEventListener("change", () => {
-      const reviewPreview = document.getElementById("reviewPreview");
-      if(reviewPreview) reviewPreview.innerHTML = "";
-      const files = Array.from(reviewPhotos.files || []);
-      if(files.length > 5){ reviewPhotos.value = ""; return; }
-      files.forEach(file => {
-        if(!file.type.startsWith("image/") && !file.type.startsWith("video/")) return;
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(file);
-        if(reviewPreview) reviewPreview.appendChild(img);
-      });
-    });
-  }
-});
-
-async function openReview(productId, productName){
-  reviewProductId = Number(productId);
-  reviewRating = 0;
-  document.getElementById("reviewProductName").textContent = productName;
-  document.getElementById("reviewText").value = "";
-  document.getElementById("reviewPhotos").value = "";
-  document.getElementById("reviewPreview").innerHTML = "";
-  document.getElementById("reviewMessage").innerHTML = "";
-  document.querySelectorAll(".review-star").forEach(s => s.classList.remove("selected"));
-  document.getElementById("reviewModal").classList.add("show");
-}
-
-function closeReview(){
-  document.getElementById("reviewModal").classList.remove("show");
-}
-
-async function submitReview(){
-  const textInput = document.getElementById("reviewText");
-  const fileInput = document.getElementById("reviewPhotos");
-  const messageBox = document.getElementById("reviewMessage");
-  if(!reviewProductId) return;
-
-  messageBox.textContent = "Uploading review & media...";
-  try {
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if(!user){ messageBox.textContent = "Please login first."; return; }
-
-    let photoUrls = [];
-    const files = fileInput ? fileInput.files : [];
-    for(let i=0; i<files.length; i++){
-      const file = files[i];
-      const fileName = `review_${Date.now()}_${i}_${file.name}`;
-      const { error: upErr } = await supabaseClient.storage.from("product-review-images").upload(fileName, file);
-      if(!upErr){
-        const { data: pubData } = supabaseClient.storage.from("product-review-images").getPublicUrl(fileName);
-        if(pubData?.publicUrl) photoUrls.push(pubData.publicUrl);
-      }
-    }
-
-    const { error: insErr } = await supabaseClient.from("product_reviews").upsert({
-      product_id: reviewProductId,
-      user_id: user.id,
-      customer_name: user.user_metadata?.full_name || user.email || "Customer",
-      rating: reviewRating || 5,
-      review: textInput.value.trim(),
-      photo_urls: photoUrls.length ? photoUrls : null
-    }, { onConflict: 'product_id,user_id' });
-
-    if(insErr){ messageBox.textContent = "Error: " + insErr.message; return; }
-
-    messageBox.textContent = "Review submitted successfully!";
-    setTimeout(() => { closeReview(); location.reload(); }, 1200);
-  } catch(err){
-    messageBox.textContent = "Failed: " + err.message;
-  }
-}
-
-async function loadOrder(){
-  const params = new URLSearchParams(location.search);
-  const orderId = params.get("id");
-  currentOrderId = orderId;
-
-  if(!orderId){
-    message.innerHTML = `<div class="card error">Order ID is missing in URL.</div>`;
-    return;
-  }
-
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if(!user){
-    location.href = "account.html?redirect=" + encodeURIComponent("order.html?id=" + orderId);
-    return;
-  }
-
-  const { data: order, error: orderError } = await supabaseClient.from("orders").select("*").eq("id", orderId).maybeSingle();
-  if(orderError || !order){
-    message.innerHTML = `<div class="card error">Order not found or unauthorized.</div>`;
-    return;
-  }
-
-  // BULLETPROOF DUAL-SAFETY FALLBACK: Fetches order_items, or seamlessly falls back to orders table data
-  let orderItems = [];
-  const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
-  
-  if (items && items.length > 0) {
-    orderItems = items;
-  } else {
-    orderItems = [{
-      product_name: order.product_name || "RADA CREST LED Product",
-      quantity: order.quantity || 1,
-      unit_price: order.total_amount || order.total || 0,
-      image_url: order.image_url || ""
-    }];
-  }
-
-  const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 1) * Number(item.unit_price ?? item.price ?? 0), 0);
-  const total = Number(order.total_amount ?? order.total || 0) > 0 ? Number(order.total_amount ?? order.total) : calculatedTotal;
-  const status = String(order.status || "pending").toLowerCase();
-  const isPending = (status === "pending" || status === "unconfirmed");
-
-  const itemsHtml = orderItems.map(item => {
-    const image = cleanImage(item.image_url || item.image || "");
-    const qty = Number(item.quantity || 1);
-    const price = Number(item.unit_price ?? item.price ?? 0);
-    const pId = item.product_id;
-    const pName = esc(item.product_name || "RADA CREST Item");
-
-    const reviewBtn = status === "delivered" && item.product_id ? `
-      <div onclick="event.stopPropagation()">
-        <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${pName.replace(/'/g,"&#039;")}')">
-          <i class="fa-solid fa-star"></i> Rate & Review
-        </button>
-      </div>
-    ` : "";
-
-    const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : ``;
-
-    return `
-      <div class="item" onclick="${clickAction}">
-        <div class="item-left">
-          ${image ? `<img class="item-image" src="${esc(image)}" alt="Product">` : `<div class="item-image"></div>`}
-          <div>
-            <div class="item-name">${pName}</div>
-            <div class="item-qty">Qty: ${qty} × ${money(price)}</div>
-            ${reviewBtn}
+            <span class="status ${statusClass}">
+              <span class="status-dot"></span>
+              <i class="${statusIcon} text-[9px]"></i>
+              ${escapeHtml(status)}
+            </span>
           </div>
         </div>
-        <div class="item-price">${money(price * qty)}</div>
-      </div>
+
+        <div class="px-5 sm:px-6 py-5">
+          <div class="flex items-center gap-4">
+            <div class="product-box">
+              ${
+                productImage
+                ? `<img src="${escapeAttr(productImage)}" alt="Product" onerror="this.style.display='none'">`
+                : `<div class="w-full h-full flex items-center justify-center text-neutral-500"><i class="fa-solid fa-box"></i></div>`
+              }
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-sm truncate text-neutral-100">
+                ${escapeHtml(productName)}
+              </h3>
+
+              ${
+                quantity
+                ? `<p class="text-xs text-neutral-400 mt-1">${escapeHtml(String(quantity))} item(s)</p>`
+                : `<p class="text-xs text-neutral-400 mt-1">View complete order</p>`
+              }
+
+              <p class="text-xs text-neutral-400 mt-2">
+                Payment: <span class="font-semibold text-neutral-200">${escapeHtml(payment)}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between gap-4 mt-5 pt-5 border-t border-white/5">
+            <div>
+              <p class="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">
+                Order Total
+              </p>
+              <p class="text-lg font-extrabold mt-1 text-[#FF7A00]">
+                ₹${formatMoney(total)}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onclick="event.stopPropagation(); openOrder('${escapeAttr(id)}')"
+              class="view-button px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2"
+            >
+              View Order
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+      </article>
     `;
-  }).join("");
-
-  box.innerHTML = `
-    <div class="card">
-      <div class="order-head">
-        <div>
-          <div class="order-id">Order #${esc(order.id)}</div>
-          <div class="date"><i class="fa-regular fa-clock"></i> ${esc(formatDate(order.created_at))}</div>
-          <div class="status status-${statusClass(status)}">${esc(status)}</div>
-        </div>
-        <div class="total">${money(total)}</div>
-      </div>
-      
-      <div style="margin-top:22px;">
-        <h2 style="font-size:15px;margin-bottom:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Ordered Products</h2>
-        <div class="items">${itemsHtml}</div>
-      </div>
-
-      ${renderTracking(status)}
-    </div>
-
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-        <h2 style="margin:0;">Delivery & Payment Info</h2>
-        ${isPending ? `<button class="btn secondary" style="padding:6px 12px;font-size:11.5px;" onclick="openAddressModal('${esc(order.shipping_address || "").replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Edit Address</button>` : ''}
-      </div>
-      <div class="info-grid">
-        <div class="info-box">
-          <strong>Customer Name</strong>
-          <span>${esc(order.shipping_name || order.customer_name || user.email)}</span>
-        </div>
-        <div class="info-box">
-          <strong>Phone Number</strong>
-          <span>${esc(order.phone || order.shipping_phone || order.customer_phone || "N/A")}</span>
-        </div>
-        <div class="info-box">
-          <strong>Email Address</strong>
-          <span>${esc(order.customer_email || user.email)}</span>
-        </div>
-        <div class="info-box">
-          <strong>Payment Mode</strong>
-          <span>${esc(order.payment_method || order.payment_mode || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
-        </div>
-      </div>
-      ${order.shipping_address || order.address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address || order.address))}</span></div>` : ""}
-    </div>
-
-    <div class="card">
-      <h2>Assistance & Control</h2>
-      <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Need modifications or help regarding this order? Connect instantly with RADA CREST support.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://wa.me/919079714767?text=${encodeURIComponent("Hello RADA CREST, I need help regarding Order #" + order.id)}" target="_blank">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp Support
-        </a>
-        <a class="btn secondary" href="index.html">Continue Shopping</a>
-        ${status === 'delivered' ? `<a href="return.html?id=${esc(order.id)}" class="btn secondary">Return / Replace</a>` : ''}
-        ${isPending ? `<a href="cancel-order.html?id=${encodeURIComponent(order.id)}" class="btn danger-btn">Cancel Order</a>` : ''}
-      </div>
-    </div>
-  `;
+  }).join('');
 }
 
-loadOrder();
+function openOrder(id){
+  if(!id) return;
+  window.location.href = `order-view.html?id=${encodeURIComponent(id)}`;
+}
+
+function getStatusClass(status){
+  const s = String(status || '').toLowerCase();
+  if(s.includes('deliver') || s.includes('complete')) return 'status-delivered';
+  if(s.includes('cancel') || s.includes('reject')) return 'status-cancelled';
+  if(s.includes('pending') || s.includes('new')) return 'status-pending';
+  if(s.includes('confirm') || s.includes('pack') || s.includes('ship') || s.includes('process')) return 'status-processing';
+  return 'status-default';
+}
+
+function getStatusIcon(status){
+  const s = String(status || '').toLowerCase();
+  if(s.includes('deliver')) return 'fa-solid fa-check';
+  if(s.includes('cancel')) return 'fa-solid fa-xmark';
+  if(s.includes('ship')) return 'fa-solid fa-truck';
+  if(s.includes('pack')) return 'fa-solid fa-box';
+  if(s.includes('confirm')) return 'fa-solid fa-check';
+  return 'fa-solid fa-clock';
+}
+
+function formatDate(value){
+  if(!value) return '';
+  const date = new Date(value);
+  if(isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function formatMoney(value){
+  return Number(value || 0).toLocaleString('en-IN', { maximumFractionDigits:2 });
+}
+
+function escapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+function escapeAttr(value){
+  return escapeHtml(value);
+}
+
+document.addEventListener('DOMContentLoaded', loadAccount);
 </script>
 
 </body>
