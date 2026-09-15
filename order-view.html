@@ -680,39 +680,26 @@ async function loadOrder(){
     return;
   }
 
-  // FIXED: Flexible query by order ID so order details load successfully without unauthorized block
   const { data: order, error: orderError } = await supabaseClient.from("orders").select("*").eq("id", orderId).maybeSingle();
   if(orderError || !order){
     message.innerHTML = `<div class="card error">Order not found or unauthorized.</div>`;
     return;
   }
 
-  // GUARANTEED FALLBACK: Even if order_items is empty, it loads item data securely
-  let orderItems = [];
   const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
-  if (items && items.length > 0) {
-    orderItems = items;
-  } else {
-    orderItems = [{
-      product_name: order.product_name || "RADA CREST LED Product",
-      quantity: order.quantity || 1,
-      unit_price: order.total_amount || order.total || 0,
-      image_url: order.image_url || ""
-    }];
-  }
+  const orderItems = items || [];
 
-  const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 1) * Number(item.unit_price ?? item.price ?? 0), 0);
-  const total = Number(order.total_amount ?? order.total || 0) > 0 ? Number(order.total_amount ?? order.total) : calculatedTotal;
+  const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0), 0);
+  const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
   const status = String(order.status || "pending").toLowerCase();
   const isPending = (status === "pending" || status === "unconfirmed");
 
-  // Items HTML with permanent fallback support
-  const itemsHtml = orderItems.map(item => {
+  const itemsHtml = orderItems.length ? orderItems.map(item => {
     const image = cleanImage(item.image_url || item.image || "");
     const qty = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
     const pId = item.product_id;
-    const pName = esc(item.product_name || "RADA CREST Item");
+    const pName = esc(item.product_name || "Product");
 
     const reviewBtn = status === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
@@ -737,7 +724,7 @@ async function loadOrder(){
         <div class="item-price">${money(price * qty)}</div>
       </div>
     `;
-  }).join("");
+  }).join("") : `<div class="empty">No order items found.</div>`;
 
   box.innerHTML = `
     <div class="card">
@@ -750,7 +737,6 @@ async function loadOrder(){
         <div class="total">${money(total)}</div>
       </div>
       
-      <!-- Ordered Products Displayed Right Above Tracking -->
       <div style="margin-top:22px;">
         <h2 style="font-size:15px;margin-bottom:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Ordered Products</h2>
         <div class="items">${itemsHtml}</div>
@@ -779,10 +765,10 @@ async function loadOrder(){
         </div>
         <div class="info-box">
           <strong>Payment Mode</strong>
-          <span>${esc(order.payment_method || order.payment_mode || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
         </div>
       </div>
-      ${order.shipping_address || order.address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address || order.address))}</span></div>` : ""}
+      ${order.shipping_address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address))}</span></div>` : ""}
     </div>
 
     <div class="card">
