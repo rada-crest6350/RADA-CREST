@@ -1,700 +1,805 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Secure Checkout | RADA CREST</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --primary: #FF7A00;
-      --primary-glow: rgba(255, 122, 0, 0.5);
-      --bg: #0b0d14;
-      --card: #12141a;
-      --text: #ffffff;
-      --muted: #9ba1b0;
-      --border: rgba(255, 255, 255, 0.08);
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 120px; min-height: 100vh; overflow-x: hidden; }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order Details — RADA CREST</title>
 
-    /* Header */
-    .header {
-      background: rgba(18, 20, 26, 0.9);
-      backdrop-filter: blur(16px);
-      border-bottom: 2px solid var(--primary);
-      padding: 12px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .brand-title { color: var(--primary); font-weight: 900; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-    .nav-btn { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+<!-- Fonts & Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    /* Ultra-Modern Premium Loading Animation Screen */
-    .loading-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 120px 20px;
-      text-align: center;
-    }
-    .radar-loader {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,122,0,0.3) 0%, transparent 70%);
-      border: 2px solid rgba(255,122,0,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 0 25px var(--primary-glow);
-      animation: radarPulse 2s infinite ease-in-out;
-    }
-    .radar-loader::after {
-      content: '';
-      position: absolute;
-      inset: -6px;
-      border: 2px dashed var(--primary);
-      border-radius: 50%;
-      animation: spinRing 6s linear infinite;
-    }
-    @keyframes radarPulse { 0%, 100% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
-    @keyframes spinRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    .checkout-wrap { max-width: 650px; margin: 15px auto; padding: 0 14px; animation: slideUp 0.4s var(--ease-spring); }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
 
-    .order-card {
-      background: var(--card);
-      border-radius: 18px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      margin-bottom: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    }
+  :root{
+    --bg-deep:#060608;
+    --panel-card:rgba(20, 20, 28, 0.85);
+    --border:rgba(255, 255, 255, 0.08);
+    --border-hover:rgba(255, 122, 0, 0.6);
+    --text:#ffffff;
+    --text-muted:#9da0b0;
+    --brand:#FF7A00;
+    --brand-glow:rgba(255, 122, 0, 0.4);
+    --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
+    --success:#3dd598;
+    --warning:#ffbb33;
+    --danger:#ff4d4d;
+  }
 
-    /* Product Summary */
-    .prod-summary { display: flex; gap: 14px; align-items: center; }
-    .prod-thumb { width: 75px; height: 75px; border-radius: 12px; object-fit: contain; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
-    .prod-info h3 { font-size: 1.1rem; font-weight: 800; line-height: 1.3; }
-    .prod-info p { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
+  body{
+    background:var(--bg-deep);
+    color:var(--text);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    min-height:100vh;
+    padding:20px;
+    position:relative;
+    overflow-x:hidden;
+  }
 
-    /* Stamp Box */
-    .stamp-box {
-      background: linear-gradient(135deg, rgba(255,122,0,0.12), rgba(255,180,0,0.03));
-      border: 1px dashed var(--primary);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-    .stamp-dots { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
-    .stamp-dot {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.04);
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.82rem;
-      color: var(--muted);
-      transition: all 0.4s var(--ease-spring);
-    }
-    .stamp-dot.earned { background: var(--primary); color: #000; border-color: var(--primary); font-weight: 900; box-shadow: 0 0 14px var(--primary-glow); transform: scale(1.1); }
+  /* Cyber Ambient Glow */
+  .cyber-grid-glow{
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background-image: 
+      radial-gradient(circle at 15% 20%, rgba(255, 122, 0, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(255, 81, 0, 0.06) 0%, transparent 40%);
+    z-index:0;
+    pointer-events:none;
+  }
 
-    /* Rule Banners */
-    .rule-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255,255,255,0.03);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-      border: 1px solid var(--border);
-    }
-    .info-btn { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1rem; padding: 2px 6px; }
+  .page{
+    max-width:1000px;
+    margin:0 auto;
+    position:relative;
+    z-index:1;
+    animation: pageEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 
-    /* Gift Choice Grid */
-    .gift-choice-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-    .gift-choice-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255,255,255,0.02);
-      padding: 10px 14px;
-      border-radius: 12px;
-      border: 1.5px solid var(--border);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .gift-choice-item.selected { border-color: var(--primary); background: rgba(255,122,0,0.1); }
-    .gift-choice-item img { width: 44px; height: 44px; border-radius: 8px; object-fit: contain; background: #fff; }
+  @keyframes pageEntrance{
+    from{opacity:0;transform:translateY(20px);}
+    to{opacity:1;transform:translateY(0);}
+  }
 
-    /* Form Fields */
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
-    .form-control {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-    .form-control:focus { border-color: var(--primary); }
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:24px;
+    background:var(--panel-card);
+    backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:16px 22px;
+  }
 
-    /* Payment Options */
-    .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-    .pay-opt {
-      background: rgba(255,255,255,0.03);
-      border: 1.5px solid var(--border);
-      padding: 12px;
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--muted);
-      transition: all 0.2s ease;
-    }
-    .pay-opt.active { border-color: var(--primary); color: #fff; background: rgba(255,122,0,0.12); }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+    color:#fff;
+    font-weight:800;
+  }
 
-    /* Bill Calculation */
-    .bill-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; padding: 6px 0; color: var(--muted); }
-    .bill-row.total-row { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; color: #fff; font-size: 1.2rem; font-weight: 900; }
-    .text-discount { color: #25D366; font-weight: 700; }
-    .text-primary { color: var(--primary); font-weight: 900; }
+  .brand-mark{
+    width:40px;height:40px;
+    border-radius:10px;
+    background:var(--brand-gradient);
+    color:#000;
+    display:grid;place-items:center;
+    font-weight:900;
+    box-shadow:0 0 15px var(--brand-glow);
+  }
 
-    /* Policies Box */
-    .policies-box {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 16px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-    .policies-box h4 { color: #fff; margin-bottom: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
-    .policies-links { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-    .policies-links a { color: var(--primary); text-decoration: none; font-weight: 700; }
+  .back{
+    text-decoration:none;
+    color:var(--text-muted);
+    font-weight:700;
+    font-size:13px;
+    transition:0.2s;
+  }
+  .back:hover{color:var(--brand);}
 
-    /* Bottom Action Bar */
-    .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(18, 20, 26, 0.95);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border);
-      padding: 14px 20px;
-      z-index: 100;
-      max-width: 650px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .btn-place-order {
-      background: linear-gradient(135deg, #FF7A00, #ff5500);
-      color: #000;
-      border: none;
-      padding: 14px 26px;
-      border-radius: 12px;
-      font-weight: 900;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 22px var(--primary-glow);
-      transition: transform 0.2s ease;
-    }
-    .btn-place-order:active { transform: scale(0.96); }
+  .card{
+    background:var(--panel-card);
+    backdrop-filter:blur(16px);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:24px;
+    margin-bottom:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    transition:0.3s;
+  }
+  .card:hover{border-color:rgba(255,122,0,0.3);}
 
-    /* Congratulations Success Modal */
-    .success-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.92);
-      backdrop-filter: blur(16px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .success-modal.active { display: flex; animation: fadeIn 0.3s ease; }
-    .success-card {
-      background: var(--card);
-      border: 2px solid var(--primary);
-      border-radius: 24px;
-      padding: 26px 20px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 0 40px var(--primary-glow);
-      animation: zoomIn 0.4s var(--ease-spring);
-    }
-    @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .order-head{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    align-items:flex-start;
+  }
 
-    .success-icon-box {
-      width: 60px;
-      height: 60px;
-      background: rgba(37,211,102,0.15);
-      border: 2px solid #25D366;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 12px;
-      color: #25D366;
-      font-size: 1.6rem;
-    }
+  .order-id{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:-0.5px;
+  }
 
-    .modal-stamp-container {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      margin: 14px 0;
-    }
+  .date{
+    color:var(--text-muted);
+    font-size:12.5px;
+    margin-top:4px;
+  }
 
-    /* Info Modal */
-    .info-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
-    .info-modal.active { display: flex; }
-    .info-modal-card { background: var(--card); border: 1px solid var(--primary); border-radius: 16px; padding: 20px; max-width: 380px; width: 100%; text-align: center; }
-  </style>
+  .total{
+    font-size:24px;
+    font-weight:900;
+    color:var(--brand);
+    text-shadow:0 0 15px var(--brand-glow);
+  }
+
+  .status{
+    display:inline-block;
+    margin-top:12px;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+    text-transform:capitalize;
+  }
+  .status-delivered{background:rgba(61,213,152,0.15);color:var(--success);border:1px solid rgba(61,213,152,0.3);}
+  .status-cancelled{background:rgba(255,77,77,0.15);color:var(--danger);border:1px solid rgba(255,77,77,0.3);}
+  .status-shipped{background:rgba(0,210,255,0.15);color:#00d2ff;border:1px solid rgba(0,210,255,0.3);}
+  .status-confirmed, .status-processing, .status-packed{background:rgba(255,187,51,0.15);color:var(--warning);border:1px solid rgba(255,187,51,0.3);}
+  .status-pending{background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid var(--border);}
+
+  /* TRACKING */
+  .tracking{margin-top:24px;border-top:1px solid var(--border);padding-top:20px;}
+  .tracking h2, .card h2{margin-top:0;font-size:17px;font-weight:800;margin-bottom:16px;}
+
+  .steps{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+    margin-top:20px;
+  }
+
+  .step{text-align:center;position:relative;}
+
+  .circle{
+    width:38px;height:38px;
+    margin:auto;
+    border-radius:50%;
+    background:rgba(255,255,255,0.05);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    display:grid;place-items:center;
+    font-weight:900;
+    font-size:13px;
+    position:relative;
+    z-index:2;
+  }
+
+  .step.active .circle{
+    background:var(--brand-gradient);
+    color:#000;
+    border-color:var(--brand);
+    box-shadow:0 0 15px var(--brand-glow);
+  }
+
+  .step.done .circle{
+    background:var(--success);
+    color:#000;
+    border-color:var(--success);
+  }
+
+  .step-label{
+    margin-top:8px;
+    font-size:11px;
+    font-weight:700;
+    color:var(--text-muted);
+  }
+  .step.active .step-label{color:#fff;}
+
+  .step-line{
+    position:absolute;
+    top:19px;left:50%;
+    width:100%;height:2px;
+    background:var(--border);
+    z-index:1;
+  }
+  .step:last-child .step-line{display:none;}
+  .step.done .step-line{background:var(--success);}
+
+  /* ITEMS */
+  .items{display:grid;gap:12px;}
+
+  .item{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    padding:12px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid var(--border);
+    border-radius:14px;
+    align-items:center;
+    cursor:pointer;
+    transition:0.3s;
+  }
+  .item:hover{
+    border-color:var(--brand);
+    background:rgba(255,122,0,0.04);
+    transform:translateY(-2px);
+  }
+
+  .item-left{display:flex;gap:14px;align-items:center;}
+
+  .item-image{
+    width:60px;height:60px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border);
+    object-fit:cover;
+  }
+
+  .item-name{font-weight:800;font-size:14px;color:#fff;}
+  .item-qty{color:var(--text-muted);font-size:12px;margin-top:3px;}
+  .item-price{font-weight:900;font-size:15px;color:var(--brand);}
+
+  /* INFO GRID */
+  .info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+
+  .info-box{
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+  }
+
+  .info-box strong{
+    display:block;
+    margin-bottom:5px;
+    font-size:12px;
+    color:var(--brand);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+
+  .info-box span{
+    color:var(--text-muted);
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  /* BUTTONS & ACTIONS */
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:0;
+    border-radius:12px;
+    padding:12px 18px;
+    text-decoration:none;
+    font-weight:800;
+    font-size:13px;
+    cursor:pointer;
+    transition:0.3s;
+  }
+
+  .primary{
+    background:var(--brand-gradient);
+    color:#000;
+    box-shadow:0 0 15px var(--brand-glow);
+  }
+  .primary:hover{transform:translateY(-2px);box-shadow:0 0 25px var(--brand);opacity:0.95;}
+
+  .secondary{
+    background:rgba(255,255,255,0.05);
+    color:#fff;
+    border:1px solid var(--border);
+  }
+  .secondary:hover{background:rgba(255,255,255,0.1);border-color:var(--brand);}
+
+  .danger-btn{
+    background:rgba(255,77,77,0.1);
+    color:var(--danger);
+    border:1px solid rgba(255,77,77,0.3);
+  }
+  .danger-btn:hover{background:var(--danger);color:#fff;}
+
+  /* REVIEW BUTTON & MODAL */
+  .review-btn{
+    margin-top:6px;
+    padding:4px 10px;
+    border:1px solid var(--brand);
+    border-radius:6px;
+    background:rgba(255,122,0,0.1);
+    color:var(--brand);
+    font-weight:700;
+    cursor:pointer;
+    font-size:11px;
+    display:inline-block;
+    transition:0.2s;
+  }
+  .review-btn:hover{background:var(--brand);color:#000;}
+
+  .review-modal{
+    position:fixed;inset:0;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(10px);
+    display:none;align-items:center;justify-content:center;
+    padding:16px;z-index:9999;
+  }
+  .review-modal.show{display:flex;}
+
+  .review-box{
+    width:min(480px,100%);
+    background:#14141c;
+    border:1.5px solid var(--border);
+    border-radius:20px;
+    padding:24px;
+    box-shadow:0 25px 60px rgba(0,0,0,0.8);
+  }
+
+  .review-head{display:flex;justify-content:space-between;align-items:center;}
+  .review-close{
+    border:0;background:rgba(255,255,255,0.06);
+    color:#fff;width:36px;height:36px;border-radius:50%;
+    font-size:18px;cursor:pointer;display:grid;place-items:center;
+  }
+
+  .review-stars{display:flex;gap:6px;margin:12px 0;}
+  .review-star{border:0;background:none;font-size:30px;color:rgba(255,255,255,0.15);cursor:pointer;}
+  .review-star.selected{color:var(--warning);text-shadow:0 0 10px rgba(255,187,51,0.5);}
+
+  .review-text{
+    width:100%;min-height:100px;
+    background:rgba(255,255,255,0.04);
+    border:1.5px solid var(--border);
+    border-radius:12px;padding:12px;
+    color:#fff;font-family:inherit;font-size:13px;resize:vertical;outline:0;
+  }
+  .review-text:focus{border-color:var(--brand);box-shadow:0 0 12px var(--brand-glow);}
+
+  .review-upload input{
+    width:100%;padding:10px;background:rgba(255,255,255,0.04);
+    border:1.5px solid var(--border);border-radius:10px;color:#fff;font-size:12px;margin-top:6px;
+  }
+
+  .review-preview{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .review-preview img{width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+
+  .empty{text-align:center;padding:40px 15px;color:var(--text-muted);}
+  .error{color:var(--danger);background:rgba(255,77,77,0.1);border:1px solid rgba(255,77,77,0.2);padding:16px;border-radius:12px;text-align:center;}
+
+  @media(max-width:700px){
+    .steps{grid-template-columns:1fr;gap:12px;}
+    .step{display:flex;align-items:center;gap:12px;text-align:left;}
+    .circle{margin:0;flex:none;}
+    .step-line{display:none;}
+    .info-grid{grid-template-columns:1fr;}
+    .order-head{flex-direction:column;gap:10px;}
+  }
+</style>
 </head>
 <body>
 
-  <header class="header">
-    <a href="index.html" class="brand-title">
-      <i class="fa-solid fa-bolt" style="color:var(--primary);"></i> RADA CREST
+<div class="cyber-grid-glow"></div>
+
+<div class="page">
+
+  <div class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">RC</span>
+      <span>RADA CREST</span>
     </a>
-    <a href="javascript:history.back()" class="nav-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
-  </header>
-
-  <div class="checkout-wrap" id="checkoutRoot">
-    <!-- Premium Radar Loading Animation -->
-    <div class="loading-screen">
-      <div class="radar-loader">
-        <i class="fa-solid fa-shield-halved" style="color: var(--primary); font-size: 1.4rem;"></i>
-      </div>
-      <h3 style="margin-top: 18px; font-weight: 800; font-size: 1.05rem;">Securing Checkout...</h3>
-      <p style="color: var(--muted); font-size: 0.8rem; margin-top: 4px;">Syncing rewards & store offers</p>
-    </div>
+    <a class="back" href="account.html"><i class="fa-solid fa-arrow-left"></i> My Account</a>
   </div>
 
-  <!-- Congratulations Success Modal -->
-  <div class="success-modal" id="successModal">
-    <div class="success-card">
-      <div class="success-icon-box">
-        <i class="fa-solid fa-check"></i>
+  <div id="pageMessage"></div>
+  <div id="orderContent"></div>
+
+</div>
+
+<!-- REVIEW MODAL -->
+<div id="reviewModal" class="review-modal">
+  <div class="review-box">
+    <div class="review-head">
+      <div>
+        <h3 style="margin:0;font-size:18px;">Rate & Review</h3>
+        <div id="reviewProductName" style="color:var(--brand);font-size:12px;margin-top:3px;font-weight:600;"></div>
       </div>
-      <h2 style="font-size: 1.3rem; font-weight: 900; margin-bottom: 4px;">Order Placed Successfully!</h2>
-      <p style="color: var(--muted); font-size: 0.82rem; margin-bottom: 10px;">Your loyalty stamp has been successfully earned!</p>
-      
-      <div class="modal-stamp-container">
-        <div style="font-size:0.8rem; font-weight:700; color:var(--primary); margin-bottom:6px;" id="modalStampText">Updating Stamps...</div>
-        <div class="stamp-dots" id="modalStampDots"></div>
+      <button class="review-close" onclick="closeReview()">✕</button>
+    </div>
+    <div style="margin-top:16px;font-size:12.5px;font-weight:700;">Select Rating</div>
+    <div class="review-stars">
+      <button type="button" class="review-star" data-rating="1">★</button>
+      <button type="button" class="review-star" data-rating="2">★</button>
+      <button type="button" class="review-star" data-rating="3">★</button>
+      <button type="button" class="review-star" data-rating="4">★</button>
+      <button type="button" class="review-star" data-rating="5">★</button>
+    </div>
+    <textarea id="reviewText" class="review-text" placeholder="Share your experience..."></textarea>
+    <div class="review-upload" style="margin-top:12px;">
+      <strong style="font-size:12px;color:var(--text-muted);">Upload Photos / Videos (Max 5)</strong>
+      <input id="reviewPhotos" type="file" accept="image/*,video/*" multiple>
+      <div id="reviewPreview" class="review-preview"></div>
+    </div>
+    <div id="reviewMessage" style="margin-top:10px;font-size:12px;color:var(--brand);"></div>
+    <button id="reviewSubmit" class="btn primary" style="width:100%;margin-top:16px;" onclick="submitReview()">Submit Review</button>
+  </div>
+</div>
+
+<!-- EDIT ADDRESS MODAL -->
+<div id="addressModal" class="review-modal">
+  <div class="review-box">
+    <div class="review-head">
+      <h3 style="margin:0;font-size:18px;">Edit Delivery Address</h3>
+      <button class="review-close" onclick="closeAddressModal()">✕</button>
+    </div>
+    <div style="margin-top:16px;">
+      <label style="font-size:12px;color:var(--text-muted);font-weight:700;">New Address</label>
+      <textarea id="newAddressText" class="review-text" placeholder="Enter updated delivery address..."></textarea>
+    </div>
+    <div id="addressMessage" style="margin-top:10px;font-size:12px;color:var(--brand);"></div>
+    <button class="btn primary" style="width:100%;margin-top:16px;" onclick="saveNewAddress()">Update Address</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const box = document.getElementById("orderContent");
+const message = document.getElementById("pageMessage");
+let currentOrderId = null;
+
+function esc(value){
+  return String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+function money(value){
+  return "₹" + Number(value || 0).toLocaleString("en-IN");
+}
+
+function formatDate(value){
+  try{
+    return new Date(value).toLocaleString("en-IN", { day:"2-digit", month:"short", year:"numeric", hour:"numeric", minute:"2-digit", hour12:true });
+  }catch{ return "-"; }
+}
+
+function cleanImage(value){
+  if(!value) return "";
+  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
+  return /^https?:\/\/\S+$/i.test(url) ? url : "";
+}
+
+function statusClass(status){
+  return String(status || "pending").toLowerCase().replace(/[^a-z]/g,"");
+}
+
+function getTrackingSteps(status){
+  const current = String(status || "pending").toLowerCase().trim();
+  if(current === "cancelled") return { cancelled: true, index: -1 };
+  const steps = ["pending", "confirmed", "packed", "shipped", "delivered"];
+  let index = steps.indexOf(current);
+  if(current === "processing") index = 2;
+  if(index < 0) index = 0;
+  return { cancelled: false, index: index };
+}
+
+function renderTracking(status){
+  const tracking = getTrackingSteps(status);
+  if(tracking.cancelled){
+    return `
+      <div class="tracking">
+        <h2>Order Tracking</h2>
+        <div class="status status-cancelled">Order Cancelled</div>
       </div>
-
-      <p style="color: var(--muted); font-size: 0.78rem;">Redirecting to WhatsApp receipt in <span id="countdownTimer" style="color:var(--primary); font-weight:800;">3s</span></p>
+    `;
+  }
+  const labels = [
+    ["pending","Placed"],
+    ["confirmed","Confirmed"],
+    ["packed","Packed"],
+    ["shipped","Shipped"],
+    ["delivered","Delivered"]
+  ];
+  return `
+    <div class="tracking">
+      <h2>Order Tracking</h2>
+      <div class="steps">
+        ${labels.map((item, index) => {
+          const done = index < tracking.index;
+          const active = index === tracking.index;
+          return `
+            <div class="step ${done ? "done" : ""} ${active ? "active" : ""}">
+              <div class="circle">${done ? "✓" : index + 1}</div>
+              <div class="step-label">${item[1]}</div>
+              ${index < labels.length - 1 ? `<div class="step-line"></div>` : ""}
+            </div>
+          `;
+        }).join("")}
+      </div>
     </div>
-  </div>
+  `;
+}
 
-  <!-- Info Modal -->
-  <div class="info-modal" id="infoModal" onclick="closeInfoModal()">
-    <div class="info-modal-card" onclick="event.stopPropagation()">
-      <h3 id="infoModalTitle" style="color:var(--primary); margin-bottom:8px;">Rule Details</h3>
-      <p id="infoModalDesc" style="color:var(--muted); font-size:0.9rem; line-height:1.4;"></p>
-      <button onclick="closeInfoModal()" style="margin-top:16px; background:var(--primary); color:#000; border:none; padding:9px 24px; border-radius:8px; font-weight:800; cursor:pointer;">Got It</button>
-    </div>
-  </div>
+// Address short formatting helper
+function shortAddress(addr){
+  if(!addr) return "N/A";
+  let clean = String(addr).trim();
+  return clean.length > 55 ? clean.substring(0, 52) + "..." : clean;
+}
 
-  <script>
-    const SUPABASE_URL = 'https://ynpsnkvrjhaxdynmurzj.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg';
-    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+function openAddressModal(currentAddr){
+  document.getElementById("newAddressText").value = currentAddr || "";
+  document.getElementById("addressMessage").textContent = "";
+  document.getElementById("addressModal").classList.add("show");
+}
 
-    let checkoutState = {
-      product: null,
-      qty: 1,
-      settings: null,
-      giftList: [],
-      selectedGift: null,
-      paymentMode: 'cod',
-      userStamps: Number(localStorage.getItem('rc_user_stamps')) || 0
-    };
+function closeAddressModal(){
+  document.getElementById("addressModal").classList.remove("show");
+}
 
-    async function initCheckout() {
-      const params = new URLSearchParams(window.location.search);
-      const prodId = params.get('id');
-      checkoutState.qty = Number(params.get('qty')) || 1;
+async function saveNewAddress(){
+  const newAddr = document.getElementById("newAddressText").value.trim();
+  const msgBox = document.getElementById("addressMessage");
+  if(!newAddr){ msgBox.textContent = "Please enter a valid address."; return; }
+  if(!currentOrderId){ msgBox.textContent = "Order ID missing."; return; }
 
-      if (!prodId || !supabaseClient) { showError("Invalid Order URL"); return; }
+  msgBox.textContent = "Updating address...";
+  const { error } = await supabaseClient
+    .from("orders")
+    .update({ shipping_address: newAddr })
+    .eq("id", currentOrderId);
 
-      const { data: prod } = await supabaseClient.from('products').select('*').eq('id', Number(prodId)).single();
-      const { data: config } = await supabaseClient.from('store_settings').select('*').eq('id', 'config').single();
-      const { data: gifts } = await supabaseClient.from('gift_items').select('*').eq('is_active', true);
+  if(error){
+    msgBox.textContent = "Error: " + error.message;
+    return;
+  }
 
-      if (prod) {
-        checkoutState.product = prod;
-        checkoutState.settings = config || {};
-        checkoutState.giftList = gifts || [];
-        if (checkoutState.giftList.length > 0) checkoutState.selectedGift = checkoutState.giftList[0];
-        renderCheckout();
-      } else {
-        showError("Product Not Found");
+  msgBox.textContent = "Address updated successfully!";
+  setTimeout(() => { closeAddressModal(); location.reload(); }, 1000);
+}
+
+let reviewProductId = null;
+let reviewRating = 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const reviewStars = document.querySelectorAll(".review-star");
+  reviewStars.forEach(star => {
+    star.addEventListener("click", () => {
+      reviewRating = Number(star.dataset.rating);
+      reviewStars.forEach(s => s.classList.toggle("selected", Number(s.dataset.rating) <= reviewRating));
+    });
+  });
+
+  const reviewPhotos = document.getElementById("reviewPhotos");
+  if(reviewPhotos){
+    reviewPhotos.addEventListener("change", () => {
+      const reviewPreview = document.getElementById("reviewPreview");
+      if(reviewPreview) reviewPreview.innerHTML = "";
+      const files = Array.from(reviewPhotos.files || []);
+      if(files.length > 5){ reviewPhotos.value = ""; return; }
+      files.forEach(file => {
+        if(!file.type.startsWith("image/") && !file.type.startsWith("video/")) return;
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        if(reviewPreview) reviewPreview.appendChild(img);
+      });
+    });
+  }
+});
+
+async function openReview(productId, productName){
+  reviewProductId = Number(productId);
+  reviewRating = 0;
+  document.getElementById("reviewProductName").textContent = productName;
+  document.getElementById("reviewText").value = "";
+  document.getElementById("reviewPhotos").value = "";
+  document.getElementById("reviewPreview").innerHTML = "";
+  document.getElementById("reviewMessage").innerHTML = "";
+  document.querySelectorAll(".review-star").forEach(s => s.classList.remove("selected"));
+  document.getElementById("reviewModal").classList.add("show");
+}
+
+function closeReview(){
+  document.getElementById("reviewModal").classList.remove("show");
+}
+
+async function submitReview(){
+  const textInput = document.getElementById("reviewText");
+  const fileInput = document.getElementById("reviewPhotos");
+  const messageBox = document.getElementById("reviewMessage");
+  if(!reviewProductId) return;
+
+  messageBox.textContent = "Uploading review & media...";
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if(!user){ messageBox.textContent = "Please login first."; return; }
+
+    let photoUrls = [];
+    const files = fileInput ? fileInput.files : [];
+    for(let i=0; i<files.length; i++){
+      const file = files[i];
+      const fileName = `review_${Date.now()}_${i}_${file.name}`;
+      const { error: upErr } = await supabaseClient.storage.from("product-review-images").upload(fileName, file);
+      if(!upErr){
+        const { data: pubData } = supabaseClient.storage.from("product-review-images").getPublicUrl(fileName);
+        if(pubData?.publicUrl) photoUrls.push(pubData.publicUrl);
       }
     }
 
-    function renderCheckout() {
-      const p = checkoutState.product;
-      const s = checkoutState.settings;
-      const root = document.getElementById('checkoutRoot');
+    const { error: insErr } = await supabaseClient.from("product_reviews").upsert({
+      product_id: reviewProductId,
+      user_id: user.id,
+      customer_name: user.user_metadata?.full_name || user.email || "Customer",
+      rating: reviewRating || 5,
+      review: textInput.value.trim(),
+      photo_urls: photoUrls.length ? photoUrls : null
+    }, { onConflict: 'product_id,user_id' });
 
-      let unitPrice = p.price;
-      if (s.festival_discount_enabled && s.festival_discount_percent > 0) {
-        unitPrice = Math.round(unitPrice - (unitPrice * (s.festival_discount_percent / 100)));
-      }
+    if(insErr){ messageBox.textContent = "Error: " + insErr.message; return; }
 
-      const unitMrp = (p.old_price && p.old_price > p.price) ? p.old_price : p.price;
-      const totalMrp = unitMrp * checkoutState.qty;
-      const totalSelling = unitPrice * checkoutState.qty;
-      const totalDiscount = totalMrp - totalSelling;
+    messageBox.textContent = "Review submitted successfully!";
+    setTimeout(() => { closeReview(); location.reload(); }, 1200);
+  } catch(err){
+    messageBox.textContent = "Failed: " + err.message;
+  }
+}
 
-      let baseFee = s.delivery_fee || 50;
-      const freeAmt = s.free_delivery_min_amount || 499;
-      const freeQty = s.free_delivery_min_qty || 3;
-      const isFreeDelivery = (totalSelling >= freeAmt) || (checkoutState.qty >= freeQty);
-      let deliveryFee = isFreeDelivery ? 0 : baseFee;
+async function loadOrder(){
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("id");
+  currentOrderId = orderId;
 
-      const minGiftQty = s.gift_min_qty || 5;
-      const minGiftAmt = s.gift_min_amount || 999;
-      const giftUnlocked = (s.gift_qty_enabled && checkoutState.qty >= minGiftQty) ||
-                           (s.gift_amount_enabled && totalSelling >= minGiftAmt);
+  if(!orderId){
+    message.innerHTML = `<div class="card error">Order ID is missing in URL.</div>`;
+    return;
+  }
 
-      const stampTarget = s.stamp_target || 5;
-      const isStampCompleted = checkoutState.userStamps >= stampTarget;
-      const finalAmount = isStampCompleted ? 0 : (totalSelling + deliveryFee);
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user){
+    location.href = "account.html?redirect=" + encodeURIComponent("order.html?id=" + orderId);
+    return;
+  }
 
-      root.innerHTML = `
-        <!-- Digital Stamp Card Progress -->
-        <div class="stamp-box">
-          <div style="display:flex; justify-content:space-between; font-size:0.88rem; align-items:center;">
-            <b><i class="fa-solid fa-stamp" style="color:var(--primary);"></i> Loyalty Stamp Card</b>
-            <span style="color:var(--primary); font-weight:800;">${checkoutState.userStamps} / ${stampTarget} Stamps</span>
-          </div>
-          <div class="stamp-dots">
-            ${Array.from({ length: stampTarget }).map((_, i) => `
-              <div class="stamp-dot ${i < checkoutState.userStamps ? 'earned' : ''}">
-                ${i < checkoutState.userStamps ? '<i class="fa-solid fa-check"></i>' : (i + 1)}
-              </div>
-            `).join('')}
-          </div>
-          ${isStampCompleted ? '<p style="color:#25D366; font-size:0.82rem; margin-top:8px; font-weight:800;">🎉 Milestone Unlocked! This order is completely FREE!</p>' : ''}
-        </div>
+  const { data: order, error: orderError } = await supabaseClient.from("orders").select("*").eq("id", orderId).maybeSingle();
+  if(orderError || !order){
+    message.innerHTML = `<div class="card error">Order not found or unauthorized.</div>`;
+    return;
+  }
 
-        <!-- Product Summary -->
-        <div class="order-card">
-          <div class="prod-summary">
-            <img class="prod-thumb" src="${p.image || 'assets/placeholder.jpg'}" />
-            <div class="prod-info">
-              <h3>${p.name}</h3>
-              <p>Quantity: <b>${checkoutState.qty} Pcs</b></p>
-              <p style="color:var(--primary); font-weight:800;">₹${unitPrice} / pc</p>
-            </div>
-          </div>
-        </div>
+  // BULLETPROOF DUAL-SAFETY FALLBACK: Fetches order_items, or seamlessly falls back to orders table data
+  let orderItems = [];
+  const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
+  
+  if (items && items.length > 0) {
+    orderItems = items;
+  } else {
+    orderItems = [{
+      product_name: order.product_name || "RADA CREST LED Product",
+      quantity: order.quantity || 1,
+      unit_price: order.total_amount || order.total || 0,
+      image_url: order.image_url || ""
+    }];
+  }
 
-        <!-- Delivery Fee Banner -->
-        <div class="rule-banner">
-          <span><i class="fa-solid fa-truck" style="color:var(--primary); margin-right:6px;"></i> Delivery: ${deliveryFee === 0 ? '<b>FREE Delivery Applied</b>' : 'Standard Fee ₹' + baseFee}</span>
-          <button type="button" class="info-btn" onclick="openInfoModal('Delivery Fee Rules', 'Standard delivery fee is ₹' + baseFee + '. Orders above ₹' + freeAmt + ' or buying ' + freeQty + '+ pieces get completely FREE delivery.')"><i class="fa-solid fa-circle-question"></i></button>
-        </div>
+  const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 1) * Number(item.unit_price ?? item.price ?? 0), 0);
+  const total = Number(order.total_amount ?? order.total || 0) > 0 ? Number(order.total_amount ?? order.total) : calculatedTotal;
+  const status = String(order.status || "pending").toLowerCase();
+  const isPending = (status === "pending" || status === "unconfirmed");
 
-        <!-- Gift Unlocked Banner -->
-        ${giftUnlocked && checkoutState.giftList.length > 0 ? `
-          <div class="order-card" style="border-color:var(--primary);">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <b style="color:var(--primary);"><i class="fa-solid fa-gift"></i> Free Gift Unlocked!</b>
-              <button type="button" class="info-btn" onclick="openInfoModal('Free Gift Rules', 'Unlocked because your order meets the threshold.')"><i class="fa-solid fa-circle-question"></i></button>
-            </div>
-            <p style="font-size:0.8rem; color:var(--muted); margin:4px 0 10px;">Select 1 gift from our pool:</p>
-            <div class="gift-choice-grid">
-              ${checkoutState.giftList.map(g => `
-                <div class="gift-choice-item ${checkoutState.selectedGift && checkoutState.selectedGift.id === g.id ? 'selected' : ''}" onclick="selectGift(${g.id})">
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="${g.image || 'https://via.placeholder.com/44'}" />
-                    <div>
-                      <b style="font-size:0.85rem;">${g.name}</b>
-                      <div style="font-size:0.75rem; color:var(--muted);">Value: ₹${g.market_value}</div>
-                    </div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        ` : `
-          <div class="rule-banner">
-            <span><i class="fa-solid fa-gift" style="color:var(--primary); margin-right:6px;"></i> Unlock Free Gift on ${minGiftQty}+ Pcs or ₹${minGiftAmt}+ order</span>
-            <button type="button" class="info-btn" onclick="openInfoModal('Free Gift Program', 'Add more quantity to claim an exclusive free gift!')"><i class="fa-solid fa-circle-question"></i></button>
-          </div>
-        `}
+  const itemsHtml = orderItems.map(item => {
+    const image = cleanImage(item.image_url || item.image || "");
+    const qty = Number(item.quantity || 1);
+    const price = Number(item.unit_price ?? item.price ?? 0);
+    const pId = item.product_id;
+    const pName = esc(item.product_name || "RADA CREST Item");
 
-        <!-- Customer Address Form -->
-        <div class="order-card">
-          <b style="font-size:0.95rem; display:block; margin-bottom:12px;">Delivery Address</b>
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input type="text" id="custName" class="form-control" placeholder="Enter your name" required />
-          </div>
-          <div class="form-group">
-            <label>Mobile / WhatsApp Number *</label>
-            <input type="tel" id="custPhone" class="form-control" placeholder="10-digit number" required />
-          </div>
-          <div class="form-group">
-            <label>Complete Address *</label>
-            <textarea id="custAddr" class="form-control" rows="2" placeholder="House no, street, landmark" required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Pincode *</label>
-            <input type="number" id="custPin" class="form-control" placeholder="6-digit pincode" required />
-          </div>
-        </div>
+    const reviewBtn = status === "delivered" && item.product_id ? `
+      <div onclick="event.stopPropagation()">
+        <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${pName.replace(/'/g,"&#039;")}')">
+          <i class="fa-solid fa-star"></i> Rate & Review
+        </button>
+      </div>
+    ` : "";
 
-        <!-- Payment Mode -->
-        <div class="order-card">
-          <b style="font-size:0.95rem; display:block; margin-bottom:8px;">Payment Method</b>
-          <div class="payment-options">
-            <div class="pay-opt ${checkoutState.paymentMode === 'cod' ? 'active' : ''}" onclick="setPaymentMode('cod')">
-              <i class="fa-solid fa-truck-ramp-box" style="display:block; font-size:1.2rem; margin-bottom:4px;"></i>
-              Cash on Delivery
-            </div>
-            <div class="pay-opt ${checkoutState.paymentMode === 'online' ? 'active' : ''}" onclick="setPaymentMode('online')">
-              <i class="fa-solid fa-credit-card" style="display:block; font-size:1.2rem; margin-bottom:4px;"></i>
-              Online Payment (UPI/Card)
-            </div>
-          </div>
-        </div>
+    const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : ``;
 
-        <!-- Price Breakdown -->
-        <div class="order-card">
-          <b style="font-size:0.95rem; display:block; margin-bottom:10px;">Price Details</b>
-          <div class="bill-row">
-            <span>Total MRP (${checkoutState.qty} items)</span>
-            <span>₹${totalMrp}</span>
-          </div>
-          <div class="bill-row">
-            <span>Discount on MRP</span>
-            <span class="text-discount">- ₹${totalDiscount}</span>
-          </div>
-          <div class="bill-row">
-            <span>Free Gift</span>
-            <span style="color:#25D366;">${giftUnlocked && checkoutState.selectedGift ? checkoutState.selectedGift.name + ' (FREE)' : 'None'}</span>
-          </div>
-          <div class="bill-row">
-            <span>Delivery Fee</span>
-            <span>${deliveryFee === 0 ? '<b style="color:#25D366;">FREE</b>' : '₹' + deliveryFee}</span>
-          </div>
-          <div class="bill-row total-row">
-            <span>Total Payable</span>
-            <span class="text-primary">₹${finalAmount}</span>
-          </div>
-
-          <!-- Policies Box -->
-          <div class="policies-box">
-            <h4><i class="fa-solid fa-shield-halved" style="color:var(--primary);"></i> Secure & Verified Store</h4>
-            <p>By placing this order, you agree to RADA CREST's policy terms. All orders are verified via WhatsApp.</p>
-            <div class="policies-links">
-              <a href="terms.html" target="_blank">Terms & Conditions</a>
-              <a href="terms.html" target="_blank">Privacy Policy</a>
-              <a href="return.html" target="_blank">Return & Refund Policy</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Bottom Bar -->
-        <div class="bottom-bar">
+    return `
+      <div class="item" onclick="${clickAction}">
+        <div class="item-left">
+          ${image ? `<img class="item-image" src="${esc(image)}" alt="Product">` : `<div class="item-image"></div>`}
           <div>
-            <small style="color:var(--muted); font-size:0.75rem;">Total Amount</small>
-            <b style="color:var(--primary); font-size:1.25rem;">₹${finalAmount}</b>
+            <div class="item-name">${pName}</div>
+            <div class="item-qty">Qty: ${qty} × ${money(price)}</div>
+            ${reviewBtn}
           </div>
-          <button class="btn-place-order" onclick="processOrder(${finalAmount}, ${giftUnlocked})">
-            <i class="fa-solid fa-lock"></i> Place Order
-          </button>
         </div>
-      `;
-    }
+        <div class="item-price">${money(price * qty)}</div>
+      </div>
+    `;
+  }).join("");
 
-    function selectGift(id) {
-      checkoutState.selectedGift = checkoutState.giftList.find(g => g.id === id);
-      renderCheckout();
-    }
-
-    function setPaymentMode(mode) {
-      checkoutState.paymentMode = mode;
-      renderCheckout();
-    }
-
-    function openInfoModal(title, desc) {
-      document.getElementById('infoModalTitle').innerText = title;
-      document.getElementById('infoModalDesc').innerText = desc;
-      document.getElementById('infoModal').classList.add('active');
-    }
-
-    function closeInfoModal() {
-      document.getElementById('infoModal').classList.remove('active');
-    }
-
-    async function processOrder(finalAmount, giftUnlocked) {
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const addr = document.getElementById('custAddr').value.trim();
-      const pin = document.getElementById('custPin').value.trim();
-
-      if (!name || !phone || !addr || !pin) {
-        alert("Kripya saari delivery details bharein!");
-        return;
-      }
-
-      if (checkoutState.paymentMode === 'online') {
-        alert("Online payment gateway simulated successfully. Proceeding to confirmation...");
-      }
-
-      const stampTarget = checkoutState.settings.stamp_target || 5;
-      let oldStamps = checkoutState.userStamps;
-      let newStamps = oldStamps + 1;
-      if (newStamps > stampTarget) newStamps = 1;
-      localStorage.setItem('rc_user_stamps', newStamps);
-
-      // FIXED: MATCHED EXACT order_items COLUMNS (price, quantity, etc.)
-      if (supabaseClient) {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        const p = checkoutState.product;
-
-        const { data: orderData, error: orderError } = await supabaseClient.from('orders').insert([{
-          customer_name: name,
-          customer_phone: phone,
-          customer_email: user ? user.email : null,
-          address: `${addr} - ${pin}`,
-          total_amount: finalAmount,
-          status: 'Pending',
-          user_id: user ? user.id : null
-        }]).select();
-
-        if (orderError) {
-          console.error("Database Insert Error:", orderError);
-          alert("Database Error: " + orderError.message);
-          return;
-        }
-
-        if (orderData && orderData.length > 0) {
-          const newOrderId = orderData[0].id;
-          await supabaseClient.from('order_items').insert([{
-            order_id: newOrderId,
-            product_id: p.id,
-            product_name: p.name,
-            quantity: checkoutState.qty,
-            quantit: checkoutState.qty,
-            price: p.price,
-            unit_price: p.price
-          }]);
-        }
-      }
-
-      const modal = document.getElementById('successModal');
-      const dotsContainer = document.getElementById('modalStampDots');
-      const textContainer = document.getElementById('modalStampText');
-
-      dotsContainer.innerHTML = Array.from({ length: stampTarget }).map((_, i) => `
-        <div class="stamp-dot ${i < oldStamps ? 'earned' : ''}">
-          ${i < oldStamps ? '<i class="fa-solid fa-check"></i>' : (i + 1)}
+  box.innerHTML = `
+    <div class="card">
+      <div class="order-head">
+        <div>
+          <div class="order-id">Order #${esc(order.id)}</div>
+          <div class="date"><i class="fa-regular fa-clock"></i> ${esc(formatDate(order.created_at))}</div>
+          <div class="status status-${statusClass(status)}">${esc(status)}</div>
         </div>
-      `).join('');
-      textContainer.innerText = `Stamps: ${oldStamps} / ${stampTarget}`;
-      modal.classList.add('active');
+        <div class="total">${money(total)}</div>
+      </div>
+      
+      <div style="margin-top:22px;">
+        <h2 style="font-size:15px;margin-bottom:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Ordered Products</h2>
+        <div class="items">${itemsHtml}</div>
+      </div>
 
-      setTimeout(() => {
-        dotsContainer.innerHTML = Array.from({ length: stampTarget }).map((_, i) => `
-          <div class="stamp-dot ${i < newStamps ? 'earned' : ''}">
-            ${i < newStamps ? '<i class="fa-solid fa-check"></i>' : (i + 1)}
-          </div>
-        `).join('');
-        textContainer.innerText = newStamps >= stampTarget ? `🎉 Stamp Milestone Completed!` : `+1 Stamp Earned! (${newStamps}/${stampTarget})`;
-      }, 600);
+      ${renderTracking(status)}
+    </div>
 
-      let timer = 3;
-      const timerEl = document.getElementById('countdownTimer');
-      const interval = setInterval(() => {
-        timer--;
-        timerEl.innerText = timer + 's';
-        if (timer <= 0) {
-          clearInterval(interval);
-          sendWhatsAppOrder(finalAmount, giftUnlocked, name, phone, addr, pin);
-        }
-      }, 1000);
-    }
-
-    function sendWhatsAppOrder(finalAmount, giftUnlocked, name, phone, addr, pin) {
-      const p = checkoutState.product;
-      const giftStr = (giftUnlocked && checkoutState.selectedGift) ? `%0A*Free Gift:* ${checkoutState.selectedGift.name}` : '';
-      const payStr = checkoutState.paymentMode === 'online' ? 'Online Paid (UPI/Card) - SUCCESS' : 'Cash on Delivery (COD)';
-
-      const msg = `🛍️ *RADA CREST — NEW ORDER*%0A` +
-                  `━━━━━━━━━━━━━━━━━━%0A` +
-                  `*Product:* ${p.name}%0A` +
-                  `*Quantity:* ${checkoutState.qty} Pcs%0A` +
-                  `*Payment Mode:* ${payStr}%0A` +
-                  `*Total Amount:* ₹${finalAmount}${giftStr}%0A` +
-                  `━━━━━━━━━━━━━━━━━━%0A` +
-                  `*Customer Details:*%0A` +
-                  `Name: ${name}%0A` +
-                  `Mobile: ${phone}%0A%0A` +
-                  `*Delivery Address:*%0A` +
-                  `${addr}%0A` +
-                  `PIN Code: ${pin}%0A` +
-                  `━━━━━━━━━━━━━━━━━━%0A` +
-                  `*Order Status:*%0AOrder Placed%0A%0A` +
-                  `Please confirm my order.%0A%0A` +
-                  `Thank you,%0A` +
-                  `RADA CREST Customer`;
-
-      // Directly opens WhatsApp chat with your number: 9079714767
-      window.location.href = `https://wa.me/919079714767?text=${msg}`;
-    }
-
-    function showError(msg) {
-      document.getElementById('checkoutRoot').innerHTML = `
-        <div style="text-align:center; padding: 90px 20px; color:#fff;">
-          <h2>${msg}</h2>
-          <p style="color:var(--muted); margin: 10px 0 20px;">Could not load checkout details.</p>
-          <a href="index.html" style="color:var(--primary); text-decoration:none; font-weight:700;">← Return to Shop</a>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h2 style="margin:0;">Delivery & Payment Info</h2>
+        ${isPending ? `<button class="btn secondary" style="padding:6px 12px;font-size:11.5px;" onclick="openAddressModal('${esc(order.shipping_address || "").replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Edit Address</button>` : ''}
+      </div>
+      <div class="info-grid">
+        <div class="info-box">
+          <strong>Customer Name</strong>
+          <span>${esc(order.shipping_name || order.customer_name || user.email)}</span>
         </div>
-      `;
-    }
+        <div class="info-box">
+          <strong>Phone Number</strong>
+          <span>${esc(order.phone || order.shipping_phone || order.customer_phone || "N/A")}</span>
+        </div>
+        <div class="info-box">
+          <strong>Email Address</strong>
+          <span>${esc(order.customer_email || user.email)}</span>
+        </div>
+        <div class="info-box">
+          <strong>Payment Mode</strong>
+          <span>${esc(order.payment_method || order.payment_mode || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+        </div>
+      </div>
+      ${order.shipping_address || order.address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address || order.address))}</span></div>` : ""}
+    </div>
 
-    document.addEventListener('DOMContentLoaded', initCheckout);
-  </script>
+    <div class="card">
+      <h2>Assistance & Control</h2>
+      <p style="color:var(--text-muted);font-size:13px;line-height:1.5;">Need modifications or help regarding this order? Connect instantly with RADA CREST support.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://wa.me/919079714767?text=${encodeURIComponent("Hello RADA CREST, I need help regarding Order #" + order.id)}" target="_blank">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp Support
+        </a>
+        <a class="btn secondary" href="index.html">Continue Shopping</a>
+        ${status === 'delivered' ? `<a href="return.html?id=${esc(order.id)}" class="btn secondary">Return / Replace</a>` : ''}
+        ${isPending ? `<a href="cancel-order.html?id=${encodeURIComponent(order.id)}" class="btn danger-btn">Cancel Order</a>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+loadOrder();
+</script>
+
 </body>
 </html>
