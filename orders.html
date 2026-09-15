@@ -22,10 +22,7 @@
 >
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 :root {
   --brand-orange: #FF7A00;
@@ -185,9 +182,6 @@ body{
   box-shadow: 0 10px 25px rgba(255, 122, 0, 0.15);
 }
 
-/* =========================================================
-   LUXURY CYBER-FUTURISTIC LOADER ANIMATION
-========================================================= */
 .cyber-loader-container {
   display: flex;
   flex-direction: column;
@@ -266,7 +260,6 @@ body{
   .page-shell{ width:calc(100% - 18px); }
   .order-card{ border-radius:20px; }
 }
-
 </style>
 </head>
 
@@ -338,7 +331,7 @@ body{
     class="hidden mb-5 px-4 py-3 rounded-2xl text-sm"
   ></div>
 
-  <!-- LUXURY CYBER-FUTURISTIC LOADER -->
+  <!-- LOADER -->
   <section id="loadingState" class="cyber-loader-container">
     <div class="cyber-loader-ring">
       <div class="cyber-loader-core"></div>
@@ -348,13 +341,13 @@ body{
     </p>
   </section>
 
-  <!-- ORDERS -->
+  <!-- ORDERS LIST -->
   <section
     id="ordersList"
     class="hidden space-y-4"
   ></section>
 
-  <!-- EMPTY -->
+  <!-- EMPTY STATE -->
   <section
     id="emptyState"
     class="hidden order-card text-center px-6 py-16"
@@ -434,7 +427,6 @@ async function loadOrders(){
   let allOrders = [];
 
   try {
-    // FIXED: Fetch all recent orders so customer can see their orders reliably
     const [summaryRes, ordersRes] = await Promise.all([
       client.from('order_summary').select('*').order('created_at', {ascending:false}).limit(20),
       client.from('orders').select('*').order('created_at', {ascending:false}).limit(20)
@@ -457,7 +449,7 @@ async function loadOrders(){
 
     allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    // Instant Batch Items Resolution
+    // Batch resolve items and images across all orders
     if (allOrders.length > 0) {
       const orderIds = allOrders.map(o => o.id || o.order_id);
       const { data: allItems } = await client
@@ -474,18 +466,25 @@ async function loadOrders(){
             if (!ord.product_name && matchItems[0].product_name) {
               ord.product_name = matchItems[0].product_name;
             }
-            ord.product_image = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || '';
+            // Smart image resolver across item and order properties
+            ord.product_image = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || ord.image_url || ord.image || '';
           }
         }
       }
     }
   } catch (err) {
-    console.warn("Fast load note:", err);
+    console.warn("Orders load note:", err);
   }
 
   document.getElementById('loadingState').classList.add('hidden');
   orders = allOrders;
   renderOrders();
+}
+
+function cleanImageUrl(value){
+  if(!value) return "";
+  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
+  return /^https?:\/\/\S+$/i.test(url) ? url : "";
 }
 
 function renderOrders(){
@@ -515,7 +514,8 @@ function renderOrders(){
     const statusClass = getStatusClass(status);
     const statusIcon = getStatusIcon(status);
 
-    const productImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || order.product?.img || '';
+    const rawImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || '';
+    const productImage = cleanImageUrl(rawImage);
     const productName = order.product_name || order.product_title || 'RADA CREST Order';
     const quantity = order.quantity || order.item_count || '';
 
