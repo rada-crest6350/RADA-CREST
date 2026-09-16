@@ -686,25 +686,32 @@ async function loadOrder(){
     return;
   }
 
+  // BULLETPROOF DUAL-SAFETY FALLBACK: Fetches order_items, or seamlessly falls back to orders table data using new image_url column
+  let orderItems = [];
   const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
-  const orderItems = items && items.length > 0 ? items : [{
-    product_name: order.product_name || "RADA CREST LED Product",
-    quantity: order.quantity || 1,
-    unit_price: order.total_amount || order.total || 0,
-    image_url: order.image_url || ""
-  }];
+  
+  if (items && items.length > 0) {
+    orderItems = items;
+  } else {
+    orderItems = [{
+      product_name: order.product_name || "RADA CREST LED Product",
+      quantity: order.quantity || 1,
+      unit_price: order.total_amount || order.total || 0,
+      image_url: order.image_url || ""
+    }];
+  }
 
-  const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unit_price ?? item.price ?? 0), 0);
-  const total = Number(order.total || 0) > 0 ? Number(order.total) : calculatedTotal;
+  const calculatedTotal = orderItems.reduce((sum, item) => sum + Number(item.quantity || 1) * Number(item.unit_price ?? item.price ?? 0), 0);
+  const total = Number(order.total_amount ?? order.total || 0) > 0 ? Number(order.total_amount ?? order.total) : calculatedTotal;
   const status = String(order.status || "pending").toLowerCase();
   const isPending = (status === "pending" || status === "unconfirmed");
 
   const itemsHtml = orderItems.map(item => {
-    const image = cleanImage(item.image_url || item.image || "");
+    const image = cleanImage(item.image_url || order.image_url || "");
     const qty = Number(item.quantity || 1);
     const price = Number(item.unit_price ?? item.price ?? 0);
     const pId = item.product_id;
-    const pName = esc(item.product_name || "Product");
+    const pName = esc(item.product_name || order.product_name || "RADA CREST Item");
 
     const reviewBtn = status === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
@@ -762,7 +769,7 @@ async function loadOrder(){
         </div>
         <div class="info-box">
           <strong>Phone Number</strong>
-          <span>${esc(order.shipping_phone || order.customer_phone || "N/A")}</span>
+          <span>${esc(order.phone || order.shipping_phone || order.customer_phone || "N/A")}</span>
         </div>
         <div class="info-box">
           <strong>Email Address</strong>
@@ -770,10 +777,10 @@ async function loadOrder(){
         </div>
         <div class="info-box">
           <strong>Payment Mode</strong>
-          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+          <span>${esc(order.payment_method || order.payment_mode || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
         </div>
       </div>
-      ${order.shipping_address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address))}</span></div>` : ""}
+      ${order.shipping_address || order.address ? `<div class="info-box" style="margin-top:14px;"><strong>Shipping Address</strong><span>${esc(shortAddress(order.shipping_address || order.address))}</span></div>` : ""}
     </div>
 
     <div class="card">
