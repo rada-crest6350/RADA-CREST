@@ -418,7 +418,7 @@
         <!-- Product Summary -->
         <div class="order-card">
           <div class="prod-summary">
-            <img class="prod-thumb" src="${p.image || 'assets/placeholder.jpg'}" />
+            <img class="prod-thumb" src="${p.image || p.image_url || 'assets/placeholder.jpg'}" />
             <div class="prod-info">
               <h3>${p.name}</h3>
               <p>Quantity: <b>${checkoutState.qty} Pcs</b></p>
@@ -445,7 +445,7 @@
               ${checkoutState.giftList.map(g => `
                 <div class="gift-choice-item ${checkoutState.selectedGift && checkoutState.selectedGift.id === g.id ? 'selected' : ''}" onclick="selectGift(${g.id})">
                   <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="${g.image || 'https://via.placeholder.com/44'}" />
+                    <img src="${g.image || g.image_url || 'https://via.placeholder.com/44'}" />
                     <div>
                       <b style="font-size:0.85rem;">${g.name}</b>
                       <div style="font-size:0.75rem; color:var(--muted);">Value: ₹${g.market_value}</div>
@@ -588,11 +588,11 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // UPDATED TO INSERT image_url INTO orders & order_items TABLES AUTOMATICALLY
+      // FIXED: BULLETPROOF IMAGE LINK EXTRACTION AND INSERTION INTO BOTH TABLES
       if (supabaseClient) {
         const { data: { user } } = await supabaseClient.auth.getUser();
         const p = checkoutState.product;
-        const productImg = p.image || p.image_url || "";
+        const productImg = p.image || p.image_url || p.img || "";
 
         const { data: orderData, error: orderError } = await supabaseClient.from('orders').insert([{
           customer_name: name,
