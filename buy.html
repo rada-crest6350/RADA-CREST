@@ -588,19 +588,22 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // FIXED: MATCHED EXACT order_items COLUMNS (price, quantity, etc.)
+      // UPDATED TO INSERT image_url INTO orders & order_items TABLES AUTOMATICALLY
       if (supabaseClient) {
         const { data: { user } } = await supabaseClient.auth.getUser();
         const p = checkoutState.product;
+        const productImg = p.image || p.image_url || "";
 
         const { data: orderData, error: orderError } = await supabaseClient.from('orders').insert([{
           customer_name: name,
           customer_phone: phone,
           customer_email: user ? user.email : null,
           address: `${addr} - ${pin}`,
+          shipping_address: `${addr} - ${pin}`,
           total_amount: finalAmount,
           status: 'Pending',
-          user_id: user ? user.id : null
+          user_id: user ? user.id : null,
+          image_url: productImg
         }]).select();
 
         if (orderError) {
@@ -618,7 +621,8 @@
             quantity: checkoutState.qty,
             quantit: checkoutState.qty,
             price: p.price,
-            unit_price: p.price
+            unit_price: p.price,
+            image_url: productImg
           }]);
         }
       }
@@ -680,7 +684,6 @@
                   `Thank you,%0A` +
                   `RADA CREST Customer`;
 
-      // Directly opens WhatsApp chat with your number: 9079714767
       window.location.href = `https://wa.me/919079714767?text=${msg}`;
     }
 
