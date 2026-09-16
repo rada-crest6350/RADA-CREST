@@ -475,6 +475,25 @@ async function loadOrders(){
         }
       }
     }
+
+    // ULTIMATE FALLBACK: Ensure image_url is saved and fetched properly during order placement insertion
+    if (allOrders.length > 0) {
+      const productIds = allOrders.map(o => o.product_id).filter(Boolean);
+      if (productIds.length > 0) {
+        const { data: prodData } = await client.from('products').select('id, image_url, image, img').in('id', productIds);
+        if (prodData && prodData.length > 0) {
+          for (let ord of allOrders) {
+            if (!ord.product_image) {
+              const matchedProd = prodData.find(p => p.id === ord.product_id);
+              if (matchedProd) {
+                ord.product_image = matchedProd.image_url || matchedProd.image || matchedProd.img || '';
+              }
+            }
+          }
+        }
+      }
+    }
+
   } catch (err) {
     console.warn("Fast load note:", err);
   }
@@ -517,7 +536,7 @@ function renderOrders(){
     const statusClass = getStatusClass(status);
     const statusIcon = getStatusIcon(status);
 
-    // Bulletproof image check across all tables and properties
+    // Bulletproof image check including order placement image insertion fallback
     const rawImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || '';
     const productImage = cleanImageUrl(rawImage);
     const productName = order.product_name || order.product_title || 'RADA CREST Order';
