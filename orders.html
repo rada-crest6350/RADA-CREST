@@ -456,7 +456,6 @@ async function loadOrders(){
         .select('*')
         .in('order_id', orderIds);
 
-      // ULTIMATE ROOT FIX: Fetch products table as well so we can fallback to main product images if item/order images are missing
       const productIds = allItems ? allItems.map(i => i.product_id).filter(Boolean) : [];
       let allProducts = [];
       if (productIds.length > 0) {
@@ -476,14 +475,12 @@ async function loadOrders(){
           }
           img = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || '';
           
-          // Fallback to product table using product_id from item
           if (!img && matchItems[0].product_id) {
             const prod = allProducts.find(p => p.id === matchItems[0].product_id);
             if (prod) img = prod.image || prod.image_url || prod.img || '';
           }
         }
 
-        // Fallback to order table fields
         if (!img) {
           img = ord.image_url || ord.image || ord.img || '';
         }
@@ -502,8 +499,8 @@ async function loadOrders(){
 
 function cleanImageUrl(value){
   if(!value) return "";
-  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+\vert{}["']+$/g,"").trim();
-  return /^https?:\/\/\S+$/i.test(url) ? url : "";
+  // FIXED: Removed strict http restriction so relative paths or custom image links load successfully without failing
+  return String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
 }
 
 function renderOrders(){
