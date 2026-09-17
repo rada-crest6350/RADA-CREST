@@ -261,7 +261,7 @@
   .item-price{font-weight:900;font-size:15px;color:var(--brand);}
   .item-mrp {font-size:11px;color:var(--text-muted);text-decoration:line-through;}
 
-  /* DETAILED ANIME BILL BREAKDOWN */
+  /* DATABASE BILL BREAKDOWN */
   .bill-box{
     background:linear-gradient(135deg, rgba(255,122,0,0.04), rgba(20,20,28,0.6));
     border:1px solid rgba(255,122,0,0.2);
@@ -673,6 +673,18 @@ async function loadOrder(){
   }
 
   const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
+  
+  let productsMap = {};
+  if (items && items.length > 0) {
+    const productIds = items.map(i => i.product_id).filter(Boolean);
+    if (productIds.length > 0) {
+      const { data: prodData } = await supabaseClient.from("products").select("id, name, price, old_price, image, image_url").in("id", productIds);
+      if (prodData) {
+        prodData.forEach(p => { productsMap[p.id] = p; });
+      }
+    }
+  }
+
   const orderItems = items && items.length > 0 ? items : [{
     product_id: order.product_id || null,
     product_name: order.product_name || "RADA CREST Product",
@@ -685,22 +697,23 @@ async function loadOrder(){
   const status = String(order.status || "pending").toLowerCase();
   const canChangeAddress = (status === "pending" || status === "unconfirmed");
 
-  // Calculate accurate bill breakdown
-  let itemsMrpTotal = 0;
-  let itemsSellingTotal = 0;
+  let totalMrpFromDb = 0;
+  let totalSellingFromDb = 0;
 
   const itemsHtml = orderItems.map(item => {
-    const image = cleanImage(item.image_url || item.image || "");
-    const qty = Number(item.quantity || 1);
-    const sellingPrice = Number(item.unit_price ?? item.price ?? 0);
-    // MRP fallback if old_price is available or estimated
-    const mrp = Number(item.old_price || item.mrp || (sellingPrice * 1.25)); 
-    
-    itemsMrpTotal += mrp * qty;
-    itemsSellingTotal += sellingPrice * qty;
-
     const pId = item.product_id;
-    const pName = esc(item.product_name || "Product");
+    const dbProduct = pId && productsMap[pId] ? productsMap[pId] : null;
+
+    const image = cleanImage(item.image_url || item.image || (dbProduct ? (dbProduct.image || dbProduct.image_url) : ""));
+    const qty = Number(item.quantity || 1);
+    
+    const sellingPrice = Number(item.unit_price ?? item.price ?? (dbProduct ? dbProduct.price : 0));
+    const mrp = Number(dbProduct?.old_price || item.old_price || sellingPrice);
+
+    totalMrpFromDb += (mrp > sellingPrice ? mrp : sellingPrice) * qty;
+    totalSellingFromDb += sellingPrice * qty;
+
+    const pName = esc(item.product_name || (dbProduct ? dbProduct.name : "Product"));
 
     const reviewBtn = status === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
@@ -710,7 +723,6 @@ async function loadOrder(){
       </div>
     ` : "";
 
-    // 100% Fixed product page redirection link
     const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : `window.location.href='index.html'`;
 
     return `
@@ -731,9 +743,9 @@ async function loadOrder(){
     `;
   }).join("");
 
-  const discountTotal = itemsMrpTotal > itemsSellingTotal ? itemsMrpTotal - itemsSellingTotal : 0;
-  const deliveryFee = 0; // Free delivery or standard policy
-  const finalPayable = Number(order.total || order.total_amount || 0) > 0 ? Number(order.total || order.total_amount) : itemsSellingTotal;
+  const discountFromDb = totalMrpFromDb > totalSellingFromDb ? totalMrpFromDb - totalSellingFromDb : 0;
+  const deliveryFee = 0;
+  const finalPayable = Number(order.total || order.total_amount || 0) > 0 ? Number(order.total || order.total_amount) : totalSellingFromDb;
 
   box.innerHTML = `
     <div class="card">
@@ -754,18 +766,18 @@ async function loadOrder(){
       ${renderTracking(status, order)}
     </div>
 
-    <!-- PROPER ANIME/CYBER BILL BREAKDOWN -->
+    <!-- ACCURATE DATABASE BILL BREAKDOWN -->
     <div class="card">
       <h2><i class="fa-solid fa-file-invoice-dollar" style="color:var(--brand);"></i> Price Details & Bill</h2>
       <div class="bill-box">
         <div class="bill-row">
           <span>Total MRP (${orderItems.reduce((s, i) => s + Number(i.quantity||1), 0)} items)</span>
-          <span>${money(itemsMrpTotal)}</span>
+          <span>${money(totalMrpFromDb)}</span>
         </div>
-        ${discountTotal > 0 ? `
+        ${discountFromDb > 0 ? `
           <div class="bill-row discount">
             <span>Discount on MRP</span>
-            <span>- ${money(discountTotal)}</span>
+            <span>- ${money(discountFromDb)}</span>
           </div>
         ` : ``}
         <div class="bill-row">
@@ -786,7 +798,7 @@ async function loadOrder(){
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
         <h2 style="margin:0;"><i class="fa-solid fa-truck-fast" style="color:var(--brand);"></i> Delivery & Contact Info</h2>
-        ${canChangeAddress ? `<button class="btn secondary" style="padding:5px 10px;font-size:11px;" onclick="openAddressModal('${esc(order.shipping_address || order.address || "").replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Change Address</button>` : ''}
+        ${canChangeAddress ? `<button class="btn secondary" style="padding:5px 10px;font-size:11.5px;" onclick="openAddressModal('${esc(order.shipping_address || order.address || "").replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Change Address</button>` : ''}
       </div>
       <div class="info-grid">
         <div class="info-box">
