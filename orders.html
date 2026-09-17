@@ -427,41 +427,29 @@ async function loadOrders(){
   let allOrders = [];
 
   try {
-    const [summaryRes, ordersRes] = await Promise.all([
-      client.from('order_summary').select('*').order('created_at', {ascending:false}).limit(20),
-      client.from('orders').select('*').order('created_at', {ascending:false}).limit(20)
-    ]);
+    const { data: ordersData, error: ordersError } = await client
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(20);
 
-    if (!summaryRes.error && summaryRes.data) {
-      allOrders = [...summaryRes.data];
+    if (!ordersError && ordersData) {
+      allOrders = ordersData;
     }
-
-    if (!ordersRes.error && ordersRes.data) {
-      const existingIds = new Set(allOrders.map(o => o.id || o.order_id));
-      for(let ord of ordersRes.data){
-        const oid = ord.id || ord.order_id;
-        if(!existingIds.has(oid)){
-          allOrders.push(ord);
-          existingIds.add(oid);
-        }
-      }
-    }
-
-    allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     if (allOrders.length > 0) {
       const orderIds = allOrders.map(o => o.id || o.order_id);
+      
+      // Fetch order items
       const { data: allItems } = await client
         .from('order_items')
         .select('*')
         .in('order_id', orderIds);
 
-      const productIds = allItems ? allItems.map(i => i.product_id).filter(Boolean) : [];
-      let allProducts = [];
-      if (productIds.length > 0) {
-        const { data: prodData } = await client.from('products').select('*').in('id', productIds);
-        if (prodData) allProducts = prodData;
-      }
+      // Fetch products table to guarantee we get product images directly via product_id
+      const { data: allProducts } = await client
+        .from('products')
+        .select('*');
 
       for (let ord of allOrders) {
         const oid = ord.id || ord.order_id;
@@ -473,23 +461,34 @@ async function loadOrders(){
           if (!ord.product_name && matchItems[0].product_name) {
             ord.product_name = matchItems[0].product_name;
           }
+          // Try item level image
           img = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || '';
-          
-          if (!img && matchItems[0].product_id) {
+
+          // If not in item, check products table via product_id
+          if (!img && matchItems[0].product_id && allProducts) {
             const prod = allProducts.find(p => p.id === matchItems[0].product_id);
-            if (prod) img = prod.image || prod.image_url || prod.img || '';
+            if (prod) {
+              img = prod.image || prod.image_url || prod.img || '';
+            }
           }
         }
 
+        // If still not found, check orders table or products table via ord.product_id if exists
         if (!img) {
           img = ord.image_url || ord.image || ord.img || '';
+        }
+        if (!img && ord.product_id && allProducts) {
+          const prod = allProducts.find(p => p.id === ord.product_id);
+          if (prod) {
+            img = prod.image || prod.image_url || prod.img || '';
+          }
         }
 
         ord.product_image = img;
       }
     }
   } catch (err) {
-    console.warn("Orders load note:", err);
+    console.warn("Orders load error:", err);
   }
 
   document.getElementById('loadingState').classList.add('hidden');
@@ -499,7 +498,6 @@ async function loadOrders(){
 
 function cleanImageUrl(value){
   if(!value) return "";
-  // FIXED: Removed strict http restriction so relative paths or custom image links load successfully without failing
   return String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
 }
 
