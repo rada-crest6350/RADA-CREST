@@ -118,7 +118,6 @@
   }
   .back:hover{color:var(--brand);}
 
-  /* Floating Anime Card Style */
   .card{
     background:var(--panel-card);
     backdrop-filter:blur(16px);
@@ -162,7 +161,6 @@
   .status-confirmed, .status-processing, .status-packed{background:rgba(255,187,51,0.15);color:var(--warning);border:1px solid rgba(255,187,51,0.3);}
   .status-pending{background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid var(--border);}
 
-  /* PROFESSIONAL ANIMATED TRACKING */
   .tracking{margin-top:20px;border-top:1px solid var(--border);padding-top:18px;}
   .tracking h2, .card h2{margin-top:0;font-size:16px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 
@@ -225,7 +223,6 @@
   .step:last-child .step-line{display:none;}
   .step.done .step-line{background:var(--success);transition:background 0.5s ease;}
 
-  /* ITEMS */
   .items{display:grid;gap:10px;}
 
   .item{
@@ -261,7 +258,6 @@
   .item-price{font-weight:900;font-size:15px;color:var(--brand);}
   .item-mrp {font-size:11px;color:var(--text-muted);text-decoration:line-through;}
 
-  /* DATABASE BILL BREAKDOWN */
   .bill-box{
     background:linear-gradient(135deg, rgba(255,122,0,0.04), rgba(20,20,28,0.6));
     border:1px solid rgba(255,122,0,0.2);
@@ -287,7 +283,6 @@
     font-weight:900;
   }
 
-  /* INFO GRID */
   .info-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -316,7 +311,6 @@
     line-height:1.4;
   }
 
-  /* BUTTONS */
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
 
   .btn{
@@ -355,7 +349,6 @@
   }
   .danger-btn:hover{background:var(--danger);color:#fff;}
 
-  /* REVIEW BUTTON & MODALS */
   .review-btn{
     margin-top:5px;
     padding:3px 8px;
@@ -502,7 +495,7 @@ function formatDate(value){
 
 function cleanImage(value){
   if(!value) return "";
-  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
+  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+\vert{}["']+$/g,"").trim();
   return /^https?:\/\/\S+$/i.test(url) ? url : "";
 }
 
@@ -549,8 +542,7 @@ function renderTracking(status, order){
             <div class="step ${done ? "done" : ""} ${active ? "active" : ""}">
               <div class="circle">${done ? "✓" : index + 1}</div>
               <div class="step-label">${item[1]}</div>
-              <div class="step-date">${timeStr}</div>
-              ${index < labels.length - 1 ? `<div class="step-line"></div>` : ""}
+              <div class="step-date">${timeStr}</div>${index < labels.length - 1 ? `<div class="step-line"></div>` : ""}
             </div>
           `;
         }).join("")}
@@ -691,6 +683,7 @@ async function loadOrder(){
     quantity: order.quantity || 1,
     unit_price: order.total_amount || order.total || 0,
     price: order.total_amount || order.total || 0,
+    old_price: order.old_price || order.mrp || 0,
     image_url: order.image_url || ""
   }];
 
@@ -707,10 +700,11 @@ async function loadOrder(){
     const image = cleanImage(item.image_url || item.image || (dbProduct ? (dbProduct.image || dbProduct.image_url) : ""));
     const qty = Number(item.quantity || 1);
     
+    // ACCURATE EXTRACTION: Prioritizing database product page values first, then order item snapshot
     const sellingPrice = Number(item.unit_price ?? item.price ?? (dbProduct ? dbProduct.price : 0));
-    const mrp = Number(dbProduct?.old_price || item.old_price || sellingPrice);
+    const itemMrp = Number(dbProduct?.old_price || item.old_price || item.mrp || sellingPrice);
 
-    totalMrpFromDb += (mrp > sellingPrice ? mrp : sellingPrice) * qty;
+    totalMrpFromDb += itemMrp * qty;
     totalSellingFromDb += sellingPrice * qty;
 
     const pName = esc(item.product_name || (dbProduct ? dbProduct.name : "Product"));
@@ -737,7 +731,7 @@ async function loadOrder(){
         </div>
         <div class="item-price-box">
           <div class="item-price">${money(sellingPrice)}</div>
-          ${mrp > sellingPrice ? `<div class="item-mrp">${money(mrp)}</div>` : ``}
+          ${itemMrp > sellingPrice ? `<div class="item-mrp">${money(itemMrp)}</div>` : ``}
         </div>
       </div>
     `;
