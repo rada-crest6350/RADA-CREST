@@ -540,7 +540,7 @@
             <small style="color:var(--muted); font-size:0.75rem;">Total Amount</small>
             <b style="color:var(--primary); font-size:1.25rem;">₹${finalAmount}</b>
           </div>
-          <button class="btn-place-order" onclick="processOrder(${finalAmount}, ${giftUnlocked})">
+          <button class="btn-place-order" onclick="processOrder(${finalAmount}, ${giftUnlocked}, ${unitMrp}, ${unitPrice})">
             <i class="fa-solid fa-lock"></i> Place Order
           </button>
         </div>
@@ -567,7 +567,7 @@
       document.getElementById('infoModal').classList.remove('active');
     }
 
-    async function processOrder(finalAmount, giftUnlocked) {
+    async function processOrder(finalAmount, giftUnlocked, unitMrp, unitPrice) {
       const name = document.getElementById('custName').value.trim();
       const phone = document.getElementById('custPhone').value.trim();
       const addr = document.getElementById('custAddr').value.trim();
@@ -588,12 +588,12 @@
       if (newStamps > stampTarget) newStamps = 1;
       localStorage.setItem('rc_user_stamps', newStamps);
 
-      // FIXED: BULLETPROOF IMAGE LINK EXTRACTION AND INSERTION INTO BOTH TABLES
       if (supabaseClient) {
         const { data: { user } } = await supabaseClient.auth.getUser();
         const p = checkoutState.product;
         const productImg = p.image || p.image_url || p.img || "";
 
+        // Insert into orders table with accurate pricing details
         const { data: orderData, error: orderError } = await supabaseClient.from('orders').insert([{
           customer_name: name,
           customer_phone: phone,
@@ -614,14 +614,16 @@
 
         if (orderData && orderData.length > 0) {
           const newOrderId = orderData[0].id;
+          // Insert into order_items with unit price and old_price (MRP) stored correctly
           await supabaseClient.from('order_items').insert([{
             order_id: newOrderId,
             product_id: p.id,
             product_name: p.name,
             quantity: checkoutState.qty,
-            quantit: checkoutState.qty,
-            price: p.price,
-            unit_price: p.price,
+            unit_price: unitPrice,
+            price: unitPrice,
+            old_price: unitMrp,
+            mrp: unitMrp,
             image_url: productImg
           }]);
         }
