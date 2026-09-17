@@ -449,7 +449,6 @@ async function loadOrders(){
 
     allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    // Batch resolve items and images across all orders
     if (allOrders.length > 0) {
       const orderIds = allOrders.map(o => o.id || o.order_id);
       const { data: allItems } = await client
@@ -457,25 +456,39 @@ async function loadOrders(){
         .select('*')
         .in('order_id', orderIds);
 
-      if (allItems && allItems.length > 0) {
-        for (let ord of allOrders) {
-          const oid = ord.id || ord.order_id;
-          const matchItems = allItems.filter(i => i.order_id === oid);
-          if (matchItems.length > 0) {
-            ord.item_count = matchItems.length;
-            if (!ord.product_name && matchItems[0].product_name) {
-              ord.product_name = matchItems[0].product_name;
-            }
-            // Smart image resolver prioritizing order_items and orders tables
-            ord.product_image = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || ord.image_url || ord.image || '';
-          } else {
-            ord.product_image = ord.image_url || ord.image || '';
+      // ULTIMATE ROOT FIX: Fetch products table as well so we can fallback to main product images if item/order images are missing
+      const productIds = allItems ? allItems.map(i => i.product_id).filter(Boolean) : [];
+      let allProducts = [];
+      if (productIds.length > 0) {
+        const { data: prodData } = await client.from('products').select('*').in('id', productIds);
+        if (prodData) allProducts = prodData;
+      }
+
+      for (let ord of allOrders) {
+        const oid = ord.id || ord.order_id;
+        const matchItems = allItems ? allItems.filter(i => i.order_id === oid) : [];
+        
+        let img = '';
+        if (matchItems.length > 0) {
+          ord.item_count = matchItems.length;
+          if (!ord.product_name && matchItems[0].product_name) {
+            ord.product_name = matchItems[0].product_name;
+          }
+          img = matchItems[0].image_url || matchItems[0].image || matchItems[0].product_image || '';
+          
+          // Fallback to product table using product_id from item
+          if (!img && matchItems[0].product_id) {
+            const prod = allProducts.find(p => p.id === matchItems[0].product_id);
+            if (prod) img = prod.image || prod.image_url || prod.img || '';
           }
         }
-      } else {
-        for (let ord of allOrders) {
-          ord.product_image = ord.image_url || ord.image || '';
+
+        // Fallback to order table fields
+        if (!img) {
+          img = ord.image_url || ord.image || ord.img || '';
         }
+
+        ord.product_image = img;
       }
     }
   } catch (err) {
@@ -489,7 +502,7 @@ async function loadOrders(){
 
 function cleanImageUrl(value){
   if(!value) return "";
-  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+|["']+$/g,"").trim();
+  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+\vert{}["']+$/g,"").trim();
   return /^https?:\/\/\S+$/i.test(url) ? url : "";
 }
 
@@ -520,9 +533,7 @@ function renderOrders(){
     const statusClass = getStatusClass(status);
     const statusIcon = getStatusIcon(status);
 
-    // FIXED: Checking order.product_image first as populated by loadOrders()
-    const rawImage = order.product_image || order.image_url || order.image || order.img || order.product?.image_url || order.product?.image || '';
-    const productImage = cleanImageUrl(rawImage);
+    const productImage = cleanImageUrl(order.product_image);
     const productName = order.product_name || order.product_title || 'RADA CREST Order';
     const quantity = order.quantity || order.item_count || '';
 
