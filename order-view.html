@@ -286,20 +286,20 @@
   .info-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:12px;
+    gap:10px;
   }
 
   .info-box{
     background:rgba(255,255,255,0.03);
     border:1px solid var(--border);
-    border-radius:12px;
-    padding:12px;
+    border-radius:10px;
+    padding:10px 12px;
   }
 
   .info-box strong{
     display:block;
-    margin-bottom:4px;
-    font-size:11.5px;
+    margin-bottom:2px;
+    font-size:11px;
     color:var(--brand);
     text-transform:uppercase;
     letter-spacing:0.5px;
@@ -307,8 +307,32 @@
 
   .info-box span{
     color:var(--text-muted);
-    font-size:12.5px;
-    line-height:1.4;
+    font-size:12px;
+    line-height:1.3;
+  }
+
+  /* COMPACT CYBER ADDRESS BOX */
+  .address-box {
+    background: rgba(255,122,0,0.03);
+    border: 1px dashed rgba(255,122,0,0.3);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+  }
+  .address-box strong {
+    display: block;
+    font-size: 11px;
+    color: var(--brand);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+  }
+  .address-box span {
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.4;
+    display: block;
+    word-break: break-word;
   }
 
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
@@ -551,12 +575,6 @@ function renderTracking(status, order){
   `;
 }
 
-function shortAddress(addr){
-  if(!addr) return "N/A";
-  let clean = String(addr).trim();
-  return clean.length > 50 ? clean.substring(0, 47) + "..." : clean;
-}
-
 function openAddressModal(currentAddr){
   document.getElementById("newAddressText").value = currentAddr || "";
   document.getElementById("addressMessage").textContent = "";
@@ -700,7 +718,6 @@ async function loadOrder(){
     const image = cleanImage(item.image_url || item.image || (dbProduct ? (dbProduct.image || dbProduct.image_url) : ""));
     const qty = Number(item.quantity || 1);
     
-    // ACCURATE EXTRACTION: Prioritizing database product page values first, then order item snapshot
     const sellingPrice = Number(item.unit_price ?? item.price ?? (dbProduct ? dbProduct.price : 0));
     const itemMrp = Number(dbProduct?.old_price || item.old_price || item.mrp || sellingPrice);
 
@@ -740,6 +757,7 @@ async function loadOrder(){
   const discountFromDb = totalMrpFromDb > totalSellingFromDb ? totalMrpFromDb - totalSellingFromDb : 0;
   const deliveryFee = 0;
   const finalPayable = Number(order.total || order.total_amount || 0) > 0 ? Number(order.total || order.total_amount) : totalSellingFromDb;
+  const deliveryAddressStr = order.shipping_address || order.address || "";
 
   box.innerHTML = `
     <div class="card">
@@ -789,10 +807,11 @@ async function loadOrder(){
       </div>
     </div>
 
+    <!-- COMPACT DELIVERY & CONTACT INFO -->
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h2 style="margin:0;"><i class="fa-solid fa-truck-fast" style="color:var(--brand);"></i> Delivery & Contact Info</h2>
-        ${canChangeAddress ? `<button class="btn secondary" style="padding:5px 10px;font-size:11.5px;" onclick="openAddressModal('${esc(order.shipping_address || order.address || "").replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Change Address</button>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h2 style="margin:0;font-size:15px;"><i class="fa-solid fa-truck-fast" style="color:var(--brand);"></i> Delivery & Contact Info</h2>
+        ${canChangeAddress ? `<button class="btn secondary" style="padding:4px 10px;font-size:11px;" onclick="openAddressModal('${esc(deliveryAddressStr).replace(/'/g,"\\'")}')"><i class="fa-solid fa-pen"></i> Change</button>` : ''}
       </div>
       <div class="info-grid">
         <div class="info-box">
@@ -805,14 +824,19 @@ async function loadOrder(){
         </div>
         <div class="info-box">
           <strong>Email Address</strong>
-          <span>${esc(order.customer_email || user.email)}</span>
+          <span style="word-break:break-all;">${esc(order.customer_email || user.email)}</span>
         </div>
         <div class="info-box">
           <strong>Payment Mode</strong>
           <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
         </div>
       </div>
-      ${order.shipping_address || order.address ? `<div class="info-box" style="margin-top:10px;"><strong>Delivery Address</strong><span>${esc(shortAddress(order.shipping_address || order.address))}</span></div>` : ""}
+      ${deliveryAddressStr ? `
+        <div class="address-box">
+          <strong>Delivery Address</strong>
+          <span>${esc(deliveryAddressStr)}</span>
+        </div>
+      ` : ""}
     </div>
 
     <div class="card">
