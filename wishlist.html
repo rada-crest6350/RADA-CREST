@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -36,7 +37,6 @@ body{
   padding-bottom:60px;
 }
 
-/* Floating Alive Cyber Glow Animation */
 .ambient-glow{
   position:fixed;
   width:450px;height:450px;
@@ -76,14 +76,9 @@ body{
 
 .container{max-width:680px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
 
-.hero{text-align:center;margin-bottom:24px; animation: fadeInDown 0.5s ease;}
+.hero{text-align:center;margin-bottom:24px;}
 .hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
 .hero p{font-size:13.5px;color:var(--text-muted);}
-
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
 .wishlist-grid{display:grid;gap:16px;}
 
@@ -96,16 +91,11 @@ body{
   display:flex;gap:16px;align-items:center;
   position:relative;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: cardEntrance 0.4s ease backwards;
 }
 .wish-card:hover{
   border-color:rgba(255,122,0,0.5);
   box-shadow:0 12px 40px rgba(255, 122, 0, 0.18);
   transform:translateY(-3px);
-}
-@keyframes cardEntrance {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .wish-img-link{flex-shrink:0;}
@@ -187,22 +177,9 @@ body{
 </div>
 
 <script>
-function getActiveUserSuffix() {
-    const user = JSON.parse(localStorage.getItem('rc_user')) || null;
-    if (user) {
-        const uid = user.email || user.phone || user.id;
-        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
-    }
-    return 'guest_user';
-}
-
-function getUserKeys() {
-    const suffix = getActiveUserSuffix();
-    return {
-        selectedKey: `rc_selected_address_${suffix}`,
-        activeKey: `rc_address_${suffix}`
-    };
-}
+const SUPABASE_URL = "https://ynpsnkvrjhaxdynmurzj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlucHNua3ZyamhheGR5bm11cnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTc5NjAsImV4cCI6MjEwMTgzMzk2MH0.I3xFYthE0JNfGnD6N1BaNBybSq7m0G6MRILzq3NXihg";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function getDeterministicRandom(seedStr) {
     let hash = 0;
@@ -212,12 +189,28 @@ function getDeterministicRandom(seedStr) {
     return Math.abs(Math.sin(hash));
 }
 
-function loadWishlist(){
+async function loadWishlist(){
   const container = document.getElementById('wishlistContainer');
-  let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
-  const now = Date.now();
+  
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if(!user){
+    container.innerHTML = `
+      <div class="empty-state">
+        <span>🔒</span>
+        <h3>Please Login</h3>
+        <p>Apni wishlist dekhne ke liye login karein.</p>
+        <a href="account.html" class="action-btn" style="margin-top:16px;">Login Now</a>
+      </div>
+    `;
+    return;
+  }
 
-  if(wishlist.length === 0){
+  const { data: wishlist, error } = await supabaseClient
+    .from('wishlist')
+    .select('*')
+    .eq('user_id', user.id);
+
+  if(error || !wishlist || wishlist.length === 0){
     container.innerHTML = `
       <div class="empty-state">
         <span>🛍️</span>
@@ -229,19 +222,16 @@ function loadWishlist(){
     return;
   }
 
+  const now = Date.now();
   let adminActiveDiscountsReport = [];
 
   container.innerHTML = wishlist.map((item, index) => {
-    if (!item.added_at) {
-      item.added_at = now - (Math.floor(Math.random() * 12) * 24 * 60 * 60 * 1000);
-      localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
-    }
-
-    const ageMs = now - item.added_at;
+    const addedTime = new Date(item.added_at || item.created_at || now).getTime();
+    const ageMs = now - addedTime;
     const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
-    const isTimeElapsed = ageDays >= 7; // Backend secret check: 7 days elapsed
+    const isTimeElapsed = ageDays >= 7; // Secret 7-day threshold
 
-    const seed = String(item.id || item.name || index);
+    const seed = String(item.product_id || item.product_name || index);
     const randomVal = getDeterministicRandom(seed);
     const isRandomSelected = randomVal < 0.45;
 
@@ -252,15 +242,15 @@ function loadWishlist(){
     const discountedPrice = hasDiscount ? Math.round(originalPrice * (1 - discountPercent / 100)) : originalPrice;
 
     if (hasDiscount) {
-      adminActiveDiscountsReport.push({ name: item.name, discount: discountPercent, ageDays: ageDays });
+      adminActiveDiscountsReport.push({ name: item.product_name, discount: discountPercent, ageDays: ageDays });
     }
 
-    const productLink = item.link || item.url || `product.html?name=${encodeURIComponent(item.name || '')}`;
-    const safeImage = item.image || '';
-    const safeName = item.name || 'RADA CREST Product';
+    const productLink = `product.html?id=${item.product_id || ''}`;
+    const safeImage = item.image_url || '';
+    const safeName = item.product_name || 'RADA CREST Product';
 
     return `
-      <div class="wish-card" id="wish-item-${index}" style="animation-delay: ${index * 0.08}s;">
+      <div class="wish-card" id="wish-item-${item.id}">
         <a href="${productLink}" class="wish-img-link">
           <img src="${safeImage || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
         </a>
@@ -274,8 +264,8 @@ function loadWishlist(){
             <span class="new-price">₹${discountedPrice}</span>
           </div>
           <div class="wish-actions">
-            <button class="action-btn" onclick="proceedToBuy('${safeName.replace(/'/g, "\\'")}', ${discountedPrice}, '${safeImage}')">⚡ Buy Now</button>
-            <button class="remove-btn" onclick="removeItem(${index})">✕ Remove</button>
+            <button class="action-btn" onclick="proceedToBuy(${item.product_id || 0}, '${safeName.replace(/'/g, "\\'")}', ${discountedPrice}, '${safeImage}')">⚡ Buy Now</button>
+            <button class="remove-btn" onclick="removeItem(${item.id})">✕ Remove</button>
           </div>
         </div>
       </div>
@@ -285,27 +275,18 @@ function loadWishlist(){
   localStorage.setItem('rc_admin_wishlist_discounts', JSON.stringify(adminActiveDiscountsReport));
 }
 
-window.removeItem = function(index){
-  let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
-  wishlist.splice(index, 1);
-  localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
-  loadWishlist();
+window.removeItem = async function(id){
+  const { error } = await supabaseClient.from('wishlist').delete().eq('id', id);
+  if(!error){
+    loadWishlist();
+  } else {
+    alert("Error removing item: " + error.message);
+  }
 };
 
-window.proceedToBuy = function(name, finalPrice, image){
-  const checkoutData = { name: name, price: finalPrice, image: image };
-  localStorage.setItem('rc_checkout_item', JSON.stringify(checkoutData));
-  
-  const queryParam = `?name=${encodeURIComponent(name)}&price=${finalPrice}&image=${encodeURIComponent(image)}`;
-
-  const keys = getUserKeys();
-  const selectedAddr = localStorage.getItem(keys.selectedKey) || localStorage.getItem(keys.activeKey);
-
-  if (selectedAddr) {
-    window.location.href = 'buy.html' + queryParam;
-  } else {
-    window.location.href = 'addresses.html?return=' + encodeURIComponent('buy.html' + queryParam);
-  }
+window.proceedToBuy = function(productId, name, finalPrice, image){
+  const queryParam = `?id=${productId}&price=${finalPrice}`;
+  window.location.href = 'buy.html' + queryParam;
 };
 
 document.addEventListener('DOMContentLoaded', loadWishlist);
