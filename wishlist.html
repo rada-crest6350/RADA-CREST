@@ -8,18 +8,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 
 :root{
   --bg-deep:#060608;
-  --panel-card:rgba(24, 24, 30, 0.75);
+  --panel-card:rgba(24, 24, 30, 0.8);
   --border:rgba(255, 255, 255, 0.08);
   --text:#ffffff;
   --text-muted:#9da0b0;
   --brand:#FF7A00;
-  --brand-glow:rgba(255, 122, 0, 0.35);
+  --brand-glow:rgba(255, 122, 0, 0.4);
   --brand-gradient:linear-gradient(135deg, #FF9433 0%, #FF5100 100%);
   --green:#3dd598;
   --red:#f87171;
@@ -35,14 +36,20 @@ body{
   padding-bottom:60px;
 }
 
+/* Floating Alive Cyber Glow Animation */
 .ambient-glow{
   position:fixed;
   width:450px;height:450px;
-  background:radial-gradient(circle, rgba(255,122,0,0.15) 0%, rgba(0,0,0,0) 70%);
+  background:radial-gradient(circle, rgba(255,122,0,0.18) 0%, rgba(0,0,0,0) 70%);
   top:-100px;left:50%;
   transform:translateX(-50%);
   z-index:0;
   pointer-events:none;
+  animation: floatGlow 8s ease-in-out infinite alternate;
+}
+@keyframes floatGlow {
+  0% { transform: translateX(-50%) translateY(0px) scale(1); }
+  100% { transform: translateX(-50%) translateY(-20px) scale(1.08); }
 }
 
 .header{
@@ -69,9 +76,14 @@ body{
 
 .container{max-width:680px;margin:0 auto;padding:24px 18px;position:relative;z-index:1;}
 
-.hero{text-align:center;margin-bottom:24px;}
+.hero{text-align:center;margin-bottom:24px; animation: fadeInDown 0.5s ease;}
 .hero h2{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;}
 .hero p{font-size:13.5px;color:var(--text-muted);}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .wishlist-grid{display:grid;gap:16px;}
 
@@ -84,11 +96,16 @@ body{
   display:flex;gap:16px;align-items:center;
   position:relative;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: cardEntrance 0.4s ease backwards;
 }
 .wish-card:hover{
   border-color:rgba(255,122,0,0.5);
-  box-shadow:0 10px 35px rgba(255, 122, 0, 0.15);
+  box-shadow:0 12px 40px rgba(255, 122, 0, 0.18);
   transform:translateY(-3px);
+}
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .wish-img-link{flex-shrink:0;}
@@ -101,12 +118,20 @@ body{
 .wish-card:hover .wish-img{transform:scale(1.05);}
 
 .wish-info{flex:1;}
+
 .discount-badge{
   display:inline-flex;align-items:center;gap:4px;
   background:rgba(61, 213, 152, 0.12);border:1px solid rgba(61, 213, 152, 0.3);
   color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;
   border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;
 }
+.timer-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255, 122, 0, 0.12);border:1px solid rgba(255, 122, 0, 0.3);
+  color:var(--brand);font-size:10.5px;font-weight:700;padding:3px 10px;
+  border-radius:20px;margin-bottom:6px;margin-left:4px;
+}
+
 .wish-title{
   font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;
   text-decoration:none;display:block;transition:0.2s;
@@ -146,7 +171,7 @@ body{
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
       <h1>My Wishlist</h1>
-      <span>Special Discount Active</span>
+      <span>Timed Smart Discounts Active</span>
     </div>
   </div>
 </header>
@@ -154,7 +179,7 @@ body{
 <div class="container">
   <div class="hero">
     <h2>Saved Products & Offers</h2>
-    <p>Wishlist me save kiye gaye products par automatic discount mil raha hai!</p>
+    <p>Wishlist me 7-10 din poore hone par चुनिंदा products par automatic discount unlock hota hai!</p>
   </div>
 
   <div class="wishlist-grid" id="wishlistContainer">
@@ -185,9 +210,20 @@ function getUserKeys() {
     };
 }
 
+// Pseudo-random deterministic generator based on product ID/name so discount status remains consistent per item
+function getDeterministicRandom(seedStr) {
+    let hash = 0;
+    for (let i = 0; i < seedStr.length; i++) {
+        hash = seedStr.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(Math.sin(hash));
+}
+
 function loadWishlist(){
   const container = document.getElementById('wishlistContainer');
   let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
+  const now = Date.now();
+  const TEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000; // 7 to 10 days delay (set to 7 days threshold)
 
   if(wishlist.length === 0){
     container.innerHTML = `
@@ -201,22 +237,51 @@ function loadWishlist(){
     return;
   }
 
-  const discountPercent = 15; 
+  // Track admin active wishlist discount states for admin reporting dashboard if needed
+  let adminActiveDiscountsReport = [];
 
   container.innerHTML = wishlist.map((item, index) => {
+    // Ensure item has an added timestamp (if added previously without it, assign now)
+    if (!item.added_at) {
+      item.added_at = now - (Math.floor(Math.random() * 12) * 24 * 60 * 60 * 1000); // Simulated history for demo or current time
+      localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
+    }
+
+    const ageMs = now - item.added_at;
+    const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
+    const isTimeElapsed = ageDays >= 7; // 7 days threshold
+
+    // Deterministic random selection for discount eligibility (e.g. roughly 40% items get lucky)
+    const seed = String(item.id || item.name || index);
+    const randomVal = getDeterministicRandom(seed);
+    const isRandomSelected = randomVal < 0.45; // 45% chance to be chosen for discount
+
     const originalPrice = parseFloat(item.price) || 500;
-    const discountedPrice = Math.round(originalPrice * (1 - discountPercent / 100));
+    let hasDiscount = isTimeElapsed && isRandomSelected;
+    
+    // Admin override or fixed discount rate (e.g., 10% to 25% random discount)
+    const discountPercent = hasDiscount ? Math.floor(randomVal * 15) + 10 : 0; 
+    const discountedPrice = hasDiscount ? Math.round(originalPrice * (1 - discountPercent / 100)) : originalPrice;
+
+    if (hasDiscount) {
+      adminActiveDiscountsReport.push({ name: item.name, discount: discountPercent, ageDays: ageDays });
+    }
+
     const productLink = item.link || item.url || `product.html?name=${encodeURIComponent(item.name || '')}`;
     const safeImage = item.image || '';
-    const safeName = item.name || 'RADA CREST LED Bulb';
+    const safeName = item.name || 'RADA CREST Product';
 
     return `
-      <div class="wish-card" id="wish-item-${index}">
+      <div class="wish-card" id="wish-item-${index}" style="animation-delay: ${index * 0.08}s;">
         <a href="${productLink}" class="wish-img-link">
           <img src="${safeImage || 'https://via.placeholder.com/90'}" class="wish-img" alt="Product">
         </a>
         <div class="wish-info">
-          <div class="discount-badge">🔥 Wishlist Special: ${discountPercent}% OFF</div>
+          ${hasDiscount ? `
+            <div class="discount-badge"><i class="fa-solid fa-fire"></i> Wishlist Special: ${discountPercent}% OFF</div>
+          ` : `
+            <div class="timer-badge"><i class="fa-regular fa-clock"></i> In Wishlist: ${ageDays} days (Discount unlocks in${Math.max(0, 7 - ageDays)}d)</div>
+          `}
           <a href="${productLink}" class="wish-title">${safeName}</a>
           <div class="price-box">
             <span class="old-price">₹${originalPrice}</span>
@@ -230,6 +295,9 @@ function loadWishlist(){
       </div>
     `;
   }).join('');
+
+  // Save admin report in localStorage so admin panel can read active wishlist discount metrics
+  localStorage.setItem('rc_admin_wishlist_discounts', JSON.stringify(adminActiveDiscountsReport));
 }
 
 window.removeItem = function(index){
