@@ -560,7 +560,6 @@
       }
     }
 
-    // Safety timeout: loader 1.5 second se zyada screen par nahi rahega
     setTimeout(dismissPreloader, 1500);
 
     async function loadProduct() {
@@ -597,6 +596,7 @@
         renderProduct(prod);
         loadSuggestedProducts(prod.category, prod.id);
         loadProductReviews(prod.id);
+        checkWishlistStatus(prod.id);
       } else {
         showError("Product Not Found");
       }
@@ -632,7 +632,6 @@
       let warrantyHtml = p.has_warranty ? `<div class="spec-node">Warranty<b>1 Year Replacement</b></div>` : '';
       let sizeHtml = `<div class="spec-node">Size Option<b>${(p.size && p.size.trim() !== '') ? p.size : 'Standard'}</b></div>`;
 
-      // Dynamic Colors Variants from Database
       let colorBlock = '';
       if (p.colors && p.colors.trim() !== '') {
         const colorArray = p.colors.split(',').map(c => c.trim()).filter(Boolean);
@@ -643,7 +642,7 @@
               <span class="section-title">Select Color / Variant:</span>
               <div class="swatches-wrap" id="swatchesContainer">
                 ${colorArray.map((c, i) => `
-                  <div class="color-chip ${i === 0 ? 'active' : ''}" onclick="pickVariant('${c}', ${i}, this)">
+                  <div class="color-chip ${i === 0 ? 'active' : ''}" onclick="pickVariant('${c}',${i}, this)">
                     <span class="color-dot-indicator"></span>
                     <span>${c}</span>
                   </div>
@@ -656,7 +655,7 @@
 
       root.innerHTML = `
         <div class="media-box">
-          <button class="wish-btn" id="wishBtn" onclick="toggleWishlist('${p.id}')">
+          <button class="wish-btn" id="wishBtn" onclick="toggleWishlist()">
             <i class="fa-regular fa-heart"></i>
           </button>
           
@@ -711,7 +710,7 @@
           </div>
         </div>
 
-        <!-- Customer Reviews Section with Photos and Videos -->
+        <!-- Customer Reviews Section -->
         <div class="reviews-box">
           <div class="reviews-header">
             <span class="section-title" style="font-size:0.9rem; color:#fff;">Ratings & Reviews</span>
@@ -738,7 +737,7 @@
           </div>
         </div>
 
-        <!-- Suggested / Category Products Section -->
+        <!-- Suggested Products -->
         <div class="suggested-section">
           <h3 class="suggested-title"><i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> Similar & Suggested Products</h3>
           <div class="suggested-scroller" id="suggestedScroller">
@@ -746,7 +745,7 @@
           </div>
         </div>
 
-        <!-- Fully Working Bottom Bar -->
+        <!-- Bottom Action Bar -->
         <div class="bottom-bar">
           <button class="btn-add-cart" onclick="addToCart()">
             <i class="fa-solid fa-cart-plus"></i> ADD TO CART
@@ -759,11 +758,8 @@
           </button>
         </div>
       `;
-
-      checkWishlistStatus(p.id);
     }
 
-    // Color Variant Click -> Updates Image and Selection
     function pickVariant(colorName, colorIndex, element) {
       document.querySelectorAll('.color-chip').forEach(el => el.classList.remove('active'));
       if (element) element.classList.add('active');
@@ -837,7 +833,6 @@
       });
     }
 
-    // Customer Reviews Load & Submit
     async function loadProductReviews(prodId) {
       const client = getSupabase();
       const container = document.getElementById('reviewsContainer');
@@ -916,7 +911,6 @@
       return 'rc_cart_items_guest_user';
     }
 
-    // 1. ADD TO CART: सिर्फ कार्ट में आइटम जोड़ेगा
     function addToCart() {
       if (!currentProduct) return;
       const targetKey = getActiveUserKey();
@@ -952,25 +946,8 @@
       showToast("Added to Cart successfully!");
     }
 
-    // 2. BUY NOW: कार्ट को बिल्कुल नहीं छेड़ेगा, सीधे buy.html पर ले जाएगा
     function goToBuyPage(productId) {
       if (!currentProduct) return;
-      
-      const itemPrice = Number(currentProduct.price || 0);
-      const buyNowItem = {
-        id: currentProduct.id,
-        title: currentProduct.name,
-        name: currentProduct.name,
-        price: itemPrice,
-        image: currentActiveImg || (currentProduct.images && currentProduct.images[0]) || currentProduct.image || 'assets/placeholder.jpg',
-        variant: selectedColorVariant ? `Color: ${selectedColorVariant}` : (currentProduct.size || 'Standard'),
-        quantity: Number(currentQty)
-      };
-
-      // डायरेक्ट ख़रीदने वाले आइटम को अलग की (key) में स्टोर करें
-      localStorage.setItem('rc_buy_now_item', JSON.stringify(buyNowItem));
-      
-      // सीधे buy.html पर भेजें
       window.location.href = `buy.html?id=${currentProduct.id}&qty=${currentQty}`;
     }
 
@@ -999,29 +976,61 @@
       `).join('');
     }
 
-    function toggleWishlist(productId) {
-      let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
+    // UPGRADED: Supabase Database Synced Wishlist Toggle
+    async function toggleWishlist() {
+      const client = getSupabase();
+      if (!client || !currentProduct) return;
+
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) {
+        alert("Wishlist me save karne ke liye pehle login karein!");
+        window.location.href = "account.html";
+        return;
+      }
+
       const btn = document.getElementById('wishBtn');
       const icon = btn.querySelector('i');
+      const isCurrentlySaved = btn.classList.contains('active');
 
-      if (wishlist.includes(productId)) {
-        wishlist = wishlist.filter(id => id !== productId);
-        icon.className = 'fa-regular fa-heart';
-        btn.classList.remove('active');
-        showToast("Removed from Wishlist");
+      if (isCurrentlySaved) {
+        const { error } = await client.from('wishlist').delete().eq('user_id', user.id).eq('product_id', currentProduct.id);
+        if (!error) {
+          icon.className = 'fa-regular fa-heart';
+          btn.classList.remove('active');
+          showToast("Removed from Wishlist");
+        }
       } else {
-        wishlist.push(productId);
-        icon.className = 'fa-solid fa-heart';
-        btn.classList.add('active');
-        showToast("Saved to Wishlist!");
+        let prodImg = currentActiveImg || (currentProduct.images && currentProduct.images[0]) || currentProduct.image || '';
+        const { error } = await client.from('wishlist').insert([{
+          user_id: user.id,
+          product_id: currentProduct.id,
+          product_name: currentProduct.name,
+          price: currentProduct.price,
+          image_url: prodImg,
+          added_at: new Date().toISOString()
+        }]);
+
+        if (!error) {
+          icon.className = 'fa-solid fa-heart';
+          btn.classList.add('active');
+          showToast("Saved to Wishlist!");
+        } else {
+          alert("Error saving to wishlist: " + error.message);
+        }
       }
-      localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
     }
 
-    function checkWishlistStatus(productId) {
-      const wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
+    async function checkWishlistStatus(productId) {
+      const client = getSupabase();
+      if (!client) return;
+
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await client.from('wishlist').select('id').eq('user_id', user.id).eq('product_id', productId).maybeSingle();
       const btn = document.getElementById('wishBtn');
-      if (wishlist.includes(productId) && btn) {
+      
+      if (!error && data && btn) {
         btn.querySelector('i').className = 'fa-solid fa-heart';
         btn.classList.add('active');
       }
