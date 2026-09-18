@@ -125,12 +125,6 @@ body{
   color:var(--green);font-size:11px;font-weight:800;padding:3px 10px;
   border-radius:20px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;
 }
-.timer-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  background:rgba(255, 122, 0, 0.12);border:1px solid rgba(255, 122, 0, 0.3);
-  color:var(--brand);font-size:10.5px;font-weight:700;padding:3px 10px;
-  border-radius:20px;margin-bottom:6px;margin-left:4px;
-}
 
 .wish-title{
   font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;
@@ -171,7 +165,7 @@ body{
     <a href="index.html" class="back-btn">←</a>
     <div class="header-title">
       <h1>My Wishlist</h1>
-      <span>Timed Smart Discounts Active</span>
+      <span>Saved Items</span>
     </div>
   </div>
 </header>
@@ -179,7 +173,7 @@ body{
 <div class="container">
   <div class="hero">
     <h2>Saved Products & Offers</h2>
-    <p>Wishlist me 7-10 din poore hone par चुनिंदा products par automatic discount unlock hota hai!</p>
+    <p>Aapke pasandida products yahan secure hain.</p>
   </div>
 
   <div class="wishlist-grid" id="wishlistContainer">
@@ -210,7 +204,6 @@ function getUserKeys() {
     };
 }
 
-// Pseudo-random deterministic generator based on product ID/name so discount status remains consistent per item
 function getDeterministicRandom(seedStr) {
     let hash = 0;
     for (let i = 0; i < seedStr.length; i++) {
@@ -223,7 +216,6 @@ function loadWishlist(){
   const container = document.getElementById('wishlistContainer');
   let wishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
   const now = Date.now();
-  const TEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000; // 7 to 10 days delay (set to 7 days threshold)
 
   if(wishlist.length === 0){
     container.innerHTML = `
@@ -237,29 +229,25 @@ function loadWishlist(){
     return;
   }
 
-  // Track admin active wishlist discount states for admin reporting dashboard if needed
   let adminActiveDiscountsReport = [];
 
   container.innerHTML = wishlist.map((item, index) => {
-    // Ensure item has an added timestamp (if added previously without it, assign now)
     if (!item.added_at) {
-      item.added_at = now - (Math.floor(Math.random() * 12) * 24 * 60 * 60 * 1000); // Simulated history for demo or current time
+      item.added_at = now - (Math.floor(Math.random() * 12) * 24 * 60 * 60 * 1000);
       localStorage.setItem('rc_wishlist', JSON.stringify(wishlist));
     }
 
     const ageMs = now - item.added_at;
     const ageDays = Math.floor(ageMs / (1000 * 60 * 60 * 24));
-    const isTimeElapsed = ageDays >= 7; // 7 days threshold
+    const isTimeElapsed = ageDays >= 7; // Backend secret check: 7 days elapsed
 
-    // Deterministic random selection for discount eligibility (e.g. roughly 40% items get lucky)
     const seed = String(item.id || item.name || index);
     const randomVal = getDeterministicRandom(seed);
-    const isRandomSelected = randomVal < 0.45; // 45% chance to be chosen for discount
+    const isRandomSelected = randomVal < 0.45;
 
     const originalPrice = parseFloat(item.price) || 500;
     let hasDiscount = isTimeElapsed && isRandomSelected;
     
-    // Admin override or fixed discount rate (e.g., 10% to 25% random discount)
     const discountPercent = hasDiscount ? Math.floor(randomVal * 15) + 10 : 0; 
     const discountedPrice = hasDiscount ? Math.round(originalPrice * (1 - discountPercent / 100)) : originalPrice;
 
@@ -278,10 +266,8 @@ function loadWishlist(){
         </a>
         <div class="wish-info">
           ${hasDiscount ? `
-            <div class="discount-badge"><i class="fa-solid fa-fire"></i> Wishlist Special: ${discountPercent}% OFF</div>
-          ` : `
-            <div class="timer-badge"><i class="fa-regular fa-clock"></i> In Wishlist: ${ageDays} days (Discount unlocks in${Math.max(0, 7 - ageDays)}d)</div>
-          `}
+            <div class="discount-badge"><i class="fa-solid fa-fire"></i> Special Offer: ${discountPercent}% OFF</div>
+          ` : ``}
           <a href="${productLink}" class="wish-title">${safeName}</a>
           <div class="price-box">
             <span class="old-price">₹${originalPrice}</span>
@@ -296,7 +282,6 @@ function loadWishlist(){
     `;
   }).join('');
 
-  // Save admin report in localStorage so admin panel can read active wishlist discount metrics
   localStorage.setItem('rc_admin_wishlist_discounts', JSON.stringify(adminActiveDiscountsReport));
 }
 
