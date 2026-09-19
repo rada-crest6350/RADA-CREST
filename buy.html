@@ -151,6 +151,28 @@
     }
     .form-control:focus { border-color: var(--primary); }
 
+    .address-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .btn-change-addr {
+      background: rgba(255, 122, 0, 0.12);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-change-addr:hover { background: var(--primary); color: #000; }
+
     .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .pay-opt {
       background: rgba(255,255,255,0.03);
@@ -330,6 +352,24 @@
       userStamps: Number(localStorage.getItem('rc_user_stamps')) || 0
     };
 
+    function getActiveUserSuffix() {
+      const user = JSON.parse(localStorage.getItem('rc_user')) || null;
+      if (user) {
+        const uid = user.email || user.phone || user.id;
+        if (uid) return String(uid).replace(/[^a-zA-Z0-9]/g, '_');
+      }
+      return 'guest_user';
+    }
+
+    function getUserAddressKeys() {
+      const suffix = getActiveUserSuffix();
+      return {
+        listKey: `rc_addresses_${suffix}`,
+        activeKey: `rc_address_${suffix}`,
+        selectedKey: `rc_selected_address_${suffix}`
+      };
+    }
+
     async function initCheckout() {
       const params = new URLSearchParams(window.location.search);
       const prodId = params.get('id');
@@ -347,8 +387,31 @@
         checkoutState.giftList = gifts || [];
         if (checkoutState.giftList.length > 0) checkoutState.selectedGift = checkoutState.giftList[0];
         renderCheckout();
+        loadSavedAddressIntoForm();
       } else {
         showError("Product Not Found");
+      }
+    }
+
+    function loadSavedAddressIntoForm() {
+      const keys = getUserAddressKeys();
+      const savedAddr = JSON.parse(localStorage.getItem(keys.selectedKey)) || 
+                        JSON.parse(localStorage.getItem(keys.activeKey));
+
+      if (savedAddr) {
+        if (document.getElementById('custName')) document.getElementById('custName').value = savedAddr.name || '';
+        if (document.getElementById('custPhone')) document.getElementById('custPhone').value = savedAddr.phone || '';
+        
+        // Handle street / complete address format safely
+        let fullStreet = savedAddr.street || savedAddr.address || '';
+        if (savedAddr.city && !fullStreet.includes(savedAddr.city)) {
+          fullStreet += `, ${savedAddr.city}`;
+        }
+        if (savedAddr.state && !fullStreet.includes(savedAddr.state)) {
+          fullStreet += `, ${savedAddr.state}`;
+        }
+        if (document.getElementById('custAddr')) document.getElementById('custAddr').value = fullStreet;
+        if (document.getElementById('custPin')) document.getElementById('custPin').value = savedAddr.pincode || '';
       }
     }
 
@@ -362,7 +425,6 @@
         unitPrice = Math.round(unitPrice - (unitPrice * (s.festival_discount_percent / 100)));
       }
 
-      // Accurate MRP matching product page logic
       const unitMrp = (p.old_price && Number(p.old_price) > Number(unitPrice)) ? Number(p.old_price) : Number(unitPrice);
       const totalMrp = unitMrp * checkoutState.qty;
       const totalSelling = unitPrice * checkoutState.qty;
@@ -444,7 +506,12 @@
         `}
 
         <div class="order-card">
-          <b style="font-size:0.95rem; display:block; margin-bottom:12px;">Delivery Address</b>
+          <div class="address-header-row">
+            <b style="font-size:0.95rem;">Delivery Address</b>
+            <a href="addresses.html?return=buy.html?id=${p.id}&qty=${checkoutState.qty}" class="btn-change-addr">
+              <i class="fa-solid fa-location-dot"></i> Change / Add Address
+            </a>
+          </div>
           <div class="form-group">
             <label>Full Name *</label>
             <input type="text" id="custName" class="form-control" placeholder="Enter your name" required />
@@ -521,6 +588,8 @@
           </button>
         </div>
       `;
+
+      loadSavedAddressIntoForm();
     }
 
     function selectGift(id) {
@@ -589,7 +658,6 @@
 
         if (orderData && orderData.length > 0) {
           const newOrderId = orderData[0].id;
-          // SAVING EXACT MRP (old_price) AND UNIT PRICE INTO order_items
           await supabaseClient.from('order_items').insert([{
             order_id: newOrderId,
             product_id: p.id,
