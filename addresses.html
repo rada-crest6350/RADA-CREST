@@ -439,11 +439,23 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Smart Return URL setup on page load
+    // Bulletproof Return URL detection (URL params + Document Referrer fallback)
     const urlParams = new URLSearchParams(window.location.search);
-    const returnTarget = urlParams.get('return') || urlParams.get('redirect') || 'cart.html';
+    let returnTarget = urlParams.get('return') || urlParams.get('redirect');
     
-    // Back button dynamic kar diya taaki wahi wapas jaye jahan se user aaya tha
+    if (!returnTarget) {
+        // Agar URL me return parameter na ho, toh check karo ki user pichli kis file se aaya tha
+        const referrer = document.referrer;
+        if (referrer && referrer.includes('buy.html')) {
+            returnTarget = 'buy.html';
+        } else if (referrer && referrer.includes('cart.html')) {
+            returnTarget = 'cart.html';
+        } else {
+            returnTarget = 'cart.html'; // Default fallback
+        }
+    }
+    
+    // Back button ko dynamic kar diya
     document.getElementById('dynamicBackBtn').href = returnTarget;
 
     function getActiveUserSuffix() {
@@ -604,12 +616,10 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // BULLETPROOF REDIRECT: Exact wahi wapas bhejega jahan se user ne entry li thi (jaise buy.html)
+    // SMART REDIRECT: Exact wahin wapas bhejega jahan se entry li thi
     function handlePostAddressRedirect() {
         setTimeout(() => {
-            const currentParams = new URLSearchParams(window.location.search);
-            const target = currentParams.get('return') || currentParams.get('redirect') || 'cart.html';
-            window.location.href = target;
+            window.location.href = returnTarget;
         }, 600);
     }
 
@@ -664,7 +674,7 @@
         renderAddressList();
         showToast("Address Safalta-poorvak Save Ho Gaya!");
 
-        // Wapas turant usi page par redirect karo jahan se aaye the
+        // Turant wapas bhej do
         handlePostAddressRedirect();
     }
 
@@ -681,7 +691,7 @@
         renderAddressList();
         showToast(`Deliver to: ${addr.name} Selected!`);
 
-        // Wapas turant usi page par redirect karo jahan se aaye the
+        // Turant wapas bhej do
         handlePostAddressRedirect();
     }
 
