@@ -46,7 +46,6 @@
             padding: 16px;
         }
 
-        /* Header */
         .header-nav {
             display: flex;
             align-items: center;
@@ -89,7 +88,6 @@
             font-weight: 800;
         }
 
-        /* Add New Button */
         .btn-add-toggle {
             width: 100%;
             background: rgba(255, 122, 0, 0.1);
@@ -114,7 +112,6 @@
             box-shadow: 0 4px 20px var(--primary-glow);
         }
 
-        /* Address Form Card */
         .form-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -217,7 +214,6 @@
             cursor: pointer;
         }
 
-        /* Saved Address Cards */
         .address-list {
             display: flex;
             flex-direction: column;
@@ -447,7 +443,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const returnTarget = urlParams.get('return') || urlParams.get('redirect') || 'cart.html';
     
-    // Back button ko dynamic kar diya taaki wahi wapas jaye jahan se user aaya tha
+    // Back button dynamic kar diya taaki wahi wapas jaye jahan se user aaya tha
     document.getElementById('dynamicBackBtn').href = returnTarget;
 
     function getActiveUserSuffix() {
@@ -608,11 +604,13 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Smart Redirect function jo user ko wahi wapas bhejega jahan se wo aaya tha
+    // BULLETPROOF REDIRECT: Exact wahi wapas bhejega jahan se user ne entry li thi (jaise buy.html)
     function handlePostAddressRedirect() {
         setTimeout(() => {
-            window.location.href = returnTarget;
-        }, 700);
+            const currentParams = new URLSearchParams(window.location.search);
+            const target = currentParams.get('return') || currentParams.get('redirect') || 'cart.html';
+            window.location.href = target;
+        }, 600);
     }
 
     function saveAddressForm() {
@@ -654,7 +652,6 @@
             list.unshift(savedItem);
         }
 
-        // Isolated Save
         localStorage.setItem(keys.listKey, JSON.stringify(list));
         localStorage.setItem(keys.activeKey, JSON.stringify(savedItem));
         localStorage.setItem(keys.selectedKey, JSON.stringify(savedItem));
@@ -667,7 +664,7 @@
         renderAddressList();
         showToast("Address Safalta-poorvak Save Ho Gaya!");
 
-        // Smart Redirect to original page
+        // Wapas turant usi page par redirect karo jahan se aaye the
         handlePostAddressRedirect();
     }
 
@@ -684,7 +681,7 @@
         renderAddressList();
         showToast(`Deliver to: ${addr.name} Selected!`);
 
-        // Smart Redirect to original page
+        // Wapas turant usi page par redirect karo jahan se aaye the
         handlePostAddressRedirect();
     }
 
@@ -709,7 +706,6 @@
         showToast("Address delete kar diya gaya!");
     }
 
-    // Initialize on page load
     renderAddressList();
 </script>
 </body>
