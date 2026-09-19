@@ -359,7 +359,7 @@
 <div class="container">
     <div class="header-nav">
         <div class="header-left">
-            <a href="cart.html" class="back-btn" id="dynamicBackBtn" title="Back">
+            <a href="buy.html" class="back-btn" id="dynamicBackBtn" title="Back">
                 <i class="fa-solid fa-arrow-left"></i>
             </a>
             <div class="header-title">Delivery Addresses</div>
@@ -412,7 +412,7 @@
         </div>
 
         <div class="form-actions">
-            <button class="btn-save" onclick="saveAddressForm()">Save & Use Address</button>
+            <button class="btn-save" onclick="saveAddressForm()">Save Address</button>
             <button class="btn-cancel" onclick="closeForm()">Cancel</button>
         </div>
     </div>
@@ -424,7 +424,7 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Smart Return URL detection (URL params + Document Referrer fallback)
+    // Smart Return URL setup for Back button only (No auto-bounce)
     const urlParams = new URLSearchParams(window.location.search);
     let returnTarget = urlParams.get('return') || urlParams.get('redirect');
     
@@ -435,7 +435,7 @@
         } else if (referrer && referrer.includes('cart.html')) {
             returnTarget = 'cart.html';
         } else {
-            returnTarget = 'buy.html'; // Default safe return to buy page
+            returnTarget = 'buy.html'; // Default back target
         }
     }
     
@@ -535,7 +535,7 @@
             const card = document.createElement('div');
             card.className = `address-item-card ${isSelected ? 'selected' : ''}`;
             
-            // Poore card par tap karte hi address select ho jayega aur turant wapas redirect ho jayega
+            // Card par click karne se sirf select hoga, koi page change nahi hoga (No unwanted redirect)
             card.onclick = () => selectAddress(addr.id);
 
             card.innerHTML = `
@@ -598,13 +598,6 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // SMART REDIRECT: Bina kisi delay ke seedha original page par wapas bhejega
-    function handlePostAddressRedirect() {
-        setTimeout(() => {
-            window.location.href = returnTarget;
-        }, 400);
-    }
-
     function saveAddressForm() {
         const name = document.getElementById('formName').value.trim();
         const phone = document.getElementById('formPhone').value.trim();
@@ -654,9 +647,8 @@
 
         closeForm();
         renderAddressList();
-        showToast("Address Saved & Selected!");
-
-        handlePostAddressRedirect();
+        showToast("Address Saved Successfully!");
+        // NO AUTO REDIRECT: User yahin rahega, jab man karega tab Back button dabayega
     }
 
     function selectAddress(id) {
@@ -671,8 +663,7 @@
 
         renderAddressList();
         showToast(`Selected: ${addr.name}`);
-
-        handlePostAddressRedirect();
+        // NO AUTO REDIRECT: User yahin rahega, bas tick lag jayega
     }
 
     function deleteAddress(id) {
