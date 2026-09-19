@@ -242,21 +242,24 @@
             box-shadow: 0 8px 25px var(--primary-glow);
         }
 
+        /* Clean Tick / Selected Badge */
         .selected-badge {
             position: absolute;
             top: 14px;
             right: 14px;
             background: var(--primary);
             color: #000;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
             font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 4px 10px;
+            border-radius: 8px;
             display: none;
+            align-items: center;
+            gap: 5px;
         }
 
         .address-item-card.selected .selected-badge {
-            display: inline-block;
+            display: inline-flex;
         }
 
         .addr-name-row {
@@ -282,51 +285,33 @@
             font-size: 0.88rem;
             color: #cbd5e1;
             line-height: 1.4;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
 
         .addr-bottom-bar {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             padding-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .addr-select-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .address-item-card.selected .addr-select-btn {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: #000;
-        }
-
         .addr-card-actions {
             display: flex;
-            gap: 12px;
+            gap: 16px;
         }
 
         .card-act-btn {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 0.82rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
 
         .card-act-btn:hover { color: var(--primary); }
@@ -427,7 +412,7 @@
         </div>
 
         <div class="form-actions">
-            <button class="btn-save" onclick="saveAddressForm()">Save & Deliver Here</button>
+            <button class="btn-save" onclick="saveAddressForm()">Save & Use Address</button>
             <button class="btn-cancel" onclick="closeForm()">Cancel</button>
         </div>
     </div>
@@ -439,23 +424,21 @@
 <div class="toast-notify" id="toastNotify"></div>
 
 <script>
-    // Bulletproof Return URL detection (URL params + Document Referrer fallback)
+    // Smart Return URL detection (URL params + Document Referrer fallback)
     const urlParams = new URLSearchParams(window.location.search);
     let returnTarget = urlParams.get('return') || urlParams.get('redirect');
     
     if (!returnTarget) {
-        // Agar URL me return parameter na ho, toh check karo ki user pichli kis file se aaya tha
         const referrer = document.referrer;
         if (referrer && referrer.includes('buy.html')) {
             returnTarget = 'buy.html';
         } else if (referrer && referrer.includes('cart.html')) {
             returnTarget = 'cart.html';
         } else {
-            returnTarget = 'cart.html'; // Default fallback
+            returnTarget = 'buy.html'; // Default safe return to buy page
         }
     }
     
-    // Back button ko dynamic kar diya
     document.getElementById('dynamicBackBtn').href = returnTarget;
 
     function getActiveUserSuffix() {
@@ -551,10 +534,12 @@
             const isSelected = activeAddress && (activeAddress.id === addr.id || (activeAddress.address === addr.address && activeAddress.name === addr.name));
             const card = document.createElement('div');
             card.className = `address-item-card ${isSelected ? 'selected' : ''}`;
+            
+            // Poore card par tap karte hi address select ho jayega aur turant wapas redirect ho jayega
             card.onclick = () => selectAddress(addr.id);
 
             card.innerHTML = `
-                <span class="selected-badge"><i class="fa-solid fa-check"></i> DELIVER HERE</span>
+                <span class="selected-badge"><i class="fa-solid fa-circle-check"></i> Selected</span>
                 <div class="addr-name-row">
                     <div class="addr-name">${addr.name}</div>
                     <div class="addr-phone">📱 ${addr.phone}</div>
@@ -562,10 +547,7 @@
                 <div class="addr-full-text">
                     ${addr.street}, ${addr.city}, ${addr.state} - <b>${addr.pincode}</b>
                 </div>
-                <div class="addr-bottom-row" onclick="event.stopPropagation()">
-                    <button class="addr-select-btn" onclick="selectAddress('${addr.id}')">
-                        ${isSelected ? '<i class="fa-solid fa-check"></i> Selected' : 'Deliver Here'}
-                    </button>
+                <div class="addr-bottom-bar" onclick="event.stopPropagation()">
                     <div class="addr-card-actions">
                         <button class="card-act-btn" onclick="editAddress('${addr.id}')"><i class="fa-solid fa-pen"></i> Edit</button>
                         <button class="card-act-btn delete" onclick="deleteAddress('${addr.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
@@ -616,11 +598,11 @@
         formCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // SMART REDIRECT: Exact wahin wapas bhejega jahan se entry li thi
+    // SMART REDIRECT: Bina kisi delay ke seedha original page par wapas bhejega
     function handlePostAddressRedirect() {
         setTimeout(() => {
             window.location.href = returnTarget;
-        }, 600);
+        }, 400);
     }
 
     function saveAddressForm() {
@@ -672,9 +654,8 @@
 
         closeForm();
         renderAddressList();
-        showToast("Address Safalta-poorvak Save Ho Gaya!");
+        showToast("Address Saved & Selected!");
 
-        // Turant wapas bhej do
         handlePostAddressRedirect();
     }
 
@@ -689,9 +670,8 @@
         localStorage.setItem(keys.selectedKey, JSON.stringify(addr));
 
         renderAddressList();
-        showToast(`Deliver to: ${addr.name} Selected!`);
+        showToast(`Selected: ${addr.name}`);
 
-        // Turant wapas bhej do
         handlePostAddressRedirect();
     }
 
