@@ -565,7 +565,12 @@
     async function loadProduct() {
       const client = getSupabase();
       const urlParams = new URLSearchParams(window.location.search);
-      const rawId = urlParams.get('id');
+      let rawId = urlParams.get('id');
+
+      // SMART FALLBACK: Agar URL me id nahi milti (back aane par), toh last viewed product ID utha lo
+      if (!rawId) {
+        rawId = localStorage.getItem('rc_last_viewed_product_id');
+      }
 
       if (!client) {
         setTimeout(loadProduct, 250);
@@ -577,6 +582,7 @@
         let query = client.from('products').select('*');
         if (rawId) {
           query = query.eq('id', Number(rawId));
+          localStorage.setItem('rc_last_viewed_product_id', rawId);
         } else {
           query = query.order('id', { ascending: false }).limit(1);
         }
@@ -584,6 +590,7 @@
         const { data, error } = await query;
         if (!error && data && data.length > 0) {
           prod = data[0];
+          localStorage.setItem('rc_last_viewed_product_id', prod.id);
         }
       } catch (e) {
         console.warn("Supabase fetch error:", e);
@@ -976,7 +983,6 @@
       `).join('');
     }
 
-    // SAFE & BULLETPROOF WISHLIST TOGGLE (Supabase + LocalStorage Fallback)
     async function toggleWishlist() {
       const client = getSupabase();
       if (!currentProduct) return;
@@ -1004,12 +1010,9 @@
               }]);
             }
           }
-        } catch (e) {
-          console.warn("Database wishlist sync fallback to local storage:", e);
-        }
+        } catch (e) {}
       }
 
-      // LocalStorage Sync for guaranteed zero errors
       let localWishlist = JSON.parse(localStorage.getItem('rc_wishlist')) || [];
       const itemIndex = localWishlist.findIndex(item => String(item.id || item.product_id) === String(currentProduct.id));
 
