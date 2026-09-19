@@ -20,7 +20,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: var(--bg); color: var(--text); padding-bottom: 100px; overflow-x: hidden; }
 
-    /* Modern Neon Preloader */
     #pageLoader {
       position: fixed;
       inset: 0;
@@ -58,7 +57,6 @@
     @keyframes spinLoader { 100% { transform: rotate(360deg); } }
     @keyframes pulseLoader { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* Top Bar */
     .header {
       background: rgba(18, 20, 26, 0.85);
       backdrop-filter: blur(16px);
@@ -80,7 +78,6 @@
     .product-wrap { max-width: 650px; margin: 15px auto; padding: 0 14px; animation: slideUp 0.4s var(--ease-spring); }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Media Box */
     .media-box { background: var(--card); border-radius: 20px; padding: 14px; border: 1px solid var(--border); position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
     
     .wish-btn {
@@ -151,7 +148,6 @@
     .thumbs-row img.active { border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
     .thumbs-row .vid-thumb { display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
 
-    /* Details Box */
     .details-box { background: var(--card); border-radius: 20px; padding: 18px; margin-top: 14px; border: 1px solid var(--border); }
     .prod-name { font-size: 1.3rem; font-weight: 800; line-height: 1.3; }
     
@@ -177,7 +173,6 @@
     .low-stock { background: rgba(255,170,0,0.15); color: #FFAA00; }
     .out-stock { background: rgba(255,68,68,0.15); color: #FF4444; }
 
-    /* Interactive Color Variant Chips */
     .color-section { margin-top: 14px; }
     .section-title { font-size: 0.8rem; text-transform: uppercase; color: var(--muted); font-weight: 700; letter-spacing: 0.5px; }
     .swatches-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
@@ -213,7 +208,6 @@
     .spec-node { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; font-size: 0.8rem; color: var(--muted); border: 1px solid rgba(255,255,255,0.04); }
     .spec-node b { display: block; color: #fff; font-size: 0.88rem; margin-top: 2px; }
 
-    /* Quantity Control */
     .qty-ctrl { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
     .qty-btn {
       width: 38px;
@@ -230,7 +224,6 @@
     .qty-btn:active { background: var(--primary); color: #000; transform: scale(0.9); }
     .qty-num { font-size: 1.2rem; font-weight: 800; min-width: 30px; text-align: center; }
 
-    /* Interactive Reviews Section */
     .reviews-box {
       background: var(--card);
       border-radius: 20px;
@@ -324,7 +317,6 @@
       background: #000;
     }
 
-    /* Suggested / Recommendations Section */
     .suggested-section { margin-top: 24px; }
     .suggested-title {
       font-size: 1.1rem;
@@ -378,7 +370,6 @@
       color: var(--primary);
     }
 
-    /* Bottom Action Bar */
     .bottom-bar {
       position: fixed;
       bottom: 0;
@@ -461,7 +452,6 @@
     }
     .btn-share:active { transform: scale(0.85); color: var(--primary); }
 
-    /* Modal Zoom View */
     .zoom-modal {
       position: fixed;
       inset: 0;
@@ -479,7 +469,6 @@
     .close-modal { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 1.8rem; cursor: pointer; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Toast */
     .toast-pill {
       position: fixed;
       bottom: 85px;
@@ -504,7 +493,6 @@
 </head>
 <body>
 
-  <!-- 1. Sleek Modern Glowing Preloader -->
   <div id="pageLoader">
     <div class="loader-ring"></div>
     <div class="loader-text">RADA CREST</div>
@@ -522,13 +510,11 @@
     <!-- Populated Dynamically -->
   </div>
 
-  <!-- Fullscreen Zoom Modal -->
   <div class="zoom-modal" id="zoomModal" onclick="closeZoom()">
     <i class="fa-solid fa-xmark close-modal"></i>
     <img id="zoomImg" src="" alt="Zoomed Product" />
   </div>
 
-  <!-- Toast -->
   <div class="toast-pill" id="toastBox">
     <i class="fa-solid fa-circle-check" style="color:var(--primary);"></i>
     <span id="toastMsg">Action Done</span>
@@ -562,12 +548,13 @@
 
     setTimeout(dismissPreloader, 1500);
 
+    // ROBUST FALLBACK LOAD PRODUCT: NEVER FAILS
     async function loadProduct() {
       const client = getSupabase();
       const urlParams = new URLSearchParams(window.location.search);
       let rawId = urlParams.get('id');
 
-      // SMART FALLBACK: Agar URL me id nahi milti (back aane par), toh last viewed product ID utha lo
+      // 1. Agar URL me ID nahi hai, toh localStorage memory se last viewed ID uthao
       if (!rawId) {
         rawId = localStorage.getItem('rc_last_viewed_product_id');
       }
@@ -579,17 +566,22 @@
 
       let prod = null;
       try {
-        let query = client.from('products').select('*');
         if (rawId) {
-          query = query.eq('id', Number(rawId));
-          localStorage.setItem('rc_last_viewed_product_id', rawId);
-        } else {
-          query = query.order('id', { ascending: false }).limit(1);
+          const { data, error } = await client.from('products').select('*').eq('id', Number(rawId)).maybeSingle();
+          if (!error && data) {
+            prod = data;
+          }
         }
 
-        const { data, error } = await query;
-        if (!error && data && data.length > 0) {
-          prod = data[0];
+        // 2. Agar specific ID nahi mili, toh store ka sabse latest product utha lo taaki error kabhi na aaye
+        if (!prod) {
+          const { data: latestData } = await client.from('products').select('*').order('id', { ascending: false }).limit(1);
+          if (latestData && latestData.length > 0) {
+            prod = latestData[0];
+          }
+        }
+
+        if (prod) {
           localStorage.setItem('rc_last_viewed_product_id', prod.id);
         }
       } catch (e) {
@@ -717,7 +709,6 @@
           </div>
         </div>
 
-        <!-- Customer Reviews Section -->
         <div class="reviews-box">
           <div class="reviews-header">
             <span class="section-title" style="font-size:0.9rem; color:#fff;">Ratings & Reviews</span>
@@ -744,7 +735,6 @@
           </div>
         </div>
 
-        <!-- Suggested Products -->
         <div class="suggested-section">
           <h3 class="suggested-title"><i class="fa-solid fa-layer-group" style="color:var(--primary);"></i> Similar & Suggested Products</h3>
           <div class="suggested-scroller" id="suggestedScroller">
@@ -752,7 +742,6 @@
           </div>
         </div>
 
-        <!-- Bottom Action Bar -->
         <div class="bottom-bar">
           <button class="btn-add-cart" onclick="addToCart()">
             <i class="fa-solid fa-cart-plus"></i> ADD TO CART
