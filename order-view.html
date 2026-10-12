@@ -42,7 +42,6 @@
     overflow-x:hidden;
   }
 
-  /* Floating Anime/Cyber Ambient Glow Animation */
   .cyber-grid-glow{
     position:fixed;
     top:0;left:0;width:100%;height:100%;
@@ -311,7 +310,6 @@
     line-height:1.3;
   }
 
-  /* COMPACT CYBER ADDRESS BOX */
   .address-box {
     background: rgba(255,122,0,0.03);
     border: 1px dashed rgba(255,122,0,0.3);
@@ -519,7 +517,7 @@ function formatDate(value){
 
 function cleanImage(value){
   if(!value) return "";
-  let url = String(value).trim().replace(/^\[img\]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+\vert{}["']+$/g,"").trim();
+  let url = String(value).trim().replace(/^[img]\s*/i,"").replace(/\s*\[\/img\]$/i,"").replace(/^["']+\vert{}["']+$/g,"").trim();
   return /^https?:\/\/\S+$/i.test(url) ? url : "";
 }
 
@@ -734,6 +732,7 @@ async function loadOrder(){
       </div>
     ` : "";
 
+    // FIXED: Ab yahan click karne par seedha product.html?id=... khulega
     const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : `window.location.href='index.html'`;
 
     return `
