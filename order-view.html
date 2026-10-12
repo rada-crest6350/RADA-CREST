@@ -732,8 +732,8 @@ async function loadOrder(){
       </div>
     ` : "";
 
-    // FIXED: Ab yahan click karne par seedha product.html?id=... khulega
-    const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : `window.location.href='index.html'`;
+    // FIXED: Ab yahan product.html open hoga agar pId maujud hai
+    const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : `alert('Product details not available');`;
 
     return `
       <div class="item" onclick="${clickAction}" title="Click to view product page">
