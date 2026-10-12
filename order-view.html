@@ -681,50 +681,27 @@ async function loadOrder(){
   }
 
   const { data: items } = await supabaseClient.from("order_items").select("*").eq("order_id", order.id);
-  
-  let productsMap = {};
-  if (items && items.length > 0) {
-    const productIds = items.map(i => i.product_id).filter(Boolean);
-    if (productIds.length > 0) {
-      const { data: prodData } = await supabaseClient.from("products").select("id, name, price, old_price, image, image_url").in("id", productIds);
-      if (prodData) {
-        prodData.forEach(p => { productsMap[p.id] = p; });
-      }
-    }
-  }
-
-  const orderItems = items && items.length > 0 ? items : [{
-    product_id: order.product_id || null,
-    product_name: order.product_name || "RADA CREST Product",
-    quantity: order.quantity || 1,
-    unit_price: order.total_amount || order.total || 0,
-    price: order.total_amount || order.total || 0,
-    old_price: order.old_price || order.mrp || 0,
-    image_url: order.image_url || ""
-  }];
-
-  const status = String(order.status || "pending").toLowerCase();
-  const canChangeAddress = (status === "pending" || status === "unconfirmed");
 
   let totalMrpFromDb = 0;
   let totalSellingFromDb = 0;
 
+  const orderItems = items && items.length > 0 ? items : [];
+
   const itemsHtml = orderItems.map(item => {
     const pId = item.product_id;
-    const dbProduct = pId && productsMap[pId] ? productsMap[pId] : null;
-
-    const image = cleanImage(item.image_url || item.image || (dbProduct ? (dbProduct.image || dbProduct.image_url) : ""));
+    const image = cleanImage(item.image_url || "");
     const qty = Number(item.quantity || 1);
     
-    const sellingPrice = Number(item.unit_price ?? item.price ?? (dbProduct ? dbProduct.price : 0));
-    const itemMrp = Number(dbProduct?.old_price || item.old_price || item.mrp || sellingPrice);
+    const sellingPrice = Number(item.unit_price || item.price || 0);
+    const itemMrp = Number(item.old_price || item.mrp || sellingPrice);
 
     totalMrpFromDb += itemMrp * qty;
     totalSellingFromDb += sellingPrice * qty;
 
-    const pName = esc(item.product_name || (dbProduct ? dbProduct.name : "Product"));
+    const pName = esc(item.product_name || "Product");
 
-    const reviewBtn = status === "delivered" && item.product_id ? `
+    const statusStr = String(order.status || "pending").toLowerCase();
+    const reviewBtn = statusStr === "delivered" && item.product_id ? `
       <div onclick="event.stopPropagation()">
         <button class="review-btn" onclick="openReview(${Number(item.product_id)}, '${pName.replace(/'/g,"&#039;")}')">
           <i class="fa-solid fa-star"></i> Rate & Review
@@ -732,7 +709,6 @@ async function loadOrder(){
       </div>
     ` : "";
 
-    // FIXED: Ab yahan click karne par seedha product.html open hoga
     const clickAction = pId ? `window.location.href='product.html?id=${pId}'` : `alert('Product view not available');`;
 
     return `
@@ -753,9 +729,19 @@ async function loadOrder(){
     `;
   }).join("");
 
+  const status = String(order.status || "pending").toLowerCase();
+  const canChangeAddress = (status === "pending" || status === "unconfirmed");
+
+  // Exact matching total saved from buy.html checkout
+  const finalPayable = Number(order.total_amount || order.total || totalSellingFromDb);
   const discountFromDb = totalMrpFromDb > totalSellingFromDb ? totalMrpFromDb - totalSellingFromDb : 0;
-  const deliveryFee = 0;
-  const finalPayable = Number(order.total || order.total_amount || 0) > 0 ? Number(order.total || order.total_amount) : totalSellingFromDb;
+  
+  // Delivery fee separation matching checkout rules
+  let deliveryFee = Number(order.delivery_fee || order.shipping_fee || 0);
+  if (deliveryFee === 0 && finalPayable > totalSellingFromDb) {
+    deliveryFee = finalPayable - totalSellingFromDb;
+  }
+
   const deliveryAddressStr = order.shipping_address || order.address || "";
 
   box.innerHTML = `
@@ -777,13 +763,13 @@ async function loadOrder(){
       ${renderTracking(status, order)}
     </div>
 
-    <!-- ACCURATE DATABASE BILL BREAKDOWN -->
+    <!-- EXACT CHECKOUT BILL BREAKDOWN FORMAT -->
     <div class="card">
       <h2><i class="fa-solid fa-file-invoice-dollar" style="color:var(--brand);"></i> Price Details & Bill</h2>
       <div class="bill-box">
         <div class="bill-row">
           <span>Total MRP (${orderItems.reduce((s, i) => s + Number(i.quantity||1), 0)} items)</span>
-          <span>${money(totalMrpFromDb)}</span>
+          <span>${money(totalMrpFromDb > 0 ? totalMrpFromDb : totalSellingFromDb)}</span>
         </div>
         ${discountFromDb > 0 ? `
           <div class="bill-row discount">
@@ -792,8 +778,12 @@ async function loadOrder(){
           </div>
         ` : ``}
         <div class="bill-row">
+          <span>Item Subtotal</span>
+          <span>${money(totalSellingFromDb)}</span>
+        </div>
+        <div class="bill-row">
           <span>Delivery Charges</span>
-          <span style="color:var(--success); font-weight:700;">${deliveryFee === 0 ? 'FREE' : money(deliveryFee)}</span>
+          <span style="color:${deliveryFee === 0 ? 'var(--success)' : 'var(--text);'}; font-weight:700;">${deliveryFee === 0 ? 'FREE' : money(deliveryFee)}</span>
         </div>
         <div class="bill-row">
           <span>GST / Taxes</span>
@@ -815,11 +805,11 @@ async function loadOrder(){
       <div class="info-grid">
         <div class="info-box">
           <strong>Customer Name</strong>
-          <span>${esc(order.shipping_name || order.customer_name || user.email)}</span>
+          <span>${esc(order.customer_name || order.shipping_name || user.email)}</span>
         </div>
         <div class="info-box">
           <strong>Phone Number</strong>
-          <span>${esc(order.shipping_phone || order.customer_phone || "N/A")}</span>
+          <span>${esc(order.customer_phone || order.shipping_phone || "N/A")}</span>
         </div>
         <div class="info-box">
           <strong>Email Address</strong>
@@ -827,7 +817,7 @@ async function loadOrder(){
         </div>
         <div class="info-box">
           <strong>Payment Mode</strong>
-          <span>${esc(order.payment_method || "COD")} ${order.payment_status ? " • " + esc(order.payment_status) : ""}</span>
+          <span>Cash on Delivery</span>
         </div>
       </div>
       ${deliveryAddressStr ? `
